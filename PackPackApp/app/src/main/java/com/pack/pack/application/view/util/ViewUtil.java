@@ -1,5 +1,8 @@
 package com.pack.pack.application.view.util;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
+
 import com.pack.pack.application.R;
 
 /**
