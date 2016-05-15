@@ -4,13 +4,18 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 /**
- * Created by CipherCloud on 12-05-2016.
+ * Created by Saurav on 12-05-2016.
  */
 public class ParcelableTopic implements Parcelable {
 
     private String topicId;
 
     private String topicCategory;
+
+    public ParcelableTopic(String topicId, String topicCategory) {
+        this.topicId = topicId;
+        this.topicCategory = topicCategory;
+    }
 
     public String getTopicId() {
         return topicId;
@@ -38,4 +43,18 @@ public class ParcelableTopic implements Parcelable {
         parcel.writeString(topicId);
         parcel.writeString(topicCategory);
     }
+
+    public static final Parcelable.Creator<ParcelableTopic> CREATOR = new Parcelable.Creator<ParcelableTopic>() {
+        @Override
+        public ParcelableTopic createFromParcel(Parcel parcel) {
+            String topicId = parcel.readString();
+            String topicCategory = parcel.readString();
+            return new ParcelableTopic(topicId, topicCategory);
+        }
+
+        @Override
+        public ParcelableTopic[] newArray(int size) {
+            return new ParcelableTopic[size];
+        }
+    };
 }

@@ -53,11 +53,12 @@ public class ImageGridAdapter extends BaseAdapter {
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
         ImageView imageView = new ImageView(mContext);
+        imageView.setMinimumHeight(300);
+        imageView.setMinimumWidth(300);
         imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        imageView.setLayoutParams(new GridView.LayoutParams(50, 50));
         if(i < getCount()) {
             String imageUrl = imageUrls.get(i);
-            new DownloadImageTask(imageView).execute(imageUrl.trim());
+            new DownloadImageTask(imageView, 90, 100).execute(imageUrl.trim());
         }
         return imageView;
     }

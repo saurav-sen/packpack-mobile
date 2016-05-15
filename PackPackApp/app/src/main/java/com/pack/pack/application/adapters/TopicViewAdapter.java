@@ -50,6 +50,11 @@ public class TopicViewAdapter extends ArrayAdapter<JTopic> {
     }
 
     @Override
+    public JTopic getItem(int position) {
+        return position < topics.size() ? topics.get(position) : null;
+    }
+
+    @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         if(inflater == null) {
             //inflater = LayoutInflater.from(activity);
@@ -73,7 +78,7 @@ public class TopicViewAdapter extends ArrayAdapter<JTopic> {
             descriptionTextView.setText(topic.getDescription());
            // followersTextView.setText(String.valueOf(topic.getFollowers()));
             if(topic.getWallpaperUrl() != null && !topic.getWallpaperUrl().trim().equals("")) {
-                new DownloadImageTask(poster).execute(topic.getWallpaperUrl() + "?thumbnail=true");
+                new DownloadImageTask(poster).execute(topic.getWallpaperUrl() + "?thumbnail=false");
             }
         }
         return convertView;

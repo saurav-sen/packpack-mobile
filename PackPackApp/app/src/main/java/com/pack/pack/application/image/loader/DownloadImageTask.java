@@ -21,8 +21,18 @@ public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
 
     private ImageView imageView;
 
+    private int imageWidth;
+
+    private int imageHeight;
+
     public DownloadImageTask(ImageView imageView) {
+        this(imageView, -1, -1);
+    }
+
+    public DownloadImageTask(ImageView imageView, int imageWidth, int imageHeight) {
         this.imageView = imageView;
+        this.imageWidth = imageWidth;
+        this.imageHeight = imageHeight;
     }
 
     @Override
@@ -39,6 +49,9 @@ public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
             stream = (InputStream) api.execute();
             if(stream != null) {
                 bitmap = BitmapFactory.decodeStream(stream);
+                if(imageWidth > 0 && imageHeight > 0 && bitmap != null) {
+                    bitmap = Bitmap.createScaledBitmap(bitmap, imageWidth, imageHeight, false);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();

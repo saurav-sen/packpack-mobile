@@ -1,6 +1,7 @@
 package com.pack.pack.application.fragments;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -16,7 +17,9 @@ import android.widget.TextView;
 
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
+import com.pack.pack.application.activity.TopicDetailActivity;
 import com.pack.pack.application.adapters.TopicViewAdapter;
+import com.pack.pack.application.topic.activity.model.ParcelableTopic;
 import com.pack.pack.application.topic.activity.model.TopicEvent;
 import com.pack.pack.application.view.util.ViewUtil;
 import com.pack.pack.client.api.API;
@@ -83,13 +86,21 @@ public abstract class TopicViewFragment extends Fragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                handleItemClick();
+                JTopic topic = (JTopic)adapterView.getAdapter().getItem(i);
+               // JTopic topic = (JTopic) listView.getSelectedItem();
+                handleItemClick(topic);
             }
         });
         return view;
     }
 
-    protected abstract void handleItemClick();
+    protected void openDetailActivity(String parcelKey, ParcelableTopic parcel, Class<?> activityClass) {
+        Intent intent = new Intent(getContext(), activityClass);
+        intent.putExtra(parcelKey, parcel);
+        startActivity(intent);
+    }
+
+    protected abstract void handleItemClick(JTopic topic);
 
     private String getCategoryType() {
         return tabType.getType();
