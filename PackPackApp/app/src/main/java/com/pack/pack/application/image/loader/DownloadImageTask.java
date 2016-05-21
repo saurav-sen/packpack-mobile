@@ -41,6 +41,9 @@ public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
         Bitmap bitmap = null;
         try {
             String url = urls[0];
+            bitmap = AppController.getInstance().getLruBitmapCache().getBitmap(url);
+            if(bitmap != null)
+                return bitmap;
             API api = APIBuilder.create()
                     .setAction(COMMAND.LOAD_RESOURCE)
                     .setOauthToken(AppController.getInstance().getoAuthToken())
@@ -51,6 +54,7 @@ public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
                 bitmap = BitmapFactory.decodeStream(stream);
                 if(imageWidth > 0 && imageHeight > 0 && bitmap != null) {
                     bitmap = Bitmap.createScaledBitmap(bitmap, imageWidth, imageHeight, false);
+                    AppController.getInstance().getLruBitmapCache().putBitmap(url, bitmap);
                 }
             }
         } catch (Exception e) {

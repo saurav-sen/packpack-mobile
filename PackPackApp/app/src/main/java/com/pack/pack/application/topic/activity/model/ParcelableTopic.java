@@ -12,9 +12,18 @@ public class ParcelableTopic implements Parcelable {
 
     private String topicCategory;
 
-    public ParcelableTopic(String topicId, String topicCategory) {
+    private String wallpaperUrl;
+
+    private String description;
+
+    public ParcelableTopic() {
+    }
+
+    public ParcelableTopic(String topicId, String topicCategory, String wallpaperUrl, String description) {
         this.topicId = topicId;
         this.topicCategory = topicCategory;
+        this.wallpaperUrl = wallpaperUrl;
+        this.description = description;
     }
 
     public String getTopicId() {
@@ -33,6 +42,22 @@ public class ParcelableTopic implements Parcelable {
         this.topicCategory = topicCategory;
     }
 
+    public String getWallpaperUrl() {
+        return wallpaperUrl;
+    }
+
+    public void setWallpaperUrl(String wallpaperUrl) {
+        this.wallpaperUrl = wallpaperUrl;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -42,6 +67,8 @@ public class ParcelableTopic implements Parcelable {
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeString(topicId);
         parcel.writeString(topicCategory);
+        parcel.writeString(wallpaperUrl);
+        parcel.writeString(description);
     }
 
     public static final Parcelable.Creator<ParcelableTopic> CREATOR = new Parcelable.Creator<ParcelableTopic>() {
@@ -49,7 +76,9 @@ public class ParcelableTopic implements Parcelable {
         public ParcelableTopic createFromParcel(Parcel parcel) {
             String topicId = parcel.readString();
             String topicCategory = parcel.readString();
-            return new ParcelableTopic(topicId, topicCategory);
+            String wallpaperUrl = parcel.readString();
+            String description = parcel.readString();
+            return new ParcelableTopic(topicId, topicCategory, wallpaperUrl, description);
         }
 
         @Override

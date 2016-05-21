@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by CipherCloud on 02-05-2016.
+ * Created by Saurav on 02-05-2016.
  */
 public class TopicDetailAdapter extends ArrayAdapter<JPack> {
 
@@ -37,7 +37,7 @@ public class TopicDetailAdapter extends ArrayAdapter<JPack> {
     private List<JPack> packs;
 
     public TopicDetailAdapter(Activity activity, List<JPack> packs) {
-        super(activity, R.layout.topic_detail_item);
+        super(activity, R.layout.inside_topic_detail_item);
         this.activity = activity;
         this.packs = packs;
     }
@@ -53,7 +53,7 @@ public class TopicDetailAdapter extends ArrayAdapter<JPack> {
             inflator = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         }
         if(convertView == null) {
-            convertView = inflator.inflate(R.layout.topic_detail_item, null);
+            convertView = inflator.inflate(R.layout.inside_topic_detail_item, null);
         }
         TextView packTitle = (TextView) convertView.findViewById(R.id.pack_title);
         TextView packStory = (TextView) convertView.findViewById(R.id.pack_story);
@@ -63,14 +63,9 @@ public class TopicDetailAdapter extends ArrayAdapter<JPack> {
             JPack pack = packs.get(position);
             packTitle.setText(pack.getTitle());
             StringBuilder story = new StringBuilder(pack.getStory());
-            for(int i=0; i<100; i++) {
-                story.append(pack.getStory());
-                story.append("  \n");
-            }
-
             String storyContent = story.toString();
             packStory.setText(storyContent);//pack.getStory());
-            if(storyContent.length() > 100) {
+            if(storyContent.length() > 1000) {
                 packStoryContinue.setText(Html.fromHtml("<a href=\\\"#\\\">Continue</a> "));
                 packStoryContinue.setTextColor(0x0a80d1);
 

@@ -14,14 +14,22 @@
         <activity android:name=".activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name=".activity.TopicDetailActivity"
             android:label="PackPack"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".activity.PackDetailActivity"
+            android:label="@string/title_activity_pack_detail"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".activity.InsideTopicActivity"
+            android:label="@string/title_activity_inside_topic"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

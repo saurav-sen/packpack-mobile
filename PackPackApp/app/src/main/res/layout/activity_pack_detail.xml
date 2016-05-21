@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context=".TopicDetailActivity">
+    tools:context="com.pack.pack.application.activity.PackDetailActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -13,7 +13,7 @@
         android:theme="@style/AppTheme.AppBarOverlay">
 
         <android.support.v7.widget.Toolbar
-            android:id="@+id/topic_detail_toolbar"
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
@@ -21,59 +21,55 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <ScrollView
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        tools:context="com.pack.pack.application.activity.PackDetailActivity"
+        tools:showIn="@layout/activity_pack_detail">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/topic_wallpaper_img"
-                android:paddingTop="5dp"
-                android:paddingBottom="5dp"
-                android:layout_marginLeft="3dp"
-                android:layout_marginRight="3dp"/>
 
             <TextView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/topic_description_text"
-                android:layout_marginLeft="5dp"
-                android:layout_marginRight="5dp"
-                android:paddingTop="5dp"
-                android:paddingBottom="5dp"/>
+                android:layout_height="match_parent"
+                android:id="@+id/activity_pack_title"
+                android:textStyle="bold"/>
 
-            <Button
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:id="@+id/enter_topic_detail"
-                android:paddingLeft="20dp"
-                android:paddingRight="20dp"
-                android:layout_marginLeft="30dp"
-                android:layout_marginRight="30dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginBottom="20dp"
-                android:background="@color/colorPrimary"/>
+                android:id="@+id/activity_pack_story"
+                android:inputType="textMultiLine"
+                android:maxLines="10"/>
 
-            <Button
+            <View
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:id="@+id/follow_not_follow_topic"
-                android:paddingLeft="20dp"
-                android:paddingRight="20dp"
-                android:layout_marginLeft="30dp"
-                android:layout_marginRight="30dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginBottom="20dp"
-                android:background="@color/colorPrimary"/>
+                style="@style/Divider"/>
+
         </LinearLayout>
-    </ScrollView>
+
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/activity_pack_attachments"
+            android:divider="@null"/>
+
+    </RelativeLayout>
+
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/upload_pack"
+        android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"

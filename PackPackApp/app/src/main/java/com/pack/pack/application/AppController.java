@@ -24,6 +24,10 @@ public class AppController extends Application {
     private ImageLoader mImageLoader;
     LruBitmapCache mLruBitmapCache;
 
+    public static final String TOPIC_PARCELABLE_KEY = "topic_parcel";
+
+    public static final String PACK_PARCELABLE_KEY = "pack_parcel";
+
     public String getoAuthToken() {
         return oAuthToken;
     }

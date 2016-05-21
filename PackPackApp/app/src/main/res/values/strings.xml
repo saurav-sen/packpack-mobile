@@ -8,4 +8,6 @@
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_topic_detail">TopicDetailActivity</string>
+    <string name="title_activity_pack_detail">PackDetailActivity</string>
+    <string name="title_activity_inside_topic">Topic Activities</string>
 </resources>
