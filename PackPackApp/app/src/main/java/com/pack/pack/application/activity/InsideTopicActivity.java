@@ -55,16 +55,7 @@ public class InsideTopicActivity extends AppCompatActivity {
         adapter = new TopicDetailAdapter(this, new ArrayList<JPack>());
         final ListView listView = (ListView) findViewById(R.id.topic_detail_list);
         listView.setAdapter(adapter);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                JPack pack = (JPack) listView.getItemAtPosition(i);
-                ParcelablePack parcel = new ParcelablePack(pack);
-                Intent intent = new Intent(InsideTopicActivity.this, PackDetailActivity.class);
-                intent.putExtra(AppController.PACK_PARCELABLE_KEY, parcel);
-                startActivity(intent);
-            }
-        });
+
         listView.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(AbsListView absListView, int scrollState) {
@@ -85,6 +76,7 @@ public class InsideTopicActivity extends AppCompatActivity {
         ParcelableTopic topic = (ParcelableTopic) getIntent().getParcelableExtra(AppController.TOPIC_PARCELABLE_KEY);
         new LoadPackTask().execute(topic);
     }
+
 
     private class LoadPackTask extends AsyncTask<ParcelableTopic, Integer, Pagination<JPack>> {
 

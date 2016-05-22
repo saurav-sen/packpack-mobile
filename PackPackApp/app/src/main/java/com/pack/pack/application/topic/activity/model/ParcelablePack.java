@@ -3,7 +3,13 @@ package com.pack.pack.application.topic.activity.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.pack.pack.common.util.JSONUtil;
 import com.pack.pack.model.web.JPack;
+import com.pack.pack.model.web.JPackAttachment;
+import com.pack.pack.services.exception.PackPackException;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Saurav on 21-05-2016.
@@ -110,7 +116,7 @@ public class ParcelablePack implements Parcelable {
         this.views = views;
     }
 
-    @Override
+   @Override
     public int describeContents() {
         return 0;
     }

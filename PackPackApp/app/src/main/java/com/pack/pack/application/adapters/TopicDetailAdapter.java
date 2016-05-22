@@ -2,6 +2,7 @@ package com.pack.pack.application.adapters;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -14,7 +15,10 @@ import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.TextView;
 
+import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
+import com.pack.pack.application.activity.PackDetailActivity;
+import com.pack.pack.application.topic.activity.model.ParcelablePack;
 import com.pack.pack.model.web.JPack;
 import com.pack.pack.model.web.JPackAttachment;
 
@@ -36,6 +40,20 @@ public class TopicDetailAdapter extends ArrayAdapter<JPack> {
 
     private List<JPack> packs;
 
+    private View.OnClickListener onClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            int position = (int) view.getTag();
+            if(position < 0 || packs == null || position >= packs.size())
+                return;
+            JPack pack = (JPack) packs.get(position);
+            ParcelablePack parcel = new ParcelablePack(pack);
+            Intent intent = new Intent(getContext(), PackDetailActivity.class);
+            intent.putExtra(AppController.PACK_PARCELABLE_KEY, parcel);
+            getContext().startActivity(intent);
+        }
+    };
+
     public TopicDetailAdapter(Activity activity, List<JPack> packs) {
         super(activity, R.layout.inside_topic_detail_item);
         this.activity = activity;
@@ -56,9 +74,19 @@ public class TopicDetailAdapter extends ArrayAdapter<JPack> {
             convertView = inflator.inflate(R.layout.inside_topic_detail_item, null);
         }
         TextView packTitle = (TextView) convertView.findViewById(R.id.pack_title);
+        packTitle.setTag(position);
+        packTitle.setOnClickListener(onClickListener);
+
         TextView packStory = (TextView) convertView.findViewById(R.id.pack_story);
+        packStory.setTag(position);
+        packStory.setOnClickListener(onClickListener);
+
         TextView packStoryContinue = (TextView) convertView.findViewById(R.id.pack_story_continue);
+
         GridView packAttachmentsGrid = (GridView) convertView.findViewById(R.id.pack_attachments);
+        packAttachmentsGrid.setTag(position);
+        //packAttachmentsGrid.setOnClickListener(onClickListener);
+
         if(position < packs.size()) {
             JPack pack = packs.get(position);
             packTitle.setText(pack.getTitle());
