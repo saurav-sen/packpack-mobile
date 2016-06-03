@@ -54,8 +54,8 @@ public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
                 bitmap = BitmapFactory.decodeStream(stream);
                 if(imageWidth > 0 && imageHeight > 0 && bitmap != null) {
                     bitmap = Bitmap.createScaledBitmap(bitmap, imageWidth, imageHeight, false);
-                    AppController.getInstance().getLruBitmapCache().putBitmap(url, bitmap);
                 }
+                AppController.getInstance().getLruBitmapCache().putBitmap(url, bitmap);
             }
         } catch (Exception e) {
             e.printStackTrace();

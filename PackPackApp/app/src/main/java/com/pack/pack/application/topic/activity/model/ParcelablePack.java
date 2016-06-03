@@ -32,16 +32,19 @@ public class ParcelablePack implements Parcelable {
 
     private int views;
 
+    private String parentTopicId;
+
     public ParcelablePack() {
     }
 
     public ParcelablePack(JPack pack) {
         this(pack.getId(), pack.getStory(), pack.getCreatorName(), pack.getTitle(),
-                pack.getRating(), pack.getCreationTime(), pack.getLikes(), pack.getViews());
+                pack.getRating(), pack.getCreationTime(), pack.getLikes(), pack.getViews(),
+                pack.getParentTopicId());
     }
 
     public ParcelablePack(String id, String story, String creatorName, String title,
-                          String rating, long creationTime, int likes, int views) {
+                          String rating, long creationTime, int likes, int views, String parentTopicId) {
         setId(id);
         setStory(story);
         setCreatorName(creatorName);
@@ -50,6 +53,15 @@ public class ParcelablePack implements Parcelable {
         setCreationTime(creationTime);
         setLikes(likes);
         setViews(views);
+        setParentTopicId(parentTopicId);
+    }
+
+    public String getParentTopicId() {
+        return parentTopicId;
+    }
+
+    public void setParentTopicId(String parentTopicId) {
+        this.parentTopicId = parentTopicId;
     }
 
     public String getId() {
@@ -131,6 +143,7 @@ public class ParcelablePack implements Parcelable {
         parcel.writeLong(creationTime);
         parcel.writeInt(likes);
         parcel.writeInt(views);
+        parcel.writeString(parentTopicId);
     }
 
     public static final Parcelable.Creator<ParcelablePack> CREATOR = new Parcelable.Creator<ParcelablePack>() {
@@ -145,7 +158,8 @@ public class ParcelablePack implements Parcelable {
             long creationTime = parcel.readLong();
             int likes = parcel.readInt();
             int views = parcel.readInt();
-            return new ParcelablePack(id, story, creatorName, title, rating, creationTime, likes, views);
+            String parentTopicId = parcel.readString();
+            return new ParcelablePack(id, story, creatorName, title, rating, creationTime, likes, views, parentTopicId);
         }
 
         @Override

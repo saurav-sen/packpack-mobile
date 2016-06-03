@@ -13,8 +13,14 @@ import com.pack.pack.client.api.API;
 import com.pack.pack.client.api.APIBuilder;
 import com.pack.pack.client.api.APIConstants;
 import com.pack.pack.client.api.COMMAND;
+import com.pack.pack.model.web.JPackAttachment;
 import com.pack.pack.model.web.JUser;
 import com.pack.pack.oauth1.client.AccessToken;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 public class AppController extends Application {
 
@@ -27,6 +33,8 @@ public class AppController extends Application {
     public static final String TOPIC_PARCELABLE_KEY = "topic_parcel";
 
     public static final String PACK_PARCELABLE_KEY = "pack_parcel";
+
+    public static final String PACK_ATTACHMENT_ID_KEY = "pack_attachment_id";
 
     public String getoAuthToken() {
         return oAuthToken;
@@ -50,6 +58,12 @@ public class AppController extends Application {
     private static final String ANDROID_APP_CLIENT_SECRET = "b1f6d761-dcb7-482b-a695-ab17e4a29b25";
 
     private static final String USERNAME = "sourabhnits@gmail.com";
+
+    public static final int APP_EXTERNAL_STORAGE_WRITE_REQUEST_CODE = 115;
+
+    private static boolean enableShareOption = true;
+
+    private Map<String, JPackAttachment> packAttachmentCache = new WeakHashMap<String, JPackAttachment>();
 
     @Override
     public void onCreate() {
@@ -143,5 +157,30 @@ public class AppController extends Application {
             }
             return oAuthToken;
         }
+    }
+
+    public static boolean isEnableShareOption() {
+        return enableShareOption;
+    }
+
+    public static void enableShareOption() {
+        enableShareOption = true;
+    }
+
+    public static void disableShareOption() {
+        enableShareOption = false;
+    }
+
+    public void cachePackAttachments(List<JPackAttachment> attachments) {
+        packAttachmentCache.clear();
+        if(attachments == null || attachments.isEmpty())
+            return;
+        for(JPackAttachment attachment : attachments) {
+            packAttachmentCache.put(attachment.getId(), attachment);
+        }
+    }
+
+    public JPackAttachment getPackAttachmentFromCache(String id) {
+        return packAttachmentCache.get(id);
     }
 }

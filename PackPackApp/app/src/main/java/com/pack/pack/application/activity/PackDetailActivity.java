@@ -1,22 +1,26 @@
 package com.pack.pack.application.activity;
 
+import android.Manifest;
+import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.AbsListView;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
 import com.pack.pack.application.adapters.PackAttachmentsAdapter;
-import com.pack.pack.application.topic.activity.model.ParcelableAttachment;
 import com.pack.pack.application.topic.activity.model.ParcelablePack;
-import com.pack.pack.application.topic.activity.model.ParcelableTopic;
 import com.pack.pack.client.api.API;
 import com.pack.pack.client.api.APIBuilder;
 import com.pack.pack.client.api.APIConstants;
@@ -33,6 +37,8 @@ public class PackDetailActivity extends AppCompatActivity {
     private PackAttachmentsAdapter adapter;
 
     private ProgressDialog progressDialog;
+
+    private ScrollablePackDetail currentScrollableObject;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,11 +65,42 @@ public class PackDetailActivity extends AppCompatActivity {
         ListView activity_pack_attachments = (ListView) findViewById(R.id.activity_pack_attachments);
         adapter = new PackAttachmentsAdapter(this, new ArrayList<JPackAttachment>(10));
         activity_pack_attachments.setAdapter(adapter);
+        activity_pack_attachments.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView absListView, int i) {
 
-        new LoadPackDetailTask().execute(pack.getId());
+            }
+
+            @Override
+            public void onScroll(AbsListView absListView, int i, int i1, int i2) {
+
+            }
+        });
+
+        currentScrollableObject = new ScrollablePackDetail();
+        currentScrollableObject.packId = pack.getId();
+        currentScrollableObject.topicId = pack.getParentTopicId();
+        currentScrollableObject.scrollUp = false;
+
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    AppController.APP_EXTERNAL_STORAGE_WRITE_REQUEST_CODE);
+        }
+
+        new LoadPackDetailTask().execute(currentScrollableObject);
     }
 
-    private class LoadPackDetailTask extends AsyncTask<String, Integer, List<JPackAttachment>> {
+    private class ScrollablePackDetail {
+        public String packId = null;
+        public String topicId = null;
+        public String previousLink = null;
+        public String nextLink = null;
+        public boolean scrollUp = false;
+    }
+
+    private class LoadPackDetailTask extends AsyncTask<ScrollablePackDetail, Integer, Pagination<JPackAttachment>> {
 
         @Override
         protected void onPreExecute() {
@@ -72,21 +109,25 @@ public class PackDetailActivity extends AppCompatActivity {
         }
 
         @Override
-        protected List<JPackAttachment> doInBackground(String... packIds) {
-            List<JPackAttachment> page = null;
-            if(packIds == null || packIds.length == 0)
+        protected Pagination<JPackAttachment> doInBackground(ScrollablePackDetail... objects) {
+            Pagination<JPackAttachment> page = null;
+            if(objects == null || objects.length == 0)
                 return page;
             try {
-                String packId = packIds[0];
+                ScrollablePackDetail obj = objects[0];
+                String packId = obj.packId;
+                String topicId = obj.topicId;
                 String oAuthToken = AppController.getInstance().getoAuthToken();
                 String userId = AppController.getInstance().getUserId();
-                API api = APIBuilder.create().setAction(COMMAND.GET_PACK_BY_ID)
+                API api = APIBuilder.create().setAction(COMMAND.GET_ALL_ATTACHMENTS_IN_PACK)
                         .setOauthToken(oAuthToken)
-                        //.addApiParam(APIConstants.User.ID, userId)
+                        .addApiParam(APIConstants.User.ID, userId)
                         .addApiParam(APIConstants.Pack.ID, packId)
+                        .addApiParam(APIConstants.Topic.ID, topicId)
+                        .addApiParam(APIConstants.PageInfo.PAGE_LINK,
+                                obj.scrollUp ? obj.previousLink : obj.nextLink)
                         .build();
-                JPack pack = (JPack) api.execute();
-                page = (pack != null ? pack.getAttachments() : new ArrayList<JPackAttachment>(1));
+                page = (Pagination<JPackAttachment>) api.execute();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -94,11 +135,15 @@ public class PackDetailActivity extends AppCompatActivity {
         }
 
         @Override
-        protected void onPostExecute(List<JPackAttachment> jPackAttachments) {
-            super.onPostExecute(jPackAttachments);
-            if(jPackAttachments != null) {
-                adapter.setAttachments(jPackAttachments);
+        protected void onPostExecute(Pagination<JPackAttachment> page) {
+            super.onPostExecute(page);
+            if(page != null) {
+                adapter.setAttachments(page.getResult());
                 adapter.notifyDataSetChanged();
+                if(currentScrollableObject != null) {
+                    currentScrollableObject.nextLink = page.getNextLink();
+                    currentScrollableObject.previousLink = page.getPreviousLink();
+                }
             }
             hideProgressDialog();
         }
@@ -124,6 +169,22 @@ public class PackDetailActivity extends AppCompatActivity {
                     }
                 }
             });
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case AppController.APP_EXTERNAL_STORAGE_WRITE_REQUEST_CODE:
+                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    AppController.enableShareOption();
+                    finish();
+                    startActivity(getIntent());
+                }
+                else {
+                    AppController.disableShareOption();
+                }
         }
     }
 }

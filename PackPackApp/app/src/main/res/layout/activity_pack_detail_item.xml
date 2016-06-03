@@ -37,6 +37,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="right"
-            android:id="@+id/pack_attachment_forward"/>
+            android:id="@+id/pack_attachment_share"/>
     </LinearLayout>
 </LinearLayout>
