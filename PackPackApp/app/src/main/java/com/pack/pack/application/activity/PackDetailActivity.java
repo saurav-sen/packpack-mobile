@@ -3,9 +3,11 @@ package com.pack.pack.application.activity;
 import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -25,12 +27,15 @@ import com.pack.pack.client.api.API;
 import com.pack.pack.client.api.APIBuilder;
 import com.pack.pack.client.api.APIConstants;
 import com.pack.pack.client.api.COMMAND;
-import com.pack.pack.model.web.JPack;
 import com.pack.pack.model.web.JPackAttachment;
 import com.pack.pack.model.web.Pagination;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.pack.pack.application.AppController.TOPIC_ID_KEY;
+import static com.pack.pack.application.AppController.UPLOAD_ENTITY_ID_KEY;
+import static com.pack.pack.application.AppController.UPLOAD_ENTITY_TYPE_KEY;
 
 public class PackDetailActivity extends AppCompatActivity {
 
@@ -47,18 +52,22 @@ public class PackDetailActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        final ParcelablePack pack = (ParcelablePack) getIntent().getParcelableExtra(AppController.PACK_PARCELABLE_KEY);
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                Intent intent = new Intent(PackDetailActivity.this, ImageVideoCaptureActivity.class);
+                intent.putExtra(TOPIC_ID_KEY, pack.getParentTopicId());
+                intent.putExtra(UPLOAD_ENTITY_ID_KEY, pack.getId());
+                intent.putExtra(UPLOAD_ENTITY_TYPE_KEY, JPackAttachment.class.getName());
+                startActivity(intent);
             }
         });
 
         TextView activity_pack_title = (TextView) findViewById(R.id.activity_pack_title);
         TextView activity_pack_story = (TextView) findViewById(R.id.activity_pack_story);
-        ParcelablePack pack = (ParcelablePack) getIntent().getParcelableExtra(AppController.PACK_PARCELABLE_KEY);
         activity_pack_title.setText(pack.getTitle());
         activity_pack_story.setText(pack.getStory());
 
@@ -90,6 +99,12 @@ public class PackDetailActivity extends AppCompatActivity {
         }
 
         new LoadPackDetailTask().execute(currentScrollableObject);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        AppController.getInstance().getPackAttachments().clear();
     }
 
     private class ScrollablePackDetail {
@@ -138,7 +153,10 @@ public class PackDetailActivity extends AppCompatActivity {
         protected void onPostExecute(Pagination<JPackAttachment> page) {
             super.onPostExecute(page);
             if(page != null) {
-                adapter.setAttachments(page.getResult());
+                List<JPackAttachment> attachments = page.getResult();
+                AppController.getInstance().getPackAttachments().clear();
+                AppController.getInstance().getPackAttachments().addAll(attachments);
+                adapter.setAttachments(attachments);
                 adapter.notifyDataSetChanged();
                 if(currentScrollableObject != null) {
                     currentScrollableObject.nextLink = page.getNextLink();
@@ -178,12 +196,12 @@ public class PackDetailActivity extends AppCompatActivity {
         switch (requestCode) {
             case AppController.APP_EXTERNAL_STORAGE_WRITE_REQUEST_CODE:
                 if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    AppController.enableShareOption();
+                    AppController.getInstance().enableShareOption();
                     finish();
                     startActivity(getIntent());
                 }
                 else {
-                    AppController.disableShareOption();
+                    AppController.getInstance().disableShareOption();
                 }
         }
     }

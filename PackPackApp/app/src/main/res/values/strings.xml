@@ -10,4 +10,14 @@
     <string name="title_activity_topic_detail">TopicDetailActivity</string>
     <string name="title_activity_pack_detail">PackDetailActivity</string>
     <string name="title_activity_inside_topic">Topic Activities</string>
+    <string name="btnTakePicture">Photo</string>
+    <string name="btnRecordVideo">Video</string>
+    <string name="or">(or)</string>
+    <string name="btnUploadToServer">Upload</string>
+    <string name="title_activity_upload">UploadActivity</string>
+
+    <string name="title_activity_fullscreen_attachment_view">FullscreenAttachmentViewActivity
+    </string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
 </resources>

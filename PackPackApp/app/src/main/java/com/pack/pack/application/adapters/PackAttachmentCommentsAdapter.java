@@ -34,7 +34,6 @@ public class PackAttachmentCommentsAdapter extends RecyclerView.Adapter<PackAtta
     public void onBindViewHolder(PackAttachmentCommentsViewHolder holder, int position) {
         if(comments != null && position < comments.size()) {
             JComment comment = comments.get(position);
-            //holder.getUserProfilePic().setI
             holder.getUserName().setText(comment.getFromUserName());
             holder.getComment().setText(comment.getComment());
         }

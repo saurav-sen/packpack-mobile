@@ -43,7 +43,7 @@ public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
             String url = urls[0];
             bitmap = AppController.getInstance().getLruBitmapCache().getBitmap(url);
             if(bitmap != null)
-                return bitmap;
+               return bitmap;
             API api = APIBuilder.create()
                     .setAction(COMMAND.LOAD_RESOURCE)
                     .setOauthToken(AppController.getInstance().getoAuthToken())

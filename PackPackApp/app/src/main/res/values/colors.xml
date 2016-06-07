@@ -10,4 +10,9 @@
     <color name="link">#0a80d1</color>
     <color name="timestamp">#a0a3a7</color>
     <color name="light_dark">#6E6E6E</color>
+    <color name="upload_view_background">#e8ecfa</color>
+    <color name="upload_btn_bg">#277bec</color>
+    <color name="upload_txt_font">#4e5572</color>
+
+    <color name="black_overlay">#66000000</color>
 </resources>

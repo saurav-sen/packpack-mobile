@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,8 +16,13 @@ import android.widget.ImageView;
 
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
+import com.pack.pack.application.activity.FullscreenAttachmentViewActivity;
 import com.pack.pack.application.activity.PackAttachmentCommentsActivity;
 import com.pack.pack.application.image.loader.DownloadImageTask;
+import com.pack.pack.client.api.API;
+import com.pack.pack.client.api.APIBuilder;
+import com.pack.pack.client.api.APIConstants;
+import com.pack.pack.client.api.COMMAND;
 import com.pack.pack.model.web.JPackAttachment;
 
 import java.io.ByteArrayOutputStream;
@@ -76,13 +82,24 @@ public class PackAttachmentsAdapter extends ArrayAdapter<JPackAttachment> {
             convertView = inflater.inflate(R.layout.activity_pack_detail_item, null);
         }
         ImageView pack_attachment_img = (ImageView) convertView.findViewById(R.id.pack_attachment_img);
+        pack_attachment_img.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getContext(), FullscreenAttachmentViewActivity.class);
+                intent.putExtra("index", position);
+                getContext().startActivity(intent);
+            }
+        });
 
         Button pack_attachment_like = (Button) convertView.findViewById(R.id.pack_attachment_like);
         pack_attachment_like.setText("Like");
         pack_attachment_like.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //TODO
+                JPackAttachment attachment = getItem(position);
+                if(attachment != null) {
+                    addLikeToPackAttachment(attachment.getId());
+                }
             }
         });
 
@@ -100,7 +117,7 @@ public class PackAttachmentsAdapter extends ArrayAdapter<JPackAttachment> {
 
         Button pack_attachment_share = (Button) convertView.findViewById(R.id.pack_attachment_share);
         pack_attachment_share.setText("Share");
-        pack_attachment_share.setEnabled(AppController.isEnableShareOption());
+        pack_attachment_share.setEnabled(AppController.getInstance().isEnableShareOption());
         pack_attachment_share.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -113,6 +130,10 @@ public class PackAttachmentsAdapter extends ArrayAdapter<JPackAttachment> {
             new DownloadImageTask(pack_attachment_img, 700, 500).execute(attachment.getAttachmentUrl());
         }
         return convertView;
+    }
+
+    private void addLikeToPackAttachment(String id) {
+        new AddLikeTask().execute(id);
     }
 
     private void shareImage(int position) {
@@ -149,6 +170,26 @@ public class PackAttachmentsAdapter extends ArrayAdapter<JPackAttachment> {
             share.putExtra(Intent.EXTRA_SUBJECT, attachment.getTitle());
 
             getContext().startActivity(share);
+        }
+    }
+
+    private class AddLikeTask extends AsyncTask<String, Void, Void> {
+        @Override
+        protected Void doInBackground(String... IDs) {
+            if(IDs == null || IDs.length == 0)
+                return null;
+            try {
+                String ID = IDs[0];
+                API api = APIBuilder.create().setAction(COMMAND.ADD_LIKE_TO_PACK_ATTACHMENT)
+                        .setOauthToken(AppController.getInstance().getoAuthToken())
+                        .addApiParam(APIConstants.PackAttachment.ID, ID)
+                        .addApiParam(APIConstants.User.ID, AppController.getInstance().getUserId())
+                        .build();
+                api.execute();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
         }
     }
 }

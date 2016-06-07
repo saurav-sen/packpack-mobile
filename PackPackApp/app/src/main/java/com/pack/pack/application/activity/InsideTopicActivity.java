@@ -28,6 +28,11 @@ import com.pack.pack.model.web.Pagination;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *
+ * @author Saurav
+ *
+ */
 public class InsideTopicActivity extends AppCompatActivity {
 
     private Pagination<JPack> page;

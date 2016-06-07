@@ -17,6 +17,8 @@ import com.pack.pack.model.web.JPackAttachment;
 import com.pack.pack.model.web.JUser;
 import com.pack.pack.oauth1.client.AccessToken;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +27,8 @@ import java.util.WeakHashMap;
 public class AppController extends Application {
 
     public static final String TAG = AppController.class.getSimpleName();
+
+    public static final String APP_NAME = "PackPack";
 
     private RequestQueue mRequestQueue;
     private ImageLoader mImageLoader;
@@ -35,6 +39,20 @@ public class AppController extends Application {
     public static final String PACK_PARCELABLE_KEY = "pack_parcel";
 
     public static final String PACK_ATTACHMENT_ID_KEY = "pack_attachment_id";
+
+    public static final int CAMERA_CAPTURE_PHOTO_REQUEST_CODE = 300;
+
+    public static final int CAMERA_RECORD_VIDEO_REQUEST_CODE = 400;
+
+    public static final String UPLOAD_FILE_PATH = "upload_file_path";
+
+    public static final String UPLOAD_FILE_IS_PHOTO = "upload_file_is_photo";
+
+    public static final String UPLOAD_ENTITY_ID_KEY = "entity_id";
+
+    public static final String UPLOAD_ENTITY_TYPE_KEY = "entity_type";
+
+    public static final String TOPIC_ID_KEY = "topic_id";
 
     public String getoAuthToken() {
         return oAuthToken;
@@ -60,10 +78,18 @@ public class AppController extends Application {
     private static final String USERNAME = "sourabhnits@gmail.com";
 
     public static final int APP_EXTERNAL_STORAGE_WRITE_REQUEST_CODE = 115;
+    public static final int CAMERA_ACCESS_REQUEST_CODE = 116;
 
-    private static boolean enableShareOption = true;
+    private boolean enableShareOption = true;
+
+    private boolean cameraPermissionGranted = false;
 
     private Map<String, JPackAttachment> packAttachmentCache = new WeakHashMap<String, JPackAttachment>();
+
+    public static final int MEDIA_TYPE_IMAGE = 1;
+    public static final int MEDIA_TYPE_VIDEO = 2;
+
+    private List<JPackAttachment> packAttachments;
 
     @Override
     public void onCreate() {
@@ -159,16 +185,28 @@ public class AppController extends Application {
         }
     }
 
-    public static boolean isEnableShareOption() {
+    public boolean isEnableShareOption() {
         return enableShareOption;
     }
 
-    public static void enableShareOption() {
+    public void enableShareOption() {
         enableShareOption = true;
     }
 
-    public static void disableShareOption() {
+    public void disableShareOption() {
         enableShareOption = false;
+    }
+
+    public boolean isCameraPermissionGranted() {
+        return cameraPermissionGranted;
+    }
+
+    public void cameraPermissionGranted() {
+        cameraPermissionGranted = true;
+    }
+
+    public void cameraPermisionDenied() {
+        cameraPermissionGranted = false;
     }
 
     public void cachePackAttachments(List<JPackAttachment> attachments) {
@@ -182,5 +220,12 @@ public class AppController extends Application {
 
     public JPackAttachment getPackAttachmentFromCache(String id) {
         return packAttachmentCache.get(id);
+    }
+
+    public List<JPackAttachment> getPackAttachments() {
+        if(packAttachments == null) {
+            packAttachments = new ArrayList<JPackAttachment>();
+        }
+        return packAttachments;
     }
 }
