@@ -40,6 +40,10 @@ public class AppController extends Application {
 
     public static final String PACK_ATTACHMENT_ID_KEY = "pack_attachment_id";
 
+    public static final int SIGNUP_ACTIVITY_REQUEST_CODE = 100;
+
+    public static final int RESET_PASSWD_ACTIVITY_REQUEST_CODE = 200;
+
     public static final int CAMERA_CAPTURE_PHOTO_REQUEST_CODE = 300;
 
     public static final int CAMERA_RECORD_VIDEO_REQUEST_CODE = 400;
@@ -72,8 +76,8 @@ public class AppController extends Application {
 
     private static AppController mInstance;
 
-    private static final String ANDROID_APP_CLIENT_KEY = "53e8a1f2-7568-4ac8-ab26-45738ca02599";
-    private static final String ANDROID_APP_CLIENT_SECRET = "b1f6d761-dcb7-482b-a695-ab17e4a29b25";
+    public static final String ANDROID_APP_CLIENT_KEY = "53e8a1f2-7568-4ac8-ab26-45738ca02599";
+    public static final String ANDROID_APP_CLIENT_SECRET = "b1f6d761-dcb7-482b-a695-ab17e4a29b25";
 
     private static final String USERNAME = "sourabhnits@gmail.com";
 
