@@ -15,13 +15,19 @@ import static com.pack.pack.application.AppController.SIGNUP_ACTIVITY_REQUEST_CO
 import static com.pack.pack.application.AppController.RESET_PASSWD_ACTIVITY_REQUEST_CODE;
 import static com.pack.pack.application.AppController.ANDROID_APP_CLIENT_KEY;
 import static com.pack.pack.application.AppController.ANDROID_APP_CLIENT_SECRET;
+import static com.pack.pack.application.AppController.getInstance;
 
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
+import com.pack.pack.application.data.UserInfo;
+import com.pack.pack.application.data.util.DBUtil;
+import com.pack.pack.application.data.util.ILoginStatusListener;
+import com.pack.pack.application.data.util.LoginTask;
 import com.pack.pack.client.api.API;
 import com.pack.pack.client.api.APIBuilder;
 import com.pack.pack.client.api.APIConstants;
 import com.pack.pack.client.api.COMMAND;
+import com.pack.pack.model.web.JUser;
 import com.pack.pack.oauth1.client.AccessToken;
 
 /**
@@ -29,7 +35,7 @@ import com.pack.pack.oauth1.client.AccessToken;
  * @author Saurav
  *
  */
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity implements ILoginStatusListener {
 
     private EditText input_email;
     private EditText input_password;
@@ -46,10 +52,18 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        boolean existingUser = false;
         String oAuthToken = AppController.getInstance().getoAuthToken();
         if(oAuthToken != null) {
+            existingUser = true;
             finish();
             startMainActivity();
+        } else {
+            UserInfo userInfo = DBUtil.loadLastLoggedInUserInfo();
+            if(userInfo != null) {
+                existingUser = true;
+                doLogin(userInfo);
+            }
         }
 
         input_email = (EditText) findViewById(R.id.input_email);
@@ -58,10 +72,41 @@ public class LoginActivity extends AppCompatActivity {
         btn_signup = (AppCompatButton) findViewById(R.id.btn_signup);
         link_forgot_passwd = (TextView) findViewById(R.id.link_forgot_passwd);
 
+        if(existingUser) {
+            boolean loginStatus = getIntent().getBooleanExtra("loginStatus", false);
+            if(loginStatus) {
+                input_email.setVisibility(View.INVISIBLE);
+                input_password.setVisibility(View.INVISIBLE);
+            } else {
+                input_email.setVisibility(View.VISIBLE);
+                input_password.setVisibility(View.VISIBLE);
+            }
+            btn_signup.setVisibility(View.INVISIBLE);
+            btn_login.setVisibility(View.INVISIBLE);
+            link_forgot_passwd.setVisibility(View.INVISIBLE);
+        } else {
+            input_email.setVisibility(View.VISIBLE);
+            input_password.setVisibility(View.VISIBLE);
+            btn_login.setVisibility(View.VISIBLE);
+            btn_signup.setVisibility(View.VISIBLE);
+            link_forgot_passwd.setVisibility(View.VISIBLE);
+        }
+
+
+        String email = getIntent().getStringExtra("email");
+        String password = getIntent().getStringExtra("passwd");
+        if(email != null) {
+            input_email.setText(email);
+        }
+        if(password != null) {
+            input_password.setText(password);
+        }
+
         btn_login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                doLogin();
+                UserInfo userInfo = new UserInfo(input_email.getText().toString(), input_password.getText().toString());
+                doLogin(userInfo);
             }
         });
         btn_signup.setOnClickListener(new View.OnClickListener() {
@@ -105,22 +150,36 @@ public class LoginActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
-    private void doLogin() {
-        btn_login.setEnabled(false);
-        showProgressDialog();
-        UserLoginInfo userLoginInfo = new UserLoginInfo(input_email.getText().toString(), input_password.getText().toString());
-        new LoginTask().execute(userLoginInfo);
-        hideProgressDialog();
+    private void doLogin(UserInfo userInfo) {
+        new LoginTask(this).execute(userInfo);
     }
 
-    protected void onLoginSuccess(AccessToken accessToken) {
-        AppController.getInstance().setoAuthToken(accessToken.getToken());
+    @Override
+    public void onPreStart() {
+        showProgressDialog();
+    }
+
+    @Override
+    public void onLoginSuccess(AccessToken token, JUser user) {
+        getIntent().putExtra("loginStatus", true);
+        finish();
         startMainActivity();
     }
 
-    protected void onLoginFailure(String errorMsg) {
+    @Override
+    public void onPostComplete() {
+
+    }
+
+    public void onLoginFailure(String errorMsg) {
+        hideProgressDialog();
+        getIntent().putExtra("email", input_email.getText().toString());
+        getIntent().putExtra("passwd", input_password.getText().toString());
+        getIntent().putExtra("loginStatus", false);
         finish();
         startActivity(getIntent());
+        btn_login.setEnabled(true);
+        btn_signup.setEnabled(true);
     }
 
     private void doSignup() {
@@ -148,67 +207,5 @@ public class LoginActivity extends AppCompatActivity {
     private void startMainActivity() {
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
-    }
-
-    private class LoginTask extends AsyncTask<UserLoginInfo, Integer, AccessToken> {
-
-        private String errorMsg;
-
-        @Override
-        protected void onPreExecute() {
-            showProgressDialog();
-            super.onPreExecute();
-        }
-
-        @Override
-        protected AccessToken doInBackground(UserLoginInfo... userLoginInfos) {
-            if(userLoginInfos == null || userLoginInfos.length == 0)
-                throw new RuntimeException("Failed to login.");
-            AccessToken accessToken = null;
-            UserLoginInfo userLoginInfo = userLoginInfos[0];
-            try {
-                API api = APIBuilder.create().setAction(COMMAND.SIGN_IN)
-                        .addApiParam(APIConstants.Login.CLIENT_KEY, ANDROID_APP_CLIENT_KEY)
-                        .addApiParam(APIConstants.Login.CLIENT_SECRET, ANDROID_APP_CLIENT_SECRET)
-                        .addApiParam(APIConstants.Login.USERNAME, userLoginInfo.getUsername())
-                        .addApiParam(APIConstants.Login.PASSWORD, userLoginInfo.getPasswd())
-                        .build();
-                accessToken = (AccessToken) api.execute();
-            } catch (Exception e) {
-                Log.i(LOG_TAG, e.getMessage());
-                errorMsg = e.getMessage();
-            }
-            return accessToken;
-        }
-
-        @Override
-        protected void onPostExecute(AccessToken accessToken) {
-            super.onPostExecute(accessToken);
-            if(accessToken != null && accessToken.getToken() != null) {
-                onLoginSuccess(accessToken);
-            }
-            else {
-                onLoginFailure(errorMsg);
-            }
-            hideProgressDialog();
-        }
-    }
-
-    private class UserLoginInfo {
-        private String username;
-        private String passwd;
-
-        UserLoginInfo(String username, String passwd) {
-            this.username = username;
-            this.passwd = passwd;
-        }
-
-        String getUsername() {
-            return username;
-        }
-
-        String getPasswd() {
-            return  passwd;
-        }
     }
 }

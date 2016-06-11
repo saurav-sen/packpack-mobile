@@ -1,4 +1,4 @@
-package com.pack.pack.application.topic.activity.model;
+package com.pack.pack.application.data;
 
 /**
  * Created by Saurav on 10-04-2016.

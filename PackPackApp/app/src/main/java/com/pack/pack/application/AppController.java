@@ -8,7 +8,9 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
-import com.pack.pack.application.topic.activity.model.UserInfo;
+import com.pack.pack.application.data.UserInfo;
+import com.pack.pack.application.data.util.DBUtil;
+import com.pack.pack.application.data.util.LoginTask;
 import com.pack.pack.client.api.API;
 import com.pack.pack.client.api.APIBuilder;
 import com.pack.pack.client.api.APIConstants;
@@ -18,8 +20,6 @@ import com.pack.pack.model.web.JUser;
 import com.pack.pack.oauth1.client.AccessToken;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -70,6 +70,10 @@ public class AppController extends Application {
 
     private JUser user;
 
+    public void setUser(JUser user) {
+        this.user = user;
+    }
+
     public String getUserId() {
         return user != null ? user.getId() : null;
     }
@@ -83,6 +87,14 @@ public class AppController extends Application {
 
     public static final int APP_EXTERNAL_STORAGE_WRITE_REQUEST_CODE = 115;
     public static final int CAMERA_ACCESS_REQUEST_CODE = 116;
+    public static final int LOCATION_FINE_ACCESS_REQUEST_CODE = 117;
+    public static final String RESULT_RECEIVER = "resultReceiver";
+    public static final String LOCATION_PARCELABLE_ADDRESS_KEY = "address";
+    public static final String LOCATION_PARCELABLE_ERR_MSG_KEY = "errMsg";
+    public static final int SUCCESS_RESULT = 0;
+    public static final int FAILURE_RESULT = 1;
+
+    public static final int PLACE_AUTO_COMPLETE_REQ_CODE = 118;
 
     private boolean enableShareOption = true;
 
@@ -95,10 +107,15 @@ public class AppController extends Application {
 
     private List<JPackAttachment> packAttachments;
 
+    private boolean signInProgress;
+
     @Override
     public void onCreate() {
         super.onCreate();
-        new AutoLoginTask().execute(new UserInfo(USERNAME, "P@ckp@K#123"));
+        UserInfo userInfo = DBUtil.loadLastLoggedInUserInfo();
+        if(userInfo != null) {
+            new LoginTask().execute(userInfo);
+        }
         mInstance = this;
     }
 
@@ -107,7 +124,7 @@ public class AppController extends Application {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
-              //  e.printStackTrace();
+                //  e.printStackTrace();
             } finally {
             }
         }
@@ -153,39 +170,6 @@ public class AppController extends Application {
     public void cancelPendingRequests(Object tag) {
         if (mRequestQueue != null) {
             mRequestQueue.cancelAll(tag);
-        }
-    }
-
-    private class AutoLoginTask extends AsyncTask<UserInfo, Integer, String> {
-        @Override
-        protected String doInBackground(UserInfo... userInfos) {
-            try {
-                API api = APIBuilder
-                        .create()
-                        .setAction(COMMAND.SIGN_IN)
-                        .addApiParam(APIConstants.Login.CLIENT_KEY,
-                                ANDROID_APP_CLIENT_KEY)
-                        .addApiParam(APIConstants.Login.CLIENT_SECRET,
-                                ANDROID_APP_CLIENT_SECRET)
-                        .addApiParam(APIConstants.Login.USERNAME, userInfos[0].getUsername())
-                        .addApiParam(APIConstants.Login.PASSWORD, userInfos[0].getPassword()).build();
-                AccessToken token = (AccessToken)api.execute();
-                if(token == null)
-                    return null;
-                oAuthToken = token.getToken();
-
-                api = APIBuilder
-                        .create()
-                        .setAction(COMMAND.GET_USER_BY_USERNAME)
-                        .setOauthToken(oAuthToken)
-                        .addApiParam(APIConstants.User.USERNAME,
-                                userInfos[0].getUsername()).build();
-                user = (JUser) api.execute();
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-            }
-            return oAuthToken;
         }
     }
 

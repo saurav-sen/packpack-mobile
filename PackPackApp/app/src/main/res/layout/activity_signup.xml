@@ -72,6 +72,12 @@
                 android:maxLines="5"
                 android:scrollHorizontally="false"
                 android:hint="Address"/>
+            <!--AutoCompleteTextView
+                android:id="@+id/input_address"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:text="Address"/-->
         </android.support.design.widget.TextInputLayout>
 
         <!-- Signup Button -->
