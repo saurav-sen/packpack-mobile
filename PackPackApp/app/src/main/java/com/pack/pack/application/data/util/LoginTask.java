@@ -4,6 +4,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.pack.pack.application.AppController;
+import com.pack.pack.application.data.LoggedInUserInfo;
 import com.pack.pack.application.data.UserInfo;
 import com.pack.pack.client.api.API;
 import com.pack.pack.client.api.APIBuilder;
@@ -21,11 +22,9 @@ import static com.pack.pack.application.AppController.ANDROID_APP_CLIENT_SECRET;
 /**
  * Created by Saurav on 11-06-2016.
  */
-public class LoginTask extends AsyncTask<UserInfo, Integer, AccessToken> {
+public class LoginTask extends AbstractTask<UserInfo, Integer, AccessToken> {
 
     private String errorMsg;
-
-    private List<ILoginStatusListener> listeners = new ArrayList<ILoginStatusListener>(2);
 
     private static final String LOG_TAG = "LoginTask";
 
@@ -34,22 +33,8 @@ public class LoginTask extends AsyncTask<UserInfo, Integer, AccessToken> {
     public LoginTask() {
     }
 
-    public LoginTask(ILoginStatusListener listener) {
+    public LoginTask(IAsyncTaskStatusListener listener) {
         addListener(listener);
-    }
-
-    public void addListener(ILoginStatusListener listener) {
-        if(listener == null)
-            return;
-        listeners.add(listener);
-    }
-
-    @Override
-    protected void onPreExecute() {
-        for(ILoginStatusListener listener : listeners) {
-            listener.onPreStart();
-        }
-        super.onPreExecute();
     }
 
     @Override
@@ -84,20 +69,17 @@ public class LoginTask extends AsyncTask<UserInfo, Integer, AccessToken> {
     }
 
     @Override
-    protected void onPostExecute(AccessToken accessToken) {
-        super.onPostExecute(accessToken);
-        if(accessToken != null && accessToken.getToken() != null) {
-            for(ILoginStatusListener listener : listeners) {
-                listener.onLoginSuccess(accessToken, user);
-            }
-        }
-        else {
-            for(ILoginStatusListener listener : listeners) {
-                listener.onLoginFailure(errorMsg);
-            }
-        }
-        for(ILoginStatusListener listener : listeners) {
-            listener.onPostComplete();
-        }
+    protected Object getSuccessResult(AccessToken accessToken) {
+        return new LoggedInUserInfo(accessToken, user);
+    }
+
+    @Override
+    protected boolean isSuccess(AccessToken accessToken) {
+        return accessToken != null && accessToken.getToken() != null;
+    }
+
+    @Override
+    protected String getFailureMessage() {
+        return errorMsg;
     }
 }

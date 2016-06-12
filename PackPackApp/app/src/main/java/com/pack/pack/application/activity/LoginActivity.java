@@ -2,31 +2,23 @@ package com.pack.pack.application.activity;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.AppCompatButton;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import static com.pack.pack.application.AppController.SIGNUP_ACTIVITY_REQUEST_CODE;
 import static com.pack.pack.application.AppController.RESET_PASSWD_ACTIVITY_REQUEST_CODE;
-import static com.pack.pack.application.AppController.ANDROID_APP_CLIENT_KEY;
-import static com.pack.pack.application.AppController.ANDROID_APP_CLIENT_SECRET;
-import static com.pack.pack.application.AppController.getInstance;
 
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
+import com.pack.pack.application.data.LoggedInUserInfo;
 import com.pack.pack.application.data.UserInfo;
 import com.pack.pack.application.data.util.DBUtil;
-import com.pack.pack.application.data.util.ILoginStatusListener;
+import com.pack.pack.application.data.util.IAsyncTaskStatusListener;
 import com.pack.pack.application.data.util.LoginTask;
-import com.pack.pack.client.api.API;
-import com.pack.pack.client.api.APIBuilder;
-import com.pack.pack.client.api.APIConstants;
-import com.pack.pack.client.api.COMMAND;
 import com.pack.pack.model.web.JUser;
 import com.pack.pack.oauth1.client.AccessToken;
 
@@ -35,7 +27,7 @@ import com.pack.pack.oauth1.client.AccessToken;
  * @author Saurav
  *
  */
-public class LoginActivity extends AppCompatActivity implements ILoginStatusListener {
+public class LoginActivity extends AppCompatActivity implements IAsyncTaskStatusListener {
 
     private EditText input_email;
     private EditText input_password;
@@ -160,7 +152,10 @@ public class LoginActivity extends AppCompatActivity implements ILoginStatusList
     }
 
     @Override
-    public void onLoginSuccess(AccessToken token, JUser user) {
+    public void onSuccess(Object data) {
+        LoggedInUserInfo userInfo = (LoggedInUserInfo)data;
+        AccessToken token = userInfo.getAccessToken();
+        JUser user = userInfo.getUser();
         getIntent().putExtra("loginStatus", true);
         finish();
         startMainActivity();
@@ -171,7 +166,7 @@ public class LoginActivity extends AppCompatActivity implements ILoginStatusList
 
     }
 
-    public void onLoginFailure(String errorMsg) {
+    public void onFailure(String errorMsg) {
         hideProgressDialog();
         getIntent().putExtra("email", input_email.getText().toString());
         getIntent().putExtra("passwd", input_password.getText().toString());

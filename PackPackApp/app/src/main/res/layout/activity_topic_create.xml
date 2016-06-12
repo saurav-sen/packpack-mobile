@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <EditText
+        android:id="@+id/topic_create_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Name" />
+
+    <EditText
+        android:id="@+id/topic_create_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Describe"
+        android:inputType="textMultiLine"
+        android:maxLines="10"
+        android:minLines="5" />
+
+    <EditText
+        android:id="@+id/topic_create_category"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Category"
+        android:inputType="textAutoComplete" />
+
+    <ImageView
+        android:id="@+id/topic_create_wallpaper"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/wallpaper_select"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <!--view
+        android:layout_width="match_parent"
+        android:layout_height="10dp"
+        style="@style/Divider" /-->
+
+    <TextView
+        android:id="@+id/topic_create_txtPercentage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="15dp"
+        android:layout_marginTop="15dp"
+        android:textColor="@color/upload_txt_font"
+        android:textSize="30dp"
+        android:visibility="gone" />
+
+    <ProgressBar
+        android:id="@+id/topic_create_progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:layout_marginBottom="35dp"
+        android:visibility="gone" />
+
+    <Button
+        android:id="@+id/topic_create_submit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:background="@color/upload_btn_bg"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:text="Done"
+        android:textColor="@color/white"
+        android:layout_marginBottom="20dp"/>
+
+</LinearLayout>

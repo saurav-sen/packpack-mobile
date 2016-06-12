@@ -30,27 +30,34 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activity.PackDetailActivity"
-            android:label="@string/title_activity_pack_detail"
+            android:label="PackPack"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activity.InsideTopicActivity"
-            android:label="@string/title_activity_inside_topic"
+            android:label="PackPack"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".activity.PackAttachmentCommentsActivity" />
         <activity android:name=".activity.ImageVideoCaptureActivity" />
         <activity
             android:name=".activity.UploadActivity"
-            android:label="@string/title_activity_upload"
+            android:label="PackPack"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activity.FullscreenAttachmentViewActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label="@string/title_activity_fullscreen_attachment_view"
+            android:label="PackPack"
             android:theme="@style/FullscreenTheme" />
         <activity android:name=".activity.MainActivity" />
         <activity android:name=".activity.SignupActivity" />
-        <activity android:name=".activity.ResetPasswordActivity"></activity>
-        <service android:name=".service.FetchAddressIntentService" android:exported="false" />
+        <activity android:name=".activity.ResetPasswordActivity" />
+
+        <service
+            android:name=".service.FetchAddressIntentService"
+            android:exported="false" />
+
+        <activity
+            android:name=".activity.TopicCreateActivity"
+            android:label="PackPack"/>
     </application>
 
 </manifest>

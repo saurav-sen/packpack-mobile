@@ -3,6 +3,8 @@ package com.pack.pack.application.topic.activity.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.pack.pack.model.web.JTopic;
+
 /**
  * Created by Saurav on 12-05-2016.
  */
@@ -17,6 +19,15 @@ public class ParcelableTopic implements Parcelable {
     private String description;
 
     public ParcelableTopic() {
+    }
+
+    public ParcelableTopic(JTopic topic) {
+        if(topic != null) {
+            setTopicId(topic.getId());
+            setDescription(topic.getDescription());
+            setTopicCategory(topic.getCategory());
+            setWallpaperUrl(topic.getWallpaperUrl());
+        }
     }
 
     public ParcelableTopic(String topicId, String topicCategory, String wallpaperUrl, String description) {

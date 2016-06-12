@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
+import com.pack.pack.application.data.util.ImageUtil;
 import com.pack.pack.application.view.CameraPreview;
 
 import java.io.File;
@@ -156,53 +157,16 @@ public class ImageVideoCaptureActivity extends Activity {
 
     private void capturePhoto() {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        mediaFileUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE);
+        mediaFileUri = ImageUtil.getOutputMediaFileUri(MEDIA_TYPE_IMAGE);
         intent.putExtra(MediaStore.EXTRA_OUTPUT, mediaFileUri);
         startActivityForResult(intent, CAMERA_CAPTURE_PHOTO_REQUEST_CODE);
     }
 
     private void recordVideo() {
         Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
-        mediaFileUri = getOutputMediaFileUri(MEDIA_TYPE_VIDEO);
+        mediaFileUri = ImageUtil.getOutputMediaFileUri(MEDIA_TYPE_VIDEO);
         intent.putExtra(MediaStore.EXTRA_OUTPUT, mediaFileUri);
         startActivityForResult(intent, CAMERA_RECORD_VIDEO_REQUEST_CODE);
-    }
-
-    private Uri getOutputMediaFileUri(int type) {
-        return Uri.fromFile(getOutputMediaFile(type));
-    }
-
-    private static File getOutputMediaFile(int type) {
-        // External sdcard location
-        File mediaStorageDir = new File(
-                Environment
-                        .getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
-                APP_NAME);
-
-        // Create the storage directory if it does not exist
-        if (!mediaStorageDir.exists()) {
-            if (!mediaStorageDir.mkdirs()) {
-                Log.d(LOG_TAG, "Oops! Failed create "
-                        + APP_NAME + " directory");
-                return null;
-            }
-        }
-
-        // Create a media file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss",
-                Locale.getDefault()).format(new Date());
-        File mediaFile;
-        if (type == MEDIA_TYPE_IMAGE) {
-            mediaFile = new File(mediaStorageDir.getPath() + File.separator
-                    + "IMG_" + timeStamp + ".jpg");
-        } else if (type == MEDIA_TYPE_VIDEO) {
-            mediaFile = new File(mediaStorageDir.getPath() + File.separator
-                    + "VID_" + timeStamp + ".mp4");
-        } else {
-            return null;
-        }
-
-        return mediaFile;
     }
 
     @Override

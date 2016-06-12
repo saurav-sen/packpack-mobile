@@ -48,6 +48,10 @@ public class AppController extends Application {
 
     public static final int CAMERA_RECORD_VIDEO_REQUEST_CODE = 400;
 
+    public static final int CREATE_TOPIC_REQUSET_CODE = 401;
+
+    public static final int IMAGE_PICK_REQUSET_CODE = 402;
+
     public static final String UPLOAD_FILE_PATH = "upload_file_path";
 
     public static final String UPLOAD_FILE_IS_PHOTO = "upload_file_is_photo";
