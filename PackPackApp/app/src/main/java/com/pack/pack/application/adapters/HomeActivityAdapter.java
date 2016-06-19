@@ -15,7 +15,9 @@ import com.pack.pack.application.topic.activity.model.TopicEvent;
 import java.util.List;
 
 /**
- * Created by CipherCloud on 08-04-2016.
+ *
+ * Created by Saurav on 08-04-2016.
+ *
  */
 public class HomeActivityAdapter extends ArrayAdapter<TopicEvent> {
 

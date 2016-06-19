@@ -45,18 +45,6 @@ public class LoginActivity extends AppCompatActivity implements IAsyncTaskStatus
         setContentView(R.layout.activity_login);
 
         boolean existingUser = false;
-        String oAuthToken = AppController.getInstance().getoAuthToken();
-        if(oAuthToken != null) {
-            existingUser = true;
-            finish();
-            startMainActivity();
-        } else {
-            UserInfo userInfo = DBUtil.loadLastLoggedInUserInfo();
-            if(userInfo != null) {
-                existingUser = true;
-                doLogin(userInfo);
-            }
-        }
 
         input_email = (EditText) findViewById(R.id.input_email);
         input_password = (EditText) findViewById(R.id.input_password);
@@ -64,7 +52,7 @@ public class LoginActivity extends AppCompatActivity implements IAsyncTaskStatus
         btn_signup = (AppCompatButton) findViewById(R.id.btn_signup);
         link_forgot_passwd = (TextView) findViewById(R.id.link_forgot_passwd);
 
-        if(existingUser) {
+        /*if(existingUser) {
             boolean loginStatus = getIntent().getBooleanExtra("loginStatus", false);
             if(loginStatus) {
                 input_email.setVisibility(View.INVISIBLE);
@@ -76,13 +64,13 @@ public class LoginActivity extends AppCompatActivity implements IAsyncTaskStatus
             btn_signup.setVisibility(View.INVISIBLE);
             btn_login.setVisibility(View.INVISIBLE);
             link_forgot_passwd.setVisibility(View.INVISIBLE);
-        } else {
+        } else {*/
             input_email.setVisibility(View.VISIBLE);
             input_password.setVisibility(View.VISIBLE);
             btn_login.setVisibility(View.VISIBLE);
             btn_signup.setVisibility(View.VISIBLE);
             link_forgot_passwd.setVisibility(View.VISIBLE);
-        }
+        //}
 
 
         String email = getIntent().getStringExtra("email");

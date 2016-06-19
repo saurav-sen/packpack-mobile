@@ -18,6 +18,8 @@ public class ParcelableTopic implements Parcelable {
 
     private String description;
 
+    private String topicName;
+
     public ParcelableTopic() {
     }
 
@@ -27,14 +29,16 @@ public class ParcelableTopic implements Parcelable {
             setDescription(topic.getDescription());
             setTopicCategory(topic.getCategory());
             setWallpaperUrl(topic.getWallpaperUrl());
+            setTopicName(topic.getName());
         }
     }
 
-    public ParcelableTopic(String topicId, String topicCategory, String wallpaperUrl, String description) {
+    public ParcelableTopic(String topicId, String topicCategory, String wallpaperUrl, String description, String name) {
         this.topicId = topicId;
         this.topicCategory = topicCategory;
         this.wallpaperUrl = wallpaperUrl;
         this.description = description;
+        this.topicName = name;
     }
 
     public String getTopicId() {
@@ -69,6 +73,14 @@ public class ParcelableTopic implements Parcelable {
         this.description = description;
     }
 
+    public String getTopicName() {
+        return topicName;
+    }
+
+    public void setTopicName(String topicName) {
+        this.topicName = topicName;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -80,6 +92,7 @@ public class ParcelableTopic implements Parcelable {
         parcel.writeString(topicCategory);
         parcel.writeString(wallpaperUrl);
         parcel.writeString(description);
+        parcel.writeString(topicName);
     }
 
     public static final Parcelable.Creator<ParcelableTopic> CREATOR = new Parcelable.Creator<ParcelableTopic>() {
@@ -89,7 +102,8 @@ public class ParcelableTopic implements Parcelable {
             String topicCategory = parcel.readString();
             String wallpaperUrl = parcel.readString();
             String description = parcel.readString();
-            return new ParcelableTopic(topicId, topicCategory, wallpaperUrl, description);
+            String name = parcel.readString();
+            return new ParcelableTopic(topicId, topicCategory, wallpaperUrl, description, name);
         }
 
         @Override

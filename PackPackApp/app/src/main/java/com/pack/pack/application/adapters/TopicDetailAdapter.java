@@ -69,7 +69,7 @@ public class TopicDetailAdapter extends ArrayAdapter<JPack> {
 
     @Override
     public int getCount() {
-        return 20;
+        return packs != null ? packs.size() : 0;
     }
 
     @Override

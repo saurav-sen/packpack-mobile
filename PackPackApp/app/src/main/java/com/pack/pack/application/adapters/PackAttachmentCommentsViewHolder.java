@@ -10,7 +10,7 @@ import com.pack.pack.model.web.JPackAttachment;
 
 /**
  *
- * Created by CipherCloud on 03-06-2016.
+ * Created by Saurav on 03-06-2016.
  */
 class PackAttachmentCommentsViewHolder extends RecyclerView.ViewHolder {
 

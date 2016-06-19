@@ -46,7 +46,7 @@ public class TopicViewAdapter extends ArrayAdapter<JTopic> {
 
     @Override
     public int getCount() {
-        return 20;//topics.size();
+        return topics != null ? topics.size() : 0;
     }
 
     @Override

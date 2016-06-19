@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by CipherCloud on 12-05-2016.
+ * Created by Saurav on 12-05-2016.
  */
 public class ImageGridAdapter extends BaseAdapter {
 
