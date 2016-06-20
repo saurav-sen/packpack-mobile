@@ -19,7 +19,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".activity.SplashActivity"
-            android:label="Zxuluk"
+            android:label="Squill"
             android:theme="@style/splashScreenTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -28,31 +28,31 @@
             </intent-filter>
         </activity>
         <activity android:name=".activity.LoginActivity"
-            android:label="Zxuluk"
+            android:label="Squill"
             android:theme="@style/AppTheme.NoActionBar" >
         </activity>
         <activity
             android:name=".activity.TopicDetailActivity"
-            android:label="Zxuluk"
+            android:label="Squill"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activity.PackDetailActivity"
-            android:label="Zxuluk"
+            android:label="Squill"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activity.InsideTopicActivity"
-            android:label="Zxuluk"
+            android:label="Squill"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".activity.PackAttachmentCommentsActivity" />
         <activity android:name=".activity.ImageVideoCaptureActivity" />
         <activity
             android:name=".activity.UploadActivity"
-            android:label="Zxuluk"
+            android:label="Squill"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activity.FullscreenAttachmentViewActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label="Zxuluk"
+            android:label="Squill"
             android:theme="@style/FullscreenTheme" />
         <activity android:name=".activity.MainActivity" />
         <activity android:name=".activity.SignupActivity" />
@@ -64,7 +64,7 @@
 
         <activity
             android:name=".activity.TopicCreateActivity"
-            android:label="Zxuluk" />
+            android:label="Squill" />
     </application>
 
 </manifest>
