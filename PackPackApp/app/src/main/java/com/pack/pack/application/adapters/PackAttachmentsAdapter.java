@@ -92,7 +92,6 @@ public class PackAttachmentsAdapter extends ArrayAdapter<JPackAttachment> {
         });
 
         Button pack_attachment_like = (Button) convertView.findViewById(R.id.pack_attachment_like);
-        pack_attachment_like.setText("Like");
         pack_attachment_like.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -104,7 +103,6 @@ public class PackAttachmentsAdapter extends ArrayAdapter<JPackAttachment> {
         });
 
         Button pack_attachment_comment = (Button) convertView.findViewById(R.id.pack_attachment_comment);
-        pack_attachment_comment.setText("Comment");
         pack_attachment_comment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -116,7 +114,6 @@ public class PackAttachmentsAdapter extends ArrayAdapter<JPackAttachment> {
         });
 
         Button pack_attachment_share = (Button) convertView.findViewById(R.id.pack_attachment_share);
-        pack_attachment_share.setText("Share");
         pack_attachment_share.setEnabled(AppController.getInstance().isEnableShareOption());
         pack_attachment_share.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -127,7 +124,7 @@ public class PackAttachmentsAdapter extends ArrayAdapter<JPackAttachment> {
 
         JPackAttachment attachment = getItem(position);
         if(attachment != null) {
-            new DownloadImageTask(pack_attachment_img, 700, 500).execute(attachment.getAttachmentUrl());
+            new DownloadImageTask(pack_attachment_img, 700, 600).execute(attachment.getAttachmentUrl());
         }
         return convertView;
     }

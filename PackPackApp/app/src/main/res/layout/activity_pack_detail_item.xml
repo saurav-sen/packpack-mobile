@@ -5,38 +5,71 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:orientation="vertical"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.pack.pack.application.activity.PackDetailActivity"
-    tools:showIn="@layout/activity_pack_detail">
+    tools:context="com.pack.pack.application.activity.PackDetailActivity">
 
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:scaleType="fitXY"
         android:id="@+id/pack_attachment_img"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="fill"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
         android:orientation="horizontal">
         <Button
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="30dp"
             android:layout_gravity="left"
-            android:id="@+id/pack_attachment_like"/>
+            android:textColor="@color/feed_bg"
+            android:background="@drawable/react_buttons"
+            android:id="@+id/pack_attachment_like"
+            android:scaleType="fitXY"
+            android:drawableLeft="@android:drawable/btn_star_big_on"
+            android:drawablePadding="10dp"
+            android:paddingRight="10dp"
+            android:text="Like"
+            android:textAllCaps="false" />
         <Button
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="30dp"
             android:layout_gravity="center"
-            android:id="@+id/pack_attachment_comment"/>
+            android:background="@drawable/react_buttons"
+            android:textColor="@color/feed_bg"
+            android:id="@+id/pack_attachment_comment"
+            android:scaleType="fitXY"
+            android:drawableLeft="@android:drawable/btn_star_big_on"
+            android:drawablePadding="10dp"
+            android:paddingRight="10dp"
+            android:text="Comment"
+            android:textAllCaps="false" />
         <Button
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="30dp"
             android:layout_gravity="right"
-            android:id="@+id/pack_attachment_share"/>
+            android:background="@drawable/react_buttons"
+            android:textColor="@color/feed_bg"
+            android:id="@+id/pack_attachment_share"
+            android:scaleType="fitXY"
+            android:drawableLeft="@android:drawable/btn_star_big_on"
+            android:drawablePadding="10dp"
+            android:paddingRight="10dp"
+            android:text="Share"
+            android:textAllCaps="false" />
     </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="5dp"
+        android:scaleType="fitXY"
+        android:paddingTop="5dp"
+        android:background="@color/feed_bg"
+        style="@style/Divider"/>
+
 </LinearLayout>

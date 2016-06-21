@@ -63,6 +63,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/activity_pack_attachments"
+            android:paddingTop="40dp"
+            android:scaleType="fitXY"
             android:divider="@null"/>
 
     </RelativeLayout>
@@ -74,6 +76,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
-        android:src="@android:drawable/ic_dialog_email" />
+        app:backgroundTint="@color/colorPrimaryDark"
+        android:src="@android:drawable/ic_menu_edit" />
 
 </android.support.design.widget.CoordinatorLayout>
