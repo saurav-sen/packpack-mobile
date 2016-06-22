@@ -9,22 +9,22 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingBottom="@dimen/activity_vertical_margin"
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin"
-        android:paddingTop="@dimen/activity_vertical_margin"
         android:background="#000000"
         android:orientation="vertical">
         <FrameLayout
             android:id="@+id/camera_preview"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1" />
+            android:layout_height="100dp" />
         <GridView
             android:id="@+id/galley_items"
             android:layout_width="match_parent"
-            android:layout_height="300dp">
-        </GridView>
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:stretchMode="columnWidth"
+            android:numColumns="auto_fit"
+            android:layout_weight="1" />
     </LinearLayout>
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/capture_photo"
@@ -32,6 +32,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="top|left"
         app:backgroundTint="@color/black_overlay"
+        app:borderWidth="0dp"
         android:layout_margin="@dimen/fab_margin"
         android:src="@android:drawable/ic_menu_camera" />
     <android.support.design.widget.FloatingActionButton
@@ -40,6 +41,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="top|right"
         app:backgroundTint="@color/black_overlay"
+        app:borderWidth="0dp"
         android:layout_margin="@dimen/fab_margin"
         android:src="@android:drawable/presence_video_away" />
 </android.support.design.widget.CoordinatorLayout>

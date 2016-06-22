@@ -89,6 +89,7 @@ public class AppController extends Application {
 
     private static final String USERNAME = "sourabhnits@gmail.com";
 
+    public static final int APP_EXTERNAL_STORAGE_READ_REQUEST_CODE = 114;
     public static final int APP_EXTERNAL_STORAGE_WRITE_REQUEST_CODE = 115;
     public static final int CAMERA_ACCESS_REQUEST_CODE = 116;
     public static final int LOCATION_FINE_ACCESS_REQUEST_CODE = 117;
@@ -103,6 +104,20 @@ public class AppController extends Application {
     private boolean enableShareOption = true;
 
     private boolean cameraPermissionGranted = false;
+
+    private boolean externalReadGranted = false;
+
+    public boolean isExternalReadGranted() {
+        return externalReadGranted;
+    }
+
+    public void externalReadGranted() {
+        this.externalReadGranted = true;
+    }
+
+    public void externalReadDenied() {
+        this.externalReadGranted = false;
+    }
 
     private Map<String, JPackAttachment> packAttachmentCache = new WeakHashMap<String, JPackAttachment>();
 
