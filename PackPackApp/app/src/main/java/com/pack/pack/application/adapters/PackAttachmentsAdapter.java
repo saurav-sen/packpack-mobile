@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +17,7 @@ import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
 import com.pack.pack.application.activity.FullscreenAttachmentViewActivity;
 import com.pack.pack.application.activity.PackAttachmentCommentsActivity;
+import com.pack.pack.application.data.util.AbstractNetworkTask;
 import com.pack.pack.application.image.loader.DownloadImageTask;
 import com.pack.pack.client.api.API;
 import com.pack.pack.client.api.APIBuilder;
@@ -30,7 +30,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -170,22 +172,29 @@ public class PackAttachmentsAdapter extends ArrayAdapter<JPackAttachment> {
         }
     }
 
-    private class AddLikeTask extends AsyncTask<String, Void, Void> {
+    private class AddLikeTask extends AbstractNetworkTask<String, Void, Void> {
+
         @Override
-        protected Void doInBackground(String... IDs) {
-            if(IDs == null || IDs.length == 0)
-                return null;
-            try {
-                String ID = IDs[0];
-                API api = APIBuilder.create().setAction(COMMAND.ADD_LIKE_TO_PACK_ATTACHMENT)
-                        .setOauthToken(AppController.getInstance().getoAuthToken())
-                        .addApiParam(APIConstants.PackAttachment.ID, ID)
-                        .addApiParam(APIConstants.User.ID, AppController.getInstance().getUserId())
-                        .build();
-                api.execute();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        protected Void executeApi(API api) throws Exception {
+            api.execute();
+            return null;
+        }
+
+        @Override
+        protected COMMAND command() {
+            return COMMAND.ADD_LIKE_TO_PACK_ATTACHMENT;
+        }
+
+        @Override
+        protected Map<String, Object> prepareApiParams(String s) {
+            Map<String, Object> apiParams = new HashMap<String, Object>();
+            apiParams.put(APIConstants.PackAttachment.ID, s);
+            apiParams.put(APIConstants.User.ID, AppController.getInstance().getUserId());
+            return apiParams;
+        }
+
+        @Override
+        protected String getFailureMessage() {
             return null;
         }
     }

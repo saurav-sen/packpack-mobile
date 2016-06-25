@@ -1,6 +1,5 @@
 package com.pack.pack.application.activity;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -20,10 +19,9 @@ import android.widget.Toast;
 
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
-import com.pack.pack.application.data.util.AbstractTask;
+import com.pack.pack.application.data.util.AbstractNetworkTask;
 import com.pack.pack.application.data.util.FileUtil;
 import com.pack.pack.application.data.util.IAsyncTaskStatusListener;
-import com.pack.pack.application.data.util.ImageUtil;
 import com.pack.pack.application.topic.activity.model.ParcelableTopic;
 import com.pack.pack.client.api.API;
 import com.pack.pack.client.api.APIBuilder;
@@ -34,9 +32,8 @@ import com.pack.pack.model.web.JTopic;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.pack.pack.application.AppController.IMAGE_PICK_REQUSET_CODE;
 
@@ -167,7 +164,7 @@ public class TopicCreateActivity extends AppCompatActivity implements IAsyncTask
         new TopicCreateTask(this).execute(data);
     }
 
-    private class TopicCreateTask extends AbstractTask<TaskData, Integer, JTopic> {
+    private class TopicCreateTask extends AbstractNetworkTask<TaskData, Integer, JTopic> {
 
         private String errorMsg;
 
@@ -194,25 +191,9 @@ public class TopicCreateActivity extends AppCompatActivity implements IAsyncTask
         }
 
         @Override
-        protected JTopic doInBackground(TaskData... datas) {
+        protected JTopic executeApi(API api) throws Exception {
             JTopic jTopic = null;
-            if(datas == null || datas.length == 0)
-                return jTopic;
-            TaskData data = datas[0];
-            String topicName = data.getTopicName();
-            String topicDescription = data.getTopicDescription();
-            String topicCategory = data.getTopicCategory();
-            String ownerId = AppController.getInstance().getUserId();
             try {
-                API api = APIBuilder.create()
-                        .setAction(COMMAND.CREATE_NEW_TOPIC)
-                        .setOauthToken(AppController.getInstance().getoAuthToken())
-                        .addApiParam(APIConstants.Topic.NAME, topicName)
-                        .addApiParam(APIConstants.Topic.DESCRIPTION, topicDescription)
-                        .addApiParam(APIConstants.Topic.CATEGORY, topicCategory)
-                        .addApiParam(APIConstants.Topic.OWNER_ID, ownerId)
-                        .addApiParam(APIConstants.Topic.WALLPAPER, mediaFile)
-                        .build();
                 MultipartRequestProgressListener listener = new MultipartRequestProgressListener() {
                     @Override
                     public void countTransferProgress(long progress, long total) {
@@ -226,6 +207,26 @@ public class TopicCreateActivity extends AppCompatActivity implements IAsyncTask
                 Log.i(LOG_TAG, "Failed creating new topic :: " + e.getMessage());
             }
             return jTopic;
+        }
+
+        @Override
+        protected COMMAND command() {
+            return COMMAND.CREATE_NEW_TOPIC;
+        }
+
+        @Override
+        protected Map<String, Object> prepareApiParams(TaskData data) {
+            Map<String, Object> apiParams = new HashMap<String, Object>();
+            String topicName = data.getTopicName();
+            String topicDescription = data.getTopicDescription();
+            String topicCategory = data.getTopicCategory();
+            String ownerId = AppController.getInstance().getUserId();
+            apiParams.put(APIConstants.Topic.NAME, topicName);
+            apiParams.put(APIConstants.Topic.DESCRIPTION, topicDescription);
+            apiParams.put(APIConstants.Topic.CATEGORY, topicCategory);
+            apiParams.put(APIConstants.Topic.OWNER_ID, ownerId);
+            apiParams.put(APIConstants.Topic.WALLPAPER, mediaFile);
+            return apiParams;
         }
 
         @Override

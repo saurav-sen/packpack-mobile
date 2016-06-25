@@ -1,23 +1,17 @@
 package com.pack.pack.application;
 
 import android.app.Application;
-import android.os.AsyncTask;
 import android.text.TextUtils;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
-import com.pack.pack.application.data.UserInfo;
+import com.pack.pack.application.db.UserInfo;
 import com.pack.pack.application.data.util.DBUtil;
 import com.pack.pack.application.data.util.LoginTask;
-import com.pack.pack.client.api.API;
-import com.pack.pack.client.api.APIBuilder;
-import com.pack.pack.client.api.APIConstants;
-import com.pack.pack.client.api.COMMAND;
 import com.pack.pack.model.web.JPackAttachment;
 import com.pack.pack.model.web.JUser;
-import com.pack.pack.oauth1.client.AccessToken;
 
 import java.util.ArrayList;
 import java.util.List;

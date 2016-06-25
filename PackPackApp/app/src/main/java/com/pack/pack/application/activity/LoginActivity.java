@@ -12,11 +12,9 @@ import android.widget.TextView;
 import static com.pack.pack.application.AppController.SIGNUP_ACTIVITY_REQUEST_CODE;
 import static com.pack.pack.application.AppController.RESET_PASSWD_ACTIVITY_REQUEST_CODE;
 
-import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
 import com.pack.pack.application.data.LoggedInUserInfo;
-import com.pack.pack.application.data.UserInfo;
-import com.pack.pack.application.data.util.DBUtil;
+import com.pack.pack.application.db.UserInfo;
 import com.pack.pack.application.data.util.IAsyncTaskStatusListener;
 import com.pack.pack.application.data.util.LoginTask;
 import com.pack.pack.model.web.JUser;

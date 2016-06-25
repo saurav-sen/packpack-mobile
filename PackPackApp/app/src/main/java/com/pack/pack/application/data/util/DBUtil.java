@@ -1,6 +1,7 @@
 package com.pack.pack.application.data.util;
 
-import com.pack.pack.application.data.UserInfo;
+import com.pack.pack.application.db.DbObject;
+import com.pack.pack.application.db.UserInfo;
 
 /**
  * Created by Saurav on 11-06-2016.
@@ -13,5 +14,9 @@ public class DBUtil {
     public static UserInfo loadLastLoggedInUserInfo() {
         return new UserInfo("sourabhnits@gmail.com", "P@ckp@K#123");
         //return null;
+    }
+
+    public static DbObject convert(Object object) {
+        return null;
     }
 }

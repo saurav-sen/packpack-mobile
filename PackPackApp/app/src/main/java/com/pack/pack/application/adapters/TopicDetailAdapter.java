@@ -1,10 +1,8 @@
 package com.pack.pack.application.adapters;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -20,6 +18,7 @@ import android.widget.TextView;
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
 import com.pack.pack.application.activity.PackDetailActivity;
+import com.pack.pack.application.data.util.AbstractNetworkTask;
 import com.pack.pack.application.topic.activity.model.ParcelablePack;
 import com.pack.pack.client.api.API;
 import com.pack.pack.client.api.APIBuilder;
@@ -30,7 +29,9 @@ import com.pack.pack.model.web.JPackAttachment;
 import com.pack.pack.model.web.Pagination;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Saurav on 02-05-2016.
@@ -135,7 +136,7 @@ public class TopicDetailAdapter extends ArrayAdapter<JPack> {
         }
     }
 
-    private class LoadPackAttachmentsTask extends AsyncTask<JPack, Integer, List<JPackAttachment>> {
+    private class LoadPackAttachmentsTask extends AbstractNetworkTask<JPack, Integer, List<JPackAttachment>> {
 
         private GridView packAttachmentsGrid;
 
@@ -144,31 +145,30 @@ public class TopicDetailAdapter extends ArrayAdapter<JPack> {
         }
 
         @Override
-        protected List<JPackAttachment> doInBackground(JPack... objects) {
-            List<JPackAttachment> attachemnts = null;
-            if(objects == null || objects.length == 0)
-                return attachemnts;
-            try {
-                JPack obj = objects[0];
-                String packId = obj.getId();
-                String topicId = obj.getParentTopicId();
-                String oAuthToken = AppController.getInstance().getoAuthToken();
-                String userId = AppController.getInstance().getUserId();
-                API api = APIBuilder.create().setAction(COMMAND.GET_ALL_ATTACHMENTS_IN_PACK)
-                        .setOauthToken(oAuthToken)
-                        .addApiParam(APIConstants.User.ID, userId)
-                        .addApiParam(APIConstants.Pack.ID, packId)
-                        .addApiParam(APIConstants.Topic.ID, topicId)
-                        .addApiParam(APIConstants.PageInfo.PAGE_LINK, null)
-                        .build();
-                Pagination<JPackAttachment> page = (Pagination<JPackAttachment>) api.execute();
-                if(page != null) {
-                    attachemnts = page.getResult();
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
+        protected List<JPackAttachment> executeApi(API api) throws Exception {
+            Pagination<JPackAttachment> page = (Pagination<JPackAttachment>) api.execute();
+            List<JPackAttachment> attachments = null;
+            if(page != null) {
+                attachments = page.getResult();
             }
-            return attachemnts;
+            return attachments;
+        }
+
+        @Override
+        protected COMMAND command() {
+            return COMMAND.GET_ALL_ATTACHMENTS_IN_PACK;
+        }
+
+        @Override
+        protected Map<String, Object> prepareApiParams(JPack jPack) {
+            Map<String, Object> apiParams = new HashMap<String, Object>();
+            String userId = AppController.getInstance().getUserId();
+            apiParams.put(APIConstants.User.ID, userId);
+            String packId = jPack.getId();
+            apiParams.put(APIConstants.Pack.ID, packId);
+            String topicId = jPack.getParentTopicId();
+            apiParams.put(APIConstants.Topic.ID, topicId);
+            return apiParams;
         }
 
         @Override
@@ -184,6 +184,11 @@ public class TopicDetailAdapter extends ArrayAdapter<JPack> {
                 adapter.getImageUrls().addAll(imageUrls);
                 packAttachmentsGrid.setAdapter(adapter);
             }
+        }
+
+        @Override
+        protected String getFailureMessage() {
+            return null;
         }
     }
 }

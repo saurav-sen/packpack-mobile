@@ -1,11 +1,10 @@
 package com.pack.pack.application.data.util;
 
-import android.os.AsyncTask;
 import android.util.Log;
 
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.data.LoggedInUserInfo;
-import com.pack.pack.application.data.UserInfo;
+import com.pack.pack.application.db.UserInfo;
 import com.pack.pack.client.api.API;
 import com.pack.pack.client.api.APIBuilder;
 import com.pack.pack.client.api.APIConstants;
@@ -13,8 +12,8 @@ import com.pack.pack.client.api.COMMAND;
 import com.pack.pack.model.web.JUser;
 import com.pack.pack.oauth1.client.AccessToken;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.pack.pack.application.AppController.ANDROID_APP_CLIENT_KEY;
 import static com.pack.pack.application.AppController.ANDROID_APP_CLIENT_SECRET;
@@ -22,13 +21,15 @@ import static com.pack.pack.application.AppController.ANDROID_APP_CLIENT_SECRET;
 /**
  * Created by Saurav on 11-06-2016.
  */
-public class LoginTask extends AbstractTask<UserInfo, Integer, AccessToken> {
+public class LoginTask extends AbstractNetworkTask<UserInfo, Integer, AccessToken> {
 
     private String errorMsg;
 
     private static final String LOG_TAG = "LoginTask";
 
     private JUser user;
+
+    private UserInfo userInfo;
 
     public LoginTask() {
     }
@@ -38,27 +39,18 @@ public class LoginTask extends AbstractTask<UserInfo, Integer, AccessToken> {
     }
 
     @Override
-    protected AccessToken doInBackground(UserInfo... userInfos) {
-        if(userInfos == null || userInfos.length == 0)
-            throw new RuntimeException("Failed to login.");
+    protected AccessToken executeApi(API api0) throws Exception {
         AccessToken accessToken = null;
-        UserInfo userInfo = userInfos[0];
         try {
-            API api = APIBuilder.create().setAction(COMMAND.SIGN_IN)
-                    .addApiParam(APIConstants.Login.CLIENT_KEY, ANDROID_APP_CLIENT_KEY)
-                    .addApiParam(APIConstants.Login.CLIENT_SECRET, ANDROID_APP_CLIENT_SECRET)
-                    .addApiParam(APIConstants.Login.USERNAME, userInfo.getUsername())
-                    .addApiParam(APIConstants.Login.PASSWORD, userInfo.getPassword())
-                    .build();
-            accessToken = (AccessToken) api.execute();
+            accessToken = (AccessToken) api0.execute();
             AppController.getInstance().setoAuthToken(accessToken.getToken());
 
-            api = APIBuilder
+            API api = APIBuilder
                     .create()
                     .setAction(COMMAND.GET_USER_BY_USERNAME)
                     .setOauthToken(AppController.getInstance().getoAuthToken())
                     .addApiParam(APIConstants.User.USERNAME,
-                            userInfos[0].getUsername()).build();
+                            userInfo.getUsername()).build();
             user = (JUser) api.execute();
             AppController.getInstance().setUser(user);
         } catch (Exception e) {
@@ -66,6 +58,22 @@ public class LoginTask extends AbstractTask<UserInfo, Integer, AccessToken> {
             errorMsg = e.getMessage();
         }
         return accessToken;
+    }
+
+    @Override
+    protected COMMAND command() {
+        return COMMAND.SIGN_IN;
+    }
+
+    @Override
+    protected Map<String, Object> prepareApiParams(UserInfo userInfo) {
+        this.userInfo = userInfo;
+        Map<String, Object> apiParams = new HashMap<String, Object>();
+        apiParams.put(APIConstants.Login.CLIENT_KEY, ANDROID_APP_CLIENT_KEY);
+        apiParams.put(APIConstants.Login.CLIENT_SECRET, ANDROID_APP_CLIENT_SECRET);
+        apiParams.put(APIConstants.Login.USERNAME, userInfo.getUsername());
+        apiParams.put(APIConstants.Login.PASSWORD, userInfo.getPassword());
+        return apiParams;
     }
 
     @Override
