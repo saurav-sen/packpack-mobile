@@ -2,6 +2,7 @@ package com.pack.pack.application.fragments;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -19,6 +20,11 @@ import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
 import com.pack.pack.application.activity.TopicDetailActivity;
 import com.pack.pack.application.adapters.TopicViewAdapter;
+import com.pack.pack.application.data.util.AbstractNetworkTask;
+import com.pack.pack.application.data.util.DBUtil;
+import com.pack.pack.application.db.JsonModel;
+import com.pack.pack.application.db.PaginationInfo;
+import com.pack.pack.application.db.UserInfo;
 import com.pack.pack.application.topic.activity.model.ParcelableTopic;
 import com.pack.pack.application.topic.activity.model.TopicEvent;
 import com.pack.pack.application.view.util.ViewUtil;
@@ -31,7 +37,9 @@ import com.pack.pack.model.web.Pagination;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -114,7 +122,18 @@ public abstract class TopicViewFragment extends Fragment {
         return ViewUtil.getListViewId(getCategoryType());
     }
 
-    private class LoadTopicTask extends AsyncTask<Void, Integer, Pagination<JTopic>> {
+    private class LoadTopicTask extends AbstractNetworkTask<Void, Integer, Pagination<JTopic>> {
+
+        private String errorMsg;
+
+        public LoadTopicTask() {
+            super(true, true);
+        }
+
+        @Override
+        protected String getFailureMessage() {
+            return errorMsg;
+        }
 
         @Override
         protected void onPreExecute() {
@@ -124,8 +143,37 @@ public abstract class TopicViewFragment extends Fragment {
         }
 
         @Override
-        protected Pagination<JTopic> doInBackground(Void... voids) {
-            return loadNextPage();
+        protected String getPaginationContainerId() {
+            return AppController.getInstance().getUserId();
+        }
+
+        @Override
+        protected String getPaginationContainerClassName() {
+            return UserInfo.class.getName() + ":TOPIC";
+        }
+
+        @Override
+        protected String getContainerIdForObjectStore() {
+            return AppController.getInstance().getUserId();
+        }
+
+        @Override
+        protected Pagination<JTopic> doRetrieveFromDB(SQLiteDatabase readable, Void inputObject) {
+            Pagination<JTopic> page = null;
+            List<JTopic> result = DBUtil.loadAllJsonModelByContainerId(readable,
+                    AppController.getInstance().getUserId(), JTopic.class);
+            String userId = AppController.getInstance().getUserId();
+            if(result != null && !result.isEmpty()) {
+                page = new Pagination<JTopic>();
+                PaginationInfo paginationInfo = DBUtil.loadPaginationInfo(
+                        readable, userId, getPaginationContainerClassName());
+                if(paginationInfo != null) {
+                    page.setNextLink(paginationInfo.getNextLink());
+                    page.setPreviousLink(paginationInfo.getPreviousLink());
+                }
+                page.setResult(result);
+            }
+            return page;
         }
 
         @Override
@@ -141,27 +189,34 @@ public abstract class TopicViewFragment extends Fragment {
             hideProgressDialog();
         }
 
-        private Pagination<JTopic> loadNextPage() {
+        @Override
+        protected COMMAND command() {
+            return COMMAND.GET_USER_FOLLOWED_TOPIC_LIST;
+        }
+
+        @Override
+        protected Pagination<JTopic> executeApi(API api) throws Exception {
             try {
                 showProgressDialog();
-                String oAuthToken = AppController.getInstance().getoAuthToken();
-                String userId = AppController.getInstance().getUserId();
-                String nextLink = page != null ? page.getNextLink() : "";
-                String categoryName = getCategoryType();
-                API api = APIBuilder.create()
-                        .setAction(COMMAND.GET_USER_FOLLOWED_TOPIC_LIST)
-                        .setOauthToken(oAuthToken)
-                        .addApiParam(APIConstants.User.ID, userId)
-                        .addApiParam(APIConstants.PageInfo.PAGE_LINK, nextLink)
-                        .addApiParam(APIConstants.Topic.CATEGORY, categoryName)
-                        .build();
                 page = (Pagination<JTopic>) api.execute();
             } catch (Exception e) {
-                e.printStackTrace();
+                errorMsg = e.getMessage();
             } finally {
                 hideProgressDialog();
             }
             return page;
+        }
+
+        @Override
+        protected Map<String, Object> prepareApiParams(Void inputObject) {
+            Map<String, Object> apiParams = new HashMap<String, Object>();
+            String userId = AppController.getInstance().getUserId();
+            apiParams.put(APIConstants.User.ID, userId);
+            String nextLink = page != null ? page.getNextLink() : "";
+            String categoryName = getCategoryType();
+            apiParams.put(APIConstants.PageInfo.PAGE_LINK, nextLink);
+            apiParams.put(APIConstants.Topic.CATEGORY, categoryName);
+            return apiParams;
         }
     }
 

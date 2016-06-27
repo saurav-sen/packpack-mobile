@@ -169,6 +169,7 @@ public class TopicCreateActivity extends AppCompatActivity implements IAsyncTask
         private String errorMsg;
 
         public TopicCreateTask(IAsyncTaskStatusListener listener) {
+            super(false, true);
             addListener(listener);
         }
 
@@ -179,6 +180,11 @@ public class TopicCreateActivity extends AppCompatActivity implements IAsyncTask
             topic_create_progressBar.setProgress(0);
             topic_create_txtPercentage.setVisibility(View.VISIBLE);
             topic_create_txtPercentage.setText("0%");
+        }
+
+        @Override
+        protected String getContainerIdForObjectStore() {
+            return null;
         }
 
         @Override

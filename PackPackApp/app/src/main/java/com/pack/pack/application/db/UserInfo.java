@@ -14,7 +14,7 @@ public class UserInfo implements DbObject {
     public static final String USER_NAME = "username";
     public static final String PASSWORD = "password";
     public static final String ACCESS_TOKEN = "access_token";
-    public static final String REFRESH_TOKEN = "refresh_token";
+    public static final String ACCESS_TOKEN_SECRET = "access_token_secret";
 
     private String userId;
 
@@ -24,7 +24,7 @@ public class UserInfo implements DbObject {
 
     private String accessToken;
 
-    private String refreshToken;
+    private String accessTokenSecret;
 
     public UserInfo(String username, String password) {
         this(username, password, null);
@@ -38,12 +38,12 @@ public class UserInfo implements DbObject {
         this(username, password, id, accessToken, null);
     }
 
-    public UserInfo(String username, String password, String id, String accessToken, String refreshToken) {
+    public UserInfo(String username, String password, String id, String accessToken, String accessTokenSecret) {
         setUsername(username);
         setPassword(password);
         setUserId(id);
         setAccessToken(accessToken);
-        setRefreshToken(refreshToken);
+        setAccessTokenSecret(accessTokenSecret);
     }
 
     public String getAccessToken() {
@@ -54,12 +54,12 @@ public class UserInfo implements DbObject {
         this.accessToken = accessToken;
     }
 
-    public String getRefreshToken() {
-        return refreshToken;
+    public String getAccessTokenSecret() {
+        return accessTokenSecret;
     }
 
-    public void setRefreshToken(String refreshToken) {
-        this.refreshToken = refreshToken;
+    public void setAccessTokenSecret(String accessTokenSecret) {
+        this.accessTokenSecret = accessTokenSecret;
     }
 
     @Override

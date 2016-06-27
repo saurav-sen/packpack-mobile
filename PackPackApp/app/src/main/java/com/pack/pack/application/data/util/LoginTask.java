@@ -1,5 +1,6 @@
 package com.pack.pack.application.data.util;
 
+import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.pack.pack.application.AppController;
@@ -32,10 +33,17 @@ public class LoginTask extends AbstractNetworkTask<UserInfo, Integer, AccessToke
     private UserInfo userInfo;
 
     public LoginTask() {
+        super(true, true);
     }
 
     public LoginTask(IAsyncTaskStatusListener listener) {
+        super(true, true);
         addListener(listener);
+    }
+
+    @Override
+    protected String getContainerIdForObjectStore() {
+        return null;
     }
 
     @Override
@@ -89,5 +97,27 @@ public class LoginTask extends AbstractNetworkTask<UserInfo, Integer, AccessToke
     @Override
     protected String getFailureMessage() {
         return errorMsg;
+    }
+
+    @Override
+    protected AccessToken doRetrieveFromDB(SQLiteDatabase readable, UserInfo inputObject) {
+        final UserInfo userInfo = DBUtil.loadLastLoggedInUserInfo(readable);
+        if(userInfo != null && userInfo.getAccessToken() != null && userInfo.getAccessTokenSecret() != null) {
+            AppController.getInstance().setoAuthToken(userInfo.getAccessToken());
+            user = DBUtil.convertUserInfo(userInfo);
+            AppController.getInstance().setUser(user);
+            return  new AccessToken() {
+                @Override
+                public String getToken() {
+                    return userInfo.getAccessToken();
+                }
+
+                @Override
+                public String getTokenSecret() {
+                    return userInfo.getAccessTokenSecret();
+                }
+            };
+        }
+        return null;
     }
 }

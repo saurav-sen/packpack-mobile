@@ -2,6 +2,7 @@ package com.pack.pack.application.activity;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -16,6 +17,9 @@ import android.widget.ListView;
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
 import com.pack.pack.application.adapters.TopicDetailAdapter;
+import com.pack.pack.application.data.util.AbstractNetworkTask;
+import com.pack.pack.application.data.util.DBUtil;
+import com.pack.pack.application.db.PaginationInfo;
 import com.pack.pack.application.topic.activity.model.ParcelablePack;
 import com.pack.pack.application.topic.activity.model.ParcelableTopic;
 import com.pack.pack.client.api.API;
@@ -26,7 +30,9 @@ import com.pack.pack.model.web.JPack;
 import com.pack.pack.model.web.Pagination;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -83,7 +89,11 @@ public class InsideTopicActivity extends AppCompatActivity {
     }
 
 
-    private class LoadPackTask extends AsyncTask<ParcelableTopic, Integer, Pagination<JPack>> {
+    private class LoadPackTask extends AbstractNetworkTask<ParcelableTopic, Integer, Pagination<JPack>> {
+
+        public LoadPackTask() {
+            super(true, true);
+        }
 
         @Override
         protected void onPreExecute() {
@@ -92,23 +102,47 @@ public class InsideTopicActivity extends AppCompatActivity {
         }
 
         @Override
-        protected Pagination<JPack> doInBackground(ParcelableTopic... jTopics) {
+        protected Map<String, Object> prepareApiParams(ParcelableTopic inputObject) {
+            Map<String, Object> apiParams = new HashMap<String, Object>();
+            String userId = AppController.getInstance().getUserId();
+            apiParams.put(APIConstants.User.ID, userId);
+            apiParams.put(APIConstants.Topic.ID, inputObject.getTopicId());
+            apiParams.put(APIConstants.Topic.CATEGORY, inputObject.getTopicCategory());
+            return apiParams;
+        }
+
+        @Override
+        protected Pagination<JPack> executeApi(API api) throws Exception {
+            return (Pagination<JPack>) api.execute();
+        }
+
+        @Override
+        protected COMMAND command() {
+            return COMMAND.GET_ALL_PACKS_IN_TOPIC;
+        }
+
+        @Override
+        protected String getFailureMessage() {
+            return "Failed to load details";
+        }
+
+        @Override
+        protected String getContainerIdForObjectStore() {
+            return getInputObject().getTopicId();
+        }
+
+        @Override
+        protected Pagination<JPack> doRetrieveFromDB(SQLiteDatabase readable, ParcelableTopic inputObject) {
             Pagination<JPack> page = null;
-            if(jTopics == null || jTopics.length == 0)
-                return page;
-            try {
-                ParcelableTopic jTopic = jTopics[0];
-                String oAuthToken = AppController.getInstance().getoAuthToken();
-                String userId = AppController.getInstance().getUserId();
-                API api = APIBuilder.create().setAction(COMMAND.GET_ALL_PACKS_IN_TOPIC)
-                        .setOauthToken(oAuthToken)
-                        .addApiParam(APIConstants.User.ID, userId)
-                        .addApiParam(APIConstants.Topic.ID, jTopic.getTopicId())
-                        .addApiParam(APIConstants.Topic.CATEGORY, jTopic.getTopicCategory())
-                        .build();
-                page = (Pagination<JPack>) api.execute();
-            } catch (Exception e) {
-                e.printStackTrace();
+            List<JPack> packs = DBUtil.loadAllJsonModelByContainerId(readable, inputObject.getTopicId(), JPack.class);
+            if(packs != null && !packs.isEmpty()) {
+                PaginationInfo paginationInfo = DBUtil.loadPaginationInfo(readable, inputObject.getTopicId());
+                page = new Pagination<JPack>();
+                page.setResult(packs);
+                if(paginationInfo != null) {
+                    page.setNextLink(paginationInfo.getNextLink());
+                    page.setPreviousLink(paginationInfo.getPreviousLink());
+                }
             }
             return page;
         }

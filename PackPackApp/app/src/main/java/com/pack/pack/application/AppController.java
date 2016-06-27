@@ -125,10 +125,10 @@ public class AppController extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        UserInfo userInfo = DBUtil.loadLastLoggedInUserInfo();
+        /*UserInfo userInfo = DBUtil.loadLastLoggedInUserInfo();
         if(userInfo != null) {
             new LoginTask().execute(userInfo);
-        }
+        }*/
         mInstance = this;
     }
 

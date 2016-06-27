@@ -13,16 +13,24 @@ public class AttachmentInfo implements DbObject {
 
     public static final String ENTITY_ID = "entity_id";
     public static final String URL = "URL";
-    public static final String BITMAP_CONTENT = "bitmap"; // Blob
     public static final String TYPE = "type";
+    public static final String CONTAINER_ID = "container_id";
 
     private String entityId;
 
     private String url;
 
-    private byte[] content;
-
     private String type;
+
+    private String containerId;
+
+    public String getContainerId() {
+        return containerId;
+    }
+
+    public void setContainerId(String containerId) {
+        this.containerId = containerId;
+    }
 
     public String getEntityId() {
         return entityId;
@@ -38,14 +46,6 @@ public class AttachmentInfo implements DbObject {
 
     public void setUrl(String url) {
         this.url = url;
-    }
-
-    public byte[] getContent() {
-        return content;
-    }
-
-    public void setContent(byte[] content) {
-        this.content = content;
     }
 
     public String getType() {

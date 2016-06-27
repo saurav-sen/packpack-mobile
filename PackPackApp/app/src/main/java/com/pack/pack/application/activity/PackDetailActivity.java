@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -22,16 +23,20 @@ import android.widget.TextView;
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
 import com.pack.pack.application.adapters.PackAttachmentsAdapter;
+import com.pack.pack.application.data.util.AbstractNetworkTask;
 import com.pack.pack.application.topic.activity.model.ParcelablePack;
 import com.pack.pack.client.api.API;
 import com.pack.pack.client.api.APIBuilder;
 import com.pack.pack.client.api.APIConstants;
 import com.pack.pack.client.api.COMMAND;
+import com.pack.pack.model.web.JPack;
 import com.pack.pack.model.web.JPackAttachment;
 import com.pack.pack.model.web.Pagination;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.pack.pack.application.AppController.TOPIC_ID_KEY;
 import static com.pack.pack.application.AppController.UPLOAD_ENTITY_ID_KEY;
@@ -115,7 +120,13 @@ public class PackDetailActivity extends AppCompatActivity {
         public boolean scrollUp = false;
     }
 
-    private class LoadPackDetailTask extends AsyncTask<ScrollablePackDetail, Integer, Pagination<JPackAttachment>> {
+    private class LoadPackDetailTask extends AbstractNetworkTask<ScrollablePackDetail, Integer, Pagination<JPackAttachment>> {
+
+        private String errorMsg;
+
+        public LoadPackDetailTask() {
+            super(true, true);
+        }
 
         @Override
         protected void onPreExecute() {
@@ -124,29 +135,59 @@ public class PackDetailActivity extends AppCompatActivity {
         }
 
         @Override
-        protected Pagination<JPackAttachment> doInBackground(ScrollablePackDetail... objects) {
+        protected String getContainerIdForObjectStore() {
+            return getInputObject().packId;
+        }
+
+        @Override
+        protected Pagination<JPackAttachment> doRetrieveFromDB(SQLiteDatabase readable, ScrollablePackDetail inputObject) {
+            return super.doRetrieveFromDB(readable, inputObject);
+        }
+
+        @Override
+        protected Map<String, Object> prepareApiParams(ScrollablePackDetail inputObject) {
+            Map<String, Object> apiParams = new HashMap<String, Object>();
+            String packId = inputObject.packId;
+            String topicId = inputObject.topicId;
+            String userId = AppController.getInstance().getUserId();
+            apiParams.put(APIConstants.User.ID, userId);
+            apiParams.put(APIConstants.Pack.ID, packId);
+            apiParams.put(APIConstants.Topic.ID, topicId);
+            apiParams.put(APIConstants.PageInfo.PAGE_LINK,
+                    inputObject.scrollUp ? inputObject.previousLink
+                            : inputObject.nextLink);
+            return apiParams;
+        }
+
+        @Override
+        protected String getPaginationContainerClassName() {
+            return JPack.class.getName();
+        }
+
+        @Override
+        protected String getPaginationContainerId() {
+            return getInputObject().packId;
+        }
+
+        @Override
+        protected COMMAND command() {
+            return COMMAND.GET_ALL_ATTACHMENTS_IN_PACK;
+        }
+
+        @Override
+        protected Pagination<JPackAttachment> executeApi(API api) throws Exception {
             Pagination<JPackAttachment> page = null;
-            if(objects == null || objects.length == 0)
-                return page;
             try {
-                ScrollablePackDetail obj = objects[0];
-                String packId = obj.packId;
-                String topicId = obj.topicId;
-                String oAuthToken = AppController.getInstance().getoAuthToken();
-                String userId = AppController.getInstance().getUserId();
-                API api = APIBuilder.create().setAction(COMMAND.GET_ALL_ATTACHMENTS_IN_PACK)
-                        .setOauthToken(oAuthToken)
-                        .addApiParam(APIConstants.User.ID, userId)
-                        .addApiParam(APIConstants.Pack.ID, packId)
-                        .addApiParam(APIConstants.Topic.ID, topicId)
-                        .addApiParam(APIConstants.PageInfo.PAGE_LINK,
-                                obj.scrollUp ? obj.previousLink : obj.nextLink)
-                        .build();
                 page = (Pagination<JPackAttachment>) api.execute();
             } catch (Exception e) {
-                e.printStackTrace();
+                errorMsg = e.getMessage();
             }
             return page;
+        }
+
+        @Override
+        protected String getFailureMessage() {
+            return errorMsg;
         }
 
         @Override

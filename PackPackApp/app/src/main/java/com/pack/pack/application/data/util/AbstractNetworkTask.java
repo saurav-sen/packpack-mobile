@@ -4,17 +4,20 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.os.AsyncTask;
 
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.data.LoggedInUserInfo;
 import com.pack.pack.application.db.DbObject;
+import com.pack.pack.application.db.PaginationInfo;
 import com.pack.pack.application.db.SquillDbHelper;
 import com.pack.pack.application.db.UserInfo;
 import com.pack.pack.client.api.API;
 import com.pack.pack.client.api.APIBuilder;
 import com.pack.pack.client.api.APIConstants;
 import com.pack.pack.client.api.COMMAND;
+import com.pack.pack.model.web.Pagination;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -37,6 +40,24 @@ public abstract class AbstractNetworkTask<X, Y, Z> extends AsyncTask<X, Y, Z> {
     private Context context;
 
     private SquillDbHelper squillDbHelper;
+
+    private boolean storeResultsInDB;
+
+    private boolean tryRetrievingFromDB;
+
+    private boolean updateExistingObjectInDB;
+
+    private X x;
+
+    public AbstractNetworkTask(boolean tryRetrievingFromDB, boolean storeResultsInDB) {
+        this(tryRetrievingFromDB, storeResultsInDB, false);
+    }
+
+    public AbstractNetworkTask(boolean tryRetrievingFromDB, boolean storeResultsInDB, boolean updateExistingObjectInDB) {
+        this.tryRetrievingFromDB = tryRetrievingFromDB;
+        this.storeResultsInDB = storeResultsInDB;
+        this.updateExistingObjectInDB = updateExistingObjectInDB;
+    }
 
     public AbstractNetworkTask(Context context) {
         this.context = context;
@@ -83,15 +104,49 @@ public abstract class AbstractNetworkTask<X, Y, Z> extends AsyncTask<X, Y, Z> {
         }
     }
 
+    protected X getInputObject() {
+        return x;
+    }
+
+    private void setInputObject(X x) {
+        this.x = x;
+    }
+
     @Override
     protected final Z doInBackground(X... xes) {
         if(xes == null || xes.length == 0)
             return null;
         X x = xes[0];
-        return doExecuteInBackground(x);
+        setInputObject(x);
+        Z z = null;
+        if(tryRetrievingFromDB) {
+            z = doRetrieveFromDB(squillDbHelper.getReadableDatabase(), getInputObject());
+        }
+        if(z == null) {
+            z = doExecuteInBackground(x);
+        }
+        return z;
+    }
+
+    protected SQLiteOpenHelper getSquillDbHelper() {
+        return squillDbHelper;
+    }
+
+    protected Z doRetrieveFromDB(SQLiteDatabase readable, X inputObject) {
+        return null;
+    }
+
+    protected void doUpdateExistingInDB(SQLiteDatabase writable, X inputObject, Z outputObject) {
+
     }
 
     protected void storeResultsInDb(Object data) {
+        storeResultsInDb(data, false);
+    }
+
+    protected abstract String getContainerIdForObjectStore();
+
+    protected final void storeResultsInDb(Object data, boolean ignorePagination) {
         if(successResult == null)
             return;
         if(data instanceof Collection) {
@@ -101,17 +156,49 @@ public abstract class AbstractNetworkTask<X, Y, Z> extends AsyncTask<X, Y, Z> {
                 Object __obj = itr.next();
                 if(__obj == null)
                     continue;
-                DbObject __dbObject = DBUtil.convert(__obj);
+                DbObject __dbObject = DBUtil.convert(__obj, getContainerIdForObjectStore());
                 if(__dbObject == null)
                     continue;
                 storeResultsInDb_0(__dbObject);
             }
+        } else if(data instanceof Pagination<?>) {
+            Pagination<?> page = (Pagination<?>) data;
+            List<?> list = page.getResult();
+            if(list != null && !list.isEmpty()) {
+                storeResultsInDb(list, true);
+            }
+            String entityId = getPaginationContainerId();
+            if(entityId != null && !ignorePagination) {
+                String className = getPaginationContainerClassName();
+                PaginationInfo paginationInfo = new PaginationInfo();
+                paginationInfo.setEntityId(entityId);
+                paginationInfo.setType(className);
+                paginationInfo.setNextLink(page.getNextLink());
+                paginationInfo.setPreviousLink(page.getPreviousLink());
+                if(checkExistence_0(paginationInfo)) {
+                    boolean success = deleteExisting_0(paginationInfo);
+                    if(!success)
+                        return;
+                }
+                ContentValues contentValues = paginationInfo.toContentValues();
+                String tableName = paginationInfo.getTableName();
+                SQLiteDatabase wDB = squillDbHelper.getWritableDatabase();
+                long newRowID = wDB.insert(tableName, null, contentValues);
+            }
         } else {
-            DbObject __dbObject = DBUtil.convert(successResult);
+            DbObject __dbObject = DBUtil.convert(successResult, getContainerIdForObjectStore());
             if(__dbObject == null)
                 return;
             storeResultsInDb_0(__dbObject);
         }
+    }
+
+    protected String getPaginationContainerId() {
+        return null;
+    }
+
+    protected String getPaginationContainerClassName() {
+        return null;
     }
 
     private void storeResultsInDb_0(DbObject __dbObject) {
@@ -138,9 +225,7 @@ public abstract class AbstractNetworkTask<X, Y, Z> extends AsyncTask<X, Y, Z> {
                     new String[]{__dbObject.getEntityId()}, null, null,
                     null);
             exists = !(!cursor.moveToFirst() || cursor.getCount() == 0);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (NoSuchFieldException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         } finally {
             if(cursor != null && !cursor.isClosed()) {
@@ -193,7 +278,7 @@ public abstract class AbstractNetworkTask<X, Y, Z> extends AsyncTask<X, Y, Z> {
 
     protected abstract COMMAND command();
 
-    protected abstract Map<String, Object> prepareApiParams(X x);
+    protected abstract Map<String, Object> prepareApiParams(X inputObject);
 
     protected Object getSuccessResult(Z result) {
         return successResult;
@@ -210,7 +295,12 @@ public abstract class AbstractNetworkTask<X, Y, Z> extends AsyncTask<X, Y, Z> {
         super.onPostExecute(z);
         if(isSuccess(z)) {
             Object data = getSuccessResult(z);
-            storeResultsInDb(data);
+            if(storeResultsInDB) {
+                storeResultsInDb(data);
+            }
+            if(updateExistingObjectInDB) {
+                doUpdateExistingInDB(squillDbHelper.getWritableDatabase(), getInputObject(), z);
+            }
             fireOnSuccess(data);
         }
         else {

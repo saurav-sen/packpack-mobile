@@ -3,6 +3,7 @@ package com.pack.pack.application.adapters;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -19,6 +20,7 @@ import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
 import com.pack.pack.application.activity.PackDetailActivity;
 import com.pack.pack.application.data.util.AbstractNetworkTask;
+import com.pack.pack.application.data.util.DBUtil;
 import com.pack.pack.application.topic.activity.model.ParcelablePack;
 import com.pack.pack.client.api.API;
 import com.pack.pack.client.api.APIBuilder;
@@ -141,6 +143,7 @@ public class TopicDetailAdapter extends ArrayAdapter<JPack> {
         private GridView packAttachmentsGrid;
 
         LoadPackAttachmentsTask(GridView packAttachmentsGrid) {
+            super(true, true);
             this.packAttachmentsGrid = packAttachmentsGrid;
         }
 
@@ -152,6 +155,11 @@ public class TopicDetailAdapter extends ArrayAdapter<JPack> {
                 attachments = page.getResult();
             }
             return attachments;
+        }
+
+        @Override
+        protected String getContainerIdForObjectStore() {
+            return getInputObject().getId();
         }
 
         @Override
@@ -189,6 +197,11 @@ public class TopicDetailAdapter extends ArrayAdapter<JPack> {
         @Override
         protected String getFailureMessage() {
             return null;
+        }
+
+        @Override
+        protected List<JPackAttachment> doRetrieveFromDB(SQLiteDatabase readable, JPack inputObject) {
+            return DBUtil.loadAllJsonModelByContainerId(readable, inputObject.getId(), JPackAttachment.class);
         }
     }
 }

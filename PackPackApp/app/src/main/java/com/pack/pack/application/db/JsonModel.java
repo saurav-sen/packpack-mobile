@@ -11,6 +11,7 @@ public class JsonModel implements DbObject {
     public static final String TABLE_NAME = "JSON_MODEL";
 
     public static final String ENTITY_ID = "entity_id";
+    public static final String ENTITY_CONTAINER_ID = "entity_container_id";
     public static final String CONTENT = "content";
     public static final String CLASS_TYPE = "type";
     public static final String HAS_ATTACHMENT = "has_attachment";
@@ -25,6 +26,16 @@ public class JsonModel implements DbObject {
     private boolean hasAttachment;
 
     private String command;
+
+    private String entityContainerId;
+
+    public String getEntityContainerId() {
+        return entityContainerId;
+    }
+
+    public void setEntityContainerId(String entityContainerId) {
+        this.entityContainerId = entityContainerId;
+    }
 
     public String getCommand() {
         return command;

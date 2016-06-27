@@ -3,6 +3,7 @@ package com.pack.pack.application.adapters;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Environment;
@@ -18,12 +19,16 @@ import com.pack.pack.application.R;
 import com.pack.pack.application.activity.FullscreenAttachmentViewActivity;
 import com.pack.pack.application.activity.PackAttachmentCommentsActivity;
 import com.pack.pack.application.data.util.AbstractNetworkTask;
+import com.pack.pack.application.data.util.DBUtil;
+import com.pack.pack.application.db.JsonModel;
 import com.pack.pack.application.image.loader.DownloadImageTask;
 import com.pack.pack.client.api.API;
 import com.pack.pack.client.api.APIBuilder;
 import com.pack.pack.client.api.APIConstants;
 import com.pack.pack.client.api.COMMAND;
+import com.pack.pack.common.util.JSONUtil;
 import com.pack.pack.model.web.JPackAttachment;
+import com.pack.pack.services.exception.PackPackException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -174,10 +179,19 @@ public class PackAttachmentsAdapter extends ArrayAdapter<JPackAttachment> {
 
     private class AddLikeTask extends AbstractNetworkTask<String, Void, Void> {
 
+        public AddLikeTask() {
+            super(false, false, true);
+        }
+
         @Override
         protected Void executeApi(API api) throws Exception {
             api.execute();
             return null;
+        }
+
+        @Override
+        protected String getContainerIdForObjectStore() {
+            return getInputObject();
         }
 
         @Override
@@ -196,6 +210,16 @@ public class PackAttachmentsAdapter extends ArrayAdapter<JPackAttachment> {
         @Override
         protected String getFailureMessage() {
             return null;
+        }
+
+        @Override
+        protected void doUpdateExistingInDB(SQLiteDatabase writable, String inputObject, Void outputObject) {
+            if(inputObject == null)
+                return;
+            JPackAttachment attachment = DBUtil.loadJsonModelByEntityId(writable, inputObject.trim(),
+                    JPackAttachment.class);
+            attachment.setLikes(attachment.getLikes() + 1);
+            storeResultsInDb(attachment);
         }
     }
 }
