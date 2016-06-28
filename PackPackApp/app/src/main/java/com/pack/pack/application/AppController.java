@@ -7,9 +7,6 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
-import com.pack.pack.application.db.UserInfo;
-import com.pack.pack.application.data.util.DBUtil;
-import com.pack.pack.application.data.util.LoginTask;
 import com.pack.pack.model.web.JPackAttachment;
 import com.pack.pack.model.web.JUser;
 

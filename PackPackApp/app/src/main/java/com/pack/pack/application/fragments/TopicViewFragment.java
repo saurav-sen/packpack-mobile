@@ -3,44 +3,33 @@ package com.pack.pack.application.fragments;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.ListFragment;
-import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.pack.pack.application.AppController;
-import com.pack.pack.application.R;
-import com.pack.pack.application.activity.TopicDetailActivity;
 import com.pack.pack.application.adapters.TopicViewAdapter;
 import com.pack.pack.application.data.util.AbstractNetworkTask;
-import com.pack.pack.application.data.util.DBUtil;
-import com.pack.pack.application.db.JsonModel;
+import com.pack.pack.application.db.DBUtil;
 import com.pack.pack.application.db.PaginationInfo;
 import com.pack.pack.application.db.UserInfo;
 import com.pack.pack.application.topic.activity.model.ParcelableTopic;
-import com.pack.pack.application.topic.activity.model.TopicEvent;
 import com.pack.pack.application.view.util.ViewUtil;
 import com.pack.pack.client.api.API;
-import com.pack.pack.client.api.APIBuilder;
 import com.pack.pack.client.api.APIConstants;
 import com.pack.pack.client.api.COMMAND;
 import com.pack.pack.model.web.JTopic;
 import com.pack.pack.model.web.Pagination;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * Created by Saurav on 08-04-2016.

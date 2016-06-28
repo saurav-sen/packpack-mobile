@@ -1,9 +1,10 @@
-package com.pack.pack.application.data.util;
+package com.pack.pack.application.db;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import com.pack.pack.application.db.AttachmentInfo;
 import com.pack.pack.application.db.DbObject;
 import com.pack.pack.application.db.JsonModel;
 import com.pack.pack.application.db.PaginationInfo;
@@ -11,6 +12,7 @@ import com.pack.pack.application.db.UserInfo;
 import com.pack.pack.common.util.JSONUtil;
 import com.pack.pack.model.web.JPack;
 import com.pack.pack.model.web.JPackAttachment;
+import com.pack.pack.model.web.JTopic;
 import com.pack.pack.model.web.JUser;
 import com.pack.pack.services.exception.PackPackException;
 
@@ -61,7 +63,51 @@ public class DBUtil {
     }
 
     public static DbObject convert(Object object, String containerId) {
+        if(object == null)
+            return null;
+        if(object instanceof JTopic) {
+            return convertToJsonModel((JTopic) object, containerId);
+        } else if(object instanceof JPack) {
+            return convertToJsonModel((JPack)object, containerId);
+        } else if(object instanceof JPackAttachment) {
+            return convertJPackAttachment((JPackAttachment) object, containerId);
+        }
         return null;
+    }
+
+    private static JsonModel convertToJsonModel(JTopic topic, String containerId) {
+        JsonModel jsonModel = new JsonModel();
+        try {
+            jsonModel.setEntityId(topic.getId());
+            jsonModel.setClassType(JTopic.class.getName());
+            jsonModel.setContent(JSONUtil.serialize(topic));
+            jsonModel.setEntityContainerId(containerId);
+        } catch (PackPackException e) {
+            Log.d(LOG_TAG, e.getMessage());
+        }
+        return jsonModel;
+    }
+
+    private static JsonModel convertToJsonModel(JPack pack, String containerId) {
+        JsonModel jsonModel = new JsonModel();
+        try {
+            jsonModel.setEntityId(pack.getId());
+            jsonModel.setClassType(JPack.class.getName());
+            jsonModel.setContent(JSONUtil.serialize(pack));
+            jsonModel.setEntityContainerId(containerId);
+        } catch (PackPackException e) {
+            Log.d(LOG_TAG, e.getMessage());
+        }
+        return jsonModel;
+    }
+
+    private static AttachmentInfo convertJPackAttachment(JPackAttachment attachment, String containerId) {
+        AttachmentInfo attachmentInfo = new AttachmentInfo();
+        attachmentInfo.setUrl(attachment.getAttachmentUrl());
+        attachmentInfo.setType(attachment.getAttachmentType());
+        attachmentInfo.setContainerId(containerId);
+        attachmentInfo.setEntityId(attachment.getId());
+        return attachmentInfo;
     }
 
     public static JUser convertUserInfo(UserInfo userInfo) {

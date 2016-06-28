@@ -5,6 +5,8 @@ import android.util.Log;
 
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.data.LoggedInUserInfo;
+import com.pack.pack.application.db.DBUtil;
+import com.pack.pack.application.db.DbObject;
 import com.pack.pack.application.db.UserInfo;
 import com.pack.pack.client.api.API;
 import com.pack.pack.client.api.APIBuilder;
@@ -66,6 +68,17 @@ public class LoginTask extends AbstractNetworkTask<UserInfo, Integer, AccessToke
             errorMsg = e.getMessage();
         }
         return accessToken;
+    }
+
+    @Override
+    protected DbObject convertObjectForStore(AccessToken successResult, String containerIdForObjectStore) {
+        UserInfo userInfo = new UserInfo();
+        userInfo.setAccessToken(successResult.getToken());
+        userInfo.setAccessTokenSecret(successResult.getTokenSecret());
+        userInfo.setUserId(user.getId());
+        userInfo.setUsername(user.getUsername());
+        //userInfo.setPassword(user.get);
+        return userInfo;
     }
 
     @Override

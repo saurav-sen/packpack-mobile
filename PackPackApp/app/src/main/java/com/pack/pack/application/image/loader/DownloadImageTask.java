@@ -1,5 +1,6 @@
 package com.pack.pack.application.image.loader;
 
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -8,11 +9,15 @@ import android.widget.ImageView;
 
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.data.util.AbstractNetworkTask;
+import com.pack.pack.application.db.DbObject;
+import com.pack.pack.application.db.ResourceURL;
 import com.pack.pack.client.api.API;
 import com.pack.pack.client.api.APIBuilder;
 import com.pack.pack.client.api.APIConstants;
 import com.pack.pack.client.api.COMMAND;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -86,8 +91,52 @@ public class DownloadImageTask extends AbstractNetworkTask<String, Void, Bitmap>
     }
 
     @Override
+    protected DbObject convertObjectForStore(Bitmap successResult, String containerIdForObjectStore) {
+        String url = getInputObject();
+        byte[] rawBytes = readRawBytes(successResult);
+        ResourceURL resourceURL = new ResourceURL();
+        resourceURL.setUrl(url);
+        resourceURL.setBytes(rawBytes);
+        return resourceURL;
+    }
+
+    private byte[] readRawBytes(Bitmap bitmap) {
+        byte[] rawBytes = null;
+        ByteArrayOutputStream byteArrayOutputStream = null;
+        try {
+            byteArrayOutputStream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 0, byteArrayOutputStream);
+            rawBytes = byteArrayOutputStream.toByteArray();
+        } finally {
+            try {
+                if(byteArrayOutputStream != null) {
+                    byteArrayOutputStream.close();
+                }
+            } catch (IOException e) {
+                // e.printStackTrace();
+            }
+        }
+        return rawBytes;
+    }
+
+    @Override
     protected Bitmap doRetrieveFromDB(SQLiteDatabase readable, String inputObject) {
-        return super.doRetrieveFromDB(readable, inputObject);
+        Cursor cursor = null;
+        Bitmap bitmap = null;
+        try {
+            String __SQL = "SELECT "+ ResourceURL.BLOB_CONTENT + " FROM " + ResourceURL.TABLE_NAME
+                    + " WHERE " + ResourceURL.URL + "='" + inputObject + "'";
+            cursor = readable.rawQuery(__SQL, null);
+            if(cursor.moveToFirst()) {
+                byte[] rawBytes = cursor.getBlob(cursor.getColumnIndexOrThrow(ResourceURL.BLOB_CONTENT));
+                bitmap = BitmapFactory.decodeByteArray(rawBytes, 0, rawBytes.length);
+            }
+        } finally {
+            if(cursor != null && !cursor.isClosed()) {
+                cursor.close();
+            }
+        }
+        return bitmap;
     }
 
     @Override

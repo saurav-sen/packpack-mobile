@@ -8,19 +8,16 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.os.AsyncTask;
 
 import com.pack.pack.application.AppController;
-import com.pack.pack.application.data.LoggedInUserInfo;
+import com.pack.pack.application.db.DBUtil;
 import com.pack.pack.application.db.DbObject;
 import com.pack.pack.application.db.PaginationInfo;
 import com.pack.pack.application.db.SquillDbHelper;
-import com.pack.pack.application.db.UserInfo;
 import com.pack.pack.client.api.API;
 import com.pack.pack.client.api.APIBuilder;
-import com.pack.pack.client.api.APIConstants;
 import com.pack.pack.client.api.COMMAND;
 import com.pack.pack.model.web.Pagination;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -186,11 +183,16 @@ public abstract class AbstractNetworkTask<X, Y, Z> extends AsyncTask<X, Y, Z> {
                 long newRowID = wDB.insert(tableName, null, contentValues);
             }
         } else {
-            DbObject __dbObject = DBUtil.convert(successResult, getContainerIdForObjectStore());
+            //DbObject __dbObject = DBUtil.convert(successResult, getContainerIdForObjectStore());
+            DbObject __dbObject = convertObjectForStore(successResult, getContainerIdForObjectStore());
             if(__dbObject == null)
                 return;
             storeResultsInDb_0(__dbObject);
         }
+    }
+
+    protected DbObject convertObjectForStore(Z successResult, String containerIdForObjectStore) {
+        return DBUtil.convert(successResult, getContainerIdForObjectStore());
     }
 
     protected String getPaginationContainerId() {

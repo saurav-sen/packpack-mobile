@@ -34,7 +34,10 @@ public class ResourceURL implements DbObject {
 
     @Override
     public ContentValues toContentValues() {
-        return null;
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(URL, url);
+        contentValues.put(BLOB_CONTENT, bytes);
+        return contentValues;
     }
 
     @Override

@@ -62,6 +62,11 @@ public class PaginationInfo implements DbObject {
 
     @Override
     public ContentValues toContentValues() {
-        return null;
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(ENTITY_ID, entityId);
+        contentValues.put(CLASS_TYPE, type);
+        contentValues.put(NEXT_LINK, nextLink);
+        contentValues.put(PREVIOUS_LINK, previousLink);
+        return contentValues;
     }
 }

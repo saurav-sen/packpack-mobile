@@ -1,9 +1,7 @@
 package com.pack.pack.application.activity;
 
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -11,19 +9,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.AbsListView;
-import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
 import com.pack.pack.application.adapters.TopicDetailAdapter;
 import com.pack.pack.application.data.util.AbstractNetworkTask;
-import com.pack.pack.application.data.util.DBUtil;
+import com.pack.pack.application.db.DBUtil;
 import com.pack.pack.application.db.PaginationInfo;
-import com.pack.pack.application.topic.activity.model.ParcelablePack;
 import com.pack.pack.application.topic.activity.model.ParcelableTopic;
 import com.pack.pack.client.api.API;
-import com.pack.pack.client.api.APIBuilder;
 import com.pack.pack.client.api.APIConstants;
 import com.pack.pack.client.api.COMMAND;
 import com.pack.pack.model.web.JPack;

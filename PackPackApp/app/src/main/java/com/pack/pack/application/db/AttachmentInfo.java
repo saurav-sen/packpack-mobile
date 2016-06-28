@@ -58,7 +58,12 @@ public class AttachmentInfo implements DbObject {
 
     @Override
     public ContentValues toContentValues() {
-        return null;
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(ENTITY_ID, entityId);
+        contentValues.put(URL, url);
+        contentValues.put(TYPE, type);
+        contentValues.put(CONTAINER_ID, containerId);
+        return contentValues;
     }
 
     @Override

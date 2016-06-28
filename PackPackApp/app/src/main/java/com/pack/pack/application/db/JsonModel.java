@@ -14,8 +14,8 @@ public class JsonModel implements DbObject {
     public static final String ENTITY_CONTAINER_ID = "entity_container_id";
     public static final String CONTENT = "content";
     public static final String CLASS_TYPE = "type";
-    public static final String HAS_ATTACHMENT = "has_attachment";
-    public static final String COMMAND = "command";
+    //public static final String HAS_ATTACHMENT = "has_attachment";
+    //public static final String COMMAND = "command";
 
     private String entityId;
 
@@ -23,9 +23,9 @@ public class JsonModel implements DbObject {
 
     private String classType;
 
-    private boolean hasAttachment;
+    //private boolean hasAttachment;
 
-    private String command;
+    //private String command;
 
     private String entityContainerId;
 
@@ -37,13 +37,13 @@ public class JsonModel implements DbObject {
         this.entityContainerId = entityContainerId;
     }
 
-    public String getCommand() {
+    /*public String getCommand() {
         return command;
     }
 
     public void setCommand(String command) {
         this.command = command;
-    }
+    }*/
 
     public String getEntityId() {
         return entityId;
@@ -69,17 +69,22 @@ public class JsonModel implements DbObject {
         this.classType = classType;
     }
 
-    public boolean isHasAttachment() {
+    /*public boolean isHasAttachment() {
         return hasAttachment;
     }
 
     public void setHasAttachment(boolean hasAttachment) {
         this.hasAttachment = hasAttachment;
-    }
+    }*/
 
     @Override
     public ContentValues toContentValues() {
-        return null;
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(ENTITY_ID, entityId);
+        contentValues.put(ENTITY_CONTAINER_ID, entityContainerId);
+        contentValues.put(CONTENT, content);
+        contentValues.put(CLASS_TYPE, classType);
+        return contentValues;
     }
 
     @Override

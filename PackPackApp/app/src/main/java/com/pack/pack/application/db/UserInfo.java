@@ -26,6 +26,9 @@ public class UserInfo implements DbObject {
 
     private String accessTokenSecret;
 
+    public UserInfo() {
+    }
+
     public UserInfo(String username, String password) {
         this(username, password, null);
     }
@@ -93,7 +96,13 @@ public class UserInfo implements DbObject {
 
     @Override
     public ContentValues toContentValues() {
-        return null;
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(ENTITY_ID, userId);
+        contentValues.put(USER_NAME, username);
+        contentValues.put(PASSWORD, password);
+        contentValues.put(ACCESS_TOKEN, accessToken);
+        contentValues.put(ACCESS_TOKEN_SECRET, accessTokenSecret);
+        return contentValues;
     }
 
     @Override
