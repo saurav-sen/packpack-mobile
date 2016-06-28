@@ -9,6 +9,7 @@ import android.os.Handler;
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
 import com.pack.pack.application.data.LoggedInUserInfo;
+import com.pack.pack.application.db.SquillDbHelper;
 import com.pack.pack.application.db.UserInfo;
 import com.pack.pack.application.db.DBUtil;
 import com.pack.pack.application.data.util.IAsyncTaskStatusListener;
@@ -40,7 +41,7 @@ public class SplashActivity extends Activity implements IAsyncTaskStatusListener
             public void run() {
 
             }
-        }, 50000);
+        }, 5000);
 
         verify();
     }
@@ -51,9 +52,20 @@ public class SplashActivity extends Activity implements IAsyncTaskStatusListener
             finish();
             startMainActivity();
         } else {
-            UserInfo userInfo = DBUtil.loadLastLoggedInUserInfo();
+            UserInfo userInfo = DBUtil.loadLastLoggedInUserInfo(new SquillDbHelper(this).getReadableDatabase());
             if(userInfo != null) {
-                doLogin(userInfo);
+                oAuthToken = userInfo.getAccessToken();
+                if(oAuthToken != null) {
+                    AppController.getInstance().setoAuthToken(oAuthToken);
+                    JUser user = DBUtil.convertUserInfo(userInfo);
+                    AppController.getInstance().setUser(user);
+                    finish();
+                    startMainActivity();
+                } else {
+                    doLogin(userInfo);
+                }
+            } else {
+                startLoginActivity();
             }
         }
     }
@@ -65,7 +77,7 @@ public class SplashActivity extends Activity implements IAsyncTaskStatusListener
 
     @Override
     public void onSuccess(Object data) {
-        LoggedInUserInfo userInfo = (LoggedInUserInfo)data;
+        LoggedInUserInfo userInfo = (LoggedInUserInfo) data;
         AccessToken token = userInfo.getAccessToken();
         JUser user = userInfo.getUser();
         getIntent().putExtra("loginStatus", true);
@@ -116,6 +128,6 @@ public class SplashActivity extends Activity implements IAsyncTaskStatusListener
     }
 
     private void doLogin(UserInfo userInfo) {
-        new LoginTask(this).execute(userInfo);
+        new LoginTask(this, this).execute(userInfo);
     }
 }

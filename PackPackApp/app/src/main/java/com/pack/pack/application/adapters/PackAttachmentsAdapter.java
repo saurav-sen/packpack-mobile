@@ -127,7 +127,8 @@ public class PackAttachmentsAdapter extends ArrayAdapter<JPackAttachment> {
 
         JPackAttachment attachment = getItem(position);
         if(attachment != null) {
-            new DownloadImageTask(pack_attachment_img, 700, 600).execute(attachment.getAttachmentUrl());
+            new DownloadImageTask(pack_attachment_img, 700, 600, PackAttachmentsAdapter.this.getContext())
+                    .execute(attachment.getAttachmentUrl());
         }
         return convertView;
     }
@@ -176,7 +177,7 @@ public class PackAttachmentsAdapter extends ArrayAdapter<JPackAttachment> {
     private class AddLikeTask extends AbstractNetworkTask<String, Void, Void> {
 
         public AddLikeTask() {
-            super(false, false, true);
+            super(false, false, true, PackAttachmentsAdapter.this.activity);
         }
 
         @Override

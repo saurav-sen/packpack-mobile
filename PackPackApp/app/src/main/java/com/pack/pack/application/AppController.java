@@ -119,6 +119,16 @@ public class AppController extends Application {
 
     private boolean signInProgress;
 
+    private String userPassword;
+
+    public String getUserPassword() {
+        return userPassword;
+    }
+
+    public void setUserPassword(String userPassword) {
+        this.userPassword = userPassword;
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();

@@ -1,5 +1,6 @@
 package com.pack.pack.application.data.util;
 
+import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
@@ -34,12 +35,12 @@ public class LoginTask extends AbstractNetworkTask<UserInfo, Integer, AccessToke
 
     private UserInfo userInfo;
 
-    public LoginTask() {
-        super(true, true);
+    public LoginTask(Context context) {
+        super(true, true, context);
     }
 
-    public LoginTask(IAsyncTaskStatusListener listener) {
-        super(true, true);
+    public LoginTask(Context context, IAsyncTaskStatusListener listener) {
+        super(true, true, context);
         addListener(listener);
     }
 
@@ -77,7 +78,7 @@ public class LoginTask extends AbstractNetworkTask<UserInfo, Integer, AccessToke
         userInfo.setAccessTokenSecret(successResult.getTokenSecret());
         userInfo.setUserId(user.getId());
         userInfo.setUsername(user.getUsername());
-        //userInfo.setPassword(user.get);
+        userInfo.setPassword(AppController.getInstance().getUserPassword());
         return userInfo;
     }
 
@@ -94,6 +95,7 @@ public class LoginTask extends AbstractNetworkTask<UserInfo, Integer, AccessToke
         apiParams.put(APIConstants.Login.CLIENT_SECRET, ANDROID_APP_CLIENT_SECRET);
         apiParams.put(APIConstants.Login.USERNAME, userInfo.getUsername());
         apiParams.put(APIConstants.Login.PASSWORD, userInfo.getPassword());
+        AppController.getInstance().setUserPassword(userInfo.getPassword());
         return apiParams;
     }
 
@@ -117,6 +119,7 @@ public class LoginTask extends AbstractNetworkTask<UserInfo, Integer, AccessToke
         final UserInfo userInfo = DBUtil.loadLastLoggedInUserInfo(readable);
         if(userInfo != null && userInfo.getAccessToken() != null && userInfo.getAccessTokenSecret() != null) {
             AppController.getInstance().setoAuthToken(userInfo.getAccessToken());
+            AppController.getInstance().setUserPassword(userInfo.getPassword());
             user = DBUtil.convertUserInfo(userInfo);
             AppController.getInstance().setUser(user);
             return  new AccessToken() {

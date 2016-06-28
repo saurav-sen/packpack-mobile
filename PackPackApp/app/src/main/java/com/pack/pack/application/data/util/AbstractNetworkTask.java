@@ -46,20 +46,22 @@ public abstract class AbstractNetworkTask<X, Y, Z> extends AsyncTask<X, Y, Z> {
 
     private X x;
 
-    public AbstractNetworkTask(boolean tryRetrievingFromDB, boolean storeResultsInDB) {
-        this(tryRetrievingFromDB, storeResultsInDB, false);
+    public AbstractNetworkTask(boolean tryRetrievingFromDB, boolean storeResultsInDB, Context context) {
+        this(tryRetrievingFromDB, storeResultsInDB, false, context);
     }
 
-    public AbstractNetworkTask(boolean tryRetrievingFromDB, boolean storeResultsInDB, boolean updateExistingObjectInDB) {
+    public AbstractNetworkTask(boolean tryRetrievingFromDB, boolean storeResultsInDB, boolean updateExistingObjectInDB, Context context) {
         this.tryRetrievingFromDB = tryRetrievingFromDB;
         this.storeResultsInDB = storeResultsInDB;
         this.updateExistingObjectInDB = updateExistingObjectInDB;
-    }
-
-    public AbstractNetworkTask(Context context) {
         this.context = context;
         squillDbHelper = new SquillDbHelper(context);
     }
+
+    /*public AbstractNetworkTask(Context context) {
+        this.context = context;
+        squillDbHelper = new SquillDbHelper(context);
+    }*/
 
     protected Context getContext() {
         return context;
@@ -110,7 +112,7 @@ public abstract class AbstractNetworkTask<X, Y, Z> extends AsyncTask<X, Y, Z> {
     }
 
     @Override
-    protected final Z doInBackground(X... xes) {
+    protected Z doInBackground(X... xes) {
         if(xes == null || xes.length == 0)
             return null;
         X x = xes[0];
@@ -147,7 +149,7 @@ public abstract class AbstractNetworkTask<X, Y, Z> extends AsyncTask<X, Y, Z> {
         if(successResult == null)
             return;
         if(data instanceof Collection) {
-            Collection<?> c = (Collection<?>)successResult;
+            Collection<?> c = (Collection<?>)data;//successResult;
             Iterator<?> itr = c.iterator();
             while(itr.hasNext()) {
                 Object __obj = itr.next();

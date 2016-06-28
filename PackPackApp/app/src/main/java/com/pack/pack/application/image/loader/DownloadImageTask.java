@@ -1,5 +1,6 @@
 package com.pack.pack.application.image.loader;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
@@ -36,12 +37,12 @@ public class DownloadImageTask extends AbstractNetworkTask<String, Void, Bitmap>
 
     private String errorMsg;
 
-    public DownloadImageTask(ImageView imageView) {
-        this(imageView, -1, -1);
+    public DownloadImageTask(ImageView imageView, Context context) {
+        this(imageView, -1, -1, context);
     }
 
-    public DownloadImageTask(ImageView imageView, int imageWidth, int imageHeight) {
-        super(true, true);
+    public DownloadImageTask(ImageView imageView, int imageWidth, int imageHeight, Context context) {
+        super(true, true, context);
         this.imageView = imageView;
         this.imageWidth = imageWidth;
         this.imageHeight = imageHeight;

@@ -142,7 +142,7 @@ public class TopicDetailAdapter extends ArrayAdapter<JPack> {
         private GridView packAttachmentsGrid;
 
         LoadPackAttachmentsTask(GridView packAttachmentsGrid) {
-            super(true, true);
+            super(true, true, TopicDetailAdapter.this.activity);
             this.packAttachmentsGrid = packAttachmentsGrid;
         }
 
@@ -200,7 +200,7 @@ public class TopicDetailAdapter extends ArrayAdapter<JPack> {
 
         @Override
         protected List<JPackAttachment> doRetrieveFromDB(SQLiteDatabase readable, JPack inputObject) {
-            return DBUtil.loadAllJsonModelByContainerId(readable, inputObject.getId(), JPackAttachment.class);
+            return null;//DBUtil.loadAllJsonModelByContainerId(readable, inputObject.getId(), JPackAttachment.class);
         }
     }
 }

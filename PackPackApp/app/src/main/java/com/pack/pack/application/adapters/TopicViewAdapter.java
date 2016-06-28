@@ -78,7 +78,8 @@ public class TopicViewAdapter extends ArrayAdapter<JTopic> {
             descriptionTextView.setText(topic.getDescription());
            // followersTextView.setText(String.valueOf(topic.getFollowers()));
             if(topic.getWallpaperUrl() != null && !topic.getWallpaperUrl().trim().equals("")) {
-                new DownloadImageTask(poster).execute(topic.getWallpaperUrl() + "?thumbnail=false");
+                new DownloadImageTask(poster, TopicViewAdapter.this.activity)
+                        .execute(topic.getWallpaperUrl() + "?thumbnail=false");
             }
         }
         return convertView;

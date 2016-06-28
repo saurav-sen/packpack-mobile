@@ -68,7 +68,8 @@ public class FullScreenAttachmentViewAdapter extends PagerAdapter {
         if(list != null && !list.isEmpty() && position < list.size()) {
             JPackAttachment attachment = list.get(position);
             if("IMAGE".equalsIgnoreCase(attachment.getAttachmentType())) {
-                 new DownloadImageTask(imgDisplay, 900, 900).execute(attachment.getAttachmentUrl());
+                 new DownloadImageTask(imgDisplay, 900, 900, FullScreenAttachmentViewAdapter.this.activity)
+                         .execute(attachment.getAttachmentUrl());
             } else if("VIDEO".equalsIgnoreCase(attachment.getAttachmentType())) {
                // new DownloadImageTask(imgDisplay, -1, -1).execute(attachment.getAttachmentUrl());
             }

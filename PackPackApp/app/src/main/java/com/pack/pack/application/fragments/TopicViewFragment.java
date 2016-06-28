@@ -78,7 +78,7 @@ public abstract class TopicViewFragment extends Fragment {
 
             }
         });
-       new LoadTopicTask().execute();
+       new LoadTopicTask().execute(AppController.getInstance().getUserId());
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -111,13 +111,26 @@ public abstract class TopicViewFragment extends Fragment {
         return ViewUtil.getListViewId(getCategoryType());
     }
 
-    private class LoadTopicTask extends AbstractNetworkTask<Void, Integer, Pagination<JTopic>> {
+    private class LoadTopicTask extends AbstractNetworkTask<String, Integer, Pagination<JTopic>> {
 
         private String errorMsg;
 
         public LoadTopicTask() {
-            super(true, true);
+            super(true, true, getActivity());
         }
+
+        /*@Override
+        protected Pagination<JTopic> doInBackground(Void... inputObjects) {
+            *//*if(xes == null || xes.length == 0)
+                return null;*//*
+            //setInputObject(null);
+            Pagination<JTopic> page = null;
+            page = doRetrieveFromDB(getSquillDbHelper().getReadableDatabase(), getInputObject());
+            if(page == null) {
+                page = doExecuteInBackground(null);
+            }
+            return page;
+        }*/
 
         @Override
         protected String getFailureMessage() {
@@ -147,11 +160,11 @@ public abstract class TopicViewFragment extends Fragment {
         }
 
         @Override
-        protected Pagination<JTopic> doRetrieveFromDB(SQLiteDatabase readable, Void inputObject) {
+        protected Pagination<JTopic> doRetrieveFromDB(SQLiteDatabase readable, String inputObject) {
             Pagination<JTopic> page = null;
             List<JTopic> result = DBUtil.loadAllJsonModelByContainerId(readable,
                     AppController.getInstance().getUserId(), JTopic.class);
-            String userId = AppController.getInstance().getUserId();
+            String userId = inputObject;//AppController.getInstance().getUserId();
             if(result != null && !result.isEmpty()) {
                 page = new Pagination<JTopic>();
                 PaginationInfo paginationInfo = DBUtil.loadPaginationInfo(
@@ -197,9 +210,9 @@ public abstract class TopicViewFragment extends Fragment {
         }
 
         @Override
-        protected Map<String, Object> prepareApiParams(Void inputObject) {
+        protected Map<String, Object> prepareApiParams(String inputObject) {
             Map<String, Object> apiParams = new HashMap<String, Object>();
-            String userId = AppController.getInstance().getUserId();
+            String userId = inputObject;//AppController.getInstance().getUserId();
             apiParams.put(APIConstants.User.ID, userId);
             String nextLink = page != null ? page.getNextLink() : "";
             String categoryName = getCategoryType();

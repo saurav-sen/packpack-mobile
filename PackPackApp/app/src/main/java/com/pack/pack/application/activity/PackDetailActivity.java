@@ -125,7 +125,7 @@ public class PackDetailActivity extends AppCompatActivity {
         private String errorMsg;
 
         public LoadPackDetailTask() {
-            super(true, true);
+            super(true, true, PackDetailActivity.this);
         }
 
         @Override

@@ -58,7 +58,7 @@ public class ImageGridAdapter extends BaseAdapter {
         imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
         if(i < getCount()) {
             String imageUrl = imageUrls.get(i);
-            new DownloadImageTask(imageView, 90, 100).execute(imageUrl.trim());
+            new DownloadImageTask(imageView, 90, 100, mContext).execute(imageUrl.trim());
         }
         return imageView;
     }

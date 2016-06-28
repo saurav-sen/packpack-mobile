@@ -169,7 +169,7 @@ public class TopicCreateActivity extends AppCompatActivity implements IAsyncTask
         private String errorMsg;
 
         public TopicCreateTask(IAsyncTaskStatusListener listener) {
-            super(false, true);
+            super(false, true, TopicCreateActivity.this);
             addListener(listener);
         }
 

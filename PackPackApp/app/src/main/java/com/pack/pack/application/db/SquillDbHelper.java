@@ -18,8 +18,7 @@ public class SquillDbHelper extends SQLiteOpenHelper {
                 "CREATE TABLE " + JsonModel.TABLE_NAME + " (" + JsonModel._ID
                         + " INTEGER PRIMARY KEY, " + JsonModel.ENTITY_ID + " TEXT, "
                         + JsonModel.ENTITY_CONTAINER_ID + " TEXT, " + JsonModel.CONTENT
-                        + " TEXT, " + JsonModel.CLASS_TYPE + " TEXT, " + JsonModel.HAS_ATTACHMENT
-                        + " INTEGER, " + JsonModel.COMMAND + " TEXT)";
+                        + " TEXT, " + JsonModel.CLASS_TYPE + " TEXT)";
 
         public static final String USER_INFO =
                 "CREATE TABLE " + UserInfo.TABLE_NAME + " (" + UserInfo._ID

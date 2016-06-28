@@ -37,7 +37,7 @@ public class TopicDetailActivity extends AppCompatActivity {
         topic_description_text.setText((topic.getDescription() + "").trim());
 
         ImageView topic_wallpaper_img = (ImageView) findViewById(R.id.topic_wallpaper_img);
-        new DownloadImageTask(topic_wallpaper_img).execute(topic.getWallpaperUrl());
+        new DownloadImageTask(topic_wallpaper_img, this).execute(topic.getWallpaperUrl());
 
 
         Button enterTopic = (Button) findViewById(R.id.enter_topic_detail);
