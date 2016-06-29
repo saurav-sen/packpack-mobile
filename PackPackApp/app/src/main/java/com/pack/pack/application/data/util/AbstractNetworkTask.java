@@ -111,6 +111,8 @@ public abstract class AbstractNetworkTask<X, Y, Z> extends AsyncTask<X, Y, Z> {
         this.x = x;
     }
 
+    private boolean loadedFromDB = false;
+
     @Override
     protected Z doInBackground(X... xes) {
         if(xes == null || xes.length == 0)
@@ -123,6 +125,8 @@ public abstract class AbstractNetworkTask<X, Y, Z> extends AsyncTask<X, Y, Z> {
         }
         if(z == null) {
             z = doExecuteInBackground(x);
+        } else {
+            loadedFromDB = true;
         }
         return z;
     }
@@ -206,11 +210,13 @@ public abstract class AbstractNetworkTask<X, Y, Z> extends AsyncTask<X, Y, Z> {
     }
 
     private void storeResultsInDb_0(DbObject __dbObject) {
-        if(checkExistence_0(__dbObject)) {
+        if(loadedFromDB)
+            return;
+        /*if(checkExistence_0(__dbObject)) {
             boolean success = deleteExisting_0(__dbObject);
             if(!success)
                 return;
-        }
+        }*/
         ContentValues values = __dbObject.toContentValues();
         String table_name = __dbObject.getTableName();
         SQLiteDatabase wDB = squillDbHelper.getWritableDatabase();

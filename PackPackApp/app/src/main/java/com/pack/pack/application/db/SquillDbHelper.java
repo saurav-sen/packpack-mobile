@@ -31,7 +31,8 @@ public class SquillDbHelper extends SQLiteOpenHelper {
                 "CREATE TABLE " + AttachmentInfo.TABLE_NAME + "(" + AttachmentInfo._ID
                         + " INTEGER PRIMARY KEY, " + AttachmentInfo.ENTITY_ID + " TEXT, "
                         + AttachmentInfo.URL + " TEXT, " + AttachmentInfo.TYPE + " TEXT, "
-                        + AttachmentInfo.CONTAINER_ID + " TEXT)";
+                        + AttachmentInfo.CONTAINER_ID + " TEXT, " + AttachmentInfo.JSON_BODY
+                        + " TEXT)";
 
         public static final String PAGINATION_INFO =
                 "CREATE TABLE " + PaginationInfo.TABLE_NAME + "(" + PaginationInfo._ID

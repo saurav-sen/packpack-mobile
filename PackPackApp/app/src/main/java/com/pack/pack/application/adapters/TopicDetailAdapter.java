@@ -200,7 +200,7 @@ public class TopicDetailAdapter extends ArrayAdapter<JPack> {
 
         @Override
         protected List<JPackAttachment> doRetrieveFromDB(SQLiteDatabase readable, JPack inputObject) {
-            return null;//DBUtil.loadAllJsonModelByContainerId(readable, inputObject.getId(), JPackAttachment.class);
+            return DBUtil.loadAllAttachmentInfo(readable, inputObject.getId());
         }
     }
 }

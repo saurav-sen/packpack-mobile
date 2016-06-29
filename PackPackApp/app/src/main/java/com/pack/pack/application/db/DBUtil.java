@@ -17,6 +17,7 @@ import com.pack.pack.model.web.JUser;
 import com.pack.pack.services.exception.PackPackException;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -102,11 +103,18 @@ public class DBUtil {
     }
 
     private static AttachmentInfo convertJPackAttachment(JPackAttachment attachment, String containerId) {
-        AttachmentInfo attachmentInfo = new AttachmentInfo();
-        attachmentInfo.setUrl(attachment.getAttachmentUrl());
-        attachmentInfo.setType(attachment.getAttachmentType());
-        attachmentInfo.setContainerId(containerId);
-        attachmentInfo.setEntityId(attachment.getId());
+        AttachmentInfo attachmentInfo = null;
+        try {
+            attachmentInfo = new AttachmentInfo();
+            attachmentInfo.setUrl(attachment.getAttachmentUrl());
+            attachmentInfo.setType(attachment.getAttachmentType());
+            attachmentInfo.setContainerId(containerId);
+            attachmentInfo.setEntityId(attachment.getId());
+            attachmentInfo.setJsonBody(JSONUtil.serialize(attachment));
+            return attachmentInfo;
+        } catch (PackPackException e) {
+            e.printStackTrace();
+        }
         return attachmentInfo;
     }
 
@@ -163,13 +171,13 @@ public class DBUtil {
                 cursor.close();
             }
         }
-        return result;
+        return result != null && !result.isEmpty() ? result : null;
     }
 
     private static <T> T convertFromJson(String json, Class<T> classType) {
         T result = null;
         try {
-            result = JSONUtil.deserialize(json, classType);
+            result = JSONUtil.deserialize(json, classType, true);
         } catch (PackPackException e) {
             Log.i(LOG_TAG, e.getMessage());
         }
@@ -178,6 +186,32 @@ public class DBUtil {
 
     public static PaginationInfo loadPaginationInfo(SQLiteDatabase readable, String entityId) {
         return loadPaginationInfo(readable, entityId, null);
+    }
+
+    public static List<JPackAttachment> loadAllAttachmentInfo(SQLiteDatabase readable, String containerId) {
+        Cursor cursor = null;
+        List<JPackAttachment> attachments = new LinkedList<JPackAttachment>();
+        try {
+            String __SQL = "SELECT " + AttachmentInfo.JSON_BODY + " FROM " + AttachmentInfo.TABLE_NAME
+                    + " WHERE " + AttachmentInfo.CONTAINER_ID + "='" + containerId + "'";
+            cursor = readable.rawQuery(__SQL, null);
+            if(cursor.moveToFirst()) {
+                do {
+                    String json = cursor.getString(cursor.getColumnIndexOrThrow(AttachmentInfo.JSON_BODY));
+                    JPackAttachment attachment = JSONUtil.deserialize(json, JPackAttachment.class);
+                    if(attachment != null) {
+                        attachments.add(attachment);
+                    }
+                } while (cursor.moveToNext());
+            }
+        } catch (PackPackException e) {
+            Log.i(LOG_TAG, e.getMessage());
+        } finally {
+            if(cursor != null && !cursor.isClosed()) {
+                cursor.close();
+            }
+        }
+        return attachments != null && !attachments.isEmpty() ? attachments : null;
     }
 
     public static PaginationInfo loadPaginationInfo(SQLiteDatabase readable, String entityId, String type) {

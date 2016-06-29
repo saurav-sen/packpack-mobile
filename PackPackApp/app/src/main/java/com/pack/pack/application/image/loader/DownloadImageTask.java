@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.widget.ImageView;
 
 import com.pack.pack.application.AppController;
@@ -21,6 +22,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,6 +38,8 @@ public class DownloadImageTask extends AbstractNetworkTask<String, Void, Bitmap>
     private int imageHeight;
 
     private String errorMsg;
+
+    private static final String LOG_TAG = "DownloadImageTask";
 
     public DownloadImageTask(ImageView imageView, Context context) {
         this(imageView, -1, -1, context);
@@ -93,6 +97,8 @@ public class DownloadImageTask extends AbstractNetworkTask<String, Void, Bitmap>
 
     @Override
     protected DbObject convertObjectForStore(Bitmap successResult, String containerIdForObjectStore) {
+        if(successResult == null)
+            return null;
         String url = getInputObject();
         byte[] rawBytes = readRawBytes(successResult);
         ResourceURL resourceURL = new ResourceURL();
@@ -102,6 +108,19 @@ public class DownloadImageTask extends AbstractNetworkTask<String, Void, Bitmap>
     }
 
     private byte[] readRawBytes(Bitmap bitmap) {
+        int size = bitmap.getRowBytes() * bitmap.getHeight();
+        ByteBuffer byteBuffer = ByteBuffer.allocate(size);
+        bitmap.copyPixelsToBuffer(byteBuffer);
+        byte[] rawBytes = new byte[size];
+        try {
+            byteBuffer.get(rawBytes, 0, size);
+        } catch (Exception e) {
+            //e.printStackTrace();
+        }
+        return rawBytes;
+    }
+
+    private byte[] readRawBytes_compressed(Bitmap bitmap) {
         byte[] rawBytes = null;
         ByteArrayOutputStream byteArrayOutputStream = null;
         try {
@@ -132,6 +151,9 @@ public class DownloadImageTask extends AbstractNetworkTask<String, Void, Bitmap>
                 byte[] rawBytes = cursor.getBlob(cursor.getColumnIndexOrThrow(ResourceURL.BLOB_CONTENT));
                 bitmap = BitmapFactory.decodeByteArray(rawBytes, 0, rawBytes.length);
             }
+        } catch (Exception e) {
+            Log.i(LOG_TAG, e.getMessage());
+            bitmap = null;
         } finally {
             if(cursor != null && !cursor.isClosed()) {
                 cursor.close();
@@ -152,6 +174,7 @@ public class DownloadImageTask extends AbstractNetworkTask<String, Void, Bitmap>
 
     @Override
     protected void onPostExecute(Bitmap bitmap) {
-       imageView.setImageBitmap(bitmap);
+        imageView.setImageBitmap(bitmap);
+        super.onPostExecute(bitmap);
     }
 }

@@ -16,6 +16,8 @@ public class AttachmentInfo implements DbObject {
     public static final String TYPE = "type";
     public static final String CONTAINER_ID = "container_id";
 
+    public static final String JSON_BODY = "JSON_BODY";
+
     private String entityId;
 
     private String url;
@@ -23,6 +25,16 @@ public class AttachmentInfo implements DbObject {
     private String type;
 
     private String containerId;
+
+    private String jsonBody;
+
+    public String getJsonBody() {
+        return jsonBody;
+    }
+
+    public void setJsonBody(String jsonBody) {
+        this.jsonBody = jsonBody;
+    }
 
     public String getContainerId() {
         return containerId;
