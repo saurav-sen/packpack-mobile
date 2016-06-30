@@ -61,7 +61,13 @@ public class DownloadImageTask extends AbstractNetworkTask<String, Void, Bitmap>
     protected Map<String, Object> prepareApiParams(String inputObject) {
         Map<String, Object> apiParams = new HashMap<String, Object>();
         apiParams.put(APIConstants.ProtectedResource.RESOURCE_URL, inputObject);
+        apiParams.put(APIConstants.Image.WIDTH, imageWidth);
+        apiParams.put(APIConstants.Image.HEIGHT, imageHeight);
         return apiParams;
+    }
+
+    private String lookupURL(String url) {
+        return url + "?w=" + imageWidth + "&h=" + imageHeight;
     }
 
     @Override
@@ -70,7 +76,7 @@ public class DownloadImageTask extends AbstractNetworkTask<String, Void, Bitmap>
         Bitmap bitmap = null;
         try {
             String url = getInputObject();
-            bitmap = AppController.getInstance().getLruBitmapCache().getBitmap(url);
+            bitmap = AppController.getInstance().getLruBitmapCache().getBitmap(lookupURL(url));
             if(bitmap != null)
                 return bitmap;
             stream = (InputStream) api.execute();
@@ -79,7 +85,7 @@ public class DownloadImageTask extends AbstractNetworkTask<String, Void, Bitmap>
                 if(imageWidth > 0 && imageHeight > 0 && bitmap != null) {
                     bitmap = Bitmap.createScaledBitmap(bitmap, imageWidth, imageHeight, false);
                 }
-                AppController.getInstance().getLruBitmapCache().putBitmap(url, bitmap);
+                AppController.getInstance().getLruBitmapCache().putBitmap(lookupURL(url), bitmap);
             }
         } catch (Exception e) {
             errorMsg = e.getMessage();
@@ -100,9 +106,9 @@ public class DownloadImageTask extends AbstractNetworkTask<String, Void, Bitmap>
         if(successResult == null)
             return null;
         String url = getInputObject();
-        byte[] rawBytes = readRawBytes(successResult);
+        byte[] rawBytes = readRawBytes_compressed(successResult);
         ResourceURL resourceURL = new ResourceURL();
-        resourceURL.setUrl(url);
+        resourceURL.setUrl(lookupURL(url));
         resourceURL.setBytes(rawBytes);
         return resourceURL;
     }
@@ -125,7 +131,7 @@ public class DownloadImageTask extends AbstractNetworkTask<String, Void, Bitmap>
         ByteArrayOutputStream byteArrayOutputStream = null;
         try {
             byteArrayOutputStream = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 0, byteArrayOutputStream);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 40, byteArrayOutputStream);
             rawBytes = byteArrayOutputStream.toByteArray();
         } finally {
             try {
@@ -145,7 +151,7 @@ public class DownloadImageTask extends AbstractNetworkTask<String, Void, Bitmap>
         Bitmap bitmap = null;
         try {
             String __SQL = "SELECT "+ ResourceURL.BLOB_CONTENT + " FROM " + ResourceURL.TABLE_NAME
-                    + " WHERE " + ResourceURL.URL + "='" + inputObject + "'";
+                    + " WHERE " + ResourceURL.URL + "='" + lookupURL(inputObject) + "'";
             cursor = readable.rawQuery(__SQL, null);
             if(cursor.moveToFirst()) {
                 byte[] rawBytes = cursor.getBlob(cursor.getColumnIndexOrThrow(ResourceURL.BLOB_CONTENT));

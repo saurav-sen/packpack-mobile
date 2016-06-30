@@ -75,6 +75,7 @@ public class AttachmentInfo implements DbObject {
         contentValues.put(URL, url);
         contentValues.put(TYPE, type);
         contentValues.put(CONTAINER_ID, containerId);
+        contentValues.put(JSON_BODY, jsonBody);
         return contentValues;
     }
 

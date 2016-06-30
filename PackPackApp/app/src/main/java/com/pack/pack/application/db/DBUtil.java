@@ -113,7 +113,7 @@ public class DBUtil {
             attachmentInfo.setJsonBody(JSONUtil.serialize(attachment));
             return attachmentInfo;
         } catch (PackPackException e) {
-            e.printStackTrace();
+            Log.d(LOG_TAG, e.getMessage());
         }
         return attachmentInfo;
     }
@@ -198,7 +198,7 @@ public class DBUtil {
             if(cursor.moveToFirst()) {
                 do {
                     String json = cursor.getString(cursor.getColumnIndexOrThrow(AttachmentInfo.JSON_BODY));
-                    JPackAttachment attachment = JSONUtil.deserialize(json, JPackAttachment.class);
+                    JPackAttachment attachment = JSONUtil.deserialize(json, JPackAttachment.class, true);
                     if(attachment != null) {
                         attachments.add(attachment);
                     }

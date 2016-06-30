@@ -36,11 +36,11 @@ public class LoginTask extends AbstractNetworkTask<UserInfo, Integer, AccessToke
     private UserInfo userInfo;
 
     public LoginTask(Context context) {
-        super(true, true, context);
+        super(false, true, context);
     }
 
     public LoginTask(Context context, IAsyncTaskStatusListener listener) {
-        super(true, true, context);
+        super(false, true, context);
         addListener(listener);
     }
 

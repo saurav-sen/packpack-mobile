@@ -24,6 +24,9 @@ import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
 import com.pack.pack.application.adapters.PackAttachmentsAdapter;
 import com.pack.pack.application.data.util.AbstractNetworkTask;
+import com.pack.pack.application.db.DBUtil;
+import com.pack.pack.application.db.DbObject;
+import com.pack.pack.application.db.PaginationInfo;
 import com.pack.pack.application.topic.activity.model.ParcelablePack;
 import com.pack.pack.client.api.API;
 import com.pack.pack.client.api.APIBuilder;
@@ -141,7 +144,19 @@ public class PackDetailActivity extends AppCompatActivity {
 
         @Override
         protected Pagination<JPackAttachment> doRetrieveFromDB(SQLiteDatabase readable, ScrollablePackDetail inputObject) {
-            return super.doRetrieveFromDB(readable, inputObject);
+            Pagination<JPackAttachment> page = null;
+            List<JPackAttachment> attachments = DBUtil.loadAllAttachmentInfo(readable, inputObject.packId);
+            //List<JPackAttachment> attachments = DBUtil.loadAllJsonModelByContainerId(readable, inputObject.packId, JPackAttachment.class);
+            if(attachments != null && !attachments.isEmpty()) {
+                PaginationInfo paginationInfo = DBUtil.loadPaginationInfo(readable, inputObject.packId);
+                page = new Pagination<JPackAttachment>();
+                page.setResult(attachments);
+                if(paginationInfo != null) {
+                    page.setNextLink(paginationInfo.getNextLink());
+                    page.setPreviousLink(paginationInfo.getPreviousLink());
+                }
+            }
+            return page;
         }
 
         @Override

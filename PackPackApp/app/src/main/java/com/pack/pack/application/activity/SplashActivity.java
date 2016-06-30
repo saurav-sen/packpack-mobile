@@ -55,15 +55,15 @@ public class SplashActivity extends Activity implements IAsyncTaskStatusListener
             UserInfo userInfo = DBUtil.loadLastLoggedInUserInfo(new SquillDbHelper(this).getReadableDatabase());
             if(userInfo != null) {
                 oAuthToken = userInfo.getAccessToken();
-                if(oAuthToken != null) {
+               /* if(oAuthToken != null) {
                     AppController.getInstance().setoAuthToken(oAuthToken);
                     JUser user = DBUtil.convertUserInfo(userInfo);
                     AppController.getInstance().setUser(user);
                     finish();
                     startMainActivity();
-                } else {
+                } else {*/
                     doLogin(userInfo);
-                }
+                //}
             } else {
                 startLoginActivity();
             }

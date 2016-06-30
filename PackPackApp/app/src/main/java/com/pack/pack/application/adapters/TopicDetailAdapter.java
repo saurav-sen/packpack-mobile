@@ -186,7 +186,7 @@ public class TopicDetailAdapter extends ArrayAdapter<JPack> {
                 List<String> imageUrls = new ArrayList<String>();
                 for(int j=0; j<attachments.size(); j++) {
                     JPackAttachment attachment = attachments.get(j);
-                    imageUrls.add(attachment.getAttachmentThumbnailUrl());
+                    imageUrls.add(attachment.getAttachmentUrl());//.getAttachmentThumbnailUrl());
                 }
                 adapter.getImageUrls().addAll(imageUrls);
                 packAttachmentsGrid.setAdapter(adapter);

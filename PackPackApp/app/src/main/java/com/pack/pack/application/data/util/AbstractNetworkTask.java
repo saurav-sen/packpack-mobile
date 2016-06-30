@@ -32,6 +32,8 @@ public abstract class AbstractNetworkTask<X, Y, Z> extends AsyncTask<X, Y, Z> {
 
     private boolean isSuccess = false;
 
+    private boolean isNetworkCalled = false;
+
     private Z successResult;
 
     private Context context;
@@ -220,7 +222,11 @@ public abstract class AbstractNetworkTask<X, Y, Z> extends AsyncTask<X, Y, Z> {
         ContentValues values = __dbObject.toContentValues();
         String table_name = __dbObject.getTableName();
         SQLiteDatabase wDB = squillDbHelper.getWritableDatabase();
-        long newRowID = wDB.insert(table_name, null, values);
+        if(!checkExistence_0(__dbObject)) {
+            long newRowID = wDB.insert(table_name, null, values);
+        } else {
+            long newRowID = wDB.update(table_name, values, "ENTITY_ID='" + __dbObject.getEntityId() + "'", null);
+        }
     }
 
     private boolean checkExistence_0(DbObject __dbObject) {
@@ -228,12 +234,14 @@ public abstract class AbstractNetworkTask<X, Y, Z> extends AsyncTask<X, Y, Z> {
         boolean exists = false;
         try {
             String table_name = __dbObject.getTableName();
-            String[] projection = new String[] {(String)(__dbObject.getClass().getField("_ID").get(null))};
-            String selection = (String)(__dbObject.getClass().getField("ENTITY_ID").get(null));
+            String[] projection = new String[] {"_ID"};//new String[] {(String)(__dbObject.getClass().getField("_ID").get(null))};
+            String selection = "entity_id";//(String)(__dbObject.getClass().getField("ENTITY_ID").get(null));
             SQLiteDatabase rDB = squillDbHelper.getReadableDatabase();
-            cursor = rDB.query(table_name, projection, selection,
+            String __SQL = "SELECT _ID FROM " + table_name + " WHERE entity_id='" + __dbObject.getEntityId() + "'";
+            cursor = rDB.rawQuery(__SQL, null);
+            /*cursor = rDB.query(table_name, projection, selection,
                     new String[]{__dbObject.getEntityId()}, null, null,
-                    null);
+                    null);*/
             exists = !(!cursor.moveToFirst() || cursor.getCount() == 0);
         } catch (Exception e) {
             e.printStackTrace();
@@ -276,12 +284,17 @@ public abstract class AbstractNetworkTask<X, Y, Z> extends AsyncTask<X, Y, Z> {
                 }
             }
             API api = builder.build();
-            successResult = executeApi(api);
+            successResult = doExecuteApi(api);
             isSuccess = true;
         } catch (Exception e) {
             e.printStackTrace();;
         }
         return successResult;
+    }
+
+    private Z doExecuteApi(API api) throws Exception {
+        isNetworkCalled = true;
+        return executeApi(api);
     }
 
     protected abstract Z executeApi(API api) throws Exception;
@@ -305,10 +318,10 @@ public abstract class AbstractNetworkTask<X, Y, Z> extends AsyncTask<X, Y, Z> {
         super.onPostExecute(z);
         if(isSuccess(z)) {
             Object data = getSuccessResult(z);
-            if(storeResultsInDB) {
+            if(storeResultsInDB && isNetworkCalled) {
                 storeResultsInDb(data);
             }
-            if(updateExistingObjectInDB) {
+            if(updateExistingObjectInDB && isNetworkCalled) {
                 doUpdateExistingInDB(squillDbHelper.getWritableDatabase(), getInputObject(), z);
             }
             fireOnSuccess(data);
