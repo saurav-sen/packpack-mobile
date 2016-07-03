@@ -22,4 +22,5 @@
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="title_activity_topic_create">TopicCreateActivity</string>
     <string name="title_activity_splash">SplashActivity</string>
+    <string name="title_activity_discussion">DiscussionActivity</string>
 </resources>

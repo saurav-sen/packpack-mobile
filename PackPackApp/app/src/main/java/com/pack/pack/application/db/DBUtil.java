@@ -10,6 +10,7 @@ import com.pack.pack.application.db.JsonModel;
 import com.pack.pack.application.db.PaginationInfo;
 import com.pack.pack.application.db.UserInfo;
 import com.pack.pack.common.util.JSONUtil;
+import com.pack.pack.model.web.JDiscussion;
 import com.pack.pack.model.web.JPack;
 import com.pack.pack.model.web.JPackAttachment;
 import com.pack.pack.model.web.JTopic;
@@ -242,5 +243,46 @@ public class DBUtil {
             }
         }
         return paginationInfo;
+    }
+
+    public static List<JDiscussion> getDiscussionInfosBasedUponContainerId(SQLiteDatabase readable, String containerId, String containerType) {
+        Cursor cursor = null;
+        List<JDiscussion> infos = null;
+        try {
+            String __SQL = "SELECT " + DiscussionInfo._ID + ", " + DiscussionInfo.ENTITY_ID + ", "
+                    + DiscussionInfo.DATE_TIME + ", " + DiscussionInfo.CONTAINER_TYPE + ", "
+                    + DiscussionInfo.CONTAINER_ID + ", " + DiscussionInfo.CONTENT + ", "
+                    + DiscussionInfo.FROM_USERNAME + ", " + DiscussionInfo.FROM_USER_FULL_NAME
+                    + " FROM " + DiscussionInfo.TABLE_NAME + " WHERE " + DiscussionInfo.CONTAINER_ID
+                    + "='" + containerId + "' AND " + DiscussionInfo.CONTAINER_TYPE + "='"
+                    + containerType + "'";
+            cursor = readable.rawQuery(__SQL, null);
+            if(cursor.moveToFirst()) {
+                infos = new ArrayList<JDiscussion>();
+                do {
+                    String eId = cursor.getString(cursor.getColumnIndexOrThrow(DiscussionInfo.ENTITY_ID));
+                    String cId = cursor.getString(cursor.getColumnIndexOrThrow(DiscussionInfo.CONTAINER_ID));
+                    String cType = cursor.getString(cursor.getColumnIndexOrThrow(DiscussionInfo.CONTAINER_TYPE));
+                    String content = cursor.getString(cursor.getColumnIndexOrThrow(DiscussionInfo.CONTENT));
+                    String userName = cursor.getString(cursor.getColumnIndexOrThrow(DiscussionInfo.FROM_USERNAME));
+                    String userFullName = cursor.getString(cursor.getColumnIndexOrThrow(DiscussionInfo.FROM_USER_FULL_NAME));
+                    long dateTime = cursor.getLong(cursor.getColumnIndexOrThrow(DiscussionInfo.DATE_TIME));
+                    JDiscussion info = new JDiscussion();
+                    info.setId(eId);
+                    info.setContent(content);
+                    info.setDateTime(dateTime);
+                    JUser user = new JUser();
+                    user.setUsername(userName);
+                    user.setName(userFullName);
+                    info.setFromUser(user);
+                    infos.add(info);
+                } while (cursor.moveToNext());
+            }
+        } finally {
+            if(cursor != null && !cursor.isClosed()) {
+                cursor.close();
+            }
+        }
+        return infos;
     }
 }

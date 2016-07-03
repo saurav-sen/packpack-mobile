@@ -22,6 +22,7 @@ import com.pack.pack.client.api.API;
 import com.pack.pack.client.api.APIConstants;
 import com.pack.pack.client.api.COMMAND;
 import com.pack.pack.model.web.JPack;
+import com.pack.pack.model.web.JTopic;
 import com.pack.pack.model.web.Pagination;
 
 import java.util.ArrayList;
@@ -124,6 +125,16 @@ public class InsideTopicActivity extends AppCompatActivity {
         @Override
         protected String getContainerIdForObjectStore() {
             return getInputObject().getTopicId();
+        }
+
+        @Override
+        protected String getPaginationContainerId() {
+            return getInputObject().getTopicId() + "::Packs";
+        }
+
+        @Override
+        protected String getPaginationContainerClassName() {
+            return JTopic.class.getName();
         }
 
         @Override
