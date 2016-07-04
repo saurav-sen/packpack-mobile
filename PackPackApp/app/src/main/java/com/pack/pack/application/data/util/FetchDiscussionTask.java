@@ -31,9 +31,10 @@ public class FetchDiscussionTask extends AbstractNetworkTask<ScrollableDiscussio
 
     private ProgressDialog progressDialog;
 
-    public FetchDiscussionTask(Activity context) {
+    public FetchDiscussionTask(Activity context, IAsyncTaskStatusListener listener) {
         super(true, true, context);
         this.context = context;
+        addListener(listener);
     }
 
     @Override

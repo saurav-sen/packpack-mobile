@@ -7,9 +7,12 @@ public interface Constants {
 
     public static final String DISCUSSION_ENTITY_ID = "entityID";
     public static final String DISCUSSION_ENTITY_TYPE = "entityType";
+    public static final String DISCUSSION_IS_REPLY = "discussion_isReply";
 
     public static final String TOPIC_DISCUSSION_ENTITY_TYPE = "Topic";
     public static final String PACK_DISCUSSION_ENTITY_TYPE = "Pack";
 
     public static final int DISCUSSION_CREATE_REQUEST_CODE = 120;
+
+    public static final String PARCELLABLE_DISCUSSION_KEY = "parcellableDiscussion";
 }

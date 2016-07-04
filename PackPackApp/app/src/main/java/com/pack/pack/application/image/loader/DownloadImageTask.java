@@ -43,10 +43,11 @@ public class DownloadImageTask extends AbstractNetworkTask<String, Void, Bitmap>
 
     public DownloadImageTask(ImageView imageView, Context context) {
         this(imageView, -1, -1, context);
+        //this(imageView, 900, 700, context);
     }
 
     public DownloadImageTask(ImageView imageView, int imageWidth, int imageHeight, Context context) {
-        super(true, true, context);
+        super(false, false, context);
         this.imageView = imageView;
         this.imageWidth = imageWidth;
         this.imageHeight = imageHeight;

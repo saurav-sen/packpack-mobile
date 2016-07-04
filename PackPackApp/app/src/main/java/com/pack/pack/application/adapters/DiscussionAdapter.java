@@ -72,7 +72,13 @@ public class DiscussionAdapter extends ArrayAdapter<JDiscussion> {
         JDiscussion discussion = getItem(position);
         if(discussion != null) {
             StringBuilder buffer = new StringBuilder();
-            buffer.append(StringEscapeUtils.unescapeHtml4(discussion.getContent()));
+            String content = discussion.getContent();
+            /*if(!content.startsWith("&lt;")) {
+               // content = "&lt;div&gt;" + content + "&lt;/div&gt;";
+                content = content.substring(content.indexOf("&lt;") + 5);
+            }*/
+            content = content.replaceAll("&amp;", "&");
+            buffer.append(StringEscapeUtils.unescapeHtml4(content));
             buffer.append("<div style=\"overflow: hidden; width: 100%\"><div style=\"float: left;padding-top: 50px; color: grey\">");
             JUser user = discussion.getFromUser();
             buffer.append(user.getUsername());

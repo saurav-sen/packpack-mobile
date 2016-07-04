@@ -17,7 +17,7 @@
             android:id="@+id/discussions_list"
             android:paddingTop="40dp"
             android:scaleType="fitXY"
-            android:divider="@null"/>
+            android:divider="@drawable/list_divider"/>
 
     </RelativeLayout>
 

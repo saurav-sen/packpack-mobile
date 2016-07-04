@@ -23,19 +23,19 @@ public class RTFEditor extends WebView {
     private static final String CALLBACK_SCHEME = "re-callback://";
     private static final String STATE_SCHEME = "re-state://";
 
-    private Activity activity;
+    private Context context;
 
-    public RTFEditor(Activity activity) {
-        this(activity, null);
+    public RTFEditor(Context context) {
+        this(context, null);
     }
 
-    public RTFEditor(Activity activity, AttributeSet attrs) {
-        this(activity, attrs, android.R.attr.webViewStyle);
+    public RTFEditor(Context context, AttributeSet attrs) {
+        this(context, attrs, android.R.attr.webViewStyle);
     }
 
     //@SuppressLint("SetJavaScriptEnabled")
-    public RTFEditor(Activity activity, AttributeSet attrs, int defStyleAttr) {
-        super(activity, attrs, defStyleAttr);
+    public RTFEditor(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
 
         setVerticalScrollBarEnabled(false);
         setHorizontalScrollBarEnabled(false);
@@ -47,7 +47,7 @@ public class RTFEditor extends WebView {
 
         //applyAttributes(context, attrs);
         addJavascriptInterface(new WebAppInterface(), "Squill");
-        this.activity = activity;
+        this.context = context;
     }
 
     private RTFListener rtfListener;
@@ -61,8 +61,8 @@ public class RTFEditor extends WebView {
     }
 
     private void close() {
-        if(activity != null) {
-            activity.finish();
+        if(context != null) {
+            ((Activity)context).finish();
         }
     }
 

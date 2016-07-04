@@ -25,13 +25,13 @@ public class DiscussionInfo implements DbObject {
     private String fromUsername;
     private String fromUserFullName;
 
-    private long dateTime;
+    private String dateTime;
 
-    public long getDateTime() {
+    public String getDateTime() {
         return dateTime;
     }
 
-    public void setDateTime(long dateTime) {
+    public void setDateTime(String dateTime) {
         this.dateTime = dateTime;
     }
 

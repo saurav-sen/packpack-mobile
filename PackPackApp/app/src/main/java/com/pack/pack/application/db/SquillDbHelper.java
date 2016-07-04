@@ -44,6 +44,13 @@ public class SquillDbHelper extends SQLiteOpenHelper {
                 "CREATE TABLE " + ResourceURL.TABLE_NAME + "(" + ResourceURL._ID
                         + " INTEGER PRIMARY KEY, " + ResourceURL.URL + " TEXT, "
                         + ResourceURL.BLOB_CONTENT + " BLOB)";
+
+        public static final String DISCUSSION_INFO = "CREATE TABLE " + DiscussionInfo.TABLE_NAME
+                + "(" + DiscussionInfo._ID + " INTEGER PRIMARY KEY, " + DiscussionInfo.ENTITY_ID
+                + " TEXT, " + DiscussionInfo.CONTAINER_TYPE + " TEXT, " + DiscussionInfo.CONTAINER_ID
+                + " TEXT, " + DiscussionInfo.CONTENT + " TEXT, " + DiscussionInfo.FROM_USERNAME
+                + " TEXT, " + DiscussionInfo.FROM_USER_FULL_NAME + " TEXT, " + DiscussionInfo.DATE_TIME
+                + " TEXT)";
     }
 
     public interface DeleteQueries {
@@ -62,6 +69,9 @@ public class SquillDbHelper extends SQLiteOpenHelper {
 
         public static final String RESOURCE_URL =
                 "DROP TABLE IF EXISTS " + ResourceURL.TABLE_NAME;
+
+        public static final String DISCUSSION_INFO =
+                "DROP TABLE IF EXISTS " + DiscussionInfo.TABLE_NAME;
     }
 
     public interface InsertQueries {
@@ -83,6 +93,7 @@ public class SquillDbHelper extends SQLiteOpenHelper {
         db.execSQL(CreateQueries.ATTACHMENT_INFO);
         db.execSQL(CreateQueries.PAGINATION_INFO);
         db.execSQL(CreateQueries.RESOURCE_URL);
+        db.execSQL(CreateQueries.DISCUSSION_INFO);
     }
 
     @Override
@@ -92,6 +103,7 @@ public class SquillDbHelper extends SQLiteOpenHelper {
         db.execSQL(DeleteQueries.ATTACHMENT_INFO);
         db.execSQL(DeleteQueries.PAGINATION_INFO);
         db.execSQL(DeleteQueries.RESOURCE_URL);
+        db.execSQL(DeleteQueries.DISCUSSION_INFO);
         onCreate(db);
     }
 

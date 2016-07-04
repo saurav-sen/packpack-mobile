@@ -15,6 +15,7 @@ import com.pack.pack.application.adapters.DiscussionAdapter;
 import com.pack.pack.application.data.util.FetchDiscussionTask;
 import com.pack.pack.application.data.util.IAsyncTaskStatusListener;
 import com.pack.pack.application.data.util.ScrollableDiscussion;
+import com.pack.pack.application.topic.activity.model.ParcelableDiscussion;
 import com.pack.pack.model.web.JDiscussion;
 import com.pack.pack.model.web.Pagination;
 
@@ -57,12 +58,13 @@ public class DiscussionViewActivity extends AppCompatActivity implements IAsyncT
         adapter = new DiscussionAdapter(this, discussions);
         discussionView.setAdapter(adapter);
         discussionView.setOnScrollListener(new AbsListView.OnScrollListener() {
+
             @Override
             public void onScrollStateChanged(AbsListView absListView, int scrollState) {
                 int count = discussionView.getCount();
                 if (scrollState == SCROLL_STATE_IDLE) {
                     if (discussionView.getLastVisiblePosition() > count - 1) {
-                        new FetchDiscussionTask(DiscussionViewActivity.this).execute();
+                        new FetchDiscussionTask(DiscussionViewActivity.this, DiscussionViewActivity.this).execute(currentScrollableDiscussion);
                     }
                 }
             }
@@ -78,9 +80,32 @@ public class DiscussionViewActivity extends AppCompatActivity implements IAsyncT
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(DiscussionViewActivity.this, DiscussionCreateActivity.class);
+                intent.putExtra(Constants.DISCUSSION_IS_REPLY, false);
+                intent.putExtra(Constants.DISCUSSION_ENTITY_ID, entityId);
+                intent.putExtra(Constants.DISCUSSION_ENTITY_TYPE, entityType);
                 startActivityForResult(intent, Constants.DISCUSSION_CREATE_REQUEST_CODE);
             }
         });
+
+        new FetchDiscussionTask(DiscussionViewActivity.this, DiscussionViewActivity.this).execute(currentScrollableDiscussion);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putCharSequence(Constants.DISCUSSION_ENTITY_ID, entityId);
+        outState.putCharSequence(Constants.DISCUSSION_ENTITY_TYPE, entityType);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        entityId = savedInstanceState.getString(Constants.DISCUSSION_ENTITY_ID);
+        entityType = savedInstanceState.getString(Constants.DISCUSSION_ENTITY_TYPE);
+
+        currentScrollableDiscussion = new ScrollableDiscussion();
+        currentScrollableDiscussion.entityId = entityId;
+        currentScrollableDiscussion.entityType = entityType;
     }
 
     @Override
@@ -136,5 +161,16 @@ public class DiscussionViewActivity extends AppCompatActivity implements IAsyncT
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if(Constants.DISCUSSION_CREATE_REQUEST_CODE == requestCode) {
+            if(RESULT_OK == resultCode) {
+                ParcelableDiscussion parcelableDiscussion = (ParcelableDiscussion) getIntent().getParcelableExtra(
+                        Constants.PARCELLABLE_DISCUSSION_KEY);
+                JDiscussion discussion = parcelableDiscussion.convert(parcelableDiscussion);
+                if(discussion != null) {
+                    adapter.getDiscussions().add(discussion);
+                    adapter.notifyDataSetChanged();;
+                }
+            }
+        }
     }
 }

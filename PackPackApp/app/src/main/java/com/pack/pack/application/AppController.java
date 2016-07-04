@@ -21,6 +21,8 @@ public class AppController extends Application {
 
     public static final String APP_NAME = "PackPack";
 
+    //public static final boolean SUPPORT_OFFLINE = false;
+
     private RequestQueue mRequestQueue;
     private ImageLoader mImageLoader;
     LruBitmapCache mLruBitmapCache;
