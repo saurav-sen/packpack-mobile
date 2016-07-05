@@ -9,9 +9,13 @@
         android:id="@+id/discussion_web_view"
         android:layout_marginBottom="5dp">
     </WebView>
-    <!--view
+
+    <View
         android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:background="@drawable/list_divider">
-    </view-->
+        android:layout_height="5dp"
+        android:scaleType="fitXY"
+        android:paddingTop="5dp"
+        android:background="@color/feed_bg"
+        style="@style/Divider"/>
+
 </LinearLayout>

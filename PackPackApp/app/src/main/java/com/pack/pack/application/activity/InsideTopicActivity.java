@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.Constants;
@@ -22,12 +23,14 @@ import com.pack.pack.application.adapters.TopicDetailAdapter;
 import com.pack.pack.application.data.util.AbstractNetworkTask;
 import com.pack.pack.application.db.DBUtil;
 import com.pack.pack.application.db.PaginationInfo;
+import com.pack.pack.application.topic.activity.model.ParcelablePack;
 import com.pack.pack.application.topic.activity.model.ParcelableTopic;
 import com.pack.pack.client.api.API;
 import com.pack.pack.client.api.APIConstants;
 import com.pack.pack.client.api.COMMAND;
 import com.pack.pack.model.web.EntityType;
 import com.pack.pack.model.web.JPack;
+import com.pack.pack.model.web.JPackAttachment;
 import com.pack.pack.model.web.JTopic;
 import com.pack.pack.model.web.Pagination;
 
@@ -35,6 +38,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.pack.pack.application.AppController.TOPIC_ID_KEY;
+import static com.pack.pack.application.AppController.UPLOAD_ENTITY_ID_KEY;
+import static com.pack.pack.application.AppController.UPLOAD_ENTITY_TYPE_KEY;
 
 /**
  *
@@ -53,6 +60,8 @@ public class InsideTopicActivity extends AppCompatActivity {
 
     ParcelableTopic topic;
 
+    private String topicId;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,8 +73,9 @@ public class InsideTopicActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                Intent intent = new Intent(InsideTopicActivity.this, CreatePackActivity.class);
+                intent.putExtra(TOPIC_ID_KEY, topic.getTopicId());
+                startActivityForResult(intent, Constants.PACK_CREATE_REQUEST_CODE);
             }
         });
 
@@ -91,9 +101,49 @@ public class InsideTopicActivity extends AppCompatActivity {
         });
 
         topic = (ParcelableTopic) getIntent().getParcelableExtra(AppController.TOPIC_PARCELABLE_KEY);
+        this.topicId = topic.getTopicId();
         new LoadPackTask().execute(topic);
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(TOPIC_ID_KEY, this.topicId);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        this.topicId = savedInstanceState.getString(TOPIC_ID_KEY);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == Constants.PACK_CREATE_REQUEST_CODE) {
+            if(resultCode == RESULT_OK) {
+                ParcelablePack pack = data.getParcelableExtra(AppController.PACK_PARCELABLE_KEY);
+                Intent intent = new Intent(InsideTopicActivity.this, ImageVideoCaptureActivity.class);
+                intent.putExtra(TOPIC_ID_KEY, topicId);
+                intent.putExtra(UPLOAD_ENTITY_ID_KEY, pack.getId());
+                intent.putExtra(UPLOAD_ENTITY_TYPE_KEY, JPackAttachment.class.getName());
+                startActivityForResult(intent, Constants.PACK_ATTACHMENT_UPLOAD_REQUEST_CODE);
+            } else if(resultCode == RESULT_CANCELED) {
+                String errorMsg = data.getStringExtra(Constants.ERROR_MSG);
+                if(errorMsg == null || errorMsg.trim().isEmpty()) {
+                    errorMsg = "Cancelled to create new pack";
+                }
+                Toast.makeText(this, errorMsg, Toast.LENGTH_LONG).show();
+            }
+        } else if(requestCode == Constants.PACK_ATTACHMENT_UPLOAD_REQUEST_CODE) {
+            if(resultCode == RESULT_CANCELED) {
+                Toast.makeText(this, "Cancelled to upload media file(s)", Toast.LENGTH_LONG).show();
+            }
+            Intent intent = new Intent(InsideTopicActivity.this, PackDetailActivity.class);
+            intent.putExtra(TOPIC_ID_KEY, topicId);
+            startActivity(intent);
+        }
+    }
 
     private class LoadPackTask extends AbstractNetworkTask<ParcelableTopic, Integer, Pagination<JPack>> {
 

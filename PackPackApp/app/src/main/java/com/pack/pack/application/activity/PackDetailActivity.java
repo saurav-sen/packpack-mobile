@@ -19,8 +19,10 @@ import android.view.View;
 import android.widget.AbsListView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.pack.pack.application.AppController;
+import com.pack.pack.application.Constants;
 import com.pack.pack.application.R;
 import com.pack.pack.application.adapters.PackAttachmentsAdapter;
 import com.pack.pack.application.data.util.AbstractNetworkTask;
@@ -53,6 +55,8 @@ public class PackDetailActivity extends AppCompatActivity {
 
     private ScrollablePackDetail currentScrollableObject;
 
+    private ParcelablePack pack;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,7 +64,7 @@ public class PackDetailActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        final ParcelablePack pack = (ParcelablePack) getIntent().getParcelableExtra(AppController.PACK_PARCELABLE_KEY);
+        pack = (ParcelablePack) getIntent().getParcelableExtra(AppController.PACK_PARCELABLE_KEY);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -70,7 +74,7 @@ public class PackDetailActivity extends AppCompatActivity {
                 intent.putExtra(TOPIC_ID_KEY, pack.getParentTopicId());
                 intent.putExtra(UPLOAD_ENTITY_ID_KEY, pack.getId());
                 intent.putExtra(UPLOAD_ENTITY_TYPE_KEY, JPackAttachment.class.getName());
-                startActivity(intent);
+                startActivityForResult(intent, Constants.IMAGE_VIDEO_CAPTURE_REQUEST_CODE);
             }
         });
 
@@ -107,6 +111,34 @@ public class PackDetailActivity extends AppCompatActivity {
         }
 
         new LoadPackDetailTask().execute(currentScrollableObject);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable(AppController.PACK_PARCELABLE_KEY, pack);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        pack = (ParcelablePack) savedInstanceState.getParcelable(AppController.PACK_PARCELABLE_KEY);
+        currentScrollableObject = new ScrollablePackDetail();
+        currentScrollableObject.packId = pack.getId();
+        currentScrollableObject.topicId = pack.getParentTopicId();
+        currentScrollableObject.scrollUp = false;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == Constants.IMAGE_VIDEO_CAPTURE_REQUEST_CODE) {
+            if(resultCode == RESULT_OK) {
+                new LoadPackDetailTask().execute(currentScrollableObject);
+            } else if(resultCode == RESULT_CANCELED) {
+                Toast.makeText(this, "You have cancelled upload", Toast.LENGTH_LONG).show();
+            }
+        }
     }
 
     @Override

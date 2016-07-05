@@ -69,7 +69,11 @@
             android:name=".activity.DiscussionCreateActivity"
             android:label="@string/title_activity_discussion"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".activity.DiscussionViewActivity"></activity>
+        <activity android:name=".activity.DiscussionViewActivity" />
+        <activity
+            android:name=".activity.CreatePackActivity"
+            android:label="@string/title_activity_create_pack"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

@@ -27,6 +27,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.pack.pack.application.AppController;
+import com.pack.pack.application.Constants;
 import com.pack.pack.application.R;
 import com.pack.pack.application.data.util.ImageUtil;
 import com.pack.pack.application.view.CameraPreview;
@@ -250,6 +251,8 @@ public class ImageVideoCaptureActivity extends Activity {
                 }
             }
             break;
+            case Constants.PACK_ATTACHMENT_UPLOAD_REQUEST_CODE:
+                finish();
         }
     }
 
@@ -260,7 +263,7 @@ public class ImageVideoCaptureActivity extends Activity {
         intent.putExtra(UPLOAD_FILE_IS_PHOTO, isPhoto);
         intent.putExtra(UPLOAD_ENTITY_ID_KEY, uploadEntityId);
         intent.putExtra(UPLOAD_ENTITY_TYPE_KEY, uploadEntityType);
-        startActivity(intent);
+        startActivityForResult(intent, Constants.PACK_ATTACHMENT_UPLOAD_REQUEST_CODE);
     }
 
     private void capturePhoto() {
