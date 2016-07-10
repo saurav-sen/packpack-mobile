@@ -60,7 +60,6 @@ public class DBUtil {
         } catch (Exception e) {
             Log.d(LOG_TAG, e.getMessage());
         }
-        //return new UserInfo("sourabhnits@gmail.com", "P@ckp@K#123");
         return null;
     }
 

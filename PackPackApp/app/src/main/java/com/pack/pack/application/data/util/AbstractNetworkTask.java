@@ -60,6 +60,18 @@ public abstract class AbstractNetworkTask<X, Y, Z> extends AsyncTask<X, Y, Z> {
         squillDbHelper = new SquillDbHelper(context);
     }
 
+    protected boolean isStoreResultsInDB() {
+        return storeResultsInDB && false;
+    }
+
+    protected boolean isTryRetrievingFromDB() {
+        return tryRetrievingFromDB && false;
+    }
+
+    protected boolean isUpdateExistingObjectInDB() {
+        return updateExistingObjectInDB && false;
+    }
+
     /*public AbstractNetworkTask(Context context) {
         this.context = context;
         squillDbHelper = new SquillDbHelper(context);
@@ -122,7 +134,7 @@ public abstract class AbstractNetworkTask<X, Y, Z> extends AsyncTask<X, Y, Z> {
         X x = xes[0];
         setInputObject(x);
         Z z = null;
-        if(tryRetrievingFromDB) {
+        if(isTryRetrievingFromDB()) {
             z = doRetrieveFromDB(squillDbHelper.getReadableDatabase(), getInputObject());
         }
         if(z == null) {
@@ -154,6 +166,8 @@ public abstract class AbstractNetworkTask<X, Y, Z> extends AsyncTask<X, Y, Z> {
     protected final void storeResultsInDb(Object data, boolean ignorePagination) {
         if(successResult == null)
             return;
+        if(!isStoreResultsInDB())
+            return;
         if(data instanceof Collection) {
             Collection<?> c = (Collection<?>)data;//successResult;
             Iterator<?> itr = c.iterator();
@@ -169,7 +183,7 @@ public abstract class AbstractNetworkTask<X, Y, Z> extends AsyncTask<X, Y, Z> {
         } else if(data instanceof Pagination<?>) {
             Pagination<?> page = (Pagination<?>) data;
             List<?> list = page.getResult();
-            if(list != null && !list.isEmpty()) {
+            if(list != null && !list.isEmpty() && isStoreResultsInDB()) {
                 storeResultsInDb(list, true);
             }
             String entityId = getPaginationContainerId();
@@ -318,10 +332,10 @@ public abstract class AbstractNetworkTask<X, Y, Z> extends AsyncTask<X, Y, Z> {
         super.onPostExecute(z);
         if(isSuccess(z)) {
             Object data = getSuccessResult(z);
-            if(storeResultsInDB && isNetworkCalled) {
+            if(isStoreResultsInDB() && isNetworkCalled) {
                 storeResultsInDb(data);
             }
-            if(updateExistingObjectInDB && isNetworkCalled) {
+            if(isUpdateExistingObjectInDB() && isNetworkCalled) {
                 doUpdateExistingInDB(squillDbHelper.getWritableDatabase(), getInputObject(), z);
             }
             fireOnSuccess(data);

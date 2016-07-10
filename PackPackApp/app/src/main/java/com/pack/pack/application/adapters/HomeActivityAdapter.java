@@ -6,28 +6,61 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.android.volley.toolbox.ImageLoader;
+import com.android.volley.toolbox.NetworkImageView;
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
-import com.pack.pack.application.topic.activity.model.TopicEvent;
+import com.pack.pack.application.image.loader.DownloadImageTask;
+import com.pack.pack.application.view.util.ViewUtil;
+import com.pack.pack.client.api.APIConstants;
+import com.pack.pack.client.api.COMMAND;
+import com.pack.pack.model.web.JRssFeed;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
  * Created by Saurav on 08-04-2016.
  *
  */
-public class HomeActivityAdapter extends ArrayAdapter<TopicEvent> {
+public class HomeActivityAdapter extends ArrayAdapter<JRssFeed> {
 
     private Activity activity;
     private LayoutInflater inflater;
     private ImageLoader imageLoader = AppController.getInstance().getImageLoader();
 
-    public HomeActivityAdapter(Activity activity, List<TopicEvent> events) {
-        super(activity, R.layout.home_topic_view, events.toArray(new TopicEvent[events.size()]));
+    private TextView home_rss_feed__name;
+    private ImageView home_rss_feed_image;
+    private TextView home_rss_feed_description;
+
+    private List<JRssFeed> feeds;
+
+    public HomeActivityAdapter(Activity activity, List<JRssFeed> feeds) {
+        super(activity, R.layout.home_event_item, feeds.toArray(new JRssFeed[feeds.size()]));
         this.activity = activity;
+        this.feeds = feeds;
+    }
+
+    public List<JRssFeed> getFeeds() {
+        return feeds;
+    }
+
+    @Override
+    public int getCount() {
+        return getFeeds().size();
+    }
+
+    @Override
+    public JRssFeed getItem(int position) {
+        if(position < getFeeds().size()) {
+            return getFeeds().get(position);
+        }
+        return null;
     }
 
     @Override
@@ -37,8 +70,45 @@ public class HomeActivityAdapter extends ArrayAdapter<TopicEvent> {
             inflater = activity.getLayoutInflater();
         }
         if(convertView == null) {
-            convertView = inflater.inflate(R.layout.home_event_item, null);
+            convertView = inflater.inflate(ViewUtil.getListViewLayoutId("home"), null);
+        }
+        home_rss_feed__name = (TextView) convertView.findViewById(R.id.home_rss_feed__name);
+        home_rss_feed_image = (ImageView) convertView.findViewById(R.id.home_rss_feed_image);
+        home_rss_feed_description = (TextView) convertView.findViewById(R.id.home_rss_feed_description);
+        JRssFeed feed = getItem(position);
+        if(feed != null) {
+            home_rss_feed__name.setText(feed.getOgTitle());
+            home_rss_feed_description.setText(feed.getOgDescription());
+            String imageUrl = feed.getOgImage();
+            if(imageUrl != null && !imageUrl.trim().isEmpty()) {
+                new DownloadFeedImageTask(home_rss_feed_image, 850, 600, HomeActivityAdapter.this.activity)
+                        .execute(imageUrl);
+            }
         }
         return convertView;
+    }
+
+    private class DownloadFeedImageTask extends DownloadImageTask {
+
+        public DownloadFeedImageTask(ImageView imageView, int imageWidth, int imageHeight, Context context) {
+            super(imageView, imageWidth, imageHeight, context);
+        }
+
+        @Override
+        protected String lookupURL(String url) {
+            return url != null ? url.trim() : url;
+        }
+
+        @Override
+        protected COMMAND command() {
+            return COMMAND.LOAD_EXTERNAL_RESOURCE;
+        }
+
+        @Override
+        protected Map<String, Object> prepareApiParams(String inputObject) {
+            Map<String, Object> apiParams = new HashMap<String, Object>();
+            apiParams.put(APIConstants.ExternalResource.RESOURCE_URL, inputObject);
+            return apiParams;
+        }
     }
 }

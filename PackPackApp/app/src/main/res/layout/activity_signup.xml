@@ -64,20 +64,26 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp">
-            <EditText android:id="@+id/input_address"
+            <EditText android:id="@+id/input_city"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textMultiLine"
-                android:minLines="3"
-                android:maxLines="5"
-                android:scrollHorizontally="false"
-                android:hint="Address"/>
+                android:hint="City"/>
             <!--AutoCompleteTextView
                 android:id="@+id/input_address"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:text="Address"/-->
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp">
+            <DatePicker android:id="@+id/input_dob"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
         </android.support.design.widget.TextInputLayout>
 
         <!-- Signup Button -->

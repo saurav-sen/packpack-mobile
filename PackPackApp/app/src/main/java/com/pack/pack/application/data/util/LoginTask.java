@@ -45,6 +45,16 @@ public class LoginTask extends AbstractNetworkTask<UserInfo, Integer, AccessToke
     }
 
     @Override
+    protected boolean isTryRetrievingFromDB() {
+        return true;
+    }
+
+    @Override
+    protected boolean isStoreResultsInDB() {
+        return true;
+    }
+
+    @Override
     protected String getContainerIdForObjectStore() {
         return null;
     }

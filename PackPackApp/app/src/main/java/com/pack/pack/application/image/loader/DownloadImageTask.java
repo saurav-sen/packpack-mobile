@@ -67,7 +67,7 @@ public class DownloadImageTask extends AbstractNetworkTask<String, Void, Bitmap>
         return apiParams;
     }
 
-    private String lookupURL(String url) {
+    protected String lookupURL(String url) {
         return url + "?w=" + imageWidth + "&h=" + imageHeight;
     }
 

@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
+import android.location.Criteria;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
@@ -60,7 +61,14 @@ public class FetchAddressIntentService extends IntentService implements Location
         geocoder = new Geocoder(this, Locale.getDefault());
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
-            if(locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            Criteria c = new Criteria();
+            String provider = locationManager.getBestProvider(c, false);
+            location = locationManager.getLastKnownLocation(provider);
+            if(location != null) {
+                double latitude = location.getLatitude();
+                double longitude = location.getLongitude();
+            }
+            /*if(locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
                 locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
                         MIN_TIME_FOR_UPDATE, MIN_DISTANCE_FOR_UPDATE, this);
                 location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
@@ -71,7 +79,7 @@ public class FetchAddressIntentService extends IntentService implements Location
                 if(location == null) {
                     location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
                 }
-            }
+            }*/
         } else {
             errMsg = "Failed to retrieve location from GPS Provider.";
         }

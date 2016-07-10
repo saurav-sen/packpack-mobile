@@ -114,8 +114,13 @@ public class TopicCreateActivity extends AppCompatActivity implements IAsyncTask
                             Locale.getDefault()).format(new Date());
                     File tempFile = new File(this.getFilesDir().getAbsolutePath(), timeStamp);
                     tempFile.createNewFile();*/
-
-                    mediaFile = new File(FileUtil.getPath(this, uri));
+                    String path = FileUtil.getPath(this, uri);
+                    if(path == null) {
+                        Toast.makeText(this, "Problem reading the file",
+                                Toast.LENGTH_LONG).show();
+                    } else {
+                        mediaFile = new File(path);
+                    }
                 } catch (IOException e) {
                     Log.d(LOG_TAG, "Failed Reading wallpaper (preview) :: " + e.getMessage());
                 }

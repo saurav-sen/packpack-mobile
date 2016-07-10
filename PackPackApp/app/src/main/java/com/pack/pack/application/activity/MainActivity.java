@@ -1,14 +1,19 @@
 package com.pack.pack.application.activity;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
+import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
 import com.pack.pack.application.adapters.MainActivityAdapter;
 import com.pack.pack.application.topic.activity.model.ParcelableTopic;
@@ -42,6 +47,51 @@ public class MainActivity extends AppCompatActivity {
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(pager);
+
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.CAMERA},
+                    AppController.CAMERA_ACCESS_REQUEST_CODE);
+        } else {
+            AppController.getInstance().cameraPermissionGranted();
+        }
+
+        if(!AppController.getInstance().isCameraPermissionGranted()
+                && ContextCompat.checkSelfPermission(this,
+                Manifest.permission.READ_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                    AppController.APP_EXTERNAL_STORAGE_READ_REQUEST_CODE);
+        } else {
+
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case AppController.CAMERA_ACCESS_REQUEST_CODE:
+                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    AppController.getInstance().cameraPermissionGranted();
+                    finish();
+                    startActivity(getIntent());
+                } else {
+                    AppController.getInstance().cameraPermisionDenied();
+                }
+                break;
+            case AppController.APP_EXTERNAL_STORAGE_READ_REQUEST_CODE:
+                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    AppController.getInstance().externalReadGranted();
+                    finish();
+                    startActivity(getIntent());
+                } else {
+                    AppController.getInstance().externalReadDenied();
+                }
+                break;
+        }
     }
 
     @Override
