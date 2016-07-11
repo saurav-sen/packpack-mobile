@@ -163,13 +163,14 @@ public class DiscussionViewActivity extends AppCompatActivity implements IAsyncT
         super.onActivityResult(requestCode, resultCode, data);
         if(Constants.DISCUSSION_CREATE_REQUEST_CODE == requestCode) {
             if(RESULT_OK == resultCode) {
-                ParcelableDiscussion parcelableDiscussion = (ParcelableDiscussion) getIntent().getParcelableExtra(
+                /*ParcelableDiscussion parcelableDiscussion = (ParcelableDiscussion) getIntent().getParcelableExtra(
                         Constants.PARCELLABLE_DISCUSSION_KEY);
                 JDiscussion discussion = parcelableDiscussion.convert(parcelableDiscussion);
                 if(discussion != null) {
                     adapter.getDiscussions().add(discussion);
                     adapter.notifyDataSetChanged();;
-                }
+                }*/
+                new FetchDiscussionTask(DiscussionViewActivity.this, DiscussionViewActivity.this).execute(currentScrollableDiscussion);
             }
         }
     }

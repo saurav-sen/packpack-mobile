@@ -109,12 +109,14 @@ public class InsideTopicActivity extends AppCompatActivity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putString(TOPIC_ID_KEY, this.topicId);
+        outState.putParcelable(AppController.TOPIC_PARCELABLE_KEY, topic);
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         this.topicId = savedInstanceState.getString(TOPIC_ID_KEY);
+        topic = (ParcelableTopic) savedInstanceState.getParcelable(AppController.TOPIC_PARCELABLE_KEY);
     }
 
     @Override
@@ -139,9 +141,12 @@ public class InsideTopicActivity extends AppCompatActivity {
             if(resultCode == RESULT_CANCELED) {
                 Toast.makeText(this, "Cancelled to upload media file(s)", Toast.LENGTH_LONG).show();
             }
-            Intent intent = new Intent(InsideTopicActivity.this, PackDetailActivity.class);
-            intent.putExtra(TOPIC_ID_KEY, topicId);
-            startActivity(intent);
+            //Intent intent = new Intent(InsideTopicActivity.this, PackDetailActivity.class);
+            //intent.putExtra(TOPIC_ID_KEY, topicId);
+            //startActivity(intent);
+            if(topic != null) {
+                new LoadPackTask().execute(topic);
+            }
         }
     }
 

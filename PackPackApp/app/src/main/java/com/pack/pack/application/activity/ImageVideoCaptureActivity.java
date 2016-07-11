@@ -252,6 +252,7 @@ public class ImageVideoCaptureActivity extends Activity {
             }
             break;
             case Constants.PACK_ATTACHMENT_UPLOAD_REQUEST_CODE:
+                setResult(RESULT_OK, getIntent());
                 finish();
         }
     }

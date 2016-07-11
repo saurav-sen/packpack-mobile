@@ -1,6 +1,7 @@
 package com.pack.pack.application.activity;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -167,6 +168,8 @@ public class UploadActivity extends Activity {
             super.onPostExecute(aVoid);
             upload_progressBar.setProgress(100);
             upload_txtPercentage.setText("100%");
+            setResult(RESULT_OK, getIntent());
+            finish();
         }
     }
 }

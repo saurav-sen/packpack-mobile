@@ -57,6 +57,12 @@ public class PackDetailActivity extends AppCompatActivity {
 
     private ParcelablePack pack;
 
+    private TextView activity_pack_title;
+
+    private ListView activity_pack_attachments;
+
+    private FloatingActionButton fab;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,7 +72,7 @@ public class PackDetailActivity extends AppCompatActivity {
 
         pack = (ParcelablePack) getIntent().getParcelableExtra(AppController.PACK_PARCELABLE_KEY);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -78,12 +84,12 @@ public class PackDetailActivity extends AppCompatActivity {
             }
         });
 
-        TextView activity_pack_title = (TextView) findViewById(R.id.activity_pack_title);
+        activity_pack_title = (TextView) findViewById(R.id.activity_pack_title);
         TextView activity_pack_story = (TextView) findViewById(R.id.activity_pack_story);
         activity_pack_title.setText(pack.getTitle());
         activity_pack_story.setText(pack.getStory());
 
-        ListView activity_pack_attachments = (ListView) findViewById(R.id.activity_pack_attachments);
+        activity_pack_attachments = (ListView) findViewById(R.id.activity_pack_attachments);
         adapter = new PackAttachmentsAdapter(this, new ArrayList<JPackAttachment>(10));
         activity_pack_attachments.setAdapter(adapter);
         activity_pack_attachments.setOnScrollListener(new AbsListView.OnScrollListener() {
@@ -134,6 +140,7 @@ public class PackDetailActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == Constants.IMAGE_VIDEO_CAPTURE_REQUEST_CODE) {
             if(resultCode == RESULT_OK) {
+                currentScrollableObject.nextLink = "FIRST_PAGE"; // TODO -- This is to get going for demo purpose
                 new LoadPackDetailTask().execute(currentScrollableObject);
             } else if(resultCode == RESULT_CANCELED) {
                 Toast.makeText(this, "You have cancelled upload", Toast.LENGTH_LONG).show();

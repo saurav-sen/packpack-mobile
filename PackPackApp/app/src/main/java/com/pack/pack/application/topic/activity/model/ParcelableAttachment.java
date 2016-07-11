@@ -12,7 +12,7 @@ public class ParcelableAttachment implements Parcelable {
 
     private String attachmentUrl;
 
-    private String attachmentThumbnailUrl;
+    //private String attachmentThumbnailUrl;
 
     private String mimeType;
 
@@ -22,13 +22,12 @@ public class ParcelableAttachment implements Parcelable {
     }
 
     public ParcelableAttachment(JPackAttachment attachment) {
-        this(attachment.getAttachmentUrl(), attachment.getAttachmentThumbnailUrl(),
-                attachment.getMimeType(), attachment.getAttachmentType());
+        this(attachment.getAttachmentUrl(), attachment.getMimeType(), attachment.getAttachmentType());
     }
 
-    public ParcelableAttachment(String attachmentUrl, String attachmentThumbnailUrl, String mimeType, String attachmentType) {
+    public ParcelableAttachment(String attachmentUrl, String mimeType, String attachmentType) {
         setAttachmentUrl(attachmentUrl + "");
-        setAttachmentThumbnailUrl(attachmentThumbnailUrl + "");
+        //setAttachmentThumbnailUrl(attachmentThumbnailUrl + "");
         setMimeType(mimeType + "");
         setAttachmentType(attachmentType + "");
     }
@@ -41,13 +40,13 @@ public class ParcelableAttachment implements Parcelable {
         this.attachmentUrl = attachmentUrl;
     }
 
-    public String getAttachmentThumbnailUrl() {
+    /*public String getAttachmentThumbnailUrl() {
         return attachmentThumbnailUrl;
     }
 
     public void setAttachmentThumbnailUrl(String attachmentThumbnailUrl) {
         this.attachmentThumbnailUrl = attachmentThumbnailUrl;
-    }
+    }*/
 
     public String getMimeType() {
         return mimeType;
@@ -73,7 +72,7 @@ public class ParcelableAttachment implements Parcelable {
     @Override
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeString(attachmentUrl);
-        parcel.writeString(attachmentThumbnailUrl);
+       // parcel.writeString(attachmentThumbnailUrl);
         parcel.writeString(mimeType);
         parcel.writeString(attachmentType);
     }
@@ -83,10 +82,10 @@ public class ParcelableAttachment implements Parcelable {
         @Override
         public ParcelableAttachment createFromParcel(Parcel parcel) {
             String attachmentUrl = parcel.readString();
-            String attachmentThumbnailUrl = parcel.readString();
+            //String attachmentThumbnailUrl = parcel.readString();
             String mimeType = parcel.readString();
             String attachmentType = parcel.readString();
-            return new ParcelableAttachment(attachmentUrl, attachmentThumbnailUrl, mimeType, attachmentType);
+            return new ParcelableAttachment(attachmentUrl, mimeType, attachmentType);
         }
 
         @Override
