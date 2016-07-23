@@ -9,6 +9,7 @@ import android.os.Bundle;
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.Constants;
 import com.pack.pack.application.R;
+import com.pack.pack.application.data.util.ApiConstants;
 import com.pack.pack.application.topic.activity.model.ParcelableDiscussion;
 import com.pack.pack.application.view.RTFEditor;
 import com.pack.pack.application.view.RTFListener;
@@ -113,7 +114,7 @@ public class DiscussionCreateActivity extends Activity implements RTFListener {
                     parentIdKey = APIConstants.Pack.ID;
                 }
 
-                API api = APIBuilder.create().setOauthToken(oAuthToken)
+                API api = APIBuilder.create(ApiConstants.BASE_URL).setOauthToken(oAuthToken)
                         .setAction(command)
                         .addApiParam(APIConstants.User.ID, userId)
                         .addApiParam(parentIdKey, createInfo.entityId)

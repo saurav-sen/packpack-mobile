@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
 import com.pack.pack.application.adapters.PackAttachmentCommentsAdapter;
+import com.pack.pack.application.data.util.ApiConstants;
 import com.pack.pack.client.api.API;
 import com.pack.pack.client.api.APIBuilder;
 import com.pack.pack.client.api.APIConstants;
@@ -81,7 +82,7 @@ public class PackAttachmentCommentsActivity extends AppCompatActivity {
                 attachment = AppController.getInstance().getPackAttachmentFromCache(id);
                 try {
                     if(attachment == null && uiInfo != null) {
-                        API api = APIBuilder.create()
+                        API api = APIBuilder.create(ApiConstants.BASE_URL)
                                 .setAction(COMMAND.GET_PACK_ATTACHMENT_BY_ID)
                                 .setOauthToken(AppController.getInstance().getoAuthToken())
                                 .addApiParam(APIConstants.PackAttachment.ID, id)

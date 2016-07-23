@@ -26,6 +26,7 @@ import android.widget.Toast;
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
 import com.pack.pack.application.data.LoggedInUserInfo;
+import com.pack.pack.application.data.util.ApiConstants;
 import com.pack.pack.application.data.util.IAsyncTaskStatusListener;
 import com.pack.pack.application.data.util.LoginTask;
 import com.pack.pack.application.db.UserInfo;
@@ -371,7 +372,7 @@ public class SignupActivity extends AppCompatActivity implements IAsyncTaskStatu
                 String passwd = userSignUpInfo.getPasswd();
                 String city = userSignUpInfo.getCity();
                 String dob = userSignUpInfo.getDob();
-                API api = APIBuilder.create().setAction(COMMAND.SIGN_UP)
+                API api = APIBuilder.create(ApiConstants.BASE_URL).setAction(COMMAND.SIGN_UP)
                         .addApiParam(APIConstants.User.Register.NAME, name)
                         .addApiParam(APIConstants.User.Register.EMAIL, username)
                         .addApiParam(APIConstants.User.Register.PASSWORD, passwd)

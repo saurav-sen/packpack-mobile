@@ -45,7 +45,7 @@ public class FullScreenAttachmentViewAdapter extends PagerAdapter {
 
     @Override
     public boolean isViewFromObject(View view, Object object) {
-        return true;//view == object;
+        return view == object;
     }
 
     @Override
@@ -55,7 +55,8 @@ public class FullScreenAttachmentViewAdapter extends PagerAdapter {
             inflater = activity.getLayoutInflater();
         }
         View view = inflater.inflate(R.layout.layout_fullscreen_attachment, container, false);
-        TouchImageView imgDisplay = (TouchImageView) view.findViewById(R.id.imgDisplay);
+        //TouchImageView imgDisplay = (TouchImageView) view.findViewById(R.id.imgDisplay);
+        ImageView imgDisplay = (ImageView) view.findViewById(R.id.imgDisplay);
         //ImageView imgDisplay = (ImageView) view.findViewById(R.id.imgDisplay);
         Button btnClose = (Button) view.findViewById(R.id.btnClose);
         btnClose.setOnClickListener(new View.OnClickListener() {

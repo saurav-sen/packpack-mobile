@@ -14,6 +14,7 @@ import android.widget.ListView;
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
 import com.pack.pack.application.adapters.HomeActivityAdapter;
+import com.pack.pack.application.data.util.ApiConstants;
 import com.pack.pack.client.api.API;
 import com.pack.pack.client.api.APIBuilder;
 import com.pack.pack.client.api.APIConstants;
@@ -115,7 +116,7 @@ public class HomeViewFragment extends Fragment {
             try {
                 String userId = AppController.getInstance().getUserId();
                 String oAuthToken = AppController.getInstance().getoAuthToken();
-                API api = APIBuilder.create()
+                API api = APIBuilder.create(ApiConstants.BASE_URL)
                         .setAction(COMMAND.GET_ALL_PROMOTIONAL_FEEDS)
                         .setOauthToken(oAuthToken)
                         .addApiParam(APIConstants.User.ID, userId)

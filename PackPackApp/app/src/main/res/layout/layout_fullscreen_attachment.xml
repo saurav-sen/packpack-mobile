@@ -4,7 +4,12 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <com.pack.pack.application.view.TouchImageView
+   <!-- <com.pack.pack.application.view.TouchImageView
+        android:id="@+id/imgDisplay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitCenter" />-->
+    <ImageView
         android:id="@+id/imgDisplay"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

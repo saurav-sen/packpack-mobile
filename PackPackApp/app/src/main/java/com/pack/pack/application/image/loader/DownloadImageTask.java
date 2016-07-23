@@ -22,6 +22,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLEncoder;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
@@ -68,7 +69,7 @@ public class DownloadImageTask extends AbstractNetworkTask<String, Void, Bitmap>
     }
 
     protected String lookupURL(String url) {
-        return url + "?w=" + imageWidth + "&h=" + imageHeight;
+        return URLEncoder.encode(url) + "?w=" + imageWidth + "&h=" + imageHeight;
     }
 
     @Override

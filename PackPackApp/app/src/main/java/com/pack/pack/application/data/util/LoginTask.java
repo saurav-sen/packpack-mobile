@@ -62,7 +62,7 @@ public class LoginTask extends AbstractNetworkTask<UserInfo, Integer, AccessToke
             AppController.getInstance().setoAuthToken(accessToken.getToken());
 
             API api = APIBuilder
-                    .create()
+                    .create(ApiConstants.BASE_URL)
                     .setAction(COMMAND.GET_USER_BY_USERNAME)
                     .setOauthToken(AppController.getInstance().getoAuthToken())
                     .addApiParam(APIConstants.User.USERNAME,

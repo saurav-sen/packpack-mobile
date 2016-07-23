@@ -30,5 +30,7 @@ public class FullscreenAttachmentViewActivity extends Activity {
 
         int currentIndex = getIntent().getIntExtra("index", 0);
         adapter.setCurrentIndex(currentIndex);
+
+        fullscreen_attachment_view_pager.setCurrentItem(currentIndex);
     }
 }

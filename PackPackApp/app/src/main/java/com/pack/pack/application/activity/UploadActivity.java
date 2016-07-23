@@ -21,6 +21,7 @@ import android.widget.VideoView;
 
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
+import com.pack.pack.application.data.util.ApiConstants;
 import com.pack.pack.client.api.API;
 import com.pack.pack.client.api.APIBuilder;
 import com.pack.pack.client.api.APIConstants;
@@ -141,7 +142,7 @@ public class UploadActivity extends Activity {
                     } else {
                         command = COMMAND.ADD_VIDEO_TO_PACK;
                     }
-                    API api = APIBuilder.create().setAction(command)
+                    API api = APIBuilder.create(ApiConstants.BASE_URL).setAction(command)
                             .setOauthToken(AppController.getInstance().getoAuthToken())
                             .addApiParam(APIConstants.User.ID, AppController.getInstance().getUserId())
                             .addApiParam(APIConstants.Pack.ID, uploadEntityId)
