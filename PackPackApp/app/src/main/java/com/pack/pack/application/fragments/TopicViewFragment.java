@@ -78,17 +78,24 @@ public abstract class TopicViewFragment extends Fragment {
 
             }
         });
-       new LoadTopicTask().execute(AppController.getInstance().getUserId());
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                JTopic topic = (JTopic)adapterView.getAdapter().getItem(i);
-               // JTopic topic = (JTopic) listView.getSelectedItem();
+                JTopic topic = (JTopic) adapterView.getAdapter().getItem(i);
+                // JTopic topic = (JTopic) listView.getSelectedItem();
                 handleItemClick(topic);
             }
         });
         return view;
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if(isVisibleToUser) {
+            new LoadTopicTask().execute(AppController.getInstance().getUserId());
+        }
     }
 
     protected void openDetailActivity(String parcelKey, ParcelableTopic parcel, Class<?> activityClass) {

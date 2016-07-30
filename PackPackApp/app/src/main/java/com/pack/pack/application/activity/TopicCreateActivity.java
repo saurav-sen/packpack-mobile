@@ -10,6 +10,8 @@ import android.text.SpannableString;
 import android.text.style.UnderlineSpan;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -20,6 +22,7 @@ import android.widget.Toast;
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
 import com.pack.pack.application.data.util.AbstractNetworkTask;
+import com.pack.pack.application.data.util.ApiConstants;
 import com.pack.pack.application.data.util.FileUtil;
 import com.pack.pack.application.data.util.IAsyncTaskStatusListener;
 import com.pack.pack.application.topic.activity.model.ParcelableTopic;
@@ -46,7 +49,7 @@ public class TopicCreateActivity extends AppCompatActivity implements IAsyncTask
 
     private EditText topic_create_name;
     private EditText topic_create_description;
-    private EditText topic_create_category;
+    private AutoCompleteTextView topic_create_category;
     private ImageView topic_create_wallpaper;
     private TextView wallpaper_select;
 
@@ -68,9 +71,15 @@ public class TopicCreateActivity extends AppCompatActivity implements IAsyncTask
         
         topic_create_name = (EditText) findViewById(R.id.topic_create_name);
         topic_create_description = (EditText) findViewById(R.id.topic_create_description);
-        topic_create_category = (EditText) findViewById(R.id.topic_create_category);
+        topic_create_category = (AutoCompleteTextView) findViewById(R.id.topic_create_category);
         topic_create_wallpaper = (ImageView) findViewById(R.id.topic_create_wallpaper);
         wallpaper_select = (TextView) findViewById(R.id.wallpaper_select);
+
+        topic_create_category.setThreshold(1);
+        ArrayAdapter<String> categoryAdapter = new ArrayAdapter<String>(this,
+                android.support.v7.appcompat.R.layout.select_dialog_item_material,
+                ApiConstants.SUPPORTED_CATEGORIES);
+        topic_create_category.setAdapter(categoryAdapter);
 
         SpannableString spannableString = new SpannableString("Select an image, as wallpaper of your topic");
         spannableString.setSpan(new UnderlineSpan(), 0, spannableString.length(), 0);

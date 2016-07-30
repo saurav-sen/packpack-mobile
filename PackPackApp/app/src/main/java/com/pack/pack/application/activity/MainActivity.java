@@ -25,13 +25,14 @@ import static com.pack.pack.application.AppController.CREATE_TOPIC_REQUSET_CODE;
  */
 public class MainActivity extends AppCompatActivity {
 
+    private ViewPager pager;
+
+    private int pageCurrentItemIndex;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        /*Toolbar toolbar = (Toolbar) findViewById(R.id.topic_toolbar);
-        setSupportActionBar(toolbar);*/
 
         FloatingActionButton FAB = (FloatingActionButton) findViewById(R.id.topic_create);
         FAB.setOnClickListener(new View.OnClickListener() {
@@ -42,8 +43,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        ViewPager pager = (ViewPager)findViewById(R.id.pager);
+        pager = (ViewPager)findViewById(R.id.pager);
         pager.setAdapter(new MainActivityAdapter(getSupportFragmentManager()));
+        int itemIndex = getIntent().getIntExtra("pageCurrentItemIndex", -1);
+        if(itemIndex >= 0 && itemIndex < MainActivityAdapter.DEFAULT_COUNT_OF_TABS) {
+            pageCurrentItemIndex = itemIndex;
+            pager.setCurrentItem(pageCurrentItemIndex);
+        }
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(pager);
@@ -67,6 +73,19 @@ public class MainActivity extends AppCompatActivity {
         } else {
 
         }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        pageCurrentItemIndex = pager.getCurrentItem();
+        outState.putInt("pageCurrentItemIndex", pageCurrentItemIndex);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        pageCurrentItemIndex = savedInstanceState.getInt("pageCurrentItemIndex");
     }
 
     @Override
@@ -102,6 +121,7 @@ public class MainActivity extends AppCompatActivity {
                 // TODO -- Refresh the list with newly created topic.
                 ParcelableTopic pTopic = (ParcelableTopic) data.getParcelableExtra(TopicCreateActivity.RESULT_KEY);
                 finish();
+                getIntent().putExtra("pageCurrentItemIndex", pageCurrentItemIndex);
                 startActivity(getIntent());
             }
             else {

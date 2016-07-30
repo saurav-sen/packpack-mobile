@@ -97,7 +97,6 @@ public class DownloadImageTask extends AbstractNetworkTask<String, Void, Bitmap>
                     stream.close();
                 }
             } catch (IOException e) {
-                // e.printStackTrace();
             }
         }
         return bitmap;

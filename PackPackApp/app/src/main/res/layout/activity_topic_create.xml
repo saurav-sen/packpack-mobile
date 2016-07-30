@@ -23,7 +23,7 @@
             android:maxLines="10"
             android:minLines="5" />
 
-        <EditText
+        <AutoCompleteTextView
             android:id="@+id/topic_create_category"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

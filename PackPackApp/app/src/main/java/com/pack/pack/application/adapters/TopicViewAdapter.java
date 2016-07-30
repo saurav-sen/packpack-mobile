@@ -61,7 +61,7 @@ public class TopicViewAdapter extends ArrayAdapter<JTopic> {
             inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         }
         if(convertView == null) {
-            convertView = inflater.inflate(R.layout.lifestyle_event_item, null);
+            convertView = inflater.inflate(ViewUtil.getListViewLayoutId(categoryType), null);
         }
         NetworkImageView topicPicView = (NetworkImageView) convertView.findViewById(ViewUtil.getViewId(categoryType, "topicPic"));
         TextView nameTextView = (TextView) convertView.findViewById(ViewUtil.getViewId(categoryType, "topic_name"));
