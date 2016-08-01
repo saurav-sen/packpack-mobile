@@ -94,6 +94,7 @@ public abstract class TopicViewFragment extends Fragment {
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
         if(isVisibleToUser) {
+            page = null;
             new LoadTopicTask().execute(AppController.getInstance().getUserId());
         }
     }

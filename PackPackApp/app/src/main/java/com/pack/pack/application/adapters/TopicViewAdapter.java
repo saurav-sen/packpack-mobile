@@ -69,17 +69,21 @@ public class TopicViewAdapter extends ArrayAdapter<JTopic> {
        // TextView followersTextView = (TextView) convertView.findViewById(R.id.topic_followers);
         ImageView poster = (ImageView) convertView.findViewById(ViewUtil.getViewId(categoryType, "topicPoster"));
 
+        ImageView followSign = (ImageView) convertView.findViewById(ViewUtil.getViewId(categoryType, "follow_sign"));
+
         if(position < topics.size()) {
             JTopic topic = topics.get(position);
-           // topic.setName("MyName");
-           // topic.setDescription("MyDescription");
-           // topic.setFollowers(100);
             nameTextView.setText(topic.getName());
             descriptionTextView.setText(topic.getDescription());
            // followersTextView.setText(String.valueOf(topic.getFollowers()));
             if(topic.getWallpaperUrl() != null && !topic.getWallpaperUrl().trim().equals("")) {
                 new DownloadImageTask(poster, 1000, 700, TopicViewAdapter.this.activity)
-                        .execute(topic.getWallpaperUrl());// + "?thumbnail=false");
+                        .execute(topic.getWallpaperUrl());
+            }
+            if(topic.isFollowing()) {
+                followSign.setVisibility(View.VISIBLE);
+            } else {
+                followSign.setVisibility(View.INVISIBLE);
             }
         }
         return convertView;
