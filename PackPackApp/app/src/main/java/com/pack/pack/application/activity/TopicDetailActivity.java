@@ -1,7 +1,10 @@
 package com.pack.pack.application.activity;
 
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -9,9 +12,21 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.Constants;
 import com.pack.pack.application.R;
@@ -24,9 +39,15 @@ import com.pack.pack.model.web.EntityType;
  * @author Saurav
  *
  */
-public class TopicDetailActivity extends AppCompatActivity {
+public class TopicDetailActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private ParcelableTopic topic;
+
+    private static final String MAP_FRAGMENT_TAG = "map";
+
+    private boolean gMapAvailable = false;
+
+    private GoogleMap gMap;
 
    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -77,8 +98,7 @@ public class TopicDetailActivity extends AppCompatActivity {
         new DownloadImageTask(topic_wallpaper_img, this).execute(topic.getWallpaperUrl());
 
 
-        Button enterTopic = (Button) findViewById(R.id.enter_topic_detail);
-        enterTopic.setText("Enter");
+        ImageButton enterTopic = (ImageButton) findViewById(R.id.enter_topic_detail);
         enterTopic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -88,7 +108,54 @@ public class TopicDetailActivity extends AppCompatActivity {
             }
         });
 
-        Button followTopic = (Button) findViewById(R.id.follow_not_follow_topic);
-        followTopic.setText("Follow");
+        ImageButton followTopic = (ImageButton) findViewById(R.id.follow_not_follow_topic);
+        followTopic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+
+       /* SupportMapFragment mapFragment = (SupportMapFragment)
+                getSupportFragmentManager().findFragmentByTag(MAP_FRAGMENT_TAG);
+        if(mapFragment == null) {
+            mapFragment = SupportMapFragment.newInstance();
+            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.add(android.R.id.content, mapFragment, MAP_FRAGMENT_TAG);
+            fragmentTransaction.commit();
+        }
+        mapFragment.getMapAsync(this);*/
+        gMapAvailable = isMapAvailable();
+        if(gMapAvailable) {
+            initializeGMap();
+        }
+    }
+
+    private void initializeGMap() {
+        if(gMap != null)
+            return;
+        MapFragment fragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
+        fragment.getMapAsync(this);
+    }
+
+    private boolean isMapAvailable() {
+        GoogleApiAvailability googleApiAvailability = GoogleApiAvailability.getInstance();
+        int code = googleApiAvailability.isGooglePlayServicesAvailable(this);
+        boolean bool = (code == ConnectionResult.SUCCESS);
+        if(!bool && googleApiAvailability.isUserResolvableError(code)) {
+            googleApiAvailability.getErrorDialog(this, code, 1010).show();
+        }
+        return bool;
+    }
+
+    @Override
+    public void onMapReady(GoogleMap map) {
+        if(gMap != null)
+            return;
+        gMap = map;
+        LatLng latLng = new LatLng(17.3850, 78.4867);
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 8);
+        gMap.moveCamera(cameraUpdate);
+        gMap.addMarker(new MarkerOptions().position(latLng).anchor(0.5f, 0.5f)).setTitle("Hyderabad");
     }
 }
