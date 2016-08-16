@@ -47,12 +47,18 @@ import static com.pack.pack.application.AppController.LOCATION_FINE_ACCESS_REQUE
 import static com.pack.pack.application.AppController.SUCCESS_RESULT;
 import static com.pack.pack.application.AppController.PLACE_AUTO_COMPLETE_REQ_CODE;
 
+/**
+ *
+ * @author Saurav
+ *
+ */
 public class SignupActivity extends AppCompatActivity implements IAsyncTaskStatusListener {
 
     private EditText input_name;
     private EditText input_email;
     private EditText input_password;
     private EditText input_city;
+    private EditText input_country;
     private DatePicker input_dob;
     private AppCompatButton btn_signup;
     private TextView link_login;
@@ -84,6 +90,7 @@ public class SignupActivity extends AppCompatActivity implements IAsyncTaskStatu
         input_email = (EditText) findViewById(R.id.input_email);
         input_password = (EditText) findViewById(R.id.input_password);
         input_city = (EditText) findViewById(R.id.input_city);
+        input_country = (EditText) findViewById(R.id.input_country);
         input_dob = (DatePicker) findViewById(R.id.input_dob);
         btn_signup = (AppCompatButton) findViewById(R.id.btn_signup);
         link_login = (TextView) findViewById(R.id.link_login);
@@ -188,6 +195,7 @@ public class SignupActivity extends AppCompatActivity implements IAsyncTaskStatu
         String passwd = input_password.getText() != null ? input_password.getText().toString().trim() : null;
         String name = input_name.getText() != null ? input_name.getText().toString().trim() : null;
         String city = input_city.getText() != null ? input_city.getText().toString().trim() : null;
+        String country = input_country.getText() != null ? input_country.getText().toString().trim() : null;
         StringBuilder dob = new StringBuilder();
         dob.append(input_dob.getDayOfMonth());
         dob.append("/");
@@ -212,13 +220,17 @@ public class SignupActivity extends AppCompatActivity implements IAsyncTaskStatu
             Snackbar.make(input_city, "City is empty", Snackbar.LENGTH_LONG).show();
             valid = false;
         }
+        if(country == null || country.isEmpty()) {
+            Snackbar.make(input_country, "Country is empty", Snackbar.LENGTH_LONG).show();
+            valid = false;
+        }
         if(!valid)
             return;
         /*LocalAddress addr = null;
         if(address != null) {
             addr = new LocalAddress(null, null, address.getCountryName(), address.getLocality());
         }*/
-        UserSignUpInfo userSignUpInfo = new UserSignUpInfo(name, email, passwd, city, dob.toString());
+        UserSignUpInfo userSignUpInfo = new UserSignUpInfo(name, email, passwd, city, country, dob.toString());
         new SignUpTask().execute(userSignUpInfo);
     }
 
@@ -290,14 +302,16 @@ public class SignupActivity extends AppCompatActivity implements IAsyncTaskStatu
         private String email;
         private String passwd;
         private String city;
+        private String country;
         private String dob;
 
-        UserSignUpInfo(String name, String email, String passwd, String city, String dob) {
+        UserSignUpInfo(String name, String email, String passwd, String city, String country, String dob) {
             this.name = name;
             this.email = email;
             this.passwd = passwd;
             this.city = city;
             this.dob = dob;
+            this.country = country;
         }
 
         String getName() {
@@ -314,6 +328,10 @@ public class SignupActivity extends AppCompatActivity implements IAsyncTaskStatu
 
         String getCity() {
             return city;
+        }
+
+        String getCountry() {
+            return country;
         }
 
         String getDob() {
@@ -371,6 +389,7 @@ public class SignupActivity extends AppCompatActivity implements IAsyncTaskStatu
                 String username = userSignUpInfo.getEmail();
                 String passwd = userSignUpInfo.getPasswd();
                 String city = userSignUpInfo.getCity();
+                String country = userSignUpInfo.getCountry();
                 String dob = userSignUpInfo.getDob();
                 API api = APIBuilder.create(ApiConstants.BASE_URL).setAction(COMMAND.SIGN_UP)
                         .addApiParam(APIConstants.User.Register.NAME, name)
@@ -378,6 +397,7 @@ public class SignupActivity extends AppCompatActivity implements IAsyncTaskStatu
                         .addApiParam(APIConstants.User.Register.PASSWORD, passwd)
                         //.addApiParam(APIConstants.User.Register.LOCALITY, locality)
                         .addApiParam(APIConstants.User.Register.CITY, city)
+                        .addApiParam(APIConstants.User.Register.COUNTRY, country)
                         //.addApiParam(APIConstants.User.Register.STATE, state)
                         //.addApiParam(APIConstants.User.Register.COUNTRY, country)
                         .addApiParam(APIConstants.User.Register.DOB, dob)
