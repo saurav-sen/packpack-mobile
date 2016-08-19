@@ -274,13 +274,19 @@ public class SignupActivity extends AppCompatActivity implements IAsyncTaskStatu
         JUser user = userInfo.getUser();
         getIntent().putExtra("loginStatus", true);
         finish();
-        startMainActivity();
+        //startMainActivity();
+        startFollowCategoryActivity();
     }
 
-    private void startMainActivity() {
-        Intent intent = new Intent(this, MainActivity.class);
+    private void startFollowCategoryActivity() {
+        Intent intent = new Intent(this, FollowCategoryActivity.class);
         startActivity(intent);
     }
+
+    /*private void startMainActivity() {
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
+    }*/
 
     @Override
     public void onPostComplete() {

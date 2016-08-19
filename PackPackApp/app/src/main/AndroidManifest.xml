@@ -76,6 +76,10 @@
             android:name=".activity.CreatePackActivity"
             android:label="@string/title_activity_create_pack"
             android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity
+            android:name=".activity.FollowCategoryActivity"
+            android:label="@string/title_activity_create_pack"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
 
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"

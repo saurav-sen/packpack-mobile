@@ -24,4 +24,5 @@
     <string name="title_activity_splash">SplashActivity</string>
     <string name="title_activity_discussion">DiscussionActivity</string>
     <string name="title_activity_create_pack">CreatePackActivity</string>
+    <string name="title_activity_follow_categories">FollowCategoriesActivity</string>
 </resources>

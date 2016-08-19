@@ -164,7 +164,7 @@ public class LoginActivity extends AppCompatActivity implements IAsyncTaskStatus
     }
 
     private void doSignup() {
-        Intent intent = new Intent(this, SignupActivity.class);
+        Intent intent = new Intent(this, SignupActivity.class);//FollowCategoryActivity.class);
         startActivityForResult(intent, SIGNUP_ACTIVITY_REQUEST_CODE);
     }
 

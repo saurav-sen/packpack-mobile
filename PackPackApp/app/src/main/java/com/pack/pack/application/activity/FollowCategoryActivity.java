@@ -58,8 +58,11 @@ public class FollowCategoryActivity extends Activity {
             LinearLayout linearLayout = new LinearLayout(this);
             linearLayout.setBackgroundColor(getResources().getColor(R.color.feed_bg));
             linearLayout.setPadding(0, 0, 5, 10);
-            linearLayout.setLayoutParams(new LinearLayout.LayoutParams(
-                    TableLayout.LayoutParams.WRAP_CONTENT, TableLayout.LayoutParams.WRAP_CONTENT));
+            LinearLayout.LayoutParams linearLayoutParams = new LinearLayout.LayoutParams(
+                    TableLayout.LayoutParams.WRAP_CONTENT, TableLayout.LayoutParams.WRAP_CONTENT);
+            linearLayoutParams.topMargin = 10;
+            linearLayoutParams.bottomMargin = 10;
+            linearLayout.setLayoutParams(linearLayoutParams);
 
             TextView textView = new TextView(this);
             textView.setText(category);
@@ -72,7 +75,7 @@ public class FollowCategoryActivity extends Activity {
 
             final ImageButton button = new ImageButton(this);
             LinearLayout.LayoutParams buttonParams = new LinearLayout.LayoutParams(
-                    FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT);
+                    LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
             buttonParams.gravity = Gravity.CENTER_VERTICAL;
             button.setLayoutParams(buttonParams);
             button.setBackgroundResource(R.drawable.remove);
@@ -82,7 +85,7 @@ public class FollowCategoryActivity extends Activity {
                 @Override
                 public void onClick(View view) {
                     Tag tag = (Tag) button.getTag();
-                    if ("enabled".equals(button.getTag())) {
+                    if ("enabled".equals(tag.tag)) {
                         map.put(tag.index, false);
                         tag.textView.setEnabled(false);
                         button.setBackgroundResource(R.drawable.add);
