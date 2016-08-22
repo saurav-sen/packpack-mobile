@@ -15,6 +15,7 @@ public class UserInfo implements DbObject {
     public static final String PASSWORD = "password";
     public static final String ACCESS_TOKEN = "access_token";
     public static final String ACCESS_TOKEN_SECRET = "access_token_secret";
+    public static final String FOLLWED_CATEGORIES = "followed_categories";
 
     private String userId;
 
@@ -26,27 +27,38 @@ public class UserInfo implements DbObject {
 
     private String accessTokenSecret;
 
+    public String getFollowedCategories() {
+        return followedCategories;
+    }
+
+    public void setFollowedCategories(String followedCategories) {
+        this.followedCategories = followedCategories;
+    }
+
+    private String followedCategories;
+
     public UserInfo() {
     }
 
     public UserInfo(String username, String password) {
-        this(username, password, null);
+        this(username, password, null, null);
     }
 
-    public UserInfo(String username, String password, String id) {
-        this(username, password, id, null);
+    public UserInfo(String username, String password, String id, String followedCategories) {
+        this(username, password, id, null, followedCategories);
     }
 
-    public UserInfo(String username, String password, String id, String accessToken) {
-        this(username, password, id, accessToken, null);
+    public UserInfo(String username, String password, String id, String accessToken, String followedCategories) {
+        this(username, password, id, accessToken, null, followedCategories);
     }
 
-    public UserInfo(String username, String password, String id, String accessToken, String accessTokenSecret) {
+    public UserInfo(String username, String password, String id, String accessToken, String accessTokenSecret, String followedCategories) {
         setUsername(username);
         setPassword(password);
         setUserId(id);
         setAccessToken(accessToken);
         setAccessTokenSecret(accessTokenSecret);
+        setFollowedCategories(followedCategories);
     }
 
     public String getAccessToken() {

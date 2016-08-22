@@ -16,7 +16,14 @@ import android.widget.Toast;
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
 import com.pack.pack.application.adapters.MainActivityAdapter;
+import com.pack.pack.application.fragments.TabType;
 import com.pack.pack.application.topic.activity.model.ParcelableTopic;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static com.pack.pack.application.AppController.CREATE_TOPIC_REQUSET_CODE;
 
@@ -43,16 +50,38 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        List<String> list = AppController.getInstance().getFollowedCategories();
+        TabType[] values = TabType.values();
+        Object __OBJECT = new Object();
+        Map<String, Object> map = new HashMap<String, Object>();
+        for(String l : list) {
+            map.put(l, __OBJECT);
+        }
+
+        List<TabType> types = new ArrayList<TabType>();
+        types.add(TabType.HOME);
+        for(TabType value : values) {
+            if(map.get(value.getType()) == null)
+                continue;
+            types.add(value);
+        }
+
         pager = (ViewPager)findViewById(R.id.pager);
-        pager.setAdapter(new MainActivityAdapter(getSupportFragmentManager()));
+        pager.setAdapter(new MainActivityAdapter(getSupportFragmentManager(), types.toArray(new TabType[types.size()])));
         int itemIndex = getIntent().getIntExtra("pageCurrentItemIndex", -1);
-        if(itemIndex >= 0 && itemIndex < MainActivityAdapter.DEFAULT_COUNT_OF_TABS) {
+        if(itemIndex >= 0 && itemIndex < list.size()) {
             pageCurrentItemIndex = itemIndex;
             pager.setCurrentItem(pageCurrentItemIndex);
         }
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(pager);
+
+        int i=0;
+        for(TabType value : types) {
+            tabLayout.getTabAt(i).setIcon(value.getIcon());
+            i++;
+        }
 
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {

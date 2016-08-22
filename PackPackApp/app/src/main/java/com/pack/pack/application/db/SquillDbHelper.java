@@ -25,7 +25,8 @@ public class SquillDbHelper extends SQLiteOpenHelper {
                         + " INTEGER PRIMARY KEY, " + UserInfo.ENTITY_ID + " TEXT, "
                         + UserInfo.USER_NAME + " TEXT, " + UserInfo.PASSWORD
                         + " TEXT, " + UserInfo.ACCESS_TOKEN + " TEXT, "
-                        + UserInfo.ACCESS_TOKEN_SECRET + " TEXT)";
+                        + UserInfo.ACCESS_TOKEN_SECRET + " TEXT, "
+                        + UserInfo.FOLLWED_CATEGORIES + " TEXT)";
 
         public static final String ATTACHMENT_INFO =
                 "CREATE TABLE " + AttachmentInfo.TABLE_NAME + "(" + AttachmentInfo._ID

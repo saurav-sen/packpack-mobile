@@ -3,11 +3,14 @@ package com.pack.pack.application.activity;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.AppCompatButton;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -26,6 +29,7 @@ import com.pack.pack.client.api.APIConstants;
 import com.pack.pack.client.api.COMMAND;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -54,23 +58,36 @@ public class FollowCategoryActivity extends Activity {
 
         layout = (LinearLayout) findViewById(R.id.follow_categories_main);
         int i = 0;
+        List<String> categories = new ArrayList<String>();
+        categories.addAll(Arrays.asList(SUPPORTED_CATEGORIES));
+        categories.add("Romance");
+        categories.add("Politics");
+        categories.add("Sports");
+        categories.add("Jokes");
+        categories.add("PartyZone");
         for(String category : SUPPORTED_CATEGORIES) {
             LinearLayout linearLayout = new LinearLayout(this);
-            linearLayout.setBackgroundColor(getResources().getColor(R.color.feed_bg));
-            linearLayout.setPadding(0, 0, 5, 10);
+            //linearLayout.setBackgroundColor(getResources().getColor(R.color.feed_bg));
+            linearLayout.setBackground(getResources().getDrawable(R.drawable.border_shadow));
+            linearLayout.setGravity(Gravity.CENTER_HORIZONTAL);
+            linearLayout.setPadding(30, 0, 5, 10);
             LinearLayout.LayoutParams linearLayoutParams = new LinearLayout.LayoutParams(
                     TableLayout.LayoutParams.WRAP_CONTENT, TableLayout.LayoutParams.WRAP_CONTENT);
             linearLayoutParams.topMargin = 10;
             linearLayoutParams.bottomMargin = 10;
+            linearLayoutParams.leftMargin = 80;
             linearLayout.setLayoutParams(linearLayoutParams);
 
             TextView textView = new TextView(this);
             textView.setText(category);
-            textView.setTextSize(25);
-            textView.setGravity(Gravity.CENTER_HORIZONTAL);
+            textView.setTextSize(20);
+            //textView.setTextColor(Color.BLACK);
+            textView.setGravity(Gravity.CENTER_VERTICAL);
             textView.setEnabled(true);
-            textView.setLayoutParams(new TableLayout.LayoutParams(
-                    TableLayout.LayoutParams.WRAP_CONTENT, TableLayout.LayoutParams.WRAP_CONTENT, 1f));
+            textView.setPadding(20, 2, 10, 2);
+            LinearLayout.LayoutParams textViewLayoutParams = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
+            textView.setLayoutParams(textViewLayoutParams);
             linearLayout.addView(textView);
 
             final ImageButton button = new ImageButton(this);
@@ -81,6 +98,18 @@ public class FollowCategoryActivity extends Activity {
             button.setBackgroundResource(R.drawable.remove);
             button.setTag(new Tag("enabled", textView, i));
             map.put(i, true);
+            button.setOnHoverListener(new View.OnHoverListener() {
+                @Override
+                public boolean onHover(View view, MotionEvent motionEvent) {
+                    Tag tag = (Tag) view.getTag();
+                    if ("enabled".equals(tag.tag)) {
+                        Snackbar.make(view, "Subscribe to Category", Snackbar.LENGTH_SHORT);
+                    } else {
+                        Snackbar.make(view, "Un-subscribe from Category", Snackbar.LENGTH_SHORT);
+                    }
+                    return true;
+                }
+            });
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -182,6 +211,7 @@ public class FollowCategoryActivity extends Activity {
                 errorMsg = "Failed, No categories specified";
                 return null;
             }
+            List<String> categoriesList = categories[0];
             errorMsg = null;
             String userId = AppController.getInstance().getUserId();
             String oAuthToken = AppController.getInstance().getoAuthToken();
@@ -190,7 +220,7 @@ public class FollowCategoryActivity extends Activity {
                         .setAction(COMMAND.EDIT_USER_CATEGORIES)
                         .setOauthToken(oAuthToken)
                         .addApiParam(APIConstants.User.ID, userId)
-                        .addApiParam(APIConstants.TopicCategories.FOLLOWED_CATEGORIES, categories)
+                        .addApiParam(APIConstants.TopicCategories.FOLLOWED_CATEGORIES, categoriesList)
                         .build();
                 api.execute();
             } catch (Exception e) {

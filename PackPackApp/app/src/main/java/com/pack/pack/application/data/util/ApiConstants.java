@@ -9,6 +9,7 @@ public interface ApiConstants {
 
     public static final String LIFESTYLE = "lifestyle";
     public static final String ART = "art";
+    public static final String PHOTOGRAPHY = "photography";
     public static final String MUSIC = "music";
     public static final String EDUCATION = "education";
     public static final String FUN = "fun";

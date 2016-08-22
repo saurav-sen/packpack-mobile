@@ -67,6 +67,15 @@ public class AppController extends Application {
 
     private JUser user;
 
+    public List<String> getFollowedCategories() {
+        if(followedCategories == null) {
+            followedCategories = new ArrayList<String>(10);
+        }
+        return followedCategories;
+    }
+
+    private List<String> followedCategories;
+
     public void setUser(JUser user) {
         this.user = user;
     }

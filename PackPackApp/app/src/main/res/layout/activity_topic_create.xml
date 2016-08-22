@@ -30,6 +30,18 @@
             android:hint="Category"
             android:inputType="textAutoComplete" />
 
+        <EditText
+            android:id="@+id/topic_create_city"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="City" />
+
+        <EditText
+            android:id="@+id/topic_create_country"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Country" />
+
         <ImageView
             android:id="@+id/topic_create_wallpaper"
             android:layout_width="match_parent"

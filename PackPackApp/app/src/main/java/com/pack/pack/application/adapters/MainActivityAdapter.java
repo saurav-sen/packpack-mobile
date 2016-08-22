@@ -22,20 +22,18 @@ public class MainActivityAdapter extends FragmentPagerAdapter {
 
     private int countOfTabs;
 
-    public static final int DEFAULT_COUNT_OF_TABS = 8;
+    private TabType[] types;
 
-    public MainActivityAdapter(FragmentManager fragmentManager) {
-        this(fragmentManager, DEFAULT_COUNT_OF_TABS);
-    }
-
-    public MainActivityAdapter(FragmentManager fragmentManager, int countOfTabs) {
+    public MainActivityAdapter(FragmentManager fragmentManager, TabType[] types) {
         super(fragmentManager);
-        this.countOfTabs = countOfTabs;
+        this.types = types;
+        this.countOfTabs = types.length;
     }
 
     @Override
     public Fragment getItem(int position) {
-        TabType tabType = TabType.values()[position];
+        return types[position].getFragment();
+        /*TabType tabType = TabType.values()[position];
 
         if(position == 0) {
             HomeViewFragment fragment = new HomeViewFragment();
@@ -71,12 +69,12 @@ public class MainActivityAdapter extends FragmentPagerAdapter {
                 fragment.setTabType(tabType);
             }
             return fragment;
-        }
+        }*/
     }
 
     @Override
     public CharSequence getPageTitle(int position) {
-        return TabType.values()[position].getDisplayName();
+        return null;//TabType.values()[position].getDisplayName();
     }
 
     @Override

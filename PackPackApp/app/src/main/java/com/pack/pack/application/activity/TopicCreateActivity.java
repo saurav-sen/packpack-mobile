@@ -49,6 +49,8 @@ public class TopicCreateActivity extends AppCompatActivity implements IAsyncTask
 
     private EditText topic_create_name;
     private EditText topic_create_description;
+    private EditText topic_create_city;
+    private EditText topic_create_country;
     private AutoCompleteTextView topic_create_category;
     private ImageView topic_create_wallpaper;
     private TextView wallpaper_select;
@@ -72,13 +74,15 @@ public class TopicCreateActivity extends AppCompatActivity implements IAsyncTask
         topic_create_name = (EditText) findViewById(R.id.topic_create_name);
         topic_create_description = (EditText) findViewById(R.id.topic_create_description);
         topic_create_category = (AutoCompleteTextView) findViewById(R.id.topic_create_category);
+        topic_create_city = (EditText) findViewById(R.id.topic_create_city);
+        topic_create_country = (EditText) findViewById(R.id.topic_create_country);
         topic_create_wallpaper = (ImageView) findViewById(R.id.topic_create_wallpaper);
         wallpaper_select = (TextView) findViewById(R.id.wallpaper_select);
 
         topic_create_category.setThreshold(1);
         ArrayAdapter<String> categoryAdapter = new ArrayAdapter<String>(this,
                 android.support.v7.appcompat.R.layout.select_dialog_item_material,
-                ApiConstants.SUPPORTED_CATEGORIES);
+                AppController.getInstance().getFollowedCategories());
         topic_create_category.setAdapter(categoryAdapter);
 
         SpannableString spannableString = new SpannableString("Select an image, as wallpaper of your topic");
@@ -174,7 +178,9 @@ public class TopicCreateActivity extends AppCompatActivity implements IAsyncTask
         String topicName = topic_create_name.getText().toString();
         String topicDescription = topic_create_description.getText().toString();
         String topicCategory = topic_create_category.getText().toString();
-        TaskData data = new TaskData(topicName, topicDescription, topicCategory);
+        String city = topic_create_city.getText().toString();
+        String country = topic_create_country.getText().toString();
+        TaskData data = new TaskData(topicName, topicDescription, topicCategory, city, country);
         new TopicCreateTask(this).execute(data);
     }
 
@@ -241,10 +247,14 @@ public class TopicCreateActivity extends AppCompatActivity implements IAsyncTask
             String topicDescription = data.getTopicDescription();
             String topicCategory = data.getTopicCategory();
             String ownerId = AppController.getInstance().getUserId();
+            String city = data.getCity();
+            String country = data.getCountry();
             apiParams.put(APIConstants.Topic.NAME, topicName);
             apiParams.put(APIConstants.Topic.DESCRIPTION, topicDescription);
             apiParams.put(APIConstants.Topic.CATEGORY, topicCategory);
             apiParams.put(APIConstants.Topic.OWNER_ID, ownerId);
+            apiParams.put(APIConstants.Topic.CITY, city);
+            apiParams.put(APIConstants.Topic.COUNTRY, country);
             apiParams.put(APIConstants.Topic.WALLPAPER, mediaFile);
             return apiParams;
         }
@@ -278,10 +288,32 @@ public class TopicCreateActivity extends AppCompatActivity implements IAsyncTask
         private String topicDescription;
         private String topicCategory;
 
-        TaskData(String topicName, String topicDescription, String topicCategory) {
+        private String city;
+
+        public String getCity() {
+            return city;
+        }
+
+        public void setCity(String city) {
+            this.city = city;
+        }
+
+        public String getCountry() {
+            return country;
+        }
+
+        public void setCountry(String country) {
+            this.country = country;
+        }
+
+        private String country;
+
+        TaskData(String topicName, String topicDescription, String topicCategory, String city, String country) {
             setTopicName(topicName);
             setTopicDescription(topicDescription);
             setTopicCategory(topicCategory);
+            setCity(city);
+            setCountry(country);
         }
 
         String getTopicName() {

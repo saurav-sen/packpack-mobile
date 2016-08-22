@@ -36,7 +36,7 @@ public class DBUtil {
         try {
             String[] projection = new String[] {UserInfo._ID, UserInfo.ENTITY_ID,
                     UserInfo.USER_NAME, UserInfo.PASSWORD, UserInfo.ACCESS_TOKEN,
-                    UserInfo.ACCESS_TOKEN_SECRET};
+                    UserInfo.ACCESS_TOKEN_SECRET, UserInfo.FOLLWED_CATEGORIES};
             try {
                 cursor = readable.query(UserInfo.TABLE_NAME, projection, null, null,
                         null, null, null);
@@ -49,7 +49,8 @@ public class DBUtil {
                         String password = cursor.getString(cursor.getColumnIndexOrThrow(UserInfo.PASSWORD));
                         String accessToken = cursor.getString(cursor.getColumnIndexOrThrow(UserInfo.ACCESS_TOKEN));
                         String accessTokenSecret = cursor.getString(cursor.getColumnIndexOrThrow(UserInfo.ACCESS_TOKEN_SECRET));
-                        return new UserInfo(userName, password, userId, accessToken, accessTokenSecret);
+                        String followedCategories = cursor.getString(cursor.getColumnIndexOrThrow(UserInfo.FOLLWED_CATEGORIES));
+                        return new UserInfo(userName, password, userId, accessToken, accessTokenSecret, followedCategories);
                     } while(cursor.moveToNext());
                 }
             } finally {

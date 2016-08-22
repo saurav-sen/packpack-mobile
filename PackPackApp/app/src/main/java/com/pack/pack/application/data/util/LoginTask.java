@@ -16,7 +16,9 @@ import com.pack.pack.client.api.COMMAND;
 import com.pack.pack.model.web.JUser;
 import com.pack.pack.oauth1.client.AccessToken;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.pack.pack.application.AppController.ANDROID_APP_CLIENT_KEY;
@@ -34,6 +36,8 @@ public class LoginTask extends AbstractNetworkTask<UserInfo, Integer, AccessToke
     private JUser user;
 
     private UserInfo userInfo;
+
+    private String followedCategories;
 
     public LoginTask(Context context) {
         super(false, true, context);
@@ -61,6 +65,7 @@ public class LoginTask extends AbstractNetworkTask<UserInfo, Integer, AccessToke
             accessToken = (AccessToken) api0.execute();
             AppController.getInstance().setoAuthToken(accessToken.getToken());
 
+            // GET user details
             API api = APIBuilder
                     .create(ApiConstants.BASE_URL)
                     .setAction(COMMAND.GET_USER_BY_USERNAME)
@@ -69,6 +74,25 @@ public class LoginTask extends AbstractNetworkTask<UserInfo, Integer, AccessToke
                             userInfo.getUsername()).build();
             user = (JUser) api.execute();
             AppController.getInstance().setUser(user);
+
+            // GET user followed categories
+            api = APIBuilder
+                    .create(ApiConstants.BASE_URL)
+                    .setAction(COMMAND.GET_USER_CATEGORIES)
+                    .setOauthToken(AppController.getInstance().getoAuthToken())
+                    .addApiParam(APIConstants.User.ID, user.getId())
+                    .build();
+            List<String> list = (List<String>)api.execute();
+            if(list != null) {
+                AppController.getInstance().getFollowedCategories().clear();
+                AppController.getInstance().getFollowedCategories().addAll(list);
+                StringBuilder stringBuilder = new StringBuilder();
+                for(String l : list) {
+                    stringBuilder.append(l);
+                    stringBuilder.append(":");
+                }
+                followedCategories = stringBuilder.toString();
+            }
         } catch (Exception e) {
             Log.i(LOG_TAG, e.getMessage());
             errorMsg = e.getMessage();
@@ -84,6 +108,7 @@ public class LoginTask extends AbstractNetworkTask<UserInfo, Integer, AccessToke
         userInfo.setUserId(user.getId());
         userInfo.setUsername(user.getUsername());
         userInfo.setPassword(AppController.getInstance().getUserPassword());
+        userInfo.setFollowedCategories("" + followedCategories);
         return userInfo;
     }
 
