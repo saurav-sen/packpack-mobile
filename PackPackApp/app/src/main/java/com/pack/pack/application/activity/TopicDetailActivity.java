@@ -152,10 +152,12 @@ public class TopicDetailActivity extends AppCompatActivity implements OnMapReady
     public void onMapReady(GoogleMap map) {
         if(gMap != null)
             return;
+        if(topic == null)
+            return;
         gMap = map;
-        LatLng latLng = new LatLng(17.3850, 78.4867);
+        LatLng latLng = new LatLng(topic.getLatitude(), topic.getLongitude());
         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 8);
         gMap.moveCamera(cameraUpdate);
-        gMap.addMarker(new MarkerOptions().position(latLng).anchor(0.5f, 0.5f)).setTitle("Hyderabad");
+        gMap.addMarker(new MarkerOptions().position(latLng).anchor(0.5f, 0.5f)).setTitle("Place");
     }
 }

@@ -20,25 +20,61 @@ public class ParcelableTopic implements Parcelable {
 
     private String topicName;
 
+    private double longitude;
+
+    private double latitude;
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    private String address;
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
     public ParcelableTopic() {
     }
 
     public ParcelableTopic(JTopic topic) {
         if(topic != null) {
-            setTopicId(topic.getId());
-            setDescription(topic.getDescription());
-            setTopicCategory(topic.getCategory());
-            setWallpaperUrl(topic.getWallpaperUrl());
-            setTopicName(topic.getName());
+            setTopicId(topic.getId() + "");
+            setDescription(topic.getDescription() + "");
+            setTopicCategory(topic.getCategory() + "");
+            setWallpaperUrl(topic.getWallpaperUrl() + "");
+            setTopicName(topic.getName() + "");
+            setLongitude(topic.getLongitude());
+            setLatitude(topic.getLatitude());
+            setAddress(topic.getAddress() + "");
         }
     }
 
-    public ParcelableTopic(String topicId, String topicCategory, String wallpaperUrl, String description, String name) {
-        this.topicId = topicId;
-        this.topicCategory = topicCategory;
-        this.wallpaperUrl = wallpaperUrl;
-        this.description = description;
-        this.topicName = name;
+    public ParcelableTopic(String topicId, String topicCategory, String wallpaperUrl, String description, String name, double longitude, double latitude, String address) {
+        this.topicId = topicId + "";
+        this.topicCategory = topicCategory + "";
+        this.wallpaperUrl = wallpaperUrl + "";
+        this.description = description + "";
+        this.topicName = name + "";
+        this.longitude = longitude;
+        this.latitude = latitude;
+        this.address = address + "";
     }
 
     public String getTopicId() {
@@ -93,6 +129,9 @@ public class ParcelableTopic implements Parcelable {
         parcel.writeString(wallpaperUrl);
         parcel.writeString(description);
         parcel.writeString(topicName);
+        parcel.writeDouble(longitude);
+        parcel.writeDouble(latitude);
+        parcel.writeString(address);
     }
 
     public static final Parcelable.Creator<ParcelableTopic> CREATOR = new Parcelable.Creator<ParcelableTopic>() {
@@ -103,7 +142,10 @@ public class ParcelableTopic implements Parcelable {
             String wallpaperUrl = parcel.readString();
             String description = parcel.readString();
             String name = parcel.readString();
-            return new ParcelableTopic(topicId, topicCategory, wallpaperUrl, description, name);
+            double longitude = parcel.readDouble();
+            double latitude = parcel.readDouble();
+            String address = parcel.readString();
+            return new ParcelableTopic(topicId, topicCategory, wallpaperUrl, description, name, longitude, latitude, address);
         }
 
         @Override

@@ -12,8 +12,7 @@ public class ArtViewFragment extends TopicViewFragment {
 
     @Override
     protected void handleItemClick(JTopic topic) {
-        ParcelableTopic parcel = new ParcelableTopic(topic.getId(), topic.getCategory(),
-                topic.getWallpaperUrl(), topic.getDescription(), topic.getName());
+        ParcelableTopic parcel = new ParcelableTopic(topic);
         openDetailActivity(AppController.TOPIC_PARCELABLE_KEY, parcel, TopicDetailActivity.class);
     }
 }

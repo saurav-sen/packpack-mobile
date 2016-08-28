@@ -17,6 +17,6 @@ public interface ApiConstants {
     public static final String OTHERS = "others";
 
     public static final String[] SUPPORTED_CATEGORIES = new String[] {
-            LIFESTYLE, ART, MUSIC, EDUCATION, FUN,
-            SPIRITUAL, OTHERS};
+            LIFESTYLE, ART, PHOTOGRAPHY, MUSIC, EDUCATION, FUN,
+            SPIRITUAL};
 }

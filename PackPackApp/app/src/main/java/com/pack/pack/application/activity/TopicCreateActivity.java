@@ -49,6 +49,7 @@ public class TopicCreateActivity extends AppCompatActivity implements IAsyncTask
 
     private EditText topic_create_name;
     private EditText topic_create_description;
+    private EditText topic_create_localityAddr;
     private EditText topic_create_city;
     private EditText topic_create_country;
     private AutoCompleteTextView topic_create_category;
@@ -74,6 +75,7 @@ public class TopicCreateActivity extends AppCompatActivity implements IAsyncTask
         topic_create_name = (EditText) findViewById(R.id.topic_create_name);
         topic_create_description = (EditText) findViewById(R.id.topic_create_description);
         topic_create_category = (AutoCompleteTextView) findViewById(R.id.topic_create_category);
+        topic_create_localityAddr = (EditText) findViewById(R.id.topic_create_localityAddr);
         topic_create_city = (EditText) findViewById(R.id.topic_create_city);
         topic_create_country = (EditText) findViewById(R.id.topic_create_country);
         topic_create_wallpaper = (ImageView) findViewById(R.id.topic_create_wallpaper);
@@ -178,9 +180,10 @@ public class TopicCreateActivity extends AppCompatActivity implements IAsyncTask
         String topicName = topic_create_name.getText().toString();
         String topicDescription = topic_create_description.getText().toString();
         String topicCategory = topic_create_category.getText().toString();
+        String locality = topic_create_localityAddr.getText().toString();
         String city = topic_create_city.getText().toString();
         String country = topic_create_country.getText().toString();
-        TaskData data = new TaskData(topicName, topicDescription, topicCategory, city, country);
+        TaskData data = new TaskData(topicName, topicDescription, topicCategory, locality, city, country);
         new TopicCreateTask(this).execute(data);
     }
 
@@ -247,12 +250,14 @@ public class TopicCreateActivity extends AppCompatActivity implements IAsyncTask
             String topicDescription = data.getTopicDescription();
             String topicCategory = data.getTopicCategory();
             String ownerId = AppController.getInstance().getUserId();
+            String localityAddr = data.getLocality();
             String city = data.getCity();
             String country = data.getCountry();
             apiParams.put(APIConstants.Topic.NAME, topicName);
             apiParams.put(APIConstants.Topic.DESCRIPTION, topicDescription);
             apiParams.put(APIConstants.Topic.CATEGORY, topicCategory);
             apiParams.put(APIConstants.Topic.OWNER_ID, ownerId);
+            apiParams.put(APIConstants.Topic.LOCALITY_ADDRESS, localityAddr);
             apiParams.put(APIConstants.Topic.CITY, city);
             apiParams.put(APIConstants.Topic.COUNTRY, country);
             apiParams.put(APIConstants.Topic.WALLPAPER, mediaFile);
@@ -308,10 +313,21 @@ public class TopicCreateActivity extends AppCompatActivity implements IAsyncTask
 
         private String country;
 
-        TaskData(String topicName, String topicDescription, String topicCategory, String city, String country) {
+        private String locality;
+
+        public String getLocality() {
+            return locality;
+        }
+
+        public void setLocality(String locality) {
+            this.locality = locality;
+        }
+
+        TaskData(String topicName, String topicDescription, String topicCategory, String locality, String city, String country) {
             setTopicName(topicName);
             setTopicDescription(topicDescription);
             setTopicCategory(topicCategory);
+            setLocality(locality);
             setCity(city);
             setCountry(country);
         }

@@ -25,6 +25,7 @@ import com.pack.pack.client.api.API;
 import com.pack.pack.client.api.APIConstants;
 import com.pack.pack.client.api.COMMAND;
 import com.pack.pack.model.web.JPackAttachment;
+import com.pack.pack.model.web.PackAttachmentType;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -127,8 +128,12 @@ public class PackAttachmentsAdapter extends ArrayAdapter<JPackAttachment> {
 
         JPackAttachment attachment = getItem(position);
         if(attachment != null) {
+            String url = attachment.getAttachmentUrl();
+            if(PackAttachmentType.VIDEO.name().equals(attachment.getMimeType())) {
+                url = attachment.getAttachmentThumbnailUrl();
+            }
             new DownloadImageTask(pack_attachment_img, 700, 600, PackAttachmentsAdapter.this.getContext())
-                    .execute(attachment.getAttachmentUrl());
+                    .execute(url);
         }
         return convertView;
     }

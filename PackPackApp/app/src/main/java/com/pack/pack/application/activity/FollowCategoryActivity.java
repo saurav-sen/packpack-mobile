@@ -223,6 +223,8 @@ public class FollowCategoryActivity extends Activity {
                         .addApiParam(APIConstants.TopicCategories.FOLLOWED_CATEGORIES, categoriesList)
                         .build();
                 api.execute();
+                AppController.getInstance().getFollowedCategories().clear();
+                AppController.getInstance().getFollowedCategories().addAll(categoriesList);
             } catch (Exception e) {
                 Log.i(LOG_TAG, e.getMessage());
                 errorMsg = "ERROR: " + e.getMessage();
