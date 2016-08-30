@@ -155,9 +155,11 @@ public class TopicDetailActivity extends AppCompatActivity implements OnMapReady
         if(topic == null)
             return;
         gMap = map;
+        gMap.getUiSettings().setZoomControlsEnabled(true);
+        gMap.getUiSettings().setZoomGesturesEnabled(true);
         LatLng latLng = new LatLng(topic.getLatitude(), topic.getLongitude());
         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 8);
         gMap.moveCamera(cameraUpdate);
-        gMap.addMarker(new MarkerOptions().position(latLng).anchor(0.5f, 0.5f)).setTitle("Place");
+        gMap.addMarker(new MarkerOptions().position(latLng).anchor(0.5f, 0.5f)).setTitle(topic.getAddress());
     }
 }

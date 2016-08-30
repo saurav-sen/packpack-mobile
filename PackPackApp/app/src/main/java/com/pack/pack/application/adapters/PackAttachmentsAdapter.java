@@ -95,13 +95,34 @@ public class PackAttachmentsAdapter extends ArrayAdapter<JPackAttachment> {
             }
         });
 
-        Button pack_attachment_like = (Button) convertView.findViewById(R.id.pack_attachment_like);
+        final ImageView pack_attachment_video_play = (ImageView) convertView.findViewById(R.id.pack_attachment_video_play);
+        pack_attachment_video_play.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getContext(), FullscreenAttachmentViewActivity.class);
+                intent.putExtra("index", position);
+                getContext().startActivity(intent);
+            }
+        });
+
+        final Button pack_attachment_like = (Button) convertView.findViewById(R.id.pack_attachment_like);
+        pack_attachment_like.setTag("NotLiked");
         pack_attachment_like.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 JPackAttachment attachment = getItem(position);
                 if(attachment != null) {
-                    addLikeToPackAttachment(attachment.getId());
+                    String tag = (String) pack_attachment_like.getTag();
+                    if(tag != null && "NotLiked".equals(tag)) {
+                        pack_attachment_like.setTag("Liked");
+                        pack_attachment_like.setCompoundDrawables(activity.getResources().getDrawable(
+                                R.drawable.like_after), null, null, null);
+                        addLikeToPackAttachment(attachment.getId());
+                    } else if(tag != null && "Liked".equals(tag)) {
+                        pack_attachment_like.setTag("NotLiked");
+                        pack_attachment_like.setCompoundDrawables(activity.getResources().getDrawable(
+                                R.drawable.like_before), null, null, null);
+                    }
                 }
             }
         });
@@ -131,6 +152,7 @@ public class PackAttachmentsAdapter extends ArrayAdapter<JPackAttachment> {
             String url = attachment.getAttachmentUrl();
             if(PackAttachmentType.VIDEO.name().equals(attachment.getMimeType())) {
                 url = attachment.getAttachmentThumbnailUrl();
+                pack_attachment_video_play.setVisibility(View.VISIBLE);
             }
             new DownloadImageTask(pack_attachment_img, 700, 600, PackAttachmentsAdapter.this.getContext())
                     .execute(url);

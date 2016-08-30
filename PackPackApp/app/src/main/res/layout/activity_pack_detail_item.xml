@@ -10,11 +10,22 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.pack.pack.application.activity.PackDetailActivity">
 
-    <ImageView
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scaleType="fitXY"
-        android:id="@+id/pack_attachment_img"/>
+        android:layout_height="match_parent">
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitXY"
+            android:id="@+id/pack_attachment_img"/>
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_centerInParent="true"
+            android:id="@+id/pack_attachment_video_play"
+            android:background="@drawable/video_play"
+            android:visibility="gone"/>
+    </RelativeLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -31,7 +42,7 @@
             android:background="@drawable/react_buttons"
             android:id="@+id/pack_attachment_like"
             android:scaleType="fitXY"
-            android:drawableLeft="@android:drawable/btn_star_big_on"
+            android:drawableLeft="@drawable/like_before"
             android:drawablePadding="10dp"
             android:paddingRight="10dp"
             android:text="Like"
@@ -44,7 +55,7 @@
             android:textColor="@color/feed_bg"
             android:id="@+id/pack_attachment_comment"
             android:scaleType="fitXY"
-            android:drawableLeft="@android:drawable/btn_star_big_on"
+            android:drawableLeft="@drawable/comment"
             android:drawablePadding="10dp"
             android:paddingRight="10dp"
             android:text="Comment"
@@ -57,7 +68,7 @@
             android:textColor="@color/feed_bg"
             android:id="@+id/pack_attachment_share"
             android:scaleType="fitXY"
-            android:drawableLeft="@android:drawable/btn_star_big_on"
+            android:drawableLeft="@drawable/share"
             android:drawablePadding="10dp"
             android:paddingRight="10dp"
             android:text="Share"

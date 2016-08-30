@@ -3,6 +3,9 @@ package com.pack.pack.application.activity;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageButton;
 
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
@@ -32,5 +35,13 @@ public class FullscreenAttachmentViewActivity extends Activity {
         adapter.setCurrentIndex(currentIndex);
 
         fullscreen_attachment_view_pager.setCurrentItem(currentIndex);
+
+        ImageButton btnClose = (ImageButton) findViewById(R.id.btnClose);
+        btnClose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
     }
 }

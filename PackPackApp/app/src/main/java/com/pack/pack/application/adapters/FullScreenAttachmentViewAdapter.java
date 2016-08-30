@@ -70,13 +70,7 @@ public class FullScreenAttachmentViewAdapter extends PagerAdapter {
         View view = inflater.inflate(R.layout.layout_fullscreen_attachment, container, false);
         ImageView imgDisplay = (ImageView) view.findViewById(R.id.imgDisplay);
         final VideoView videoView = (VideoView) view.findViewById(R.id.videoDisplay);
-        Button btnClose = (Button) view.findViewById(R.id.btnClose);
-        btnClose.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                activity.finish();
-            }
-        });
+
         List<JPackAttachment> list = AppController.getInstance().getPackAttachments();
         if(list != null && !list.isEmpty() && position < list.size()) {
             JPackAttachment attachment = list.get(position);

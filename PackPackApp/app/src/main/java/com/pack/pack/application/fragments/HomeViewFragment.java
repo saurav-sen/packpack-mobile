@@ -71,7 +71,7 @@ public class HomeViewFragment extends Fragment {
             public void onScrollStateChanged(AbsListView absListView, int scrollState) {
                 int count = listView.getCount();
                 if (scrollState == SCROLL_STATE_IDLE) {
-                    if (listView.getLastVisiblePosition() > count - 1) {
+                    if (listView.getLastVisiblePosition() > count - 1 && !"END_OF_PAGE".equals(nextLink)) {
                         new RSSFeedTask().execute(nextLink);
                     }
                 }
@@ -82,7 +82,7 @@ public class HomeViewFragment extends Fragment {
 
             }
         });
-        new RSSFeedTask().execute(nextLink);
+        new RSSFeedTask().execute(!"END_OF_PAGE".equals(nextLink) ? nextLink : prevLink);
         //hideProgressDialog();
         return view;
     }
