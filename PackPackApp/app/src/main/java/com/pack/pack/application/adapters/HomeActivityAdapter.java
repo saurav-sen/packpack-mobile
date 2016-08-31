@@ -2,6 +2,8 @@ package com.pack.pack.application.adapters;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -75,14 +77,22 @@ public class HomeActivityAdapter extends ArrayAdapter<JRssFeed> {
         home_rss_feed__name = (TextView) convertView.findViewById(R.id.home_rss_feed__name);
         home_rss_feed_image = (ImageView) convertView.findViewById(R.id.home_rss_feed_image);
         home_rss_feed_description = (TextView) convertView.findViewById(R.id.home_rss_feed_description);
-        JRssFeed feed = getItem(position);
+        final JRssFeed feed = getItem(position);
         if(feed != null) {
             home_rss_feed__name.setText(feed.getOgTitle());
             home_rss_feed_description.setText(feed.getOgDescription());
-            String imageUrl = feed.getOgImage();
+            final String imageUrl = feed.getOgImage();
             if(imageUrl != null && !imageUrl.trim().isEmpty()) {
                 new DownloadFeedImageTask(home_rss_feed_image, 850, 600, HomeActivityAdapter.this.activity)
                         .execute(imageUrl);
+                home_rss_feed_image.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent intent = new Intent(Intent.ACTION_VIEW);
+                        intent.setData(Uri.parse(feed.getOgUrl()));
+                        getContext().startActivity(intent);
+                    }
+                });
             }
         }
         return convertView;
