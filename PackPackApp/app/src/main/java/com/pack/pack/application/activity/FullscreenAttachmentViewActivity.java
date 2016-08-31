@@ -36,7 +36,7 @@ public class FullscreenAttachmentViewActivity extends Activity {
 
         fullscreen_attachment_view_pager.setCurrentItem(currentIndex);
 
-        ImageButton btnClose = (ImageButton) findViewById(R.id.btnClose);
+        Button btnClose = (Button) findViewById(R.id.btnClose);
         btnClose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

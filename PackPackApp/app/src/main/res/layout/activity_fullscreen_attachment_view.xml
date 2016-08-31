@@ -7,16 +7,17 @@
     <android.support.v4.view.ViewPager
         android:id="@+id/fullscreen_attachment_view_pager"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/btnClose"/>
+        android:layout_height="match_parent"/>
 
-    <ImageButton
+    <Button
         android:id="@+id/btnClose"
         android:layout_width="wrap_content"
-        android:layout_height="30dp"
+        android:layout_height="wrap_content"
+        android:text="Close"
+        android:textColor="@android:color/white"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
         android:layout_marginRight="15dp"
-        android:background="@drawable/close"/>
+        android:background="@android:color/transparent"/>
 
 </RelativeLayout>
