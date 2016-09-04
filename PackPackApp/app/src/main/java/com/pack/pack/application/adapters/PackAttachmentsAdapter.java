@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
@@ -85,6 +86,8 @@ public class PackAttachmentsAdapter extends ArrayAdapter<JPackAttachment> {
         if(convertView == null) {
             convertView = inflater.inflate(R.layout.activity_pack_detail_item, null);
         }
+        final TextView pack_attachment_title = (TextView) convertView.findViewById(R.id.pack_attachment_title);
+        final TextView pack_attachment_description = (TextView) convertView.findViewById(R.id.pack_attachment_description);
         ImageView pack_attachment_img = (ImageView) convertView.findViewById(R.id.pack_attachment_img);
         pack_attachment_img.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -149,6 +152,8 @@ public class PackAttachmentsAdapter extends ArrayAdapter<JPackAttachment> {
 
         JPackAttachment attachment = getItem(position);
         if(attachment != null) {
+            pack_attachment_title.setText(attachment.getTitle() + "");
+            pack_attachment_description.setText(attachment.getDescription() + "");
             String url = attachment.getAttachmentUrl();
             if(PackAttachmentType.VIDEO.name().equals(attachment.getMimeType())) {
                 url = attachment.getAttachmentThumbnailUrl();

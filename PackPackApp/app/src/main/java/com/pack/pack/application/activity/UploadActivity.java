@@ -13,6 +13,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -36,6 +37,9 @@ import static com.pack.pack.application.AppController.UPLOAD_ENTITY_ID_KEY;
 import static com.pack.pack.application.AppController.UPLOAD_ENTITY_TYPE_KEY;
 import static com.pack.pack.application.AppController.UPLOAD_FILE_IS_PHOTO;
 import static com.pack.pack.application.AppController.UPLOAD_FILE_PATH;
+import static com.pack.pack.application.AppController.UPLOAD_ATTACHMENT_TITLE;
+import static com.pack.pack.application.AppController.UPLOAD_ATTACHMENT_DESCRIPTION;
+
 
 /**
  *
@@ -52,11 +56,17 @@ public class UploadActivity extends Activity {
 
     private String mediaFilePath;
 
+    private String title;
+
+    private String description;
+
     private boolean isPhotoUpload = true;
 
     private TextView upload_txtPercentage;
     private ImageView upload_imgPreview;
     private VideoView upload_videoPreview;
+    private EditText upload_title;
+    private EditText upload_description;
     private Button upload_submit;
     private ProgressBar upload_progressBar;
 
@@ -72,12 +82,16 @@ public class UploadActivity extends Activity {
         uploadEntityType = getIntent().getStringExtra(UPLOAD_ENTITY_TYPE_KEY);
         mediaFilePath = getIntent().getStringExtra(UPLOAD_FILE_PATH);
         isPhotoUpload = getIntent().getBooleanExtra(UPLOAD_FILE_IS_PHOTO, true);
+        title = getIntent().getStringExtra(UPLOAD_ATTACHMENT_TITLE) + "";
+        description = getIntent().getStringExtra(UPLOAD_ATTACHMENT_DESCRIPTION) + "";
 
         upload_txtPercentage = (TextView) findViewById(R.id.upload_txtPercentage);
         upload_submit = (Button) findViewById(R.id.upload_submit);
         upload_progressBar = (ProgressBar) findViewById(R.id.upload_progressBar);
         upload_imgPreview = (ImageView) findViewById(R.id.upload_imgPreview);
         upload_videoPreview = (VideoView) findViewById(R.id.upload_videoPreview);
+        upload_title = (EditText) findViewById(R.id.upload_title);
+        upload_description = (EditText) findViewById(R.id.upload_description);
 
         if (mediaFilePath != null) {
             previewMedia();
@@ -89,6 +103,8 @@ public class UploadActivity extends Activity {
         upload_submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                title = upload_title.getText() + "";
+                description = upload_description.getText() + "";
                 new UploadJob().execute();
             }
         });
@@ -148,6 +164,8 @@ public class UploadActivity extends Activity {
                             .addApiParam(APIConstants.Pack.ID, uploadEntityId)
                             .addApiParam(APIConstants.Topic.ID, topicId)
                             .addApiParam(APIConstants.Attachment.FILE_ATTACHMENT, file)
+                            .addApiParam(APIConstants.Attachment.TITLE, title)
+                            .addApiParam(APIConstants.Attachment.DESCRIPTION, description)
                             .build();
                     MultipartRequestProgressListener listener = new MultipartRequestProgressListener() {
                         @Override

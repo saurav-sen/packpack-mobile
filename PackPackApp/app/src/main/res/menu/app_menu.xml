@@ -7,4 +7,10 @@
         android:title="Forum"
         android:icon="@drawable/forum"
         app:showAsAction="always"/>
+    <item
+        android:id="@+id/app_settings"
+        android:orderInCategory="100"
+        android:title="Forum"
+        android:icon="@drawable/settings"
+        app:showAsAction="never"/>
 </menu>

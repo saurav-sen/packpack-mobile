@@ -9,4 +9,7 @@
         <attr name="metaButtonBarButtonStyle" format="reference" />
     </declare-styleable>
 
+    <declare-styleable name="ProfilePicturePreference">
+        <attr name="image" format="reference" />
+    </declare-styleable>
 </resources>

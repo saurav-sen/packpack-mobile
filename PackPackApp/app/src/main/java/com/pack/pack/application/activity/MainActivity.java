@@ -10,6 +10,8 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
@@ -102,6 +104,34 @@ public class MainActivity extends AppCompatActivity {
         } else {
 
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.app_menu, menu);
+        MenuItem item0 = menu.findItem(R.id.app_settings);
+        if(item0 != null) {
+            item0.setVisible(true);
+        }
+        MenuItem item1 = menu.findItem(R.id.enter_forum);
+        if(item1 != null) {
+            item1.setVisible(false);
+        }
+        invalidateOptionsMenu();
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.app_settings:
+                Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+                startActivity(intent);
+                break;
+            default:
+                break;
+        }
+        return true;
     }
 
     @Override

@@ -25,4 +25,13 @@
     <string name="title_activity_discussion">DiscussionActivity</string>
     <string name="title_activity_create_pack">CreatePackActivity</string>
     <string name="title_activity_follow_categories">FollowCategoriesActivity</string>
+    <string-array name="topic_categories">
+        <item>lifestyle</item>
+        <item>art</item>
+        <item>photography</item>
+        <item>music</item>
+        <item>education</item>
+        <item>fun</item>
+        <item>spiritual</item>
+    </string-array>
 </resources>

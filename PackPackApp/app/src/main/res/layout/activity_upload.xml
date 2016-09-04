@@ -20,6 +20,23 @@
         android:visibility="gone"
         android:layout_marginTop="15dp"/>
 
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/upload_title"
+        android:layout_marginTop="15dp"
+        android:hint="Title" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/upload_description"
+        android:layout_marginTop="15dp"
+        android:inputType="textMultiLine"
+        android:maxLines="10"
+        android:minLines="3"
+        android:hint="Description" />
+
     <TextView
         android:id="@+id/upload_txtPercentage"
         android:layout_width="wrap_content"

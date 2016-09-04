@@ -5,6 +5,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -59,8 +60,17 @@ public class TopicDetailActivity extends AppCompatActivity implements OnMapReady
                 return onOptionsItemSelected(item);
             }
         });*/
-        getMenuInflater().inflate(R.menu.inside_topic, menu);
-        return true;
+       getMenuInflater().inflate(R.menu.app_menu, menu);
+       MenuItem item0 = menu.findItem(R.id.app_settings);
+       if(item0 != null) {
+           item0.setVisible(true);
+       }
+       MenuItem item1 = menu.findItem(R.id.enter_forum);
+       if(item1 != null) {
+           item1.setVisible(true);
+       }
+       invalidateOptionsMenu();
+       return true;
     }
 
    @Override
@@ -85,6 +95,9 @@ public class TopicDetailActivity extends AppCompatActivity implements OnMapReady
         Toolbar toolbar = (Toolbar) findViewById(R.id.topic_detail_toolbar);
         //setActionBar(toolbar);
         setSupportActionBar(toolbar);
+
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
 
         topic = (ParcelableTopic) getIntent().getParcelableExtra(AppController.TOPIC_PARCELABLE_KEY);
 

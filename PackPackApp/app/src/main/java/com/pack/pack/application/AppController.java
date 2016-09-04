@@ -53,6 +53,10 @@ public class AppController extends Application {
 
     public static final String UPLOAD_ENTITY_TYPE_KEY = "entity_type";
 
+    public static final String UPLOAD_ATTACHMENT_TITLE = "upload_attachment_title";
+
+    public static final String UPLOAD_ATTACHMENT_DESCRIPTION = "upload_attachment_description";
+
     public static final String TOPIC_ID_KEY = "topic_id";
 
     public String getoAuthToken() {
