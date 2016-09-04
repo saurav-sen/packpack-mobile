@@ -71,6 +71,10 @@ public class AppController extends Application {
 
     private JUser user;
 
+    public JUser getUser() {
+        return user;
+    }
+
     public List<String> getFollowedCategories() {
         if(followedCategories == null) {
             followedCategories = new ArrayList<String>(10);

@@ -82,7 +82,9 @@ public class TopicDetailActivity extends AppCompatActivity implements OnMapReady
                 intent.putExtra(Constants.DISCUSSION_ENTITY_TYPE, EntityType.TOPIC.name());
                 startActivity(intent);
                 break;
-            default:
+            case R.id.app_settings:
+                Intent intent_0 = new Intent(TopicDetailActivity.this, SettingsActivity.class);
+                startActivity(intent_0);
                 break;
         }
         return true;

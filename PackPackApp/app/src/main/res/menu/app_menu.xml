@@ -10,7 +10,7 @@
     <item
         android:id="@+id/app_settings"
         android:orderInCategory="100"
-        android:title="Forum"
+        android:title="Settings"
         android:icon="@drawable/settings"
-        app:showAsAction="never"/>
+        app:showAsAction="ifRoom"/>
 </menu>

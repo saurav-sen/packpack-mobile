@@ -212,7 +212,7 @@ public abstract class TopicViewFragment extends Fragment {
             } catch (Exception e) {
                 errorMsg = e.getMessage();
             } finally {
-                hideProgressDialog();
+                //hideProgressDialog();
             }
             return page;
         }

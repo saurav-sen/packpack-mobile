@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <Preference
+    <com.pack.pack.application.view.ProfilePicturePreference
         android:id="@+id/profilePicPref"
         android:key="profilePicPref"
         android:summary="" />

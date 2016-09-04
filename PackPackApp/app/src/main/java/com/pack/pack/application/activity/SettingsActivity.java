@@ -49,7 +49,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     public void onBuildHeaders(List<Header> target) {
         super.onBuildHeaders(target);
         Header accountsHeader = new Header();
-        accountsHeader.fragment = "";
+        accountsHeader.fragment = "com.pack.pack.application.activity.SettingsActivity$AccountsFragment";
         accountsHeader.iconRes = getResources().getIdentifier("accounts_settings_icon", "drawable", this.getPackageName());
         accountsHeader.title = "Accounts";
         target.add(accountsHeader);

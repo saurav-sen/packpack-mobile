@@ -10,13 +10,13 @@ import android.widget.ImageView;
 
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
+import com.pack.pack.application.image.loader.DownloadImageTask;
+import com.pack.pack.model.web.JUser;
 
 /**
  * Created by Saurav on 03-09-2016.
  */
 public class ProfilePicturePreference extends Preference {
-
-    //private Drawable image;
 
     public ProfilePicturePreference(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
@@ -34,13 +34,12 @@ public class ProfilePicturePreference extends Preference {
     protected void onBindView(View view) {
         super.onBindView(view);
         ImageView profile_picture_pref = (ImageView) view.findViewById(R.id.profile_picture_pref);
-        /*if(profile_picture_pref != null && image != null) {
-            profile_picture_pref.setImageDrawable(image);
-        }*/
-    }
-
-    public void setImage(Drawable image) {
-        //this.image = image;
-        notifyChanged();
+        JUser user = AppController.getInstance().getUser();
+        if(user.getProfilePictureUrl() != null && !user.getProfilePictureUrl().isEmpty()) {
+            new DownloadImageTask(profile_picture_pref, getContext()).execute(user.getProfilePictureUrl());
+        }
+       else {
+            profile_picture_pref.setImageResource(R.drawable.default_profile_picture);
+        }
     }
 }
