@@ -2,6 +2,9 @@ package com.pack.pack.application.db;
 
 import android.content.ContentValues;
 
+import java.util.Collections;
+import java.util.List;
+
 /**
  * Created by Saurav on 04-07-2016.
  */
@@ -90,5 +93,10 @@ public class DiscussionInfo implements DbObject {
         contentValues.put(FROM_USERNAME, getFromUsername());
         contentValues.put(FROM_USER_FULL_NAME, getFromUserFullName());
         return contentValues;
+    }
+
+    @Override
+    public List<? extends DbObject> getChildrenObjects() {
+        return Collections.emptyList();
     }
 }

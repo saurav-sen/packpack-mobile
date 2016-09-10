@@ -2,6 +2,9 @@ package com.pack.pack.application.db;
 
 import android.content.ContentValues;
 
+import java.util.Collections;
+import java.util.List;
+
 /**
  * Created by Saurav on 27-06-2016.
  */
@@ -68,5 +71,10 @@ public class PaginationInfo implements DbObject {
         contentValues.put(NEXT_LINK, nextLink);
         contentValues.put(PREVIOUS_LINK, previousLink);
         return contentValues;
+    }
+
+    @Override
+    public List<? extends DbObject> getChildrenObjects() {
+        return Collections.emptyList();
     }
 }

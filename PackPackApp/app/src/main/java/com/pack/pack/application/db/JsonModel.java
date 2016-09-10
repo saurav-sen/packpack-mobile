@@ -3,6 +3,9 @@ package com.pack.pack.application.db;
 import android.content.ContentValues;
 import android.provider.BaseColumns;
 
+import java.util.Collections;
+import java.util.List;
+
 /**
  * Created by Saurav on 25-06-2016.
  */
@@ -90,5 +93,10 @@ public class JsonModel implements DbObject {
     @Override
     public String getTableName() {
         return TABLE_NAME;
+    }
+
+    @Override
+    public List<? extends DbObject> getChildrenObjects() {
+        return Collections.emptyList();
     }
 }

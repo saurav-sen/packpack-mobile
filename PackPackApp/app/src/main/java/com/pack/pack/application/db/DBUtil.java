@@ -31,6 +31,42 @@ public class DBUtil {
     private DBUtil() {
     }
 
+    private static List<UserOwnedTopicInfo> loadUserOwnedTopicInfos(SQLiteDatabase readable) {
+        Cursor cursor = null;
+        List<UserOwnedTopicInfo> userOwnedTopicInfos = new ArrayList<UserOwnedTopicInfo>();
+        try {
+            String[] projection = new String[] {UserOwnedTopicInfo._ID, UserOwnedTopicInfo.ENTITY_ID,
+                    UserOwnedTopicInfo.TABLE_NAME, UserOwnedTopicInfo.TOPIC_DESCRIPTION, UserOwnedTopicInfo.OWNER_ID,
+                    UserOwnedTopicInfo.TOPIC_CATEGORY, UserOwnedTopicInfo.TOPIC_WALLPAPER_URL};
+            try {
+                cursor = readable.query(UserOwnedTopicInfo.TABLE_NAME, projection, null, null,
+                        null, null, null);
+
+                if(cursor.moveToFirst()) {
+                    do {
+                        long id = cursor.getLong(cursor.getColumnIndexOrThrow(UserOwnedTopicInfo._ID));
+                        String topicId = cursor.getString(cursor.getColumnIndexOrThrow(UserOwnedTopicInfo.ENTITY_ID));
+                        String topicName = cursor.getString(cursor.getColumnIndexOrThrow(UserOwnedTopicInfo.TOPIC_NAME));
+                        String topicDescription = cursor.getString(cursor.getColumnIndexOrThrow(UserOwnedTopicInfo.TOPIC_DESCRIPTION));
+                        String ownerId = cursor.getString(cursor.getColumnIndexOrThrow(UserOwnedTopicInfo.OWNER_ID));
+                        String topicCategory = cursor.getString(cursor.getColumnIndexOrThrow(UserOwnedTopicInfo.TOPIC_CATEGORY));
+                        String topicWallpaperUrl = cursor.getString(cursor.getColumnIndexOrThrow(UserOwnedTopicInfo.TOPIC_WALLPAPER_URL));
+                        UserOwnedTopicInfo userOwnedTopicInfo = new UserOwnedTopicInfo(topicId, topicName, topicDescription,
+                                ownerId, topicCategory, topicWallpaperUrl);
+                        userOwnedTopicInfos.add(userOwnedTopicInfo);
+                    } while(cursor.moveToNext());
+                }
+            } finally {
+                if(cursor != null && !cursor.isClosed()) {
+                    cursor.close();
+                }
+            }
+        } catch (Exception e) {
+            Log.d(LOG_TAG, e.getMessage());
+        }
+        return userOwnedTopicInfos;
+    }
+
     public static UserInfo loadLastLoggedInUserInfo(SQLiteDatabase readable) {
         Cursor cursor = null;
         try {
@@ -50,7 +86,10 @@ public class DBUtil {
                         String accessToken = cursor.getString(cursor.getColumnIndexOrThrow(UserInfo.ACCESS_TOKEN));
                         String accessTokenSecret = cursor.getString(cursor.getColumnIndexOrThrow(UserInfo.ACCESS_TOKEN_SECRET));
                         String followedCategories = cursor.getString(cursor.getColumnIndexOrThrow(UserInfo.FOLLWED_CATEGORIES));
-                        return new UserInfo(userName, password, userId, accessToken, accessTokenSecret, followedCategories);
+                        UserInfo userInfo = new UserInfo(userName, password, userId, accessToken, accessTokenSecret, followedCategories);
+                        List<UserOwnedTopicInfo> userOwnedTopicInfos = loadUserOwnedTopicInfos(readable);
+                        userInfo.setUserOwnedTopicInfos(userOwnedTopicInfos);
+                        return userInfo;
                     } while(cursor.moveToNext());
                 }
             } finally {
@@ -124,6 +163,26 @@ public class DBUtil {
         user.setId(userInfo.getEntityId());
         user.setUsername(userInfo.getUsername());
         return user;
+    }
+
+    public static List<JTopic> convertUserOwnedTopicInfo(List<UserOwnedTopicInfo> userOwnedTopicInfos) {
+        List<JTopic> result = new ArrayList<JTopic>();
+        if(userOwnedTopicInfos != null && !userOwnedTopicInfos.isEmpty()) {
+            for(UserOwnedTopicInfo userOwnedTopicInfo : userOwnedTopicInfos) {
+                result.add(convertUserOwnedTopicInfo(userOwnedTopicInfo));
+            }
+        }
+        return result;
+    }
+
+    private static JTopic convertUserOwnedTopicInfo(UserOwnedTopicInfo userOwnedTopicInfo) {
+        JTopic topic = new JTopic();
+        topic.setId(userOwnedTopicInfo.getId());
+        topic.setName(userOwnedTopicInfo.getName());
+        topic.setDescription(userOwnedTopicInfo.getDescription());
+        topic.setCategory(userOwnedTopicInfo.getCategory());
+        topic.setWallpaperUrl(userOwnedTopicInfo.getWallpaperUrl());
+        return topic;
     }
 
     public static <T> T loadJsonModelByEntityId(SQLiteDatabase writable, String entityId, Class<T> classType) {

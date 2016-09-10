@@ -2,6 +2,9 @@ package com.pack.pack.application.db;
 
 import android.content.ContentValues;
 
+import java.util.Collections;
+import java.util.List;
+
 /**
  * Created by Saurav on 28-06-2016.
  */
@@ -48,5 +51,10 @@ public class ResourceURL implements DbObject {
     @Override
     public String getTableName() {
         return TABLE_NAME;
+    }
+
+    @Override
+    public List<? extends DbObject> getChildrenObjects() {
+        return Collections.emptyList();
     }
 }

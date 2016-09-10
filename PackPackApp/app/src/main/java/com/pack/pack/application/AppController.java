@@ -8,6 +8,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
 import com.pack.pack.model.web.JPackAttachment;
+import com.pack.pack.model.web.JTopic;
 import com.pack.pack.model.web.JUser;
 
 import java.util.ArrayList;
@@ -70,6 +71,12 @@ public class AppController extends Application {
     private String oAuthToken;
 
     private JUser user;
+
+    public List<JTopic> getUserOwnedTopics() {
+        return userOwnedTopics;
+    }
+
+    private List<JTopic> userOwnedTopics = new ArrayList<JTopic>();
 
     public JUser getUser() {
         return user;

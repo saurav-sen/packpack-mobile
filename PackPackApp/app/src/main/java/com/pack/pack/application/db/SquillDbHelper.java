@@ -28,6 +28,14 @@ public class SquillDbHelper extends SQLiteOpenHelper {
                         + UserInfo.ACCESS_TOKEN_SECRET + " TEXT, "
                         + UserInfo.FOLLWED_CATEGORIES + " TEXT)";
 
+        public static final String USER_OWNED_TOPIC_INFO =
+                "CREATE TABLE " + UserOwnedTopicInfo.TABLE_NAME + " (" + UserOwnedTopicInfo._ID
+                        + " INTEGER PRIMARY KEY, " + UserOwnedTopicInfo.ENTITY_ID + " TEXT, "
+                        + UserOwnedTopicInfo.TOPIC_NAME + " TEXT, " + UserOwnedTopicInfo.TOPIC_DESCRIPTION
+                        + " TEXT, " + UserOwnedTopicInfo.OWNER_ID + " TEXT, "
+                        + UserOwnedTopicInfo.TOPIC_CATEGORY + " TEXT, "
+                        + UserOwnedTopicInfo.TOPIC_WALLPAPER_URL + " TEXT)";
+
         public static final String ATTACHMENT_INFO =
                 "CREATE TABLE " + AttachmentInfo.TABLE_NAME + "(" + AttachmentInfo._ID
                         + " INTEGER PRIMARY KEY, " + AttachmentInfo.ENTITY_ID + " TEXT, "
@@ -62,6 +70,9 @@ public class SquillDbHelper extends SQLiteOpenHelper {
         public static final String USER_INFO =
                 "DROP TABLE IF EXISTS " + UserInfo.TABLE_NAME;
 
+        public static final String USER_OWNED_TOPIC_INFO =
+                "DROP TABLE IF EXISTS " + UserOwnedTopicInfo.TABLE_NAME;
+
         public static final String ATTACHMENT_INFO =
                 "DROP TABLE IF EXISTS " + AttachmentInfo.TABLE_NAME;
 
@@ -91,6 +102,7 @@ public class SquillDbHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CreateQueries.JSON_MODEL);
         db.execSQL(CreateQueries.USER_INFO);
+        db.execSQL(CreateQueries.USER_OWNED_TOPIC_INFO);
         db.execSQL(CreateQueries.ATTACHMENT_INFO);
         db.execSQL(CreateQueries.PAGINATION_INFO);
         db.execSQL(CreateQueries.RESOURCE_URL);
@@ -101,6 +113,7 @@ public class SquillDbHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL(DeleteQueries.JSON_MODEL);
         db.execSQL(DeleteQueries.USER_INFO);
+        db.execSQL(DeleteQueries.USER_OWNED_TOPIC_INFO);
         db.execSQL(DeleteQueries.ATTACHMENT_INFO);
         db.execSQL(DeleteQueries.PAGINATION_INFO);
         db.execSQL(DeleteQueries.RESOURCE_URL);

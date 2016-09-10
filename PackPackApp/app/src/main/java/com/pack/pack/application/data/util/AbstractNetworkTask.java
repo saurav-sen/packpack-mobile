@@ -210,6 +210,12 @@ public abstract class AbstractNetworkTask<X, Y, Z> extends AsyncTask<X, Y, Z> {
             if(__dbObject == null)
                 return;
             storeResultsInDb_0(__dbObject);
+            List<? extends DbObject> __dbObjects = __dbObject.getChildrenObjects();
+            if(__dbObjects != null && !__dbObjects.isEmpty()) {
+                for(DbObject obj : __dbObjects) {
+                    storeResultsInDb_0(obj);
+                }
+            }
         }
     }
 

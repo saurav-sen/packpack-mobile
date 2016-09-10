@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <SwitchPreference
+        android:key="allow_followers_to_promote"
+        android:title="Allow Topic Followers To Promote"
+        android:defaultValue="false"/>
+
+    <EditTextPreference
+        android:key="number_of_promotions"
+        android:title="Number of promotions"
+        android:capitalize="words"
+        android:defaultValue="500"
+        android:inputType="number"
+        android:singleLine="true"/>
+
+    <SwitchPreference
+        android:key="enable_live_streaming_service"
+        android:title="Enable Live Streaming Service"
+        android:defaultValue="false"/>
+
+    <SwitchPreference
+        android:key="enable_notification_service"
+        android:title="Enable Notification Service"
+        android:defaultValue="false"/>
+
+</PreferenceScreen>

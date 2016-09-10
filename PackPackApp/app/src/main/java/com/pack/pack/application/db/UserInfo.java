@@ -3,6 +3,10 @@ package com.pack.pack.application.db;
 import android.content.ContentValues;
 import android.provider.BaseColumns;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * Created by Saurav on 10-04-2016.
  */
@@ -26,6 +30,19 @@ public class UserInfo implements DbObject {
     private String accessToken;
 
     private String accessTokenSecret;
+
+    public List<UserOwnedTopicInfo> getUserOwnedTopicInfos() {
+        if(userOwnedTopicInfos == null) {
+            userOwnedTopicInfos = new ArrayList<UserOwnedTopicInfo>();
+        }
+        return userOwnedTopicInfos;
+    }
+
+    public void setUserOwnedTopicInfos(List<UserOwnedTopicInfo> userOwnedTopicInfos) {
+        this.userOwnedTopicInfos = userOwnedTopicInfos;
+    }
+
+    private List<UserOwnedTopicInfo> userOwnedTopicInfos;
 
     public String getFollowedCategories() {
         return followedCategories;
@@ -120,5 +137,10 @@ public class UserInfo implements DbObject {
     @Override
     public String getTableName() {
         return TABLE_NAME;
+    }
+
+    @Override
+    public List<? extends DbObject> getChildrenObjects() {
+        return getUserOwnedTopicInfos();
     }
 }

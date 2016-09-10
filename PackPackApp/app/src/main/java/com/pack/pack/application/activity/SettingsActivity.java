@@ -28,7 +28,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
     @Override
     protected boolean isValidFragment(String fragmentName) {
-        return AccountsFragment.class.getName().equals(fragmentName);
+        return AccountsFragment.class.getName().equals(fragmentName) || TopicSettingsFragment.class.getName().equals(fragmentName);
     }
 
     private static void bindPreferenceSummaryToValue(Preference preference) {
@@ -48,11 +48,21 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public void onBuildHeaders(List<Header> target) {
         super.onBuildHeaders(target);
-        Header accountsHeader = new Header();
-        accountsHeader.fragment = "com.pack.pack.application.activity.SettingsActivity$AccountsFragment";
-        accountsHeader.iconRes = getResources().getIdentifier("accounts_settings_icon", "drawable", this.getPackageName());
-        accountsHeader.title = "Accounts";
-        target.add(accountsHeader);
+
+        {
+            Header accountsHeader = new Header();
+            accountsHeader.fragment = "com.pack.pack.application.activity.SettingsActivity$AccountsFragment";
+            accountsHeader.iconRes = getResources().getIdentifier("accounts_settings_icon", "drawable", this.getPackageName());
+            accountsHeader.title = "Accounts";
+        }
+
+        {
+            Header topicSettingsHeader = new Header();
+            topicSettingsHeader.fragment = "com.pack.pack.application.activity.SettingsActivity$TopicSettingsFragment";
+            topicSettingsHeader.iconRes = getResources().getIdentifier("accounts_settings_icon", "drawable", this.getPackageName());
+            topicSettingsHeader.title = "Topic";
+            target.add(topicSettingsHeader);
+        }
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
@@ -66,6 +76,21 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             bindPreferenceSummaryToValue(findPreference("display_name"));
             bindPreferenceSummaryToValue(findPreference("user_address"));
             bindPreferenceSummaryToValue(findPreference("profilePicPref"));
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    public static class TopicSettingsFragment extends PreferenceFragment {
+
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            addPreferencesFromResource(R.xml.pref_topics);
+
+            bindPreferenceSummaryToValue(findPreference("allow_followers_to_promote"));
+            bindPreferenceSummaryToValue(findPreference("number_of_promotions"));
+            bindPreferenceSummaryToValue(findPreference("enable_live_streaming_service"));
+            bindPreferenceSummaryToValue(findPreference("enable_notification_service"));
         }
     }
 }
