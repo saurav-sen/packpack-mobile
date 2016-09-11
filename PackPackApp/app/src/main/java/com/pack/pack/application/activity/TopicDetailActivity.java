@@ -15,6 +15,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -110,8 +111,11 @@ public class TopicDetailActivity extends AppCompatActivity implements OnMapReady
         topic_description_text.setText((topic.getDescription() + "").trim());
 
         ImageView topic_wallpaper_img = (ImageView) findViewById(R.id.topic_wallpaper_img);
-        new DownloadImageTask(topic_wallpaper_img, this).execute(topic.getWallpaperUrl());
 
+        ProgressBar topic_detail_loading_progress = (ProgressBar) findViewById(R.id.topic_detail_loading_progress);
+        topic_detail_loading_progress.setVisibility(View.VISIBLE);
+
+        new DownloadImageTask(topic_wallpaper_img, this, topic_detail_loading_progress).execute(topic.getWallpaperUrl());
 
         ImageButton enterTopic = (ImageButton) findViewById(R.id.enter_topic_detail);
         enterTopic.setOnClickListener(new View.OnClickListener() {

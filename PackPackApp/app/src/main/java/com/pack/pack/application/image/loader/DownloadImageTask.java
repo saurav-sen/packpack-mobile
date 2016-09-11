@@ -7,7 +7,9 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.data.util.AbstractNetworkTask;
@@ -40,18 +42,30 @@ public class DownloadImageTask extends AbstractNetworkTask<String, Void, Bitmap>
 
     private String errorMsg;
 
+    private ProgressBar progressBar;
+
     private static final String LOG_TAG = "DownloadImageTask";
 
     public DownloadImageTask(ImageView imageView, Context context) {
-        this(imageView, -1, -1, context);
+        this(imageView, context, null);
+        //this(imageView, 900, 700, context);
+    }
+
+    public DownloadImageTask(ImageView imageView, Context context, ProgressBar progressBar) {
+        this(imageView, -1, -1, context, progressBar);
         //this(imageView, 900, 700, context);
     }
 
     public DownloadImageTask(ImageView imageView, int imageWidth, int imageHeight, Context context) {
+        this(imageView, imageWidth, imageHeight, context, null);
+    }
+
+    public DownloadImageTask(ImageView imageView, int imageWidth, int imageHeight, Context context, ProgressBar progressBar) {
         super(false, false, context);
         this.imageView = imageView;
         this.imageWidth = imageWidth;
         this.imageHeight = imageHeight;
+        this.progressBar = progressBar;
     }
 
     @Override
@@ -181,7 +195,11 @@ public class DownloadImageTask extends AbstractNetworkTask<String, Void, Bitmap>
 
     @Override
     protected void onPostExecute(Bitmap bitmap) {
+        if(progressBar != null) {
+            progressBar.setVisibility(View.GONE);
+        }
         imageView.setImageBitmap(bitmap);
+        imageView.setVisibility(View.VISIBLE);
         super.onPostExecute(bitmap);
     }
 }

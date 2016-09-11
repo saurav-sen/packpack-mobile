@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.android.volley.toolbox.NetworkImageView;
@@ -68,6 +69,7 @@ public class TopicViewAdapter extends ArrayAdapter<JTopic> {
         TextView descriptionTextView = (TextView) convertView.findViewById(ViewUtil.getViewId(categoryType, "topic_description"));
        // TextView followersTextView = (TextView) convertView.findViewById(R.id.topic_followers);
         ImageView poster = (ImageView) convertView.findViewById(ViewUtil.getViewId(categoryType, "topicPoster"));
+        ProgressBar loadingProgres = (ProgressBar) convertView.findViewById(ViewUtil.getViewId(categoryType, "loading_progress"));
 
         ImageView followSign = (ImageView) convertView.findViewById(ViewUtil.getViewId(categoryType, "follow_sign"));
 
@@ -77,7 +79,7 @@ public class TopicViewAdapter extends ArrayAdapter<JTopic> {
             descriptionTextView.setText(topic.getDescription());
            // followersTextView.setText(String.valueOf(topic.getFollowers()));
             if(topic.getWallpaperUrl() != null && !topic.getWallpaperUrl().trim().equals("")) {
-                new DownloadImageTask(poster, 1000, 700, TopicViewAdapter.this.activity)
+                new DownloadImageTask(poster, 1000, 700, TopicViewAdapter.this.activity, loadingProgres)
                         .execute(topic.getWallpaperUrl());
             }
             if(topic.isFollowing()) {

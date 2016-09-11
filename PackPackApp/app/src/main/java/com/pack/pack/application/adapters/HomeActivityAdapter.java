@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.android.volley.toolbox.ImageLoader;
@@ -39,6 +40,8 @@ public class HomeActivityAdapter extends ArrayAdapter<JRssFeed> {
     private TextView home_rss_feed__name;
     private ImageView home_rss_feed_image;
     private TextView home_rss_feed_description;
+
+    private ProgressBar loading_progress;
 
     private List<JRssFeed> feeds;
 
@@ -77,13 +80,15 @@ public class HomeActivityAdapter extends ArrayAdapter<JRssFeed> {
         home_rss_feed__name = (TextView) convertView.findViewById(R.id.home_rss_feed__name);
         home_rss_feed_image = (ImageView) convertView.findViewById(R.id.home_rss_feed_image);
         home_rss_feed_description = (TextView) convertView.findViewById(R.id.home_rss_feed_description);
+        loading_progress = (ProgressBar) convertView.findViewById(R.id.loading_progress);
+        loading_progress.setVisibility(View.VISIBLE);
         final JRssFeed feed = getItem(position);
         if(feed != null) {
             home_rss_feed__name.setText(feed.getOgTitle());
             home_rss_feed_description.setText(feed.getOgDescription());
             final String imageUrl = feed.getOgImage();
             if(imageUrl != null && !imageUrl.trim().isEmpty()) {
-                new DownloadFeedImageTask(home_rss_feed_image, 850, 600, HomeActivityAdapter.this.activity)
+                new DownloadFeedImageTask(home_rss_feed_image, 850, 600, HomeActivityAdapter.this.activity, loading_progress)
                         .execute(imageUrl);
                 home_rss_feed_image.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -100,8 +105,8 @@ public class HomeActivityAdapter extends ArrayAdapter<JRssFeed> {
 
     private class DownloadFeedImageTask extends DownloadImageTask {
 
-        public DownloadFeedImageTask(ImageView imageView, int imageWidth, int imageHeight, Context context) {
-            super(imageView, imageWidth, imageHeight, context);
+        public DownloadFeedImageTask(ImageView imageView, int imageWidth, int imageHeight, Context context, ProgressBar progressBar) {
+            super(imageView, imageWidth, imageHeight, context, progressBar);
         }
 
         @Override

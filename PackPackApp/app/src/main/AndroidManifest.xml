@@ -82,7 +82,7 @@
 
         <activity
             android:name=".activity.SettingsActivity"
-            android:label="SettingsActivity" />
+            android:label="Settings" />
 
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"

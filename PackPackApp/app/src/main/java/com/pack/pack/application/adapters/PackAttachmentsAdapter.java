@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.pack.pack.application.AppController;
@@ -108,6 +109,8 @@ public class PackAttachmentsAdapter extends ArrayAdapter<JPackAttachment> {
             }
         });
 
+        final ProgressBar pack_loading_progress = (ProgressBar) convertView.findViewById(R.id.pack_loading_progress);
+
         final Button pack_attachment_like = (Button) convertView.findViewById(R.id.pack_attachment_like);
         pack_attachment_like.setTag("NotLiked");
         pack_attachment_like.setOnClickListener(new View.OnClickListener() {
@@ -154,13 +157,22 @@ public class PackAttachmentsAdapter extends ArrayAdapter<JPackAttachment> {
         if(attachment != null) {
             pack_attachment_title.setText(attachment.getTitle() + "");
             pack_attachment_description.setText(attachment.getDescription() + "");
-            String url = attachment.getAttachmentUrl();
+            String url = null;
             if(PackAttachmentType.VIDEO.name().equals(attachment.getMimeType())) {
                 url = attachment.getAttachmentThumbnailUrl();
+                pack_attachment_img.setVisibility(View.GONE);
+                pack_loading_progress.setVisibility(View.GONE);
                 pack_attachment_video_play.setVisibility(View.VISIBLE);
+            } else if(PackAttachmentType.IMAGE.name().equals(attachment.getMimeType())) {
+                url = attachment.getAttachmentUrl();
+                pack_attachment_video_play.setVisibility(View.GONE);
+                pack_loading_progress.setVisibility(View.GONE);
+                pack_attachment_img.setVisibility(View.VISIBLE);
             }
-            new DownloadImageTask(pack_attachment_img, 700, 600, PackAttachmentsAdapter.this.getContext())
-                    .execute(url);
+            if(url != null) {
+                new DownloadImageTask(pack_attachment_img, 700, 600, PackAttachmentsAdapter.this.getContext(), pack_loading_progress)
+                        .execute(url);
+            }
         }
         return convertView;
     }

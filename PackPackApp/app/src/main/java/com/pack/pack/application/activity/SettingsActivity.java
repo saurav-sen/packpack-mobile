@@ -8,7 +8,9 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.support.v7.app.ActionBar;
 
+import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
+import com.pack.pack.model.web.JTopic;
 
 import java.util.List;
 
@@ -54,14 +56,20 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             accountsHeader.fragment = "com.pack.pack.application.activity.SettingsActivity$AccountsFragment";
             accountsHeader.iconRes = getResources().getIdentifier("accounts_settings_icon", "drawable", this.getPackageName());
             accountsHeader.title = "Accounts";
+            target.add(accountsHeader);
         }
 
         {
-            Header topicSettingsHeader = new Header();
-            topicSettingsHeader.fragment = "com.pack.pack.application.activity.SettingsActivity$TopicSettingsFragment";
-            topicSettingsHeader.iconRes = getResources().getIdentifier("accounts_settings_icon", "drawable", this.getPackageName());
-            topicSettingsHeader.title = "Topic";
-            target.add(topicSettingsHeader);
+            List<JTopic> userOwnedTopics = AppController.getInstance().getUserOwnedTopics();
+            if(userOwnedTopics != null && !userOwnedTopics.isEmpty()) {
+                for(JTopic userOwnedTopic : userOwnedTopics) {
+                    Header topicSettingsHeader = new Header();
+                    topicSettingsHeader.fragment = "com.pack.pack.application.activity.SettingsActivity$TopicSettingsFragment";
+                    topicSettingsHeader.iconRes = getResources().getIdentifier("topic_settings_icon", "drawable", this.getPackageName());
+                    topicSettingsHeader.title = userOwnedTopic.getName();
+                    target.add(topicSettingsHeader);
+                }
+            }
         }
     }
 

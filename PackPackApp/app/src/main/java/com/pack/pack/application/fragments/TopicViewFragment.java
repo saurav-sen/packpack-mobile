@@ -36,7 +36,7 @@ import java.util.Map;
  */
 public abstract class TopicViewFragment extends Fragment {
 
-    private ProgressDialog progressDialog;
+    // private ProgressDialog progressDialog;
 
     private ListView listView;
 
@@ -231,14 +231,14 @@ public abstract class TopicViewFragment extends Fragment {
     }
 
     private void showProgressDialog() {
-        TopicViewFragment.this.getActivity().runOnUiThread(new Runnable() {
+        /*TopicViewFragment.this.getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 progressDialog = new ProgressDialog(getActivity());
                 progressDialog.setMessage("Loading...");
                 progressDialog.show();
             }
-        });
+        });*/
     }
 
     /*private void loadPreviousPage() {
@@ -261,7 +261,7 @@ public abstract class TopicViewFragment extends Fragment {
     }*/
 
     private void hideProgressDialog() {
-        TopicViewFragment.this.getActivity().runOnUiThread(new Runnable() {
+        /*TopicViewFragment.this.getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 if(progressDialog != null) {
@@ -269,6 +269,6 @@ public abstract class TopicViewFragment extends Fragment {
                     progressDialog = null;
                 }
             }
-        });
+        });*/
     }
 }
