@@ -56,6 +56,12 @@ public abstract class TopicViewFragment extends Fragment {
     }
 
     @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        //outState.
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(getViewLayoutId(), container, false);
         listView = (ListView) view.findViewById(getListViewId());
