@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
@@ -67,7 +68,7 @@ public class UploadActivity extends Activity {
     private VideoView upload_videoPreview;
     private EditText upload_title;
     private EditText upload_description;
-    private Button upload_submit;
+    private AppCompatButton upload_submit;
     private ProgressBar upload_progressBar;
 
     private static final String LOG_TAG = "UploadActivity";
@@ -86,7 +87,7 @@ public class UploadActivity extends Activity {
         description = getIntent().getStringExtra(UPLOAD_ATTACHMENT_DESCRIPTION) + "";
 
         upload_txtPercentage = (TextView) findViewById(R.id.upload_txtPercentage);
-        upload_submit = (Button) findViewById(R.id.upload_submit);
+        upload_submit = (AppCompatButton) findViewById(R.id.upload_submit);
         upload_progressBar = (ProgressBar) findViewById(R.id.upload_progressBar);
         upload_imgPreview = (ImageView) findViewById(R.id.upload_imgPreview);
         upload_videoPreview = (VideoView) findViewById(R.id.upload_videoPreview);

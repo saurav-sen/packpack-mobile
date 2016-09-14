@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
@@ -34,7 +35,7 @@ public class CreatePackActivity extends AppCompatActivity implements IAsyncTaskS
 
     private EditText pack_description;
 
-    private Button pack_create_submit;
+    private AppCompatButton pack_create_submit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +48,7 @@ public class CreatePackActivity extends AppCompatActivity implements IAsyncTaskS
 
         pack_title = (EditText) findViewById(R.id.pack_title);
         pack_description = (EditText) findViewById(R.id.pack_description);
-        pack_create_submit = (Button) findViewById(R.id.pack_create_submit);
+        pack_create_submit = (AppCompatButton) findViewById(R.id.pack_create_submit);
         pack_create_submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

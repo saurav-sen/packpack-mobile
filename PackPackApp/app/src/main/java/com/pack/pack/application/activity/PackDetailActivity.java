@@ -144,6 +144,9 @@ public class PackDetailActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                break;
             case R.id.app_settings:
                 Intent intent = new Intent(PackDetailActivity.this, SettingsActivity.class);
                 startActivity(intent);

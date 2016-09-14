@@ -127,6 +127,9 @@ public class InsideTopicActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                break;
             case R.id.enter_forum:
                 Intent intent = new Intent(InsideTopicActivity.this, DiscussionViewActivity.class);
                 intent.putExtra(Constants.DISCUSSION_ENTITY_ID, topic.getTopicId());

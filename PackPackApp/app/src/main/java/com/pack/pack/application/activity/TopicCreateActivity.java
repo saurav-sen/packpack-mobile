@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.AppCompatButton;
 import android.text.SpannableString;
 import android.text.style.UnderlineSpan;
 import android.util.Log;
@@ -59,7 +60,7 @@ public class TopicCreateActivity extends AppCompatActivity implements IAsyncTask
     private TextView topic_create_txtPercentage;
     private ProgressBar topic_create_progressBar;
 
-    private Button topic_create_submit;
+    private AppCompatButton topic_create_submit;
 
     private File mediaFile;
 
@@ -93,7 +94,7 @@ public class TopicCreateActivity extends AppCompatActivity implements IAsyncTask
 
         topic_create_txtPercentage = (TextView) findViewById(R.id.topic_create_txtPercentage);
         topic_create_progressBar = (ProgressBar) findViewById(R.id.topic_create_progressBar);
-        topic_create_submit = (Button) findViewById(R.id.topic_create_submit);
+        topic_create_submit = (AppCompatButton) findViewById(R.id.topic_create_submit);
 
         wallpaper_select.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -77,6 +77,9 @@ public class TopicDetailActivity extends AppCompatActivity implements OnMapReady
    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                break;
             case R.id.enter_forum:
                 Intent intent = new Intent(TopicDetailActivity.this, DiscussionViewActivity.class);
                 intent.putExtra(Constants.DISCUSSION_ENTITY_ID, topic.getTopicId());

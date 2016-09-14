@@ -58,7 +58,7 @@
             android:layout_marginBottom="35dp"
             android:visibility="gone"/>
 
-        <Button
+        <android.support.v7.widget.AppCompatButton
             android:id="@+id/upload_submit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

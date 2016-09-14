@@ -97,6 +97,16 @@ public class DiscussionViewActivity extends AppCompatActivity implements IAsyncT
     }
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putCharSequence(Constants.DISCUSSION_ENTITY_ID, entityId);
