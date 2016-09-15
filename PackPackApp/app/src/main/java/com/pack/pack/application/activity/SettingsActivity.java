@@ -2,6 +2,9 @@ package com.pack.pack.application.activity;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -11,21 +14,28 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
 import android.preference.SwitchPreference;
+import android.provider.MediaStore;
 import android.support.v7.app.ActionBar;
 import android.text.InputType;
 import android.util.Log;
+import android.widget.BaseAdapter;
 
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
 import com.pack.pack.application.data.util.ApiConstants;
 import com.pack.pack.application.topic.activity.model.ParcelableTopic;
+import com.pack.pack.application.view.ProfilePicturePreference;
 import com.pack.pack.client.api.API;
 import com.pack.pack.client.api.APIBuilder;
 import com.pack.pack.client.api.APIConstants;
 import com.pack.pack.client.api.COMMAND;
 import com.pack.pack.model.web.JTopic;
 
+import java.util.LinkedList;
 import java.util.List;
+
+import static com.pack.pack.application.AppController.CAMERA_CAPTURE_PHOTO_REQUEST_CODE;
+import static com.pack.pack.application.AppController.CROP_PHOTO_REQUEST_CODE;
 
 /**
  * Created by Saurav on 03-09-2016.
@@ -36,16 +46,33 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
     private static final String DISPLAY_NAME = "display_name";
     private static final String USER_ADDRESS = "user_address";
-    private static final String PROFILE_PICTURE = "profilePicPref";
+    public static final String PROFILE_PICTURE = "profilePicPref";
+
+    public static final String PREFERENCE_KEY = "preference_key";
+
+    public static final String PROFILE_PICTURE_CHANGE_KEY = "profilePictureChange";
+    public static final String PROFILE_PICTURE_CROP_KEY = "profilePictureCrop";
+
+    private List<SettingsChangeListener> listeners;
+
+    public void addSettingsChangeListener(SettingsChangeListener listener) {
+        if(listeners == null) {
+            listeners = new LinkedList<SettingsChangeListener>();
+        }
+        if(listener == null) {
+            return;
+        }
+        listeners.add(listener);
+    }
 
     private static Preference.OnPreferenceChangeListener onPreferenceChangeListener = new Preference.OnPreferenceChangeListener() {
         @Override
         public boolean onPreferenceChange(Preference preference, Object o) {
             String key = preference.getKey();
             String value = o.toString();
-            preference.setDefaultValue(value);
             ParcelableTopic topic = (ParcelableTopic) preference.getExtras().getParcelable(PARCELABLE_TOPIC_KEY);
             if(topic != null) {
+                preference.setDefaultValue(value);
                 key = key.substring(key.indexOf(".")+1);
                 TopicPreferenceSettings[] topicPreferenceSettingses = new TopicPreferenceSettings[] {
                         new TopicPreferenceSettings(key, value, topic.getTopicId())};
@@ -70,6 +97,34 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         ActionBar actionBar = getSupportActionBar();
         if(actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == CROP_PHOTO_REQUEST_CODE) {
+            if(resultCode == RESULT_OK) {
+                Bundle extras = data.getExtras();
+                Bitmap bitmap = extras.getParcelable("data");
+                String preferenceKey = PROFILE_PICTURE_CHANGE_KEY;
+                fireOnPreferenceChangeListeners(preferenceKey, bitmap);
+                finish();
+                startActivity(getIntent());
+            }
+        } else if(requestCode == CAMERA_CAPTURE_PHOTO_REQUEST_CODE) {
+            if(resultCode == RESULT_OK) {
+                fireOnPreferenceChangeListeners(PROFILE_PICTURE_CROP_KEY, null);
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private void fireOnPreferenceChangeListeners(String preferenceKey, Bitmap bitmap) {
+        if(listeners == null || listeners.isEmpty()) {
+            return;
+        }
+        for(SettingsChangeListener listener : listeners) {
+            listener.onChange(preferenceKey, bitmap);
         }
     }
 
@@ -113,7 +168,9 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
             bindPreferenceSummaryToValue(findPreference(DISPLAY_NAME));
             bindPreferenceSummaryToValue(findPreference(USER_ADDRESS));
-            bindPreferenceSummaryToValue(findPreference(PROFILE_PICTURE));
+            ProfilePicturePreference profilePicturePreference = (ProfilePicturePreference) findPreference(PROFILE_PICTURE);
+            bindPreferenceSummaryToValue(profilePicturePreference);
+            ((SettingsActivity) getActivity()).addSettingsChangeListener(profilePicturePreference);
         }
     }
 
@@ -253,5 +310,10 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             }
             return null;
         }
+    }
+
+    public static interface SettingsChangeListener {
+
+        public void onChange(String preferenceKey, Object data);
     }
 }

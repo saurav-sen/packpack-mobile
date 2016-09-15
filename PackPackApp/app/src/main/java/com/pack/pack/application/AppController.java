@@ -1,6 +1,7 @@
 package com.pack.pack.application;
 
 import android.app.Application;
+import android.graphics.Bitmap;
 import android.text.TextUtils;
 
 import com.android.volley.Request;
@@ -45,6 +46,8 @@ public class AppController extends Application {
     public static final int CREATE_TOPIC_REQUSET_CODE = 401;
 
     public static final int IMAGE_PICK_REQUSET_CODE = 402;
+
+    public static final int CROP_PHOTO_REQUEST_CODE = 420;
 
     public static final String UPLOAD_FILE_PATH = "upload_file_path";
 

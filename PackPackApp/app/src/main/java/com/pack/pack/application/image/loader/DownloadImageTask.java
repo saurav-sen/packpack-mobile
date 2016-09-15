@@ -198,8 +198,10 @@ public class DownloadImageTask extends AbstractNetworkTask<String, Void, Bitmap>
         if(progressBar != null) {
             progressBar.setVisibility(View.GONE);
         }
-        imageView.setImageBitmap(bitmap);
-        imageView.setVisibility(View.VISIBLE);
+        if(imageView != null) {
+            imageView.setImageBitmap(bitmap);
+            imageView.setVisibility(View.VISIBLE);
+        }
         super.onPostExecute(bitmap);
     }
 }

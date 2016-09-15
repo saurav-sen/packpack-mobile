@@ -1,19 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="400dp"
+    android:layout_height="wrap_content"
     android:paddingTop="10dp"
     android:paddingBottom="20dp">
 
     <ImageView
         android:id="@+id/profile_picture_pref"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"/>
+        android:layout_centerVertical="false"/>
 
     <ImageButton
-        android:layout_width="5dp"
-        android:layout_height="5dp"
-        android:src="@android:drawable/ic_menu_edit"/>
+        android:id="@+id/profile_picture_pref_camera"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@android:drawable/ic_menu_camera"
+        android:background="@drawable/rounded_image_button"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"/>
 </RelativeLayout>
