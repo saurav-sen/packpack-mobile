@@ -46,8 +46,7 @@ public class ProfilePicturePreference extends Preference implements SettingsActi
         if(SettingsActivity.PROFILE_PICTURE_CHANGE_KEY.equals(preferenceKey)) {
             Bitmap bitmap = (Bitmap) data;
             //bitmap = Bitmap.createScaledBitmap(bitmap, 200, 200, false);
-            ProfilePicturePreferenceCache.INSTANCE.uploadUserProfilePicture(getContext(),
-                    AppController.getInstance().getUser(), bitmap);
+            ProfilePicturePreferenceCache.INSTANCE.uploadUserProfilePicture(getContext(), bitmap);
         } else if(SettingsActivity.PROFILE_PICTURE_CROP_KEY.equals(preferenceKey)) {
             cropPhoto();
         }
