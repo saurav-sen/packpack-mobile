@@ -30,6 +30,8 @@ import com.pack.pack.client.api.APIBuilder;
 import com.pack.pack.client.api.APIConstants;
 import com.pack.pack.client.api.COMMAND;
 import com.pack.pack.model.web.JTopic;
+import com.pack.pack.model.web.JUser;
+import com.pack.pack.model.web.dto.UserSettings;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -44,8 +46,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
     private static final String PARCELABLE_TOPIC_KEY = "topic";
 
-    private static final String DISPLAY_NAME = "display_name";
-    private static final String USER_ADDRESS = "user_address";
     public static final String PROFILE_PICTURE = "profilePicPref";
 
     public static final String PREFERENCE_KEY = "preference_key";
@@ -68,15 +68,21 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     private static Preference.OnPreferenceChangeListener onPreferenceChangeListener = new Preference.OnPreferenceChangeListener() {
         @Override
         public boolean onPreferenceChange(Preference preference, Object o) {
+            if(preference instanceof ProfilePicturePreference) {
+                return true;
+            }
             String key = preference.getKey();
             String value = o.toString();
+            preference.setDefaultValue(value);
             ParcelableTopic topic = (ParcelableTopic) preference.getExtras().getParcelable(PARCELABLE_TOPIC_KEY);
             if(topic != null) {
-                preference.setDefaultValue(value);
                 key = key.substring(key.indexOf(".")+1);
                 TopicPreferenceSettings[] topicPreferenceSettingses = new TopicPreferenceSettings[] {
                         new TopicPreferenceSettings(key, value, topic.getTopicId())};
                 new UpdateTopicSettingsTask().execute(topicPreferenceSettingses);
+            } else if(UserSettings.DISPLAY_NAME.equals(key) || UserSettings.USER_ADDRESS.equals(key)){
+                PreferenceObj preferenceObj = new PreferenceObj(key, value);
+                new UpdateUserSettings().execute(preferenceObj);
             }
             return true;
         }
@@ -166,10 +172,29 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.pref_accounts);
 
-            bindPreferenceSummaryToValue(findPreference(DISPLAY_NAME));
-            bindPreferenceSummaryToValue(findPreference(USER_ADDRESS));
+            Preference displayName = findPreference(UserSettings.DISPLAY_NAME);
+            JUser user = AppController.getInstance().getUser();
+            if(user != null) {
+                displayName.setDefaultValue(user.getName());
+                displayName.setTitle(user.getName());
+            }
+            bindPreferenceSummaryToValue(displayName);
+
+            Preference user_addr = findPreference(UserSettings.USER_ADDRESS);
+            if(user != null) {
+                String city = user.getCity();
+                String country = user.getCountry();
+                if(city != null && !city.trim().isEmpty() && country != null && !country.trim().isEmpty()) {
+                    String addr = city + ", " + country;
+                    user_addr.setDefaultValue(addr);
+                    user_addr.setTitle(addr);
+                }
+            }
+            bindPreferenceSummaryToValue(user_addr);
+
             ProfilePicturePreference profilePicturePreference = (ProfilePicturePreference) findPreference(PROFILE_PICTURE);
             bindPreferenceSummaryToValue(profilePicturePreference);
+
             ((SettingsActivity) getActivity()).addSettingsChangeListener(profilePicturePreference);
         }
     }
@@ -309,6 +334,51 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 Log.i(LOG_TAG, e.getMessage(), e);
             }
             return null;
+        }
+    }
+
+    private static class UpdateUserSettings extends AsyncTask<PreferenceObj, Void, Void> {
+
+        private static final String LOG_TAG = "UpdateUserSettings";
+
+        @Override
+        protected Void doInBackground(PreferenceObj... preferences) {
+            if(preferences == null || preferences.length == 0)
+                return null;
+            PreferenceObj preference = preferences[0];
+            try {
+                API api = APIBuilder.create(ApiConstants.BASE_URL)
+                        .setAction(COMMAND.UPDATE_USER_SETTINGS)
+                        .setOauthToken(AppController.getInstance().getoAuthToken())
+                        .addApiParam(APIConstants.User.ID, AppController.getInstance().getUserId())
+                        .addApiParam(APIConstants.User.Settings.KEY, preference.getKey())
+                        .addApiParam(APIConstants.User.Settings.VALUE, preference.getValue())
+                        .build();
+                api.execute();
+            } catch (Exception e) {
+                Log.i(LOG_TAG, e.getMessage(), e);
+            }
+            return null;
+        }
+    }
+
+    private static class PreferenceObj {
+
+        private String key;
+
+        private String value;
+
+        PreferenceObj(String key, String value) {
+            this.key = key;
+            this.value = value;
+        }
+
+        String getKey() {
+            return key;
+        }
+
+        String getValue() {
+            return value;
         }
     }
 

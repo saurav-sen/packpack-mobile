@@ -5,10 +5,20 @@
     android:paddingTop="10dp"
     android:paddingBottom="20dp">
 
-    <ImageView
+    <!--ImageView
         android:id="@+id/profile_picture_pref"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="false"/-->
+
+    <com.pack.pack.application.view.CircleImageView
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/profile_picture_pref"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:civ_border_width="1dp"
+        app:civ_border_color="#FF000000"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="false"/>
 

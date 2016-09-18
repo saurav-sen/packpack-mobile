@@ -12,8 +12,7 @@
         android:inputType="textCapWords"
         android:maxLines="1"
         android:singleLine="true"
-        android:key="display_name"
-        android:title="Display Name"/>
+        android:key="display_name"/>
 
     <EditTextPreference
         android:capitalize="words"
@@ -21,6 +20,5 @@
         android:inputType="textCapWords"
         android:maxLines="5"
         android:singleLine="false"
-        android:key="user_address"
-        android:title="Location"/>
+        android:key="user_address"/>
 </PreferenceScreen>

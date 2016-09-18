@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.ImageView;
 
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.data.util.ApiConstants;
@@ -32,8 +33,8 @@ public class ProfilePicturePreferenceCache {
         return profilePicture;
     }
 
-    public void downloadUserProfilePicutre(Context context, JUser user) {
-        new DownloadImageTask(null, context).execute(user.getProfilePictureUrl());
+    public void downloadUserProfilePicutre(ImageView imageView, Context context, JUser user) {
+        new DownloadImageTask(imageView, context).execute(user.getProfilePictureUrl());
     }
 
     public void uploadUserProfilePicture(Context context, Bitmap profilePicture) {
