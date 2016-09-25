@@ -245,8 +245,20 @@ public abstract class AbstractNetworkTask<X, Y, Z> extends AsyncTask<X, Y, Z> {
         if(!checkExistence_0(__dbObject)) {
             long newRowID = wDB.insert(table_name, null, values);
         } else {
-            long newRowID = wDB.update(table_name, values, "ENTITY_ID='" + __dbObject.getEntityId() + "'", null);
+            String ENTITY_ID = entityIdColumnName(__dbObject);
+            long newRowID = wDB.update(table_name, values, ENTITY_ID + "='" + __dbObject.getEntityId() + "'", null);
         }
+    }
+
+    private static String entityIdColumnName(DbObject __dbObject) {
+        try {
+            return __dbObject.getClass().getField("ENTITY_ID").get(null).toString();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     private boolean checkExistence_0(DbObject __dbObject) {
@@ -255,9 +267,9 @@ public abstract class AbstractNetworkTask<X, Y, Z> extends AsyncTask<X, Y, Z> {
         try {
             String table_name = __dbObject.getTableName();
             String[] projection = new String[] {"_ID"};//new String[] {(String)(__dbObject.getClass().getField("_ID").get(null))};
-            String selection = "entity_id";//(String)(__dbObject.getClass().getField("ENTITY_ID").get(null));
+            String ENTITY_ID = entityIdColumnName(__dbObject);
             SQLiteDatabase rDB = squillDbHelper.getReadableDatabase();
-            String __SQL = "SELECT _ID FROM " + table_name + " WHERE entity_id='" + __dbObject.getEntityId() + "'";
+            String __SQL = "SELECT _ID FROM " + table_name + " WHERE " + ENTITY_ID + " ='" + __dbObject.getEntityId() + "'";
             cursor = rDB.rawQuery(__SQL, null);
             /*cursor = rDB.query(table_name, projection, selection,
                     new String[]{__dbObject.getEntityId()}, null, null,

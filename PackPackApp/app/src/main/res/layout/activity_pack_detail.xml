@@ -41,21 +41,16 @@
 
             <TextView
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:id="@+id/activity_pack_title"
                 android:textStyle="bold"/>
 
             <TextView
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:id="@+id/activity_pack_story"
                 android:inputType="textMultiLine"
                 android:maxLines="10"/>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                style="@style/Divider"/>
 
         </LinearLayout>
 

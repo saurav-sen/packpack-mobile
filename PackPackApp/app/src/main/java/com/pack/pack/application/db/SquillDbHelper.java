@@ -23,9 +23,8 @@ public class SquillDbHelper extends SQLiteOpenHelper {
         public static final String USER_INFO =
                 "CREATE TABLE " + UserInfo.TABLE_NAME + " (" + UserInfo._ID
                         + " INTEGER PRIMARY KEY, " + UserInfo.ENTITY_ID + " TEXT, "
-                        + UserInfo.USER_NAME + " TEXT, " + UserInfo.PASSWORD
-                        + " TEXT, " + UserInfo.ACCESS_TOKEN + " TEXT, "
-                        + UserInfo.ACCESS_TOKEN_SECRET + " TEXT, "
+                        + UserInfo.USER_NAME + " TEXT, " + UserInfo.ACCESS_TOKEN
+                        + " TEXT, " + UserInfo.ACCESS_TOKEN_SECRET + " TEXT, "
                         + UserInfo.FOLLWED_CATEGORIES + " TEXT)";
 
         public static final String USER_OWNED_TOPIC_INFO =

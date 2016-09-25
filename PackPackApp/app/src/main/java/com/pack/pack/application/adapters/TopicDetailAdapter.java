@@ -20,13 +20,17 @@ import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
 import com.pack.pack.application.activity.PackDetailActivity;
 import com.pack.pack.application.data.util.AbstractNetworkTask;
+import com.pack.pack.application.data.util.DateTimeUtil;
 import com.pack.pack.application.db.DBUtil;
+import com.pack.pack.application.image.loader.DownloadImageTask;
 import com.pack.pack.application.topic.activity.model.ParcelablePack;
+import com.pack.pack.application.view.CircleImageView;
 import com.pack.pack.client.api.API;
 import com.pack.pack.client.api.APIConstants;
 import com.pack.pack.client.api.COMMAND;
 import com.pack.pack.model.web.JPack;
 import com.pack.pack.model.web.JPackAttachment;
+import com.pack.pack.model.web.JUser;
 import com.pack.pack.model.web.Pagination;
 
 import java.util.ArrayList;
@@ -86,11 +90,15 @@ public class TopicDetailAdapter extends ArrayAdapter<JPack> {
         packTitle.setTag(position);
         packTitle.setOnClickListener(onClickListener);
 
+        CircleImageView pack_creator_picture = (CircleImageView) convertView.findViewById(R.id.pack_creator_picture);
+        TextView pack_creator_name = (TextView) convertView.findViewById(R.id.pack_creator_name);
+        TextView pack_create_time = (TextView) convertView.findViewById(R.id.pack_create_time);
+
         TextView packStory = (TextView) convertView.findViewById(R.id.pack_story);
         packStory.setTag(position);
         packStory.setOnClickListener(onClickListener);
 
-        TextView packStoryContinue = (TextView) convertView.findViewById(R.id.pack_story_continue);
+        //TextView packStoryContinue = (TextView) convertView.findViewById(R.id.pack_story_continue);
 
         GridView packAttachmentsGrid = (GridView) convertView.findViewById(R.id.pack_attachments);
         packAttachmentsGrid.setTag(position);
@@ -102,13 +110,25 @@ public class TopicDetailAdapter extends ArrayAdapter<JPack> {
             StringBuilder story = new StringBuilder(pack.getStory());
             String storyContent = story.toString();
             packStory.setText(storyContent);//pack.getStory());
-            if(storyContent.length() > 1000) {
+           /* if(storyContent.length() > 1000) {
                 packStoryContinue.setText(Html.fromHtml("<a href=\\\"#\\\">Continue</a> "));
                 packStoryContinue.setTextColor(0x0a80d1);
 
                 stripUnderlines(packStoryContinue);
+            }*/
+            pack_create_time.setText(DateTimeUtil.sentencify(pack.getCreationTime()));
+            JUser creator = pack.getCreator();
+            if(creator != null) {
+                if(creator.getName() != null) {
+                    pack_creator_name.setText(creator.getName());
+                }
+                String profilePictureUrl = creator.getProfilePictureUrl();
+                if(profilePictureUrl != null && !profilePictureUrl.trim().isEmpty()) {
+                    new DownloadImageTask(pack_creator_picture, getContext()).execute(profilePictureUrl);
+                } else {
+                    pack_creator_picture.setImageResource(R.drawable.default_profile_picture_big);
+                }
             }
-
             new LoadPackAttachmentsTask(packAttachmentsGrid).execute(pack);
         }
         return convertView;

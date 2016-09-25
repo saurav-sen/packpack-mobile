@@ -71,7 +71,7 @@ public class DBUtil {
         Cursor cursor = null;
         try {
             String[] projection = new String[] {UserInfo._ID, UserInfo.ENTITY_ID,
-                    UserInfo.USER_NAME, UserInfo.PASSWORD, UserInfo.ACCESS_TOKEN,
+                    UserInfo.USER_NAME, UserInfo.ACCESS_TOKEN,
                     UserInfo.ACCESS_TOKEN_SECRET, UserInfo.FOLLWED_CATEGORIES};
             try {
                 cursor = readable.query(UserInfo.TABLE_NAME, projection, null, null,
@@ -82,11 +82,10 @@ public class DBUtil {
                         long id = cursor.getLong(cursor.getColumnIndexOrThrow(UserInfo._ID));
                         String userId = cursor.getString(cursor.getColumnIndexOrThrow(UserInfo.ENTITY_ID));
                         String userName = cursor.getString(cursor.getColumnIndexOrThrow(UserInfo.USER_NAME));
-                        String password = cursor.getString(cursor.getColumnIndexOrThrow(UserInfo.PASSWORD));
                         String accessToken = cursor.getString(cursor.getColumnIndexOrThrow(UserInfo.ACCESS_TOKEN));
                         String accessTokenSecret = cursor.getString(cursor.getColumnIndexOrThrow(UserInfo.ACCESS_TOKEN_SECRET));
                         String followedCategories = cursor.getString(cursor.getColumnIndexOrThrow(UserInfo.FOLLWED_CATEGORIES));
-                        UserInfo userInfo = new UserInfo(userName, password, userId, accessToken, accessTokenSecret, followedCategories);
+                        UserInfo userInfo = new UserInfo(userName, userId, accessToken, accessTokenSecret, followedCategories);
                         List<UserOwnedTopicInfo> userOwnedTopicInfos = loadUserOwnedTopicInfos(readable);
                         userInfo.setUserOwnedTopicInfos(userOwnedTopicInfos);
                         return userInfo;

@@ -16,7 +16,6 @@ public class UserInfo implements DbObject {
 
     public static final String ENTITY_ID = "user_id";
     public static final String USER_NAME = "username";
-    public static final String PASSWORD = "password";
     public static final String ACCESS_TOKEN = "access_token";
     public static final String ACCESS_TOKEN_SECRET = "access_token_secret";
     public static final String FOLLWED_CATEGORIES = "followed_categories";
@@ -24,8 +23,6 @@ public class UserInfo implements DbObject {
     private String userId;
 
     private String username;
-
-    private String password;
 
     private String accessToken;
 
@@ -58,20 +55,20 @@ public class UserInfo implements DbObject {
     }
 
     public UserInfo(String username, String password) {
-        this(username, password, null, null);
-    }
-
-    public UserInfo(String username, String password, String id, String followedCategories) {
-        this(username, password, id, null, followedCategories);
-    }
-
-    public UserInfo(String username, String password, String id, String accessToken, String followedCategories) {
-        this(username, password, id, accessToken, null, followedCategories);
-    }
-
-    public UserInfo(String username, String password, String id, String accessToken, String accessTokenSecret, String followedCategories) {
-        setUsername(username);
+        this(username, null, null, null);
         setPassword(password);
+    }
+
+    public UserInfo(String username, String id, String followedCategories) {
+        this(username, id, null, followedCategories);
+    }
+
+    public UserInfo(String username, String id, String accessToken, String followedCategories) {
+        this(username, id, accessToken, null, followedCategories);
+    }
+
+    public UserInfo(String username, String id, String accessToken, String accessTokenSecret, String followedCategories) {
+        setUsername(username);
         setUserId(id);
         setAccessToken(accessToken);
         setAccessTokenSecret(accessTokenSecret);
@@ -115,6 +112,8 @@ public class UserInfo implements DbObject {
         this.username = username;
     }
 
+    private String password;
+
     public String getPassword() {
         return password;
     }
@@ -128,7 +127,6 @@ public class UserInfo implements DbObject {
         ContentValues contentValues = new ContentValues();
         contentValues.put(ENTITY_ID, userId);
         contentValues.put(USER_NAME, username);
-        contentValues.put(PASSWORD, password);
         contentValues.put(ACCESS_TOKEN, accessToken);
         contentValues.put(ACCESS_TOKEN_SECRET, accessTokenSecret);
         return contentValues;

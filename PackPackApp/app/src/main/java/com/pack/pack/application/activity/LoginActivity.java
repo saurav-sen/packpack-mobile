@@ -129,7 +129,7 @@ public class LoginActivity extends AppCompatActivity implements IAsyncTaskStatus
     }
 
     private void doLogin(UserInfo userInfo) {
-        new LoginTask(this, this).execute(userInfo);
+        new LoginTask(this, this, false).execute(userInfo);
     }
 
     @Override

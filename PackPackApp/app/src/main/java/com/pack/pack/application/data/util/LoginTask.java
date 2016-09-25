@@ -43,15 +43,18 @@ public class LoginTask extends AbstractNetworkTask<UserInfo, Integer, AccessToke
 
     private String followedCategories;
 
+    private boolean refreshToken = false;
+
     private List<UserOwnedTopicInfo> userOwnedTopicInfos = new ArrayList<UserOwnedTopicInfo>();
 
     public LoginTask(Context context) {
         super(false, true, context);
     }
 
-    public LoginTask(Context context, IAsyncTaskStatusListener listener) {
+    public LoginTask(Context context, IAsyncTaskStatusListener listener, boolean refreshToken) {
         super(false, true, context);
         addListener(listener);
+        this.refreshToken = refreshToken;
     }
 
     @Override
@@ -129,7 +132,6 @@ public class LoginTask extends AbstractNetworkTask<UserInfo, Integer, AccessToke
         userInfo.setAccessTokenSecret(successResult.getTokenSecret());
         userInfo.setUserId(user.getId());
         userInfo.setUsername(user.getUsername());
-        userInfo.setPassword(AppController.getInstance().getUserPassword());
         userInfo.setFollowedCategories("" + followedCategories);
         if(userOwnedTopicInfos != null && !userOwnedTopicInfos.isEmpty()) {
             for(UserOwnedTopicInfo userOwnedTopicInfo : userOwnedTopicInfos) {
@@ -150,9 +152,13 @@ public class LoginTask extends AbstractNetworkTask<UserInfo, Integer, AccessToke
         Map<String, Object> apiParams = new HashMap<String, Object>();
         apiParams.put(APIConstants.Login.CLIENT_KEY, ANDROID_APP_CLIENT_KEY);
         apiParams.put(APIConstants.Login.CLIENT_SECRET, ANDROID_APP_CLIENT_SECRET);
-        apiParams.put(APIConstants.Login.USERNAME, userInfo.getUsername());
-        apiParams.put(APIConstants.Login.PASSWORD, userInfo.getPassword());
-        AppController.getInstance().setUserPassword(userInfo.getPassword());
+        if(!refreshToken) {
+            apiParams.put(APIConstants.Login.USERNAME, userInfo.getUsername());
+            apiParams.put(APIConstants.Login.PASSWORD, userInfo.getPassword());
+        } else {
+            apiParams.put(APIConstants.Login.OLD_ACCESS_TOKEN, userInfo.getAccessToken());
+            apiParams.put(APIConstants.Login.OLD_ACCESS_TOKEN_SECRET, userInfo.getAccessTokenSecret());
+        }
         return apiParams;
     }
 
@@ -176,7 +182,6 @@ public class LoginTask extends AbstractNetworkTask<UserInfo, Integer, AccessToke
         final UserInfo userInfo = DBUtil.loadLastLoggedInUserInfo(readable);
         if(userInfo != null && userInfo.getAccessToken() != null && userInfo.getAccessTokenSecret() != null) {
             AppController.getInstance().setoAuthToken(userInfo.getAccessToken());
-            AppController.getInstance().setUserPassword(userInfo.getPassword());
             user = DBUtil.convertUserInfo(userInfo);
             List<JTopic> userOwnedTopics = DBUtil.convertUserOwnedTopicInfo(
                     userInfo.getUserOwnedTopicInfos());

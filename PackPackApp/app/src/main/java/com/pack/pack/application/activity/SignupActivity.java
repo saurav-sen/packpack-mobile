@@ -255,7 +255,7 @@ public class SignupActivity extends AppCompatActivity implements IAsyncTaskStatu
     }
 
     private void doLogin(UserInfo userInfo) {
-        new LoginTask(this, this).execute(userInfo);
+        new LoginTask(this, this, false).execute(userInfo);
     }
 
     protected void onSignUpFailure(String errorMsg) {

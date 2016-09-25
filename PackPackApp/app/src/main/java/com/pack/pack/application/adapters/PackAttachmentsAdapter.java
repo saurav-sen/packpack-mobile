@@ -21,12 +21,15 @@ import com.pack.pack.application.R;
 import com.pack.pack.application.activity.FullscreenAttachmentViewActivity;
 import com.pack.pack.application.activity.PackAttachmentCommentsActivity;
 import com.pack.pack.application.data.util.AbstractNetworkTask;
+import com.pack.pack.application.data.util.DateTimeUtil;
 import com.pack.pack.application.db.DBUtil;
 import com.pack.pack.application.image.loader.DownloadImageTask;
+import com.pack.pack.application.view.CircleImageView;
 import com.pack.pack.client.api.API;
 import com.pack.pack.client.api.APIConstants;
 import com.pack.pack.client.api.COMMAND;
 import com.pack.pack.model.web.JPackAttachment;
+import com.pack.pack.model.web.JUser;
 import com.pack.pack.model.web.PackAttachmentType;
 
 import java.io.ByteArrayOutputStream;
@@ -89,6 +92,26 @@ public class PackAttachmentsAdapter extends ArrayAdapter<JPackAttachment> {
         }
         final TextView pack_attachment_title = (TextView) convertView.findViewById(R.id.pack_attachment_title);
         final TextView pack_attachment_description = (TextView) convertView.findViewById(R.id.pack_attachment_description);
+
+        final CircleImageView user_profile_picture = (CircleImageView) convertView.findViewById(R.id.user_profile_picture);
+        final TextView user_name = (TextView) convertView.findViewById(R.id.user_name);
+        final TextView attachment_create_time = (TextView) convertView.findViewById(R.id.attachment_create_time);
+
+        JPackAttachment attachment = getItem(position);
+        if(attachment != null) {
+            JUser creator = attachment.getCreator();
+            if(creator != null) {
+                user_name.setText(creator.getName());
+                attachment_create_time.setText(DateTimeUtil.sentencify(attachment.getCreationTime()));
+                if(creator.getProfilePictureUrl() != null
+                        && !creator.getProfilePictureUrl().trim().isEmpty()) {
+                    new DownloadImageTask(user_profile_picture, getContext()).execute(creator.getProfilePictureUrl());
+                } else {
+                    user_profile_picture.setImageResource(R.drawable.default_profile_picture_big);
+                }
+            }
+        }
+
         ImageView pack_attachment_img = (ImageView) convertView.findViewById(R.id.pack_attachment_img);
         pack_attachment_img.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -138,7 +161,7 @@ public class PackAttachmentsAdapter extends ArrayAdapter<JPackAttachment> {
             @Override
             public void onClick(View view) {
                 JPackAttachment attachment = getItem(position);
-                Intent commentsIntent = new Intent((Activity)getContext(), PackAttachmentCommentsActivity.class);
+                Intent commentsIntent = new Intent((Activity) getContext(), PackAttachmentCommentsActivity.class);
                 commentsIntent.putExtra(AppController.PACK_ATTACHMENT_ID_KEY, attachment.getId());
                 getContext().startActivity(commentsIntent);
             }
@@ -153,7 +176,10 @@ public class PackAttachmentsAdapter extends ArrayAdapter<JPackAttachment> {
             }
         });
 
-        JPackAttachment attachment = getItem(position);
+        if(attachment == null) {
+            attachment = getItem(position);
+        }
+
         if(attachment != null) {
             pack_attachment_title.setText(attachment.getTitle() + "");
             pack_attachment_description.setText(attachment.getDescription() + "");
