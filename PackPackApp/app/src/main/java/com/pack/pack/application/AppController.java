@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+import io.branch.referral.Branch;
+
 public class AppController extends Application {
 
     public static final String TAG = AppController.class.getSimpleName();
@@ -113,6 +115,7 @@ public class AppController extends Application {
     public static final int APP_EXTERNAL_STORAGE_WRITE_REQUEST_CODE = 115;
     public static final int CAMERA_ACCESS_REQUEST_CODE = 116;
     public static final int LOCATION_FINE_ACCESS_REQUEST_CODE = 117;
+    public static final int READ_CONTACTS_REQUEST_CODE = 118;
     public static final String RESULT_RECEIVER = "resultReceiver";
     public static final String LOCATION_PARCELABLE_ADDRESS_KEY = "address";
     public static final String LOCATION_PARCELABLE_ERR_MSG_KEY = "errMsg";
@@ -156,6 +159,7 @@ public class AppController extends Application {
             new LoginTask().execute(userInfo);
         }*/
         mInstance = this;
+        initializeBranchIO();
     }
 
     public void waitForLoginSuccess() {
@@ -167,6 +171,10 @@ public class AppController extends Application {
             } finally {
             }
         }
+    }
+
+    public void initializeBranchIO() {
+        Branch.getAutoInstance(this);
     }
 
     public static synchronized AppController getInstance() {

@@ -81,6 +81,17 @@
             <ImageButton
                 android:layout_width="50dp"
                 android:layout_height="50dp"
+                android:id="@+id/invite_people"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="20dp"
+                android:src="@drawable/invite_people"
+                android:background="@drawable/border_shape_image_button"/>
+
+            <ImageButton
+                android:layout_width="50dp"
+                android:layout_height="50dp"
                 android:id="@+id/promote_topic"
                 android:paddingLeft="10dp"
                 android:paddingRight="10dp"

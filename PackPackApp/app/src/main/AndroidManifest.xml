@@ -9,6 +9,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
 
     <application
         android:name=".AppController"
@@ -37,6 +38,13 @@
             android:name=".activity.TopicDetailActivity"
             android:label="Squill"
             android:theme="@style/AppTheme.NoActionBar" />
+
+            <intent-filter>
+                <data android:scheme="squill" android:host="open" />
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+            </intent-filter>
         <activity
             android:name=".activity.PackDetailActivity"
             android:label="Squill"
@@ -87,6 +95,12 @@
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="AIzaSyATxB4S4Vi5K8QP_Ly5-kW-oL5mid40Fy0" />
+
+        <!-- Add this meta-data below, and change "key_live_xxxxxxx" to your actual live Branch key -->
+        <meta-data android:name="io.branch.sdk.BranchKey" android:value="key_live_iiDjEJlqZfawGqyQWfhfgjmcsFgs5Isy" />
+
+        <!-- For your test app, if you have one; Again, use your actual test Branch key -->
+        <meta-data android:name="io.branch.sdk.BranchKey.test" android:value="key_test_akDeFGmEZpkwPvzP2oamkidkyqpB0SwI" />
     </application>
 
 </manifest>

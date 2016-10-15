@@ -1,10 +1,14 @@
 package com.pack.pack.application.activity;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -36,6 +40,9 @@ import com.pack.pack.application.image.loader.DownloadImageTask;
 import com.pack.pack.application.topic.activity.model.ParcelableTopic;
 import com.pack.pack.model.web.EntityType;
 
+import io.branch.invite.SimpleInviteBuilder;
+import io.branch.referral.Branch;
+
 /**
  *
  * @author Saurav
@@ -50,6 +57,8 @@ public class TopicDetailActivity extends AppCompatActivity implements OnMapReady
     private boolean gMapAvailable = false;
 
     private GoogleMap gMap;
+
+    private ImageButton invitePeople;
 
    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -94,6 +103,8 @@ public class TopicDetailActivity extends AppCompatActivity implements OnMapReady
         return true;
     }
 
+    private boolean readContactsGranted = true;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -101,6 +112,15 @@ public class TopicDetailActivity extends AppCompatActivity implements OnMapReady
         Toolbar toolbar = (Toolbar) findViewById(R.id.topic_detail_toolbar);
         //setActionBar(toolbar);
         setSupportActionBar(toolbar);
+
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.READ_CONTACTS},
+                    AppController.READ_CONTACTS_REQUEST_CODE);
+        } else {
+            readContactsGranted = false;
+        }
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
@@ -138,6 +158,30 @@ public class TopicDetailActivity extends AppCompatActivity implements OnMapReady
             }
         });
 
+        invitePeople = (ImageButton) findViewById(R.id.invite_people);
+        invitePeople.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new SimpleInviteBuilder(TopicDetailActivity.this, "Inviting userID", "Inviting user Name").showInviteDialog();
+            }
+        });
+
+        ImageButton promoteTopic = (ImageButton) findViewById(R.id.promote_topic);
+        promoteTopic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+
+        ImageButton shareTopic = (ImageButton) findViewById(R.id.share_topic);
+        shareTopic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+
        /* SupportMapFragment mapFragment = (SupportMapFragment)
                 getSupportFragmentManager().findFragmentByTag(MAP_FRAGMENT_TAG);
         if(mapFragment == null) {
@@ -150,6 +194,24 @@ public class TopicDetailActivity extends AppCompatActivity implements OnMapReady
         gMapAvailable = isMapAvailable();
         if(gMapAvailable) {
             initializeGMap();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case AppController.READ_CONTACTS_REQUEST_CODE:
+                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    readContactsGranted = true;
+                    AppController.getInstance().initializeBranchIO();
+                } else {
+                    readContactsGranted = false;
+                }
+                if(invitePeople != null) {
+                    invitePeople.setEnabled(readContactsGranted);
+                }
+                break;
         }
     }
 
