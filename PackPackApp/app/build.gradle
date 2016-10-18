@@ -48,4 +48,5 @@ dependencies {
     compile 'com.google.android.gms:play-services-maps:8.+'
     compile 'io.branch.sdk.android:library:1.8.+'
     compile 'io.branch.invite.sdk.android:library:0.1.+'
+    compile 'org.jsoup:jsoup:1.8.3'
 }

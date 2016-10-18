@@ -19,6 +19,7 @@ import com.pack.pack.model.web.JDiscussion;
 import com.pack.pack.model.web.JUser;
 
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.jsoup.Jsoup;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,7 +73,7 @@ public class DiscussionAdapter extends ArrayAdapter<JDiscussion> implements IDis
             layoutInflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         }
         if(convertView == null) {
-            convertView = layoutInflater.inflate(R.layout.discusion_detail_items, null);
+            convertView = layoutInflater.inflate(R.layout.discussion_items, null);
         }
         discussion_text_view = (TextView) convertView.findViewById(R.id.discussion_text_view);
         discussion_text_view.setTag(position);
@@ -80,6 +81,9 @@ public class DiscussionAdapter extends ArrayAdapter<JDiscussion> implements IDis
         if(discussion != null) {
             StringBuilder buffer = new StringBuilder();
             String content = discussion.getContent();
+            content = content.replaceAll("&amp;", "&");
+            buffer.append(StringEscapeUtils.unescapeHtml4(content));
+            content = Jsoup.parse(buffer.toString()).text();
             int len = content.length();
             if(len > 200) {
                 content = content.substring(0, 200) + "...";
