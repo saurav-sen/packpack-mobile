@@ -80,6 +80,7 @@
             android:label="@string/title_activity_discussion"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".activity.DiscussionViewActivity" />
+        <activity android:name=".activity.DiscussionDetailViewActivity" />
         <activity
             android:name=".activity.CreatePackActivity"
             android:label="@string/title_activity_create_pack"

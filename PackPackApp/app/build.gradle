@@ -46,4 +46,6 @@ dependencies {
     compile 'org.apache.commons:commons-lang3:3.4'
     // compile 'com.google.android.gms:play-services:9.0.2'
     compile 'com.google.android.gms:play-services-maps:8.+'
+    compile 'io.branch.sdk.android:library:1.8.+'
+    compile 'io.branch.invite.sdk.android:library:0.1.+'
 }

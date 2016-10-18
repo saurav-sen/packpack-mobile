@@ -9,7 +9,6 @@ import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
-import android.widget.TextView;
 
 import com.pack.pack.application.Constants;
 import com.pack.pack.application.R;
@@ -24,9 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Saurav on 19-10-2016.
+ * Created by Saurav on 02-07-2016.
  */
-public class DiscussionAdapter extends ArrayAdapter<JDiscussion> implements IDiscussionAdapter {
+public class DiscussionDetailAdapter extends ArrayAdapter<JDiscussion> implements IDiscussionAdapter {
 
     private Activity activity;
 
@@ -34,10 +33,10 @@ public class DiscussionAdapter extends ArrayAdapter<JDiscussion> implements IDis
 
     private LayoutInflater layoutInflater;
 
-    private TextView discussion_text_view;
+    private WebView discussion_web_view;
 
-    public DiscussionAdapter(Activity activity, List<JDiscussion> discussions) {
-        super(activity, R.layout.discussion_items, discussions);
+    public DiscussionDetailAdapter(Activity activity, List<JDiscussion> discussions) {
+        super(activity, R.layout.discusion_detail_items, discussions);
         this.activity = activity;
         this.discussions = discussions;
     }
@@ -74,34 +73,26 @@ public class DiscussionAdapter extends ArrayAdapter<JDiscussion> implements IDis
         if(convertView == null) {
             convertView = layoutInflater.inflate(R.layout.discusion_detail_items, null);
         }
-        discussion_text_view = (TextView) convertView.findViewById(R.id.discussion_text_view);
-        discussion_text_view.setTag(position);
+
+        discussion_web_view = (WebView) convertView.findViewById(R.id.discussion_web_view);
         JDiscussion discussion = getItem(position);
         if(discussion != null) {
             StringBuilder buffer = new StringBuilder();
             String content = discussion.getContent();
-            int len = content.length();
-            if(len > 200) {
-                content = content.substring(0, 200) + "...";
-            }
-            discussion_text_view.setText(content);
+            /*if(!content.startsWith("&lt;")) {
+               // content = "&lt;div&gt;" + content + "&lt;/div&gt;";
+                content = content.substring(content.indexOf("&lt;") + 5);
+            }*/
+            content = content.replaceAll("&amp;", "&");
+            buffer.append(StringEscapeUtils.unescapeHtml4(content));
+            buffer.append("<div style=\"overflow: hidden; width: 100%\"><div style=\"float: left;padding-top: 50px; color: grey\">");
+            JUser user = discussion.getFromUser();
+            buffer.append(user.getUsername());
+            buffer.append("</div><div style=\"float: right;padding-top: 50px; color: grey\">");
+            buffer.append(user.getName());
+            buffer.append("</div></div>");
+            discussion_web_view.loadData(buffer.toString(), "text/html", null);
         }
-        discussion_text_view.setTag(position);
-        discussion_text_view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                int position = (int) view.getTag();
-                if(position < 0 || discussions == null || position >= discussions.size())
-                    return;
-                JDiscussion discussion = discussions.get(position);
-                if(discussion == null)
-                    return;
-                Intent intent = new Intent(getContext(), DiscussionDetailViewActivity.class);
-                intent.putExtra(Constants.DISCUSSION_ENTITY_ID, discussion.getId());
-                intent.putExtra(Constants.DISCUSSION_ENTITY_TYPE, EntityType.DISCUSSION.name());
-                getContext().startActivity(intent);
-            }
-        });
         return convertView;
     }
 }

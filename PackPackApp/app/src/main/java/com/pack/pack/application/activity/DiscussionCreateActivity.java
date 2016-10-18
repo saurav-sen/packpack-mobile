@@ -112,6 +112,8 @@ public class DiscussionCreateActivity extends Activity implements RTFListener {
                 } else if(EntityType.PACK.name().equalsIgnoreCase(createInfo.entityType)) {
                     command = COMMAND.START_DISCUSSION_ON_PACK;
                     parentIdKey = APIConstants.Pack.ID;
+                } else if(EntityType.DISCUSSION.name().equalsIgnoreCase(createInfo.entityType) && createInfo.isReply) {
+                    command = COMMAND.ADD_REPLY_TO_DISCUSSION;
                 }
 
                 API api = APIBuilder.create(ApiConstants.BASE_URL).setOauthToken(oAuthToken)

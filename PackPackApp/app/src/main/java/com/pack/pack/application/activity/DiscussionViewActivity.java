@@ -7,18 +7,19 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import com.pack.pack.application.Constants;
 import com.pack.pack.application.R;
 import com.pack.pack.application.adapters.DiscussionAdapter;
+import com.pack.pack.application.adapters.DiscussionDetailAdapter;
+import com.pack.pack.application.adapters.IDiscussionAdapter;
 import com.pack.pack.application.data.util.FetchDiscussionTask;
 import com.pack.pack.application.data.util.IAsyncTaskStatusListener;
 import com.pack.pack.application.data.util.ScrollableDiscussion;
-import com.pack.pack.application.topic.activity.model.ParcelableDiscussion;
 import com.pack.pack.model.web.JDiscussion;
 import com.pack.pack.model.web.Pagination;
 
@@ -34,12 +35,12 @@ public class DiscussionViewActivity extends AppCompatActivity implements IAsyncT
 
     private ListView discussionView;
 
-    private String entityId;
-    private String entityType;
+    protected String entityId;
+    protected String entityType;
 
-    private DiscussionAdapter adapter;
+    private IDiscussionAdapter adapter;
 
-    private List<JDiscussion> discussions = new LinkedList<JDiscussion>();
+    protected List<JDiscussion> discussions = new LinkedList<JDiscussion>();
 
     private ScrollableDiscussion currentScrollableDiscussion;
 
@@ -61,7 +62,7 @@ public class DiscussionViewActivity extends AppCompatActivity implements IAsyncT
         currentScrollableDiscussion.entityType = entityType;
 
         discussionView = (ListView) findViewById(R.id.discussions_list);
-        adapter = new DiscussionAdapter(this, discussions);
+        adapter = createAdapterInstance();
         discussionView.setAdapter(adapter);
         discussionView.setOnScrollListener(new AbsListView.OnScrollListener() {
 
@@ -80,20 +81,40 @@ public class DiscussionViewActivity extends AppCompatActivity implements IAsyncT
 
             }
         });
+        /*discussionView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                JDiscussion discussion = adapter.getItem(position);
+                if(discussion == null)
+                    return;
+                Intent intent = new Intent(DiscussionViewActivity.this, DiscussionDetailViewActivity.class);
+                intent.putExtra(Constants.DISCUSSION_ENTITY_ID, discussion.getId());
+                intent.putExtra(Constants.DISCUSSION_ENTITY_TYPE, EntityType.DISCUSSION.name());
+                startActivity(intent);
+            }
+        });*/
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(DiscussionViewActivity.this, DiscussionCreateActivity.class);
-                intent.putExtra(Constants.DISCUSSION_IS_REPLY, false);
-                intent.putExtra(Constants.DISCUSSION_ENTITY_ID, entityId);
-                intent.putExtra(Constants.DISCUSSION_ENTITY_TYPE, entityType);
-                startActivityForResult(intent, Constants.DISCUSSION_CREATE_REQUEST_CODE);
+                handleCreateAction();
             }
         });
 
         new FetchDiscussionTask(DiscussionViewActivity.this, DiscussionViewActivity.this).execute(currentScrollableDiscussion);
+    }
+
+    protected IDiscussionAdapter createAdapterInstance() {
+        return new DiscussionAdapter(this, discussions);
+    }
+
+    protected void handleCreateAction() {
+        Intent intent = new Intent(DiscussionViewActivity.this, DiscussionCreateActivity.class);
+        intent.putExtra(Constants.DISCUSSION_IS_REPLY, false);
+        intent.putExtra(Constants.DISCUSSION_ENTITY_ID, entityId);
+        intent.putExtra(Constants.DISCUSSION_ENTITY_TYPE, entityType);
+        startActivityForResult(intent, Constants.DISCUSSION_CREATE_REQUEST_CODE);
     }
 
     @Override
