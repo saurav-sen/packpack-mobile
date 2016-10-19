@@ -106,6 +106,7 @@ public class DiscussionCreateActivity extends Activity implements RTFListener {
                 String userId = AppController.getInstance().getUserId();
                 COMMAND command = null;
                 String parentIdKey = null;
+                boolean isReply = false;
                 if(EntityType.TOPIC.name().equalsIgnoreCase(createInfo.entityType)) {
                     command = COMMAND.START_DISCUSSION_ON_TOPIC;
                     parentIdKey = APIConstants.Topic.ID;
@@ -114,15 +115,21 @@ public class DiscussionCreateActivity extends Activity implements RTFListener {
                     parentIdKey = APIConstants.Pack.ID;
                 } else if(EntityType.DISCUSSION.name().equalsIgnoreCase(createInfo.entityType) && createInfo.isReply) {
                     command = COMMAND.ADD_REPLY_TO_DISCUSSION;
+                    parentIdKey = APIConstants.Discussion.ID;
+                    isReply = true;
                 }
 
-                API api = APIBuilder.create(ApiConstants.BASE_URL).setOauthToken(oAuthToken)
+                APIBuilder apiBuilder = APIBuilder.create(ApiConstants.BASE_URL).setOauthToken(oAuthToken)
                         .setAction(command)
                         .addApiParam(APIConstants.User.ID, userId)
                         .addApiParam(parentIdKey, createInfo.entityId)
                         .addApiParam(APIConstants.Discussion.TITLE, createInfo.title)
-                        .addApiParam(APIConstants.Discussion.CONTENT, createInfo.content)
-                        .build();
+                        .addApiParam(APIConstants.Discussion.CONTENT, createInfo.content);
+                if(isReply) {
+                    apiBuilder = apiBuilder.addApiParam(APIConstants.Discussion.TYPE, EntityType.DISCUSSION.name());
+                }
+
+                API api = apiBuilder.build();
                 discussion = (JDiscussion) api.execute();
             } catch (Exception e) {
                // e.printStackTrace();

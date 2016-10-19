@@ -43,6 +43,8 @@ public class FetchDiscussionTask extends AbstractNetworkTask<ScrollableDiscussio
             return COMMAND.GET_ALL_DISCUSSIONS_FOR_TOPIC;
         } else if(EntityType.PACK.name().equalsIgnoreCase(getInputObject().entityType)) {
             return  COMMAND.GET_ALL_DISCUSSIONS_FOR_PACK;
+        } else if(EntityType.DISCUSSION.name().equalsIgnoreCase(getInputObject().entityType)) {
+            return COMMAND.GET_ALL_REPLIES_FOR_DISCUSSION;
         }
         return null;
     }
@@ -57,6 +59,8 @@ public class FetchDiscussionTask extends AbstractNetworkTask<ScrollableDiscussio
             key = APIConstants.Topic.ID;
         } else if(EntityType.PACK.name().equalsIgnoreCase(getInputObject().entityType)) {
             key = APIConstants.Pack.ID;
+        } else if(EntityType.DISCUSSION.name().equalsIgnoreCase(getInputObject().entityType)) {
+            key = APIConstants.Discussion.ID;
         }
         if(key != null) {
             apiParams.put(key, getInputObject().entityId);

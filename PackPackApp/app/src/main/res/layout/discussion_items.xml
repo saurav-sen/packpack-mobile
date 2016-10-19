@@ -3,14 +3,19 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:id="@+id/discussion_open"
+        android:src="@drawable/common_full_open_on_phone"/>
+
+    <WebView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/discussion_text_view"
-        android:layout_marginBottom="5dp"
-        android:maxLines="5"
-        android:minLines="2">
-    </TextView>
+        android:layout_marginBottom="5dp">
+    </WebView>
 
     <View
         android:layout_width="match_parent"

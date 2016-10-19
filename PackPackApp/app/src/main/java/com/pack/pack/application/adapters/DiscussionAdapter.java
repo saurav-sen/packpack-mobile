@@ -19,7 +19,6 @@ import com.pack.pack.model.web.JDiscussion;
 import com.pack.pack.model.web.JUser;
 
 import org.apache.commons.lang3.StringEscapeUtils;
-import org.jsoup.Jsoup;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +34,9 @@ public class DiscussionAdapter extends ArrayAdapter<JDiscussion> implements IDis
 
     private LayoutInflater layoutInflater;
 
-    private TextView discussion_text_view;
+    private ImageButton discussion_open;
+
+    private WebView discussion_text_view;
 
     public DiscussionAdapter(Activity activity, List<JDiscussion> discussions) {
         super(activity, R.layout.discussion_items, discussions);
@@ -75,23 +76,38 @@ public class DiscussionAdapter extends ArrayAdapter<JDiscussion> implements IDis
         if(convertView == null) {
             convertView = layoutInflater.inflate(R.layout.discussion_items, null);
         }
-        discussion_text_view = (TextView) convertView.findViewById(R.id.discussion_text_view);
-        discussion_text_view.setTag(position);
+
+        discussion_open = (ImageButton) convertView.findViewById(R.id.discussion_open);
+        discussion_open.setTag(position);
+        discussion_text_view = (WebView) convertView.findViewById(R.id.discussion_text_view);
+
         JDiscussion discussion = getItem(position);
         if(discussion != null) {
             StringBuilder buffer = new StringBuilder();
             String content = discussion.getContent();
+            /*if(!content.startsWith("&lt;")) {
+               // content = "&lt;div&gt;" + content + "&lt;/div&gt;";
+                content = content.substring(content.indexOf("&lt;") + 5);
+            }*/
             content = content.replaceAll("&amp;", "&");
-            buffer.append(StringEscapeUtils.unescapeHtml4(content));
-            content = Jsoup.parse(buffer.toString()).text();
-            int len = content.length();
-            if(len > 200) {
-                content = content.substring(0, 200) + "...";
+            if(content.length() > 200) {
+                content = content.substring(0, 200);
+                buffer.append(StringEscapeUtils.unescapeHtml4(content));
+                buffer.append("...");
+            } else {
+                buffer.append(StringEscapeUtils.unescapeHtml4(content));
             }
-            discussion_text_view.setText(content);
+
+            buffer.append("<div style=\"overflow: hidden; width: 100%\"><div style=\"float: left;padding-top: 50px; color: grey\">");
+            JUser user = discussion.getFromUser();
+            buffer.append(user.getUsername());
+            buffer.append("</div><div style=\"float: right;padding-top: 50px; color: grey\">");
+            buffer.append(user.getName());
+            buffer.append("</div></div>");
+            discussion_text_view.loadData(buffer.toString(), "text/html", null);
         }
-        discussion_text_view.setTag(position);
-        discussion_text_view.setOnClickListener(new View.OnClickListener() {
+
+        discussion_open.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 int position = (int) view.getTag();
