@@ -110,7 +110,7 @@ public class DiscussionViewActivity extends AppCompatActivity implements IAsyncT
     }
 
     protected void handleCreateAction() {
-        Intent intent = new Intent(DiscussionViewActivity.this, DiscussionCreateActivity.class);
+        Intent intent = new Intent(DiscussionViewActivity.this, DiscussionStartActivity.class);
         intent.putExtra(Constants.DISCUSSION_IS_REPLY, false);
         intent.putExtra(Constants.DISCUSSION_ENTITY_ID, entityId);
         intent.putExtra(Constants.DISCUSSION_ENTITY_TYPE, entityType);

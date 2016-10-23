@@ -1,55 +1,51 @@
 package com.pack.pack.application.activity;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
-import com.pack.pack.application.AppController;
 import com.pack.pack.application.Constants;
 import com.pack.pack.application.R;
-import com.pack.pack.application.data.util.ApiConstants;
 import com.pack.pack.application.data.util.CreateDiscussionTask;
 import com.pack.pack.application.data.util.IAsyncTaskStatusListener;
 import com.pack.pack.application.topic.activity.model.ParcelableDiscussion;
-import com.pack.pack.application.view.RTFEditor;
-import com.pack.pack.application.view.RTFListener;
-import com.pack.pack.client.api.API;
-import com.pack.pack.client.api.APIBuilder;
-import com.pack.pack.client.api.APIConstants;
-import com.pack.pack.client.api.COMMAND;
-import com.pack.pack.model.web.EntityType;
 import com.pack.pack.model.web.JDiscussion;
 
-import org.apache.commons.lang3.StringEscapeUtils;
+/**
+ * Created by Saurav on 21-10-2016.
+ */
+public class DiscussionStartActivity extends Activity implements IAsyncTaskStatusListener {
 
-public class DiscussionCreateActivity extends Activity implements RTFListener, IAsyncTaskStatusListener {
+    private EditText discussion_title0;
 
-    private RTFEditor editor;
-    private String rtfText;
+    private EditText discussion_description0;
 
-    private ProgressDialog progressDialog;
+    private Button discussion_start_submit0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_create_discussion);
+        setContentView(R.layout.activity_start_discussion);
 
-        editor = (RTFEditor) findViewById(R.id.discussion_editor);
-        editor.setOnSaveListener(this);
-    }
-
-    @Override
-    public void onSave(String rtfText) {
-        rtfText = StringEscapeUtils.escapeHtml4(rtfText);
-        CreateDiscussionTask.CreateInfo obj = new CreateDiscussionTask.CreateInfo();
-        obj.content = rtfText;
-        obj.isReply = getIntent().getBooleanExtra(Constants.DISCUSSION_IS_REPLY, false);
-        obj.entityId = getIntent().getStringExtra(Constants.DISCUSSION_ENTITY_ID);
-        obj.entityType = getIntent().getStringExtra(Constants.DISCUSSION_ENTITY_TYPE);
-        new CreateDiscussionTask(this).execute(obj);
+        discussion_title0 = (EditText) findViewById(R.id.discussion_title0);
+        discussion_description0 = (EditText) findViewById(R.id.discussion_description0);
+        discussion_start_submit0 = (Button) findViewById(R.id.discussion_start_submit0);
+        discussion_start_submit0.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                CreateDiscussionTask.CreateInfo obj = new CreateDiscussionTask.CreateInfo();
+                obj.title = discussion_title0.getText().toString();
+                obj.content = discussion_description0.getText().toString();
+                obj.isReply = getIntent().getBooleanExtra(Constants.DISCUSSION_IS_REPLY, false);
+                obj.entityId = getIntent().getStringExtra(Constants.DISCUSSION_ENTITY_ID);
+                obj.entityType = getIntent().getStringExtra(Constants.DISCUSSION_ENTITY_TYPE);
+                new CreateDiscussionTask(DiscussionStartActivity.this).execute(obj);
+            }
+        });
     }
 
     public void done(JDiscussion discussion) {

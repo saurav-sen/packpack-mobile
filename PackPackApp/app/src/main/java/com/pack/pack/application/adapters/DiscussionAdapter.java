@@ -3,6 +3,10 @@ package com.pack.pack.application.adapters;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Typeface;
+import android.text.SpannableString;
+import android.text.style.StyleSpan;
+import android.text.style.UnderlineSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +23,7 @@ import com.pack.pack.model.web.JDiscussion;
 import com.pack.pack.model.web.JUser;
 
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.jsoup.Jsoup;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +41,9 @@ public class DiscussionAdapter extends ArrayAdapter<JDiscussion> implements IDis
 
     private ImageButton discussion_open;
 
-    private WebView discussion_text_view;
+    private TextView discussion_title;
+
+    private TextView discussion_description;
 
     public DiscussionAdapter(Activity activity, List<JDiscussion> discussions) {
         super(activity, R.layout.discussion_items, discussions);
@@ -79,32 +86,27 @@ public class DiscussionAdapter extends ArrayAdapter<JDiscussion> implements IDis
 
         discussion_open = (ImageButton) convertView.findViewById(R.id.discussion_open);
         discussion_open.setTag(position);
-        discussion_text_view = (WebView) convertView.findViewById(R.id.discussion_text_view);
+        discussion_title = (TextView) convertView.findViewById(R.id.discussion_title);
+        discussion_description = (TextView) convertView.findViewById(R.id.discussion_description);
 
         JDiscussion discussion = getItem(position);
         if(discussion != null) {
-            StringBuilder buffer = new StringBuilder();
+            String title = discussion.getTitle();
+            SpannableString spannableString = new SpannableString(title);
+            spannableString.setSpan(new UnderlineSpan(), 0, spannableString.length(), 0);
+            spannableString.setSpan(new StyleSpan(Typeface.BOLD), 0, spannableString.length(), 0);
+            discussion_title.setText(spannableString);
+
             String content = discussion.getContent();
-            /*if(!content.startsWith("&lt;")) {
-               // content = "&lt;div&gt;" + content + "&lt;/div&gt;";
-                content = content.substring(content.indexOf("&lt;") + 5);
-            }*/
             content = content.replaceAll("&amp;", "&");
+            content = StringEscapeUtils.unescapeHtml4(content);
             if(content.length() > 200) {
                 content = content.substring(0, 200);
-                buffer.append(StringEscapeUtils.unescapeHtml4(content));
-                buffer.append("...");
-            } else {
-                buffer.append(StringEscapeUtils.unescapeHtml4(content));
+                content = content + "...";
             }
 
-            buffer.append("<div style=\"overflow: hidden; width: 100%\"><div style=\"float: left;padding-top: 50px; color: grey\">");
-            JUser user = discussion.getFromUser();
-            buffer.append(user.getUsername());
-            buffer.append("</div><div style=\"float: right;padding-top: 50px; color: grey\">");
-            buffer.append(user.getName());
-            buffer.append("</div></div>");
-            discussion_text_view.loadData(buffer.toString(), "text/html", null);
+            content = Jsoup.parse(content).text();
+            discussion_description.setText(content);
         }
 
         discussion_open.setOnClickListener(new View.OnClickListener() {

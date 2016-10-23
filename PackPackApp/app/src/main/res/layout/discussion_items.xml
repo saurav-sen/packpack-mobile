@@ -10,12 +10,23 @@
         android:id="@+id/discussion_open"
         android:src="@drawable/common_full_open_on_phone"/>
 
-    <WebView
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/discussion_text_view"
-        android:layout_marginBottom="5dp">
-    </WebView>
+        android:layout_gravity="start"
+        android:id="@+id/discussion_title"
+        android:paddingTop="4dp">
+    </TextView>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/discussion_description"
+        android:layout_marginBottom="5dp"
+        android:paddingTop="5dp"
+        android:minLines="3"
+        android:maxLines="7">
+    </TextView>
 
     <View
         android:layout_width="match_parent"
