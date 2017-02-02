@@ -1,5 +1,6 @@
 package com.pack.pack.application.data.util;
 
+import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
@@ -8,6 +9,9 @@ import android.os.Build;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.provider.OpenableColumns;
+
+import java.io.File;
 
 /**
  * Created by Saurav on 12-06-2016.
@@ -154,5 +158,28 @@ public class FileUtil {
      */
     public static boolean isGooglePhotosUri(Uri uri) {
         return "com.google.android.apps.photos.content".equals(uri.getAuthority());
+    }
+
+    public static String getFileNameFromUri(final Uri uri, final Context context) {
+        String fileName = null;
+        if (uri != null) {
+            // Get fileName.
+            // File Scheme.
+            if (ContentResolver.SCHEME_FILE.equals(uri.getScheme())) {
+                File file = new File(uri.getPath());
+                fileName = file.getName();
+            }
+            // Content Scheme.
+            else if (ContentResolver.SCHEME_CONTENT.equals(uri.getScheme())) {
+                Cursor returnCursor =
+                        context.getContentResolver().query(uri, null, null, null, null);
+                if (returnCursor != null && returnCursor.moveToFirst()) {
+                    int nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+                    fileName = returnCursor.getString(nameIndex);
+                    returnCursor.close();
+                }
+            }
+        }
+        return fileName;
     }
 }

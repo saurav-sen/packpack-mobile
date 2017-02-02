@@ -27,10 +27,14 @@ import com.pack.pack.application.data.util.ApiConstants;
 import com.pack.pack.client.api.API;
 import com.pack.pack.client.api.APIBuilder;
 import com.pack.pack.client.api.APIConstants;
+import com.pack.pack.client.api.ByteBody;
 import com.pack.pack.client.api.COMMAND;
 import com.pack.pack.client.api.MultipartRequestProgressListener;
 import com.pack.pack.model.web.JPackAttachment;
 
+import org.apache.http.entity.mime.content.ContentBody;
+
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 
 import static com.pack.pack.application.AppController.TOPIC_ID_KEY;
@@ -38,6 +42,7 @@ import static com.pack.pack.application.AppController.UPLOAD_ENTITY_ID_KEY;
 import static com.pack.pack.application.AppController.UPLOAD_ENTITY_TYPE_KEY;
 import static com.pack.pack.application.AppController.UPLOAD_FILE_IS_PHOTO;
 import static com.pack.pack.application.AppController.UPLOAD_FILE_PATH;
+import static com.pack.pack.application.AppController.UPLOAD_FILE_BITMAP;
 import static com.pack.pack.application.AppController.UPLOAD_ATTACHMENT_TITLE;
 import static com.pack.pack.application.AppController.UPLOAD_ATTACHMENT_DESCRIPTION;
 
@@ -56,6 +61,8 @@ public class UploadActivity extends Activity {
     private String uploadEntityType;
 
     private String mediaFilePath;
+
+    private Bitmap mediaBitmap;
 
     private String title;
 
@@ -82,6 +89,8 @@ public class UploadActivity extends Activity {
         uploadEntityId = getIntent().getStringExtra(UPLOAD_ENTITY_ID_KEY);
         uploadEntityType = getIntent().getStringExtra(UPLOAD_ENTITY_TYPE_KEY);
         mediaFilePath = getIntent().getStringExtra(UPLOAD_FILE_PATH);
+        //mediaBitmap = getIntent().getParcelableExtra(UPLOAD_FILE_BITMAP);
+        mediaBitmap = AppController.getInstance().getSelectedBitmapPhoto();
         isPhotoUpload = getIntent().getBooleanExtra(UPLOAD_FILE_IS_PHOTO, true);
         title = getIntent().getStringExtra(UPLOAD_ATTACHMENT_TITLE) + "";
         description = getIntent().getStringExtra(UPLOAD_ATTACHMENT_DESCRIPTION) + "";
@@ -94,7 +103,7 @@ public class UploadActivity extends Activity {
         upload_title = (EditText) findViewById(R.id.upload_title);
         upload_description = (EditText) findViewById(R.id.upload_description);
 
-        if (mediaFilePath != null) {
+        if (mediaFilePath != null || mediaBitmap != null) {
             previewMedia();
         } else {
             Toast.makeText(getApplicationContext(),
@@ -121,8 +130,12 @@ public class UploadActivity extends Activity {
             // images
             options.inSampleSize = 8;
 
-            final Bitmap bitmap = BitmapFactory.decodeFile(mediaFilePath, options);
-            upload_imgPreview.setImageBitmap(bitmap);
+            if(mediaFilePath != null) {
+                final Bitmap bitmap = BitmapFactory.decodeFile(mediaFilePath, options);
+                upload_imgPreview.setImageBitmap(bitmap);
+            } else if(mediaBitmap != null) {
+                upload_imgPreview.setImageBitmap(mediaBitmap);
+            }
         } else {
             upload_imgPreview.setVisibility(View.GONE);
             upload_videoPreview.setVisibility(View.VISIBLE);
@@ -153,21 +166,41 @@ public class UploadActivity extends Activity {
             try {
                 COMMAND command = null;
                 if(JPackAttachment.class.getName().equals(uploadEntityType)) {
-                    File file = new File(mediaFilePath);
                     if(isPhotoUpload) {
                         command = COMMAND.ADD_IMAGE_TO_PACK;
                     } else {
                         command = COMMAND.ADD_VIDEO_TO_PACK;
                     }
-                    API api = APIBuilder.create(ApiConstants.BASE_URL).setAction(command)
+                    API api = null;
+                    APIBuilder apiBuilder = APIBuilder.create(ApiConstants.BASE_URL).setAction(command)
                             .setOauthToken(AppController.getInstance().getoAuthToken())
                             .addApiParam(APIConstants.User.ID, AppController.getInstance().getUserId())
                             .addApiParam(APIConstants.Pack.ID, uploadEntityId)
-                            .addApiParam(APIConstants.Topic.ID, topicId)
-                            .addApiParam(APIConstants.Attachment.FILE_ATTACHMENT, file)
-                            .addApiParam(APIConstants.Attachment.TITLE, title)
-                            .addApiParam(APIConstants.Attachment.DESCRIPTION, description)
-                            .build();
+                            .addApiParam(APIConstants.Topic.ID, topicId);
+
+                    if(AppController.getInstance().getSelectedGalleryVideo() != null) {
+                        ContentBody contentBody = AppController.getInstance().getSelectedGalleryVideo();
+                        api = apiBuilder.addApiParam(APIConstants.Attachment.FILE_ATTACHMENT, contentBody)
+                                .addApiParam(APIConstants.Attachment.TITLE, title)
+                                .addApiParam(APIConstants.Attachment.DESCRIPTION, description)
+                                .build();
+                    } else if(mediaFilePath != null) {
+                        File file = new File(mediaFilePath);
+                        api = apiBuilder.addApiParam(APIConstants.Attachment.FILE_ATTACHMENT, file)
+                                .addApiParam(APIConstants.Attachment.TITLE, title)
+                                .addApiParam(APIConstants.Attachment.DESCRIPTION, description)
+                                .build();
+                    } else if(mediaBitmap != null) {
+                        ByteArrayOutputStream baOS = new ByteArrayOutputStream();
+                        mediaBitmap.compress(Bitmap.CompressFormat.JPEG, 75, baOS);
+                        byte[] bytes = baOS.toByteArray();
+                        ByteBody byteBody = new ByteBody();
+                        byteBody.setBytes(bytes);
+                        api = apiBuilder.addApiParam(APIConstants.Attachment.FILE_ATTACHMENT, byteBody)
+                                .addApiParam(APIConstants.Attachment.TITLE, title)
+                                .addApiParam(APIConstants.Attachment.DESCRIPTION, description)
+                                .build();
+                    }
                     MultipartRequestProgressListener listener = new MultipartRequestProgressListener() {
                         @Override
                         public void countTransferProgress(long progress, long total) {
@@ -179,6 +212,9 @@ public class UploadActivity extends Activity {
                 }
             } catch (Exception e) {
                 Log.d(LOG_TAG, "Failed to upload attachment: " + e.getMessage());
+            } finally {
+                AppController.getInstance().setSelectedBitmapPhoto(null);
+                AppController.getInstance().setSelectedGalleryVideo(null);
             }
             return null;
         }

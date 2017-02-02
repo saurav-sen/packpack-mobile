@@ -17,14 +17,28 @@
             android:id="@+id/camera_preview"
             android:layout_width="match_parent"
             android:layout_height="100dp" />
-        <GridView
+        <!--GridView
             android:id="@+id/galley_items"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
+            android:layout_margin="2dp"
+            android:columnWidth="100dp"
             android:stretchMode="columnWidth"
             android:numColumns="3"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:focusable="true"
+            android:clickable="true" /-->
+        <Button
+            android:id="@+id/btnUploadSelectPhoto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Select Photo" />
+        <Button
+            android:id="@+id/btnUploadSelectVideo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Select Video" />
     </LinearLayout>
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/capture_photo"

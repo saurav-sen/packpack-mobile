@@ -12,6 +12,9 @@ import com.pack.pack.model.web.JPackAttachment;
 import com.pack.pack.model.web.JTopic;
 import com.pack.pack.model.web.JUser;
 
+import org.apache.http.entity.mime.content.ContentBody;
+
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +53,12 @@ public class AppController extends Application {
     public static final int IMAGE_PICK_REQUSET_CODE = 402;
 
     public static final int CROP_PHOTO_REQUEST_CODE = 420;
+
+    public static final int GALLERY_SELECT_PHOTO_REQUEST_CODE = 421;
+
+    public static final int GALLERY_SELECT_VIDEO_REQUEST_CODE = 422;
+
+    public static final String UPLOAD_FILE_BITMAP = "upload_file_bitmap";
 
     public static final String UPLOAD_FILE_PATH = "upload_file_path";
 
@@ -263,4 +272,25 @@ public class AppController extends Application {
         }
         return packAttachments;
     }
+
+    private Bitmap selectedBitmapPhoto;
+
+    public Bitmap getSelectedBitmapPhoto() {
+        return selectedBitmapPhoto;
+    }
+
+    public void setSelectedBitmapPhoto(Bitmap selectedBitmapPhoto) {
+        this.selectedBitmapPhoto = selectedBitmapPhoto;
+    }
+
+    private ContentBody selectedGalleryVideo;
+
+    public ContentBody getSelectedGalleryVideo() {
+        return selectedGalleryVideo;
+    }
+
+    public void setSelectedGalleryVideo(ContentBody selectedGalleryVideo) {
+        this.selectedGalleryVideo = selectedGalleryVideo;
+    }
+
 }
