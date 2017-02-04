@@ -8,6 +8,7 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
+import com.pack.pack.model.web.JCategories;
 import com.pack.pack.model.web.JPackAttachment;
 import com.pack.pack.model.web.JTopic;
 import com.pack.pack.model.web.JUser;
@@ -293,4 +294,13 @@ public class AppController extends Application {
         this.selectedGalleryVideo = selectedGalleryVideo;
     }
 
+    private JCategories supportedCategories;
+
+    public JCategories getSupportedCategories() {
+        return supportedCategories;
+    }
+
+    public void setSupportedCategories(JCategories supportedCategories) {
+        this.supportedCategories = supportedCategories;
+    }
 }

@@ -98,6 +98,17 @@ public class CreatePackActivity extends AppCompatActivity implements IAsyncTaskS
     }
 
     private void doCreatePack(PackCreateInfo info) {
+        String title = info.title + "";
+        String story = info.story + "";
+        if(title.length() < 5) {
+            Toast.makeText(CreatePackActivity.this, "Title should be of minimum 5 characters long.",
+                    Toast.LENGTH_LONG).show();
+            return;
+        } else if(story.length() < 50) {
+            Toast.makeText(CreatePackActivity.this, "Story should be of minimum 50 characters long.",
+                    Toast.LENGTH_LONG).show();
+            return;
+        }
         new CreateTopicTasK(this, this).execute(info);
     }
 

@@ -115,6 +115,15 @@ public class UploadActivity extends Activity {
             public void onClick(View view) {
                 title = upload_title.getText() + "";
                 description = upload_description.getText() + "";
+                if(title.length() < 5) {
+                    Toast.makeText(UploadActivity.this, "Title should be of minimum 5 characters long.",
+                            Toast.LENGTH_LONG).show();
+                    return;
+                } else if(description.length() < 50) {
+                    Toast.makeText(UploadActivity.this, "Description should be of minimum 50 characters long.",
+                            Toast.LENGTH_LONG).show();
+                    return;
+                }
                 new UploadJob().execute();
             }
         });

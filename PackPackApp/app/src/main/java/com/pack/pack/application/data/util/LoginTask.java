@@ -14,6 +14,7 @@ import com.pack.pack.client.api.API;
 import com.pack.pack.client.api.APIBuilder;
 import com.pack.pack.client.api.APIConstants;
 import com.pack.pack.client.api.COMMAND;
+import com.pack.pack.model.web.JCategories;
 import com.pack.pack.model.web.JTopic;
 import com.pack.pack.model.web.JTopics;
 import com.pack.pack.model.web.JUser;
@@ -103,6 +104,7 @@ public class LoginTask extends AbstractNetworkTask<UserInfo, Integer, AccessToke
                 followedCategories = stringBuilder.toString();
             }
 
+            // GET user owned topics
             api = APIBuilder
                     .create(ApiConstants.BASE_URL)
                     .setAction(COMMAND.GET_USER_OWNED_TOPICS)
@@ -118,6 +120,14 @@ public class LoginTask extends AbstractNetworkTask<UserInfo, Integer, AccessToke
                     userOwnedTopicInfos.add(userOwnedTopicInfo);
                 }
             }
+
+            // GET list of all system supported categories
+            api = APIBuilder
+                    .create(ApiConstants.BASE_URL)
+                    .setAction(COMMAND.GET_ALL_SYSTEM_SUPPORTED_CATEGORIES)
+                    .build();
+            JCategories supportedCategories = (JCategories)api.execute();
+            AppController.getInstance().setSupportedCategories(supportedCategories);
         } catch (Exception e) {
             Log.i(LOG_TAG, e.getMessage());
             errorMsg = e.getMessage();

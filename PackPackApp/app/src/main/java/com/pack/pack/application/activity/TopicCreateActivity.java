@@ -32,11 +32,13 @@ import com.pack.pack.client.api.APIBuilder;
 import com.pack.pack.client.api.APIConstants;
 import com.pack.pack.client.api.COMMAND;
 import com.pack.pack.client.api.MultipartRequestProgressListener;
+import com.pack.pack.model.web.JCategory;
 import com.pack.pack.model.web.JTopic;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.pack.pack.application.AppController.IMAGE_PICK_REQUSET_CODE;
@@ -184,8 +186,45 @@ public class TopicCreateActivity extends AppCompatActivity implements IAsyncTask
         String locality = topic_create_localityAddr.getText().toString();
         String city = topic_create_city.getText().toString();
         String country = topic_create_country.getText().toString();
+        if(topicName.length() < 5) {
+            Toast.makeText(TopicCreateActivity.this, "Name should be of minimum 5 characters long.",
+                    Toast.LENGTH_LONG).show();
+            return;
+        } else if(topicDescription.length() < 50) {
+            Toast.makeText(TopicCreateActivity.this, "Description should be of minimum 50 characters long.",
+                    Toast.LENGTH_LONG).show();
+            return;
+        } else if(!validateTopicCategory(topicCategory)) {
+            Toast.makeText(TopicCreateActivity.this, "Not a valid category name.",
+                    Toast.LENGTH_LONG).show();
+            return;
+        } else if(locality == null || locality.trim().isEmpty()) {
+            Toast.makeText(TopicCreateActivity.this, "Locality can't be empty.",
+                    Toast.LENGTH_LONG).show();
+            return;
+        } else if(city == null || city.trim().isEmpty()) {
+            Toast.makeText(TopicCreateActivity.this, "City can't be empty.",
+                    Toast.LENGTH_LONG).show();
+            return;
+        } else if(country == null || country.trim().isEmpty()) {
+            Toast.makeText(TopicCreateActivity.this, "Country can't be empty.",
+                    Toast.LENGTH_LONG).show();
+            return;
+        }
         TaskData data = new TaskData(topicName, topicDescription, topicCategory, locality, city, country);
         new TopicCreateTask(this).execute(data);
+    }
+
+    private boolean validateTopicCategory(String topicCategory) {
+        if(topicCategory == null || topicCategory.trim().isEmpty())
+            return false;
+        List<JCategory> categories = AppController.getInstance().getSupportedCategories().getCategories();
+        for(JCategory category : categories) {
+            if(category.getLabel().equalsIgnoreCase(topicCategory)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private class TopicCreateTask extends AbstractNetworkTask<TaskData, Integer, JTopic> {

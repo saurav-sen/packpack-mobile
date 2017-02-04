@@ -16,7 +16,7 @@ public interface ApiConstants {
     public static final String SPIRITUAL = "spiritual";
     public static final String OTHERS = "others";
 
-    public static final String[] SUPPORTED_CATEGORIES = new String[] {
+    /*public static final String[] SUPPORTED_CATEGORIES = new String[] {
             LIFESTYLE, ART, PHOTOGRAPHY, MUSIC, EDUCATION, FUN,
-            SPIRITUAL};
+            SPIRITUAL};*/
 }

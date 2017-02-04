@@ -3,7 +3,6 @@ package com.pack.pack.application.activity;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -12,9 +11,6 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TableLayout;
@@ -27,9 +23,10 @@ import com.pack.pack.client.api.API;
 import com.pack.pack.client.api.APIBuilder;
 import com.pack.pack.client.api.APIConstants;
 import com.pack.pack.client.api.COMMAND;
+import com.pack.pack.model.web.JCategories;
+import com.pack.pack.model.web.JCategory;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -58,14 +55,16 @@ public class FollowCategoryActivity extends Activity {
 
         layout = (LinearLayout) findViewById(R.id.follow_categories_main);
         int i = 0;
-        List<String> categories = new ArrayList<String>();
+        /*List<String> categories = new ArrayList<String>();
         categories.addAll(Arrays.asList(SUPPORTED_CATEGORIES));
         categories.add("Romance");
         categories.add("Politics");
         categories.add("Sports");
         categories.add("Jokes");
-        categories.add("PartyZone");
-        for(String category : SUPPORTED_CATEGORIES) {
+        categories.add("PartyZone");*/
+        JCategories categoriesContainer = AppController.getInstance().getSupportedCategories();
+        List<JCategory> categories = categoriesContainer.getCategories();
+        for(JCategory category : categories) {
             LinearLayout linearLayout = new LinearLayout(this);
             //linearLayout.setBackgroundColor(getResources().getColor(R.color.feed_bg));
             linearLayout.setBackground(getResources().getDrawable(R.drawable.border_shadow));
@@ -79,7 +78,7 @@ public class FollowCategoryActivity extends Activity {
             linearLayout.setLayoutParams(linearLayoutParams);
 
             TextView textView = new TextView(this);
-            textView.setText(category);
+            textView.setText(category.getLabel());
             textView.setTextSize(20);
             //textView.setTextColor(Color.BLACK);
             textView.setGravity(Gravity.CENTER_VERTICAL);
@@ -141,12 +140,15 @@ public class FollowCategoryActivity extends Activity {
     }
 
     private void doEditCategories() {
+        JCategories categoriesContainer = AppController.getInstance().getSupportedCategories();
+        List<JCategory> supportedCategories = categoriesContainer.getCategories();
         List<String> categories = new ArrayList<String>();
         Iterator<Map.Entry<Integer, Boolean>> itr = map.entrySet().iterator();
         while(itr.hasNext()) {
             Map.Entry<Integer, Boolean> entry = itr.next();
             if(entry.getValue()) {
-                categories.add(SUPPORTED_CATEGORIES[entry.getKey()]);
+                //categories.add(SUPPORTED_CATEGORIES[entry.getKey()]);
+                categories.add(supportedCategories.get(entry.getKey()).getName());
             }
         }
         String userId = AppController.getInstance().getUserId();
