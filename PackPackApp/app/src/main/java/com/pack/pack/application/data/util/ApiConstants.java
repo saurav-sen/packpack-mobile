@@ -4,8 +4,10 @@ package com.pack.pack.application.data.util;
  * Created by Saurav on 23-07-2016.
  */
 public interface ApiConstants {
-    //public static final String BASE_URL = "http://54.169.84.61:9999/packpack/";
-    public static final String BASE_URL = "http://192.168.35.12:8080/packpack/";
+
+    //public static final String BASE_URL = "http://192.168.35.12:8080/packpack/"; //DEV Environment
+    public static final String BASE_URL = "http://api.squill.co.in/packpack/"; //PRODUCTION Environment
+    public static final boolean IS_PRODUCTION_ENV = true;
 
     public static final String LIFESTYLE = "lifestyle";
     public static final String ART = "art";

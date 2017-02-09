@@ -13,6 +13,7 @@ import android.widget.ProgressBar;
 
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.data.util.AbstractNetworkTask;
+import com.pack.pack.application.data.util.ApiConstants;
 import com.pack.pack.application.db.DbObject;
 import com.pack.pack.application.db.ResourceURL;
 import com.pack.pack.client.api.API;
@@ -70,11 +71,19 @@ public class DownloadImageTask extends AbstractNetworkTask<String, Void, Bitmap>
 
     @Override
     protected COMMAND command() {
+        if(ApiConstants.IS_PRODUCTION_ENV) {
+            return COMMAND.LOAD_EXTERNAL_RESOURCE;
+        }
         return COMMAND.LOAD_RESOURCE;
     }
 
     @Override
     protected Map<String, Object> prepareApiParams(String inputObject) {
+        if(ApiConstants.IS_PRODUCTION_ENV) {
+            Map<String, Object> apiParams = new HashMap<String, Object>();
+            apiParams.put(APIConstants.ExternalResource.RESOURCE_URL, inputObject);
+            return apiParams;
+        }
         Map<String, Object> apiParams = new HashMap<String, Object>();
         apiParams.put(APIConstants.ProtectedResource.RESOURCE_URL, inputObject);
         apiParams.put(APIConstants.Image.WIDTH, imageWidth);
@@ -83,6 +92,9 @@ public class DownloadImageTask extends AbstractNetworkTask<String, Void, Bitmap>
     }
 
     protected String lookupURL(String url) {
+        if(ApiConstants.IS_PRODUCTION_ENV) {
+            return url != null ? url.trim() : url;
+        }
         return URLEncoder.encode(url) + "?w=" + imageWidth + "&h=" + imageHeight;
     }
 
