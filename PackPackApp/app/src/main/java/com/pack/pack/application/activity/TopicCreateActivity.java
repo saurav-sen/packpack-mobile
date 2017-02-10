@@ -190,7 +190,7 @@ public class TopicCreateActivity extends AppCompatActivity implements IAsyncTask
             Toast.makeText(TopicCreateActivity.this, "Name should be of minimum 5 characters long.",
                     Toast.LENGTH_LONG).show();
             return;
-        } else if(topicDescription.length() < 50) {
+        } else if(topicDescription.length() < ApiConstants.MIN_DESC_FIELD_LENGTH) {
             Toast.makeText(TopicCreateActivity.this, "Description should be of minimum 50 characters long.",
                     Toast.LENGTH_LONG).show();
             return;

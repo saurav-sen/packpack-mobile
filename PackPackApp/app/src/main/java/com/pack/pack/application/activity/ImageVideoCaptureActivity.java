@@ -30,8 +30,10 @@ import android.widget.Toast;
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.Constants;
 import com.pack.pack.application.R;
+import com.pack.pack.application.data.util.ApiConstants;
 import com.pack.pack.application.data.util.FileUtil;
 import com.pack.pack.application.data.util.ImageUtil;
+import com.pack.pack.application.topic.activity.model.UploadAttachmentData;
 import com.pack.pack.application.view.CameraPreview;
 
 import org.apache.http.entity.mime.content.ContentBody;
@@ -48,6 +50,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import static com.pack.pack.application.AppController.APP_NAME;
 import static com.pack.pack.application.AppController.MEDIA_TYPE_IMAGE;
 import static com.pack.pack.application.AppController.MEDIA_TYPE_VIDEO;
 import static com.pack.pack.application.AppController.CAMERA_CAPTURE_PHOTO_REQUEST_CODE;
@@ -157,6 +160,7 @@ public class ImageVideoCaptureActivity extends Activity {
     }
 
     private void selectPhotoFromGallery() {
+        copyUploadData();
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
@@ -164,96 +168,18 @@ public class ImageVideoCaptureActivity extends Activity {
     }
 
     private void selectVideoFromGallery() {
+        copyUploadData();
         Intent intent = new Intent();
         intent.setType("video/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(Intent.createChooser(intent, "Select Video"), GALLERY_SELECT_VIDEO_REQUEST_CODE);
     }
 
-    /*private void initializeGalleryGridView() {
-        galley_items = (GridView) findViewById(R.id.galley_items);
-        if(galleryImages != null && !galleryImages.isEmpty()) {
-            galley_items.setAdapter(new GalleryImageAdapter());
-        }
-    }*/
-
-   /* private class GalleryImageAdapter extends BaseAdapter {
-
-        private LayoutInflater layoutInflater;
-
-        @Override
-        public int getCount() {
-            return galleryImages.size();
-        }
-
-        @Override
-        public Object getItem(int i) {
-            return i < getCount() ? galleryImages.get(i) : null;
-        }
-
-        @Override
-        public long getItemId(int i) {
-            return i;
-        }
-
-        @Override
-        public View getView(int i, View view, ViewGroup viewGroup) {
-            if(layoutInflater == null) {
-                layoutInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            }
-            ViewHolder viewHolder = null;
-            if(view == null) {
-                viewHolder = new ViewHolder();
-                view = layoutInflater.inflate(R.layout.gallery_items, null);
-                viewHolder.imageView = (ImageView) view.findViewById(R.id.gallery_item_image);
-                viewHolder.imageView.setTag(i);
-                viewHolder.imageView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        int position = (int) view.getTag();
-                        String selectedGalleryImage = (galleryImages != null
-                                && galleryImages.size() > position) ?
-                                galleryImages.get(position) : null;
-                        if(selectedGalleryImage != null) {
-                            startUploadActivity(selectedGalleryImage, true);
-                        }
-                    }
-                });
-                view.setTag(viewHolder);
-            } else {
-                viewHolder = (ViewHolder) view.getTag();
-            }
-            String imageFilePath = (String) getItem(i);
-            if(imageFilePath != null) {
-                Bitmap image = BitmapFactory.decodeFile(imageFilePath);
-                viewHolder.imageView.setImageBitmap(image);
-            }
-            return view;
-        }
-    }*/
-
     private class ViewHolder {
         ImageView imageView;
     }
 
-    /*private List<String> getAllGalleryImagesPath() {
-        List<String> list = new LinkedList<String>();
-        String[] projection = new String[] {MediaStore.Images.Media.DATA, MediaStore.Images.Media.BUCKET_DISPLAY_NAME};
-        Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-        Cursor cursor = this.getContentResolver().query(uri, projection, null, null, null);
-        if(cursor.moveToFirst()) {
-            int dataColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-            do {
-                String data = cursor.getString(dataColumn);
-                if(data != null) {
-                    list.add(data);
-                }
-            } while (cursor.moveToNext());
-        }
-        return list;
-    }*/
-
-    @Override
+   /*@Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putParcelable(MEDIA_FILE_URI_KEY, mediaFileUri);
@@ -269,7 +195,7 @@ public class ImageVideoCaptureActivity extends Activity {
         topicId = savedInstanceState.getString(TOPIC_ID_KEY);
         uploadEntityId = savedInstanceState.getString(UPLOAD_ENTITY_ID_KEY);
         uploadEntityType = savedInstanceState.getString(UPLOAD_ENTITY_TYPE_KEY);
-    }
+    }*/
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -278,7 +204,15 @@ public class ImageVideoCaptureActivity extends Activity {
             case CAMERA_CAPTURE_PHOTO_REQUEST_CODE:
             {
                 if(resultCode == RESULT_OK) {
-                    startUploadActivity(mediaFileUri.getPath(), true);
+                    /*mediaFileUri = AppController.getInstance().getUploadAttachmentData().getMediaFileUri();
+                    startUploadActivity(mediaFileUri.getPath(), true);*/
+                    try {
+                        Bitmap bitmap = MediaStore.Images.Media.getBitmap(
+                                getContentResolver(), data.getData());
+                        startUploadActivity(bitmap);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 } else {
                     Toast.makeText(getApplicationContext(),
                             "You have cancelled photo capture", Toast.LENGTH_SHORT)
@@ -289,6 +223,7 @@ public class ImageVideoCaptureActivity extends Activity {
             case CAMERA_RECORD_VIDEO_REQUEST_CODE:
             {
                 if(resultCode == RESULT_OK) {
+                    mediaFileUri = AppController.getInstance().getUploadAttachmentData().getMediaFileUri();
                     startUploadActivity(mediaFileUri.getPath(), false);
                 } else {
                     Toast.makeText(getApplicationContext(),
@@ -301,9 +236,18 @@ public class ImageVideoCaptureActivity extends Activity {
                 if(resultCode == RESULT_OK) {
                     try {
                         Bitmap bitmap = MediaStore.Images.Media.getBitmap(
-                                getApplicationContext().getContentResolver(),
-                                data.getData());
+                                getContentResolver(), data.getData());
                         startUploadActivity(bitmap);
+                       /* if(!ApiConstants.IS_PRODUCTION_ENV) {
+                            Bitmap bitmap = MediaStore.Images.Media.getBitmap(
+                                    getContentResolver(), data.getData());
+                            startUploadActivity(bitmap);
+                        } else {
+                            Uri selectedPhotoUri = data.getData();
+                            String path = FileUtil.getPath(this, selectedPhotoUri);
+                            AppController.getInstance().getUploadAttachmentData().setMediaFileUri(selectedPhotoUri);
+                            startUploadActivity(path, true);
+                        }*/
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -325,30 +269,12 @@ public class ImageVideoCaptureActivity extends Activity {
                         String fileName = FileUtil.getFileNameFromUri(selectedVideoUri, getApplicationContext());
                         ContentBody contentBody = new InputStreamBody(inputStream, fileName);
                         AppController.getInstance().setSelectedGalleryVideo(contentBody);
+                        AppController.getInstance().getUploadAttachmentData().setMediaFileUri(selectedVideoUri);
                         String selectedVideoUriPath = FileUtil.getPath(getApplicationContext(), selectedVideoUri);
                         startUploadActivity(selectedVideoUriPath, false);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    /*FileInputStream inputStream = null;
-                    try {
-                        File file = new File(selectedVideoUriPath);
-                        inputStream = new FileInputStream(file);
-                        byte[] bytes = new byte[(int)file.length()];
-                        inputStream.read(bytes);
-                        AppController.getInstance().setSelectedGalleryVideo(bytes);
-                        startUploadActivity(selectedVideoUriPath, false);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    } finally {
-                        try {
-                            if(inputStream != null) {
-                                inputStream.close();
-                            }
-                        } catch (IOException e) {
-
-                        }
-                    }*/
                 } else {
                     Toast.makeText(getApplicationContext(),
                             "You have cancelled video selection", Toast.LENGTH_SHORT)
@@ -363,15 +289,30 @@ public class ImageVideoCaptureActivity extends Activity {
 
     private void startUploadActivity(String filePath, boolean isPhoto) {
         Intent intent = new Intent(this, UploadActivity.class);
+        UploadAttachmentData uploadAttachmentData = AppController.getInstance().getUploadAttachmentData();
         intent.putExtra(UPLOAD_FILE_PATH, filePath);
-        intent.putExtra(TOPIC_ID_KEY, topicId);
+        intent.putExtra(TOPIC_ID_KEY, uploadAttachmentData.getTopicId());
         intent.putExtra(UPLOAD_FILE_IS_PHOTO, isPhoto);
-        intent.putExtra(UPLOAD_ENTITY_ID_KEY, uploadEntityId);
-        intent.putExtra(UPLOAD_ENTITY_TYPE_KEY, uploadEntityType);
+        intent.putExtra(UPLOAD_ENTITY_ID_KEY, uploadAttachmentData.getUploadEntityId());
+        intent.putExtra(UPLOAD_ENTITY_TYPE_KEY, uploadAttachmentData.getUploadEntityType());
         startActivityForResult(intent, Constants.PACK_ATTACHMENT_UPLOAD_REQUEST_CODE);
     }
 
     private void startUploadActivity(Bitmap bitmap) {
+        Intent intent = new Intent(this, UploadActivity.class);
+        //intent.putExtra(UPLOAD_FILE_BITMAP, bitmap);
+        AppController.getInstance().setSelectedBitmapPhoto(bitmap);
+
+        UploadAttachmentData uploadAttachmentData = AppController.getInstance().getUploadAttachmentData();
+
+        intent.putExtra(TOPIC_ID_KEY, uploadAttachmentData.getTopicId());
+        intent.putExtra(UPLOAD_FILE_IS_PHOTO, true);
+        intent.putExtra(UPLOAD_ENTITY_ID_KEY, uploadAttachmentData.getUploadEntityId());
+        intent.putExtra(UPLOAD_ENTITY_TYPE_KEY, uploadAttachmentData.getUploadEntityType());
+        startActivityForResult(intent, Constants.PACK_ATTACHMENT_UPLOAD_REQUEST_CODE);
+    }
+
+    /*private void startUploadActivity(Bitmap bitmap) {
         Intent intent = new Intent(this, UploadActivity.class);
         //intent.putExtra(UPLOAD_FILE_BITMAP, bitmap);
         AppController.getInstance().setSelectedBitmapPhoto(bitmap);
@@ -380,35 +321,27 @@ public class ImageVideoCaptureActivity extends Activity {
         intent.putExtra(UPLOAD_ENTITY_ID_KEY, uploadEntityId);
         intent.putExtra(UPLOAD_ENTITY_TYPE_KEY, uploadEntityType);
         startActivityForResult(intent, Constants.PACK_ATTACHMENT_UPLOAD_REQUEST_CODE);
-    }
-
-    /*private String getGalleryVideoPath(Uri uri) {
-        Cursor cursor = getContentResolver().query(uri, null, null, null, null);
-        cursor.moveToFirst();
-        String document_id = cursor.getString(0);
-        document_id = document_id.substring(document_id.lastIndexOf(":") + 1);
-        cursor.close();
-
-        cursor = getContentResolver().query(
-                android.provider.MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
-                null, MediaStore.Images.Media._ID + " = ? ", new String[]{document_id}, null);
-        cursor.moveToFirst();
-        String path = cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.DATA));
-        cursor.close();
-
-        return path;
     }*/
 
+    private void copyUploadData() {
+        UploadAttachmentData uploadAttachmentData = new UploadAttachmentData(mediaFileUri, uploadEntityId, uploadEntityType, topicId);
+        AppController.getInstance().setUploadAttachmentData(uploadAttachmentData);
+    }
+
     private void capturePhoto() {
+        copyUploadData();
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         mediaFileUri = ImageUtil.getOutputMediaFileUri(MEDIA_TYPE_IMAGE);
+        AppController.getInstance().getUploadAttachmentData().setMediaFileUri(mediaFileUri);
         intent.putExtra(MediaStore.EXTRA_OUTPUT, mediaFileUri);
         startActivityForResult(intent, CAMERA_CAPTURE_PHOTO_REQUEST_CODE);
     }
 
     private void recordVideo() {
+        copyUploadData();
         Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
         mediaFileUri = ImageUtil.getOutputMediaFileUri(MEDIA_TYPE_VIDEO);
+        AppController.getInstance().getUploadAttachmentData().setMediaFileUri(mediaFileUri);
         intent.putExtra(MediaStore.EXTRA_OUTPUT, mediaFileUri);
         startActivityForResult(intent, CAMERA_RECORD_VIDEO_REQUEST_CODE);
     }
@@ -441,6 +374,9 @@ public class ImageVideoCaptureActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
+        if(AppController.getInstance().getUploadAttachmentData() != null) {
+            return;
+        }
         if(!AppController.getInstance().isCameraPermissionGranted())
             return;
         cameraPreview = new CameraPreview(this);
@@ -452,6 +388,9 @@ public class ImageVideoCaptureActivity extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
+        if(AppController.getInstance().getUploadAttachmentData() != null) {
+            return;
+        }
         if(cameraPreview != null) {
             cameraPreview.stop();
         }

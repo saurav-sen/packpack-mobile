@@ -24,6 +24,7 @@ import android.widget.VideoView;
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
 import com.pack.pack.application.data.util.ApiConstants;
+import com.pack.pack.application.data.util.ImageUtil;
 import com.pack.pack.client.api.API;
 import com.pack.pack.client.api.APIBuilder;
 import com.pack.pack.client.api.APIConstants;
@@ -85,6 +86,8 @@ public class UploadActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_upload);
 
+        AppController.getInstance().setUploadAttachmentData(null);
+
         topicId = getIntent().getStringExtra(TOPIC_ID_KEY);
         uploadEntityId = getIntent().getStringExtra(UPLOAD_ENTITY_ID_KEY);
         uploadEntityType = getIntent().getStringExtra(UPLOAD_ENTITY_TYPE_KEY);
@@ -119,7 +122,7 @@ public class UploadActivity extends Activity {
                     Toast.makeText(UploadActivity.this, "Title should be of minimum 5 characters long.",
                             Toast.LENGTH_LONG).show();
                     return;
-                } else if(description.length() < 50) {
+                } else if(description.length() < ApiConstants.MIN_DESC_FIELD_LENGTH) {
                     Toast.makeText(UploadActivity.this, "Description should be of minimum 50 characters long.",
                             Toast.LENGTH_LONG).show();
                     return;
@@ -200,8 +203,9 @@ public class UploadActivity extends Activity {
                                 .addApiParam(APIConstants.Attachment.DESCRIPTION, description)
                                 .build();
                     } else if(mediaBitmap != null) {
+                        mediaBitmap = ImageUtil.downscaleBitmap(mediaBitmap, 1200, 900);
                         ByteArrayOutputStream baOS = new ByteArrayOutputStream();
-                        mediaBitmap.compress(Bitmap.CompressFormat.JPEG, 75, baOS);
+                        mediaBitmap.compress(Bitmap.CompressFormat.JPEG, 60, baOS);
                         byte[] bytes = baOS.toByteArray();
                         ByteBody byteBody = new ByteBody();
                         byteBody.setBytes(bytes);
@@ -217,7 +221,7 @@ public class UploadActivity extends Activity {
                             publishProgress(percentage);
                         }
                     };
-                    api.execute(listener);
+                    api.execute(null);
                 }
             } catch (Exception e) {
                 Log.d(LOG_TAG, "Failed to upload attachment: " + e.getMessage());

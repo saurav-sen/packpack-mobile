@@ -18,6 +18,8 @@ public interface ApiConstants {
     public static final String SPIRITUAL = "spiritual";
     public static final String OTHERS = "others";
 
+    public static final int MIN_DESC_FIELD_LENGTH = 5;
+
     /*public static final String[] SUPPORTED_CATEGORIES = new String[] {
             LIFESTYLE, ART, PHOTOGRAPHY, MUSIC, EDUCATION, FUN,
             SPIRITUAL};*/

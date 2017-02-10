@@ -182,7 +182,10 @@ public class InsideTopicActivity extends AppCompatActivity {
             //intent.putExtra(TOPIC_ID_KEY, topicId);
             //startActivity(intent);
             if(topic != null) {
-                new LoadPackTask().execute(topic);
+                //new LoadPackTask().execute(topic);
+                Intent intent = new Intent(InsideTopicActivity.this, InsideTopicActivity.class);
+                intent.putExtra(AppController.TOPIC_PARCELABLE_KEY, topic);
+                startActivity(intent);
             }
         }
     }

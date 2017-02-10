@@ -2,6 +2,8 @@ package com.pack.pack.application.data.util;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -77,4 +79,24 @@ public class ImageUtil {
             }
         }
     }*/
+
+    public static Bitmap downscaleBitmap(Bitmap bitmap, int preferredWidth, int preferredHeight) {
+        int originalWidth = bitmap.getWidth();
+        int originalHeight = bitmap.getHeight();
+
+        // FALSE case (ignore it to save time)
+        if(preferredWidth >= originalWidth && preferredHeight >= originalHeight) {
+            return bitmap;
+        }
+
+        float widthScaleRatio = preferredWidth < originalWidth ? ((float)preferredWidth) / originalWidth : 1.0f;
+        float heightScaleRatio = preferredHeight < originalHeight ? ((float)preferredHeight) / originalHeight : 1.0f;
+
+        Matrix transformation = new Matrix();
+        transformation.postScale(widthScaleRatio, heightScaleRatio);
+
+        Bitmap downscaleBitmap = Bitmap.createBitmap(bitmap, 0, 0, originalWidth, originalHeight, transformation, true);
+        bitmap.recycle();
+        return downscaleBitmap;
+    }
 }

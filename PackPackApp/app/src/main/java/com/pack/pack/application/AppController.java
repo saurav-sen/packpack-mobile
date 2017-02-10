@@ -8,6 +8,7 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
+import com.pack.pack.application.topic.activity.model.UploadAttachmentData;
 import com.pack.pack.model.web.JCategories;
 import com.pack.pack.model.web.JPackAttachment;
 import com.pack.pack.model.web.JTopic;
@@ -15,6 +16,7 @@ import com.pack.pack.model.web.JUser;
 
 import org.apache.http.entity.mime.content.ContentBody;
 
+import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -302,5 +304,15 @@ public class AppController extends Application {
 
     public void setSupportedCategories(JCategories supportedCategories) {
         this.supportedCategories = supportedCategories;
+    }
+
+    private UploadAttachmentData uploadAttachmentData;
+
+    public UploadAttachmentData getUploadAttachmentData() {
+        return uploadAttachmentData;
+    }
+
+    public void setUploadAttachmentData(UploadAttachmentData uploadAttachmentData) {
+        this.uploadAttachmentData = uploadAttachmentData;
     }
 }

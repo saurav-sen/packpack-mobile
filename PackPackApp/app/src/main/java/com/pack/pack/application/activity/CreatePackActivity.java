@@ -17,6 +17,7 @@ import com.pack.pack.application.AppController;
 import com.pack.pack.application.Constants;
 import com.pack.pack.application.R;
 import com.pack.pack.application.data.util.AbstractNetworkTask;
+import com.pack.pack.application.data.util.ApiConstants;
 import com.pack.pack.application.data.util.IAsyncTaskStatusListener;
 import com.pack.pack.application.topic.activity.model.ParcelablePack;
 import com.pack.pack.client.api.API;
@@ -104,21 +105,21 @@ public class CreatePackActivity extends AppCompatActivity implements IAsyncTaskS
             Toast.makeText(CreatePackActivity.this, "Title should be of minimum 5 characters long.",
                     Toast.LENGTH_LONG).show();
             return;
-        } else if(story.length() < 50) {
+        } else if(story.length() < ApiConstants.MIN_DESC_FIELD_LENGTH) {
             Toast.makeText(CreatePackActivity.this, "Story should be of minimum 50 characters long.",
                     Toast.LENGTH_LONG).show();
             return;
         }
-        new CreateTopicTasK(this, this).execute(info);
+        new CreatePackTasK(this, this).execute(info);
     }
 
-    private class CreateTopicTasK extends AbstractNetworkTask<PackCreateInfo, Integer, JPack> {
+    private class CreatePackTasK extends AbstractNetworkTask<PackCreateInfo, Integer, JPack> {
 
         private String containerId;
 
         private String errorMsg;
 
-        CreateTopicTasK(Context context, IAsyncTaskStatusListener listener) {
+        CreatePackTasK(Context context, IAsyncTaskStatusListener listener) {
             super(true, true, context);
             addListener(listener);
         }
