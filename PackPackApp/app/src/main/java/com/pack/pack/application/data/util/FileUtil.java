@@ -18,6 +18,12 @@ import java.io.File;
  */
 public class FileUtil {
 
+    public static String getParentFilePath(final Context context, final Uri uri) {
+        String filePath = getPath(context, uri);
+        File file = new File(filePath);
+        return file.getParent();
+    }
+
     /**
      * Get a file path from a Uri. This will get the the path for Storage Access
      * Framework Documents, as well as the _data field for the MediaStore and

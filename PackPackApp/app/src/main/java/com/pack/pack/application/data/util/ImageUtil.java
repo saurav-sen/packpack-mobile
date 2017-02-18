@@ -9,6 +9,9 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 
+import com.github.hiteshsondhi88.libffmpeg.FFmpeg;
+import com.github.hiteshsondhi88.libffmpeg.FFmpegExecuteResponseHandler;
+
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -98,5 +101,45 @@ public class ImageUtil {
         Bitmap downscaleBitmap = Bitmap.createBitmap(bitmap, 0, 0, originalWidth, originalHeight, transformation, true);
         bitmap.recycle();
         return downscaleBitmap;
+    }
+
+    public static void compressVideo(final Context context, String inputFilePath, String outputFilePath, final CompressionStatusListener listener) throws Exception {
+        // Using H.264 AI backed compression to compromise minimum on quality
+        // @ http://writingminds.github.io/ffmpeg-android-java/
+        //final String cmd = "-i " + inputFilePath + " -c:v libx264 -crf 24 -b:v 1M -c:a aac " + outputFilePath;
+        final String cmd = "-i " + inputFilePath + " -vf scale=400:600 " + outputFilePath;
+        String[] compress = new String[] {cmd};
+        FFmpeg.getInstance(context).execute(compress, new FFmpegExecuteResponseHandler() {
+            @Override
+            public void onSuccess(String message) {
+                if(listener != null) {
+                    listener.onSuccess(message);
+                }
+            }
+
+            @Override
+            public void onProgress(String message) {
+
+            }
+
+            @Override
+            public void onFailure(String message) {
+                if(listener != null) {
+                    listener.onFailure(message);
+                }
+            }
+
+            @Override
+            public void onStart() {
+
+            }
+
+            @Override
+            public void onFinish() {
+                if(listener != null) {
+                    listener.onFinish();
+                }
+            }
+        });
     }
 }

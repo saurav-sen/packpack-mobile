@@ -34,6 +34,26 @@ public class ParcelablePack implements Parcelable {
 
     private String parentTopicId;
 
+    public String getNextLink() {
+        return nextLink;
+    }
+
+    public void setNextLink(String nextLink) {
+        this.nextLink = nextLink;
+    }
+
+    public String getPreviousLink() {
+        return previousLink;
+    }
+
+    public void setPreviousLink(String previousLink) {
+        this.previousLink = previousLink;
+    }
+
+    private String nextLink;
+
+    private String previousLink;
+
     public ParcelablePack() {
     }
 
@@ -54,6 +74,8 @@ public class ParcelablePack implements Parcelable {
         setLikes(likes);
         setViews(views);
         setParentTopicId(parentTopicId);
+        setNextLink("FIRST_PAGE");
+        setPreviousLink("FIRST_PAGE");
     }
 
     public String getParentTopicId() {
@@ -144,6 +166,16 @@ public class ParcelablePack implements Parcelable {
         parcel.writeInt(likes);
         parcel.writeInt(views);
         parcel.writeString(parentTopicId);
+        if(nextLink != null) {
+            parcel.writeString(nextLink);
+        } else {
+            parcel.writeString("FIRST_PAGE");
+        }
+        if(previousLink != null) {
+            parcel.writeString(previousLink);
+        } else {
+            parcel.writeString("FIRST_PAGE");
+        }
     }
 
     public static final Parcelable.Creator<ParcelablePack> CREATOR = new Parcelable.Creator<ParcelablePack>() {
@@ -159,7 +191,20 @@ public class ParcelablePack implements Parcelable {
             int likes = parcel.readInt();
             int views = parcel.readInt();
             String parentTopicId = parcel.readString();
-            return new ParcelablePack(id, story, creatorName, title, rating, creationTime, likes, views, parentTopicId);
+            String nextLink = parcel.readString();
+            String previousLink = parcel.readString();
+            ParcelablePack result = new ParcelablePack(id, story, creatorName, title, rating, creationTime, likes, views, parentTopicId);
+            if(nextLink != null) {
+                result.setNextLink(nextLink);
+            } else {
+                result.setNextLink("FIRST_PAGE");
+            }
+            if(previousLink != null) {
+                result.setPreviousLink(previousLink);
+            } else {
+                result.setPreviousLink("FIRST_PAGE");
+            }
+            return result;
         }
 
         @Override

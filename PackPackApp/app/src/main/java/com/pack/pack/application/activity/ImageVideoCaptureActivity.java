@@ -27,10 +27,13 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.github.hiteshsondhi88.libffmpeg.FFmpeg;
+import com.github.hiteshsondhi88.libffmpeg.FFmpegExecuteResponseHandler;
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.Constants;
 import com.pack.pack.application.R;
 import com.pack.pack.application.data.util.ApiConstants;
+import com.pack.pack.application.data.util.CompressionStatusListener;
 import com.pack.pack.application.data.util.FileUtil;
 import com.pack.pack.application.data.util.ImageUtil;
 import com.pack.pack.application.topic.activity.model.UploadAttachmentData;
@@ -223,8 +226,50 @@ public class ImageVideoCaptureActivity extends Activity {
             case CAMERA_RECORD_VIDEO_REQUEST_CODE:
             {
                 if(resultCode == RESULT_OK) {
-                    mediaFileUri = AppController.getInstance().getUploadAttachmentData().getMediaFileUri();
-                    startUploadActivity(mediaFileUri.getPath(), false);
+                   /* mediaFileUri = AppController.getInstance().getUploadAttachmentData().getMediaFileUri();
+                    startUploadActivity(mediaFileUri.getPath(), false);*/
+
+                    try {
+                        mediaFileUri = AppController.getInstance().getUploadAttachmentData().getMediaFileUri();
+                        final String fileName = FileUtil.getFileNameFromUri(mediaFileUri, getApplicationContext());
+                        String selectedInputVideoFilePath = FileUtil.getPath(this, mediaFileUri);
+                        File file = new File(selectedInputVideoFilePath);
+                        /*String selectedVideoFilePath = file.getParent();
+                        if(!selectedVideoFilePath.endsWith(File.separator)) {
+                            selectedVideoFilePath = selectedVideoFilePath + File.separator;
+                        }*/
+                        File selectedVideoFileDir = this.getCacheDir();
+                        final File selectedVideoFile = File.createTempFile(ApiConstants.APP_NAME, ".mp4", selectedVideoFileDir);
+
+                        ImageUtil.compressVideo(this, selectedInputVideoFilePath, selectedVideoFile.getAbsolutePath(), new CompressionStatusListener() {
+                            @Override
+                            public void onSuccess(String message) {
+                                try {
+                                    InputStream inputStream = new FileInputStream(selectedVideoFile);
+                                    ContentBody contentBody = new InputStreamBody(inputStream, fileName);
+                                    AppController.getInstance().setSelectedGalleryVideo(contentBody);
+                                    AppController.getInstance().getUploadAttachmentData().setMediaFileUri(mediaFileUri);
+                                    String selectedVideoUriPath = FileUtil.getPath(getApplicationContext(), mediaFileUri);
+                                    startUploadActivity(selectedVideoUriPath, false);
+                                } catch (FileNotFoundException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(String message) {
+                                mediaFileUri = AppController.getInstance().getUploadAttachmentData().getMediaFileUri();
+                                startUploadActivity(mediaFileUri.getPath(), false);
+                            }
+
+                            @Override
+                            public void onFinish() {
+
+                            }
+                        });
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 } else {
                     Toast.makeText(getApplicationContext(),
                             "You have cancelled video recording", Toast.LENGTH_SHORT)
@@ -263,15 +308,45 @@ public class ImageVideoCaptureActivity extends Activity {
                     startUploadActivity(mediaFileUri.getPath(), false);*/
                     /*Uri selectedVideoUri = data.getData();
                     String selectedVideoUriPath = getGalleryVideoPath(selectedVideoUri);*/
-                    Uri selectedVideoUri = data.getData();
+                    final Uri selectedVideoUri = data.getData();
                     try {
-                        InputStream inputStream = getApplicationContext().getContentResolver().openInputStream(selectedVideoUri);
-                        String fileName = FileUtil.getFileNameFromUri(selectedVideoUri, getApplicationContext());
-                        ContentBody contentBody = new InputStreamBody(inputStream, fileName);
-                        AppController.getInstance().setSelectedGalleryVideo(contentBody);
-                        AppController.getInstance().getUploadAttachmentData().setMediaFileUri(selectedVideoUri);
-                        String selectedVideoUriPath = FileUtil.getPath(getApplicationContext(), selectedVideoUri);
-                        startUploadActivity(selectedVideoUriPath, false);
+                        //InputStream inputStream = getApplicationContext().getContentResolver().openInputStream(selectedVideoUri);
+                        final String fileName = FileUtil.getFileNameFromUri(selectedVideoUri, getApplicationContext());
+                        String selectedInputVideoFilePath = FileUtil.getPath(this, selectedVideoUri);
+                        File file = new File(selectedInputVideoFilePath);
+                        /*String selectedVideoFilePath = file.getParent();
+                        if(!selectedVideoFilePath.endsWith(File.separator)) {
+                            selectedVideoFilePath = selectedVideoFilePath + File.separator;
+                        }*/
+                        File selectedVideoFileDir = this.getCacheDir();
+                        final File selectedVideoFile = File.createTempFile(ApiConstants.APP_NAME, ".mp4", selectedVideoFileDir);
+
+                        ImageUtil.compressVideo(this, selectedInputVideoFilePath, selectedVideoFile.getAbsolutePath(), new CompressionStatusListener() {
+                            @Override
+                            public void onSuccess(String message) {
+                                try {
+                                    InputStream inputStream = new FileInputStream(selectedVideoFile);
+                                    ContentBody contentBody = new InputStreamBody(inputStream, fileName);
+                                    AppController.getInstance().setSelectedGalleryVideo(contentBody);
+                                    AppController.getInstance().getUploadAttachmentData().setMediaFileUri(selectedVideoUri);
+                                    String selectedVideoUriPath = FileUtil.getPath(getApplicationContext(), selectedVideoUri);
+                                    startUploadActivity(selectedVideoUriPath, false);
+                                } catch (FileNotFoundException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(String message) {
+                                mediaFileUri = selectedVideoUri;
+                                startUploadActivity(mediaFileUri.getPath(), false);
+                            }
+
+                            @Override
+                            public void onFinish() {
+
+                            }
+                        });
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

@@ -26,6 +26,7 @@ import com.pack.pack.application.data.util.AbstractNetworkTask;
 import com.pack.pack.application.data.util.ApiConstants;
 import com.pack.pack.application.data.util.FileUtil;
 import com.pack.pack.application.data.util.IAsyncTaskStatusListener;
+import com.pack.pack.application.data.util.ImageUtil;
 import com.pack.pack.application.topic.activity.model.ParcelableTopic;
 import com.pack.pack.client.api.API;
 import com.pack.pack.client.api.APIBuilder;
@@ -57,7 +58,7 @@ public class TopicCreateActivity extends AppCompatActivity implements IAsyncTask
     private EditText topic_create_country;
     private AutoCompleteTextView topic_create_category;
     private ImageView topic_create_wallpaper;
-    private TextView wallpaper_select;
+    private Button wallpaper_select;
 
     private TextView topic_create_txtPercentage;
     private ProgressBar topic_create_progressBar;
@@ -82,7 +83,7 @@ public class TopicCreateActivity extends AppCompatActivity implements IAsyncTask
         topic_create_city = (EditText) findViewById(R.id.topic_create_city);
         topic_create_country = (EditText) findViewById(R.id.topic_create_country);
         topic_create_wallpaper = (ImageView) findViewById(R.id.topic_create_wallpaper);
-        wallpaper_select = (TextView) findViewById(R.id.wallpaper_select);
+        wallpaper_select = (Button) findViewById(R.id.wallpaper_select);
 
         topic_create_category.setThreshold(1);
         ArrayAdapter<String> categoryAdapter = new ArrayAdapter<String>(this,
@@ -90,9 +91,9 @@ public class TopicCreateActivity extends AppCompatActivity implements IAsyncTask
                 AppController.getInstance().getFollowedCategories());
         topic_create_category.setAdapter(categoryAdapter);
 
-        SpannableString spannableString = new SpannableString("Select an image, as wallpaper of your topic");
+        /*SpannableString spannableString = new SpannableString("Select an image, as wallpaper of your topic");
         spannableString.setSpan(new UnderlineSpan(), 0, spannableString.length(), 0);
-        wallpaper_select.setText(spannableString);
+        wallpaper_select.setText(spannableString);*/
 
         topic_create_txtPercentage = (TextView) findViewById(R.id.topic_create_txtPercentage);
         topic_create_progressBar = (ProgressBar) findViewById(R.id.topic_create_progressBar);
@@ -125,6 +126,10 @@ public class TopicCreateActivity extends AppCompatActivity implements IAsyncTask
                 Uri uri = data.getData();
                 try {
                     Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
+                    if(bitmap == null) {
+                        return;
+                    }
+                    bitmap = ImageUtil.downscaleBitmap(bitmap, 1200, 900);
                     topic_create_wallpaper.setVisibility(View.VISIBLE);
                     topic_create_wallpaper.setImageBitmap(bitmap);
 
@@ -167,6 +172,8 @@ public class TopicCreateActivity extends AppCompatActivity implements IAsyncTask
 
     @Override
     public void onFailure(String errorMsg) {
+        wallpaper_select.setEnabled(true);
+        topic_create_submit.setEnabled(true);
         Toast.makeText(this, errorMsg, Toast.LENGTH_LONG).show();
         Intent newIntent = new Intent();
         newIntent.putExtra(RESULT_KEY, errorMsg);
@@ -210,7 +217,13 @@ public class TopicCreateActivity extends AppCompatActivity implements IAsyncTask
             Toast.makeText(TopicCreateActivity.this, "Country can't be empty.",
                     Toast.LENGTH_LONG).show();
             return;
+        } else if(mediaFile == null) {
+            Toast.makeText(TopicCreateActivity.this, "Please select topic wallpaper",
+                    Toast.LENGTH_LONG).show();
+            return;
         }
+        wallpaper_select.setEnabled(false);
+        topic_create_submit.setEnabled(false);
         TaskData data = new TaskData(topicName, topicDescription, topicCategory, locality, city, country);
         new TopicCreateTask(this).execute(data);
     }

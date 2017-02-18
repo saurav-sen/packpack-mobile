@@ -115,6 +115,7 @@ public class PackDetailActivity extends AppCompatActivity {
         currentScrollableObject.packId = pack.getId();
         currentScrollableObject.topicId = pack.getParentTopicId();
         currentScrollableObject.scrollUp = false;
+        currentScrollableObject.nextLink = "FIRST_PAGE";
 
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -160,6 +161,12 @@ public class PackDetailActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        if(currentScrollableObject.nextLink != null) {
+            pack.setNextLink(currentScrollableObject.nextLink);
+        }
+        if(currentScrollableObject.previousLink != null) {
+            pack.setPreviousLink(currentScrollableObject.previousLink);
+        }
         outState.putParcelable(AppController.PACK_PARCELABLE_KEY, pack);
     }
 
@@ -171,6 +178,8 @@ public class PackDetailActivity extends AppCompatActivity {
         currentScrollableObject.packId = pack.getId();
         currentScrollableObject.topicId = pack.getParentTopicId();
         currentScrollableObject.scrollUp = false;
+        currentScrollableObject.nextLink = pack.getNextLink();
+        currentScrollableObject.previousLink = pack.getPreviousLink();
     }
 
     @Override
@@ -178,7 +187,7 @@ public class PackDetailActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == Constants.IMAGE_VIDEO_CAPTURE_REQUEST_CODE) {
             if(resultCode == RESULT_OK) {
-                currentScrollableObject.nextLink = "FIRST_PAGE"; // TODO -- This is to get going for demo purpose
+                //currentScrollableObject.nextLink = "FIRST_PAGE"; // TODO -- This is to get going for demo purpose
                 new LoadPackDetailTask().execute(currentScrollableObject);
             } else if(resultCode == RESULT_CANCELED) {
                 Toast.makeText(this, "You have cancelled upload", Toast.LENGTH_LONG).show();

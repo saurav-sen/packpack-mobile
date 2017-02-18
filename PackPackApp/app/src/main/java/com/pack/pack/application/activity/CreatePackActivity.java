@@ -75,6 +75,7 @@ public class CreatePackActivity extends AppCompatActivity implements IAsyncTaskS
 
     @Override
     public void onFailure(String errorMsg) {
+        pack_create_submit.setEnabled(true);
         Intent resultant = new Intent();
         resultant.putExtra(Constants.ERROR_MSG, errorMsg);
         setResult(RESULT_CANCELED, resultant);
@@ -110,6 +111,7 @@ public class CreatePackActivity extends AppCompatActivity implements IAsyncTaskS
                     Toast.LENGTH_LONG).show();
             return;
         }
+        pack_create_submit.setEnabled(false);
         new CreatePackTasK(this, this).execute(info);
     }
 

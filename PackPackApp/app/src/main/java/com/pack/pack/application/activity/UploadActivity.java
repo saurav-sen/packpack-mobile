@@ -94,6 +94,9 @@ public class UploadActivity extends Activity {
         mediaFilePath = getIntent().getStringExtra(UPLOAD_FILE_PATH);
         //mediaBitmap = getIntent().getParcelableExtra(UPLOAD_FILE_BITMAP);
         mediaBitmap = AppController.getInstance().getSelectedBitmapPhoto();
+        if(mediaBitmap != null) {
+            mediaBitmap = ImageUtil.downscaleBitmap(mediaBitmap, 1200, 900);
+        }
         isPhotoUpload = getIntent().getBooleanExtra(UPLOAD_FILE_IS_PHOTO, true);
         title = getIntent().getStringExtra(UPLOAD_ATTACHMENT_TITLE) + "";
         description = getIntent().getStringExtra(UPLOAD_ATTACHMENT_DESCRIPTION) + "";
@@ -127,6 +130,7 @@ public class UploadActivity extends Activity {
                             Toast.LENGTH_LONG).show();
                     return;
                 }
+                upload_submit.setEnabled(false);
                 new UploadJob().execute();
             }
         });
@@ -143,7 +147,8 @@ public class UploadActivity extends Activity {
             options.inSampleSize = 8;
 
             if(mediaFilePath != null) {
-                final Bitmap bitmap = BitmapFactory.decodeFile(mediaFilePath, options);
+                Bitmap bitmap = BitmapFactory.decodeFile(mediaFilePath, options);
+                bitmap = ImageUtil.downscaleBitmap(bitmap, 1200, 900);
                 upload_imgPreview.setImageBitmap(bitmap);
             } else if(mediaBitmap != null) {
                 upload_imgPreview.setImageBitmap(mediaBitmap);
@@ -203,7 +208,6 @@ public class UploadActivity extends Activity {
                                 .addApiParam(APIConstants.Attachment.DESCRIPTION, description)
                                 .build();
                     } else if(mediaBitmap != null) {
-                        mediaBitmap = ImageUtil.downscaleBitmap(mediaBitmap, 1200, 900);
                         ByteArrayOutputStream baOS = new ByteArrayOutputStream();
                         mediaBitmap.compress(Bitmap.CompressFormat.JPEG, 60, baOS);
                         byte[] bytes = baOS.toByteArray();
