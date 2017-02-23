@@ -14,12 +14,14 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
 import com.pack.pack.application.activity.FullscreenAttachmentViewActivity;
 import com.pack.pack.application.activity.PackAttachmentCommentsActivity;
+import com.pack.pack.application.data.cache.AppCache;
 import com.pack.pack.application.data.util.AbstractNetworkTask;
 import com.pack.pack.application.data.util.DateTimeUtil;
 import com.pack.pack.application.db.DBUtil;
@@ -51,6 +53,8 @@ public class PackAttachmentsAdapter extends ArrayAdapter<JPackAttachment> {
     private Activity activity;
 
     private List<JPackAttachment> attachments;
+
+    private Map<String, AttachmentUnderUploadDetails> attachmentIdVsAttachmentDetails = new HashMap<String, AttachmentUnderUploadDetails>();
 
     public PackAttachmentsAdapter(Activity activity, List<JPackAttachment> attachments) {
         super(activity, R.layout.activity_pack_detail_item, attachments);
@@ -172,9 +176,11 @@ public class PackAttachmentsAdapter extends ArrayAdapter<JPackAttachment> {
         pack_attachment_share.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-               shareImage(position);
+                shareImage(position);
             }
         });
+
+        final RelativeLayout upload_in_progress_overlay = (RelativeLayout) convertView.findViewById(R.id.upload_in_progress_overlay);
 
         if(attachment == null) {
             attachment = getItem(position);
@@ -195,12 +201,41 @@ public class PackAttachmentsAdapter extends ArrayAdapter<JPackAttachment> {
                 pack_loading_progress.setVisibility(View.GONE);
                 pack_attachment_img.setVisibility(View.VISIBLE);
             }
+
+            if(attachment.isUploadProgress()) {
+                upload_in_progress_overlay.setVisibility(View.VISIBLE);
+                AttachmentUnderUploadDetails attachmentUnderUploadDetails = new AttachmentUnderUploadDetails();
+                attachmentUnderUploadDetails.setAttachment(attachment);
+                attachmentUnderUploadDetails.setImageView(pack_attachment_img);
+                attachmentUnderUploadDetails.setOverlayProgress(upload_in_progress_overlay);
+
+                attachmentIdVsAttachmentDetails.put(attachment.getId(), attachmentUnderUploadDetails);
+            } else {
+                upload_in_progress_overlay.setVisibility(View.GONE);
+            }
+
             if(url != null) {
                 new DownloadImageTask(pack_attachment_img, 700, 600, PackAttachmentsAdapter.this.getContext(), pack_loading_progress)
                         .execute(url);
             }
         }
         return convertView;
+    }
+
+    private void replace(JPackAttachment oldAttachment, JPackAttachment newAttachment) {
+        oldAttachment.setAttachmentUrl(newAttachment.getAttachmentUrl());
+        oldAttachment.setId(newAttachment.getId());
+        oldAttachment.setUploadProgress(false);
+        oldAttachment.setAttachmentType(newAttachment.getAttachmentType());
+        oldAttachment.setViews(newAttachment.getViews());
+        oldAttachment.setMimeType(newAttachment.getMimeType());
+        oldAttachment.setLikes(newAttachment.getLikes());
+        oldAttachment.setDescription(newAttachment.getDescription());
+        oldAttachment.setAttachmentThumbnailUrl(newAttachment.getAttachmentThumbnailUrl());
+        oldAttachment.setAvgRating(newAttachment.getAvgRating());
+        oldAttachment.setCreationTime(newAttachment.getCreationTime());
+        oldAttachment.setCreator(newAttachment.getCreator());
+        oldAttachment.setTitle(newAttachment.getTitle());
     }
 
     private void addLikeToPackAttachment(String id) {
@@ -242,6 +277,22 @@ public class PackAttachmentsAdapter extends ArrayAdapter<JPackAttachment> {
 
             getContext().startActivity(share);
         }
+    }
+
+    public void onUploadError(String oldAttachmentId) {
+        AttachmentUnderUploadDetails attachmentUnderUploadDetails = attachmentIdVsAttachmentDetails.get(oldAttachmentId);
+        attachmentUnderUploadDetails.setUploadSuccess(false);
+        attachmentUnderUploadDetails.getAttachment().setUploadProgress(false);
+        notifyDataSetChanged();
+    }
+
+    public void onUploadSuccess(String oldAttachmentId, JPackAttachment newAttachment) {
+        AttachmentUnderUploadDetails attachmentUnderUploadDetails = attachmentIdVsAttachmentDetails.get(oldAttachmentId);
+        attachmentUnderUploadDetails.setUploadSuccess(true);
+        replace(attachmentUnderUploadDetails.getAttachment(), newAttachment);
+        attachmentUnderUploadDetails.getAttachment().setUploadProgress(false);
+        AppCache.INSTANCE.removeFromCacheOfSuccessfullyUploadedAttachment(newAttachment);
+        notifyDataSetChanged();
     }
 
     private class AddLikeTask extends AbstractNetworkTask<String, Void, Void> {
@@ -288,5 +339,48 @@ public class PackAttachmentsAdapter extends ArrayAdapter<JPackAttachment> {
             attachment.setLikes(attachment.getLikes() + 1);
             storeResultsInDb(attachment);
         }
+    }
+
+    private class AttachmentUnderUploadDetails {
+
+        private JPackAttachment attachment;
+
+        public JPackAttachment getAttachment() {
+            return attachment;
+        }
+
+        public void setAttachment(JPackAttachment attachment) {
+            this.attachment = attachment;
+        }
+
+        public RelativeLayout getOverlayProgress() {
+            return overlayProgress;
+        }
+
+        public void setOverlayProgress(RelativeLayout overlayProgress) {
+            this.overlayProgress = overlayProgress;
+        }
+
+        public ImageView getImageView() {
+            return imageView;
+        }
+
+        public void setImageView(ImageView imageView) {
+            this.imageView = imageView;
+        }
+
+        private ImageView imageView;
+
+        private RelativeLayout overlayProgress;
+
+        public boolean isUploadSuccess() {
+            return uploadSuccess;
+        }
+
+        public void setUploadSuccess(boolean uploadSuccess) {
+            this.uploadSuccess = uploadSuccess;
+        }
+
+        private boolean uploadSuccess;
     }
 }

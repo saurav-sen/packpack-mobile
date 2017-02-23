@@ -3,7 +3,10 @@ package com.pack.pack.application.activity;
 import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
@@ -13,9 +16,11 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,19 +33,26 @@ import com.pack.pack.application.AppController;
 import com.pack.pack.application.Constants;
 import com.pack.pack.application.R;
 import com.pack.pack.application.adapters.PackAttachmentsAdapter;
+import com.pack.pack.application.data.cache.AppCache;
 import com.pack.pack.application.data.util.AbstractNetworkTask;
 import com.pack.pack.application.db.DBUtil;
 import com.pack.pack.application.db.DbObject;
 import com.pack.pack.application.db.PaginationInfo;
+import com.pack.pack.application.service.UploadImageAttachmentService;
+import com.pack.pack.application.service.UploadResult;
+import com.pack.pack.application.service.UploadVideoAttachmentService;
 import com.pack.pack.application.topic.activity.model.ParcelablePack;
 import com.pack.pack.client.api.API;
 import com.pack.pack.client.api.APIBuilder;
 import com.pack.pack.client.api.APIConstants;
 import com.pack.pack.client.api.COMMAND;
+import com.pack.pack.common.util.JSONUtil;
 import com.pack.pack.model.web.EntityType;
 import com.pack.pack.model.web.JPack;
 import com.pack.pack.model.web.JPackAttachment;
+import com.pack.pack.model.web.PackAttachmentType;
 import com.pack.pack.model.web.Pagination;
+import com.pack.pack.services.exception.PackPackException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -66,6 +78,8 @@ public class PackDetailActivity extends AppCompatActivity {
     private ListView activity_pack_attachments;
 
     private FloatingActionButton fab;
+
+    private static final String LOG_TAG = "PackDetailActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -188,7 +202,41 @@ public class PackDetailActivity extends AppCompatActivity {
         if(requestCode == Constants.IMAGE_VIDEO_CAPTURE_REQUEST_CODE) {
             if(resultCode == RESULT_OK) {
                 //currentScrollableObject.nextLink = "FIRST_PAGE"; // TODO -- This is to get going for demo purpose
-                new LoadPackDetailTask().execute(currentScrollableObject);
+                //new LoadPackDetailTask().execute(currentScrollableObject);
+                try {
+                    String json = data.getStringExtra(UploadActivity.ATTACHMENT_UNDER_UPLOAD);
+
+                    if(json != null && !json.trim().isEmpty()) {
+                        JPackAttachment attachment = JSONUtil.deserialize(json, JPackAttachment.class, true);
+                        adapter.getAttachments().add(attachment);
+                        adapter.notifyDataSetChanged();
+                        if(PackAttachmentType.IMAGE.name().equals(attachment.getMimeType())) {
+                            String packId = data.getStringExtra(UploadImageAttachmentService.PACK_ID);
+                            String topicId = data.getStringExtra(UploadImageAttachmentService.TOPIC_ID);
+                            Intent service = new Intent(PackDetailActivity.this, UploadImageAttachmentService.class);
+                            service.putExtra(UploadImageAttachmentService.ATTACHMENT_TITLE, attachment.getTitle());
+                            service.putExtra(UploadImageAttachmentService.ATTACHMENT_DESCRIPTION, attachment.getDescription());
+                            service.putExtra(UploadImageAttachmentService.PACK_ID, packId);
+                            service.putExtra(UploadImageAttachmentService.TOPIC_ID, topicId);
+                            service.putExtra(UploadImageAttachmentService.ATTACHMENT_ID, attachment.getId());
+                            startService(service);
+                        } else if(PackAttachmentType.VIDEO.name().equals(attachment.getMimeType())) {
+                            String packId = data.getStringExtra(UploadVideoAttachmentService.PACK_ID);
+                            String topicId = data.getStringExtra(UploadVideoAttachmentService.TOPIC_ID);
+                            String selectedInputVideoFilePath = data.getStringExtra(UploadVideoAttachmentService.SELECTED_INPUT_VIDEO_FILE);
+                            Intent service = new Intent(PackDetailActivity.this, UploadVideoAttachmentService.class);
+                            service.putExtra(UploadVideoAttachmentService.SELECTED_INPUT_VIDEO_FILE, selectedInputVideoFilePath);
+                            service.putExtra(UploadVideoAttachmentService.ATTACHMENT_TITLE,  attachment.getTitle());
+                            service.putExtra(UploadVideoAttachmentService.ATTACHMENT_DESCRIPTION, attachment.getDescription());
+                            service.putExtra(UploadVideoAttachmentService.PACK_ID, packId);
+                            service.putExtra(UploadVideoAttachmentService.TOPIC_ID, topicId);
+                            service.putExtra(UploadVideoAttachmentService.ATTACHMENT_ID, attachment.getId());
+                            startService(service);
+                        }
+                    }
+                } catch (PackPackException e) {
+                    Log.d(LOG_TAG, e.getMessage(), e);
+                }
             } else if(resultCode == RESULT_CANCELED) {
                 Toast.makeText(this, "You have cancelled upload", Toast.LENGTH_LONG).show();
             }
@@ -347,4 +395,34 @@ public class PackDetailActivity extends AppCompatActivity {
                 }
         }
     }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, new IntentFilter("UPLOAD_ATTACHMENT"));
+    }
+
+    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String oldAttachmentId = intent.getStringExtra(UploadResult.ATTACHMENT_OLD_ID);
+            String newAttachmentId = intent.getStringExtra(UploadResult.ATTACHMENT_NEW_ID);
+            String status = intent.getStringExtra(UploadResult.STATUS);
+            if(UploadResult.OK_STATUS.equals(status)) {
+                JPackAttachment newAttachment = AppCache.INSTANCE.getSuccessfullyUploadedAttachment(newAttachmentId);
+                adapter.onUploadSuccess(oldAttachmentId, newAttachment);
+                //adapter.notifyDataSetChanged();
+            } else {
+                adapter.onUploadError(oldAttachmentId);
+                //adapter.notifyDataSetChanged();
+            }
+        }
+    };
 }

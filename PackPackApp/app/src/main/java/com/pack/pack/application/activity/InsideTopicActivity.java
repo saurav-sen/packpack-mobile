@@ -161,12 +161,14 @@ public class InsideTopicActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == Constants.PACK_CREATE_REQUEST_CODE) {
             if(resultCode == RESULT_OK) {
-                ParcelablePack pack = data.getParcelableExtra(AppController.PACK_PARCELABLE_KEY);
+                /*ParcelablePack pack = data.getParcelableExtra(AppController.PACK_PARCELABLE_KEY);
                 Intent intent = new Intent(InsideTopicActivity.this, ImageVideoCaptureActivity.class);
                 intent.putExtra(TOPIC_ID_KEY, topicId);
                 intent.putExtra(UPLOAD_ENTITY_ID_KEY, pack.getId());
                 intent.putExtra(UPLOAD_ENTITY_TYPE_KEY, JPackAttachment.class.getName());
-                startActivityForResult(intent, Constants.PACK_ATTACHMENT_UPLOAD_REQUEST_CODE);
+                startActivityForResult(intent, Constants.PACK_ATTACHMENT_UPLOAD_REQUEST_CODE);*/
+                finish();
+                startActivity(getIntent());
             } else if(resultCode == RESULT_CANCELED) {
                 String errorMsg = data.getStringExtra(Constants.ERROR_MSG);
                 if(errorMsg == null || errorMsg.trim().isEmpty()) {
@@ -174,7 +176,7 @@ public class InsideTopicActivity extends AppCompatActivity {
                 }
                 Toast.makeText(this, errorMsg, Toast.LENGTH_LONG).show();
             }
-        } else if(requestCode == Constants.PACK_ATTACHMENT_UPLOAD_REQUEST_CODE) {
+        } /*else if(requestCode == Constants.PACK_ATTACHMENT_UPLOAD_REQUEST_CODE) {
             if(resultCode == RESULT_CANCELED) {
                 Toast.makeText(this, "Cancelled to upload media file(s)", Toast.LENGTH_LONG).show();
             }
@@ -183,11 +185,12 @@ public class InsideTopicActivity extends AppCompatActivity {
             //startActivity(intent);
             if(topic != null) {
                 //new LoadPackTask().execute(topic);
-                Intent intent = new Intent(InsideTopicActivity.this, InsideTopicActivity.class);
-                intent.putExtra(AppController.TOPIC_PARCELABLE_KEY, topic);
-                startActivity(intent);
+                finish();
+                //Intent intent = new Intent(InsideTopicActivity.this, InsideTopicActivity.class);
+                //intent.putExtra(AppController.TOPIC_PARCELABLE_KEY, topic);
+                startActivity(getIntent());
             }
-        }
+        }*/
     }
 
     private class LoadPackTask extends AbstractNetworkTask<ParcelableTopic, Integer, Pagination<JPack>> {

@@ -5,8 +5,9 @@ package com.pack.pack.application.data.util;
  */
 public interface ApiConstants {
 
-    //public static final String BASE_URL = "http://192.168.35.12:8080/packpack/"; //DEV Environment
-    public static final String BASE_URL = "http://api.squill.co.in/packpack/"; //PRODUCTION Environment
+    public static final String BASE_URL = "http://192.168.35.12:8080/packpack/"; //DEV Environment
+    //public static final String BASE_URL = "http://api.squill.co.in/packpack/"; //PRODUCTION Environment
+
     public static final boolean IS_PRODUCTION_ENV = true;
 
     public static final String APP_NAME = "Squill";

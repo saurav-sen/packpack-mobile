@@ -37,9 +37,9 @@ public class DownloadImageTask extends AbstractNetworkTask<String, Void, Bitmap>
 
     private ImageView imageView;
 
-    private int imageWidth;
+    private int imageWidth = 0;
 
-    private int imageHeight;
+    private int imageHeight = 0;
 
     private String errorMsg;
 
@@ -92,9 +92,9 @@ public class DownloadImageTask extends AbstractNetworkTask<String, Void, Bitmap>
     }
 
     protected String lookupURL(String url) {
-        if(ApiConstants.IS_PRODUCTION_ENV) {
+        /*if(ApiConstants.IS_PRODUCTION_ENV) {
             return url != null ? url.trim() : url;
-        }
+        }*/
         return URLEncoder.encode(url) + "?w=" + imageWidth + "&h=" + imageHeight;
     }
 
@@ -110,8 +110,12 @@ public class DownloadImageTask extends AbstractNetworkTask<String, Void, Bitmap>
             stream = (InputStream) api.execute();
             if(stream != null) {
                 bitmap = BitmapFactory.decodeStream(stream);
-                if(imageWidth > 0 && imageHeight > 0 && bitmap != null) {
-                    bitmap = Bitmap.createScaledBitmap(bitmap, imageWidth, imageHeight, false);
+                if(bitmap != null) {
+                    if (imageWidth > 0 && imageHeight > 0) {
+                        bitmap = Bitmap.createScaledBitmap(bitmap, imageWidth, imageHeight, false);
+                    } else {
+                        bitmap = Bitmap.createScaledBitmap(bitmap, 800, 800, false);
+                    }
                 }
                 AppController.getInstance().getLruBitmapCache().putBitmap(lookupURL(url), bitmap);
             }

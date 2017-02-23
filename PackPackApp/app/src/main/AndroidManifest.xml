@@ -72,6 +72,9 @@
             android:name=".service.FetchAddressIntentService"
             android:exported="false" />
 
+        <service android:name=".service.UploadVideoAttachmentService"/>
+        <service android:name=".service.UploadImageAttachmentService"/>
+
         <activity
             android:name=".activity.TopicCreateActivity"
             android:label="Squill" />

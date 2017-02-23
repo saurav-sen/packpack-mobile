@@ -9,6 +9,7 @@ import android.os.Handler;
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
 import com.pack.pack.application.data.LoggedInUserInfo;
+import com.pack.pack.application.data.util.ImageUtil;
 import com.pack.pack.application.db.SquillDbHelper;
 import com.pack.pack.application.db.UserInfo;
 import com.pack.pack.application.db.DBUtil;
@@ -43,6 +44,7 @@ public class SplashActivity extends Activity implements IAsyncTaskStatusListener
             }
         }, 5000);
 
+        ImageUtil.loadFFMpeg(this);
         verify();
     }
 

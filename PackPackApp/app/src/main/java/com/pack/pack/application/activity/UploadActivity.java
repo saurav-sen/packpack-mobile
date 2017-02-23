@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -23,20 +24,36 @@ import android.widget.VideoView;
 
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
+import com.pack.pack.application.data.cache.AppCache;
 import com.pack.pack.application.data.util.ApiConstants;
+import com.pack.pack.application.data.util.CompressionStatusListener;
+import com.pack.pack.application.data.util.FileUtil;
 import com.pack.pack.application.data.util.ImageUtil;
+import com.pack.pack.application.service.UploadImageAttachmentService;
+import com.pack.pack.application.service.UploadVideoAttachmentService;
 import com.pack.pack.client.api.API;
 import com.pack.pack.client.api.APIBuilder;
 import com.pack.pack.client.api.APIConstants;
 import com.pack.pack.client.api.ByteBody;
 import com.pack.pack.client.api.COMMAND;
 import com.pack.pack.client.api.MultipartRequestProgressListener;
+import com.pack.pack.common.util.JSONUtil;
 import com.pack.pack.model.web.JPackAttachment;
+import com.pack.pack.model.web.PackAttachmentType;
+import com.pack.pack.services.exception.PackPackException;
 
 import org.apache.http.entity.mime.content.ContentBody;
+import org.apache.http.entity.mime.content.InputStreamBody;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.UUID;
+import java.util.zip.GZIPInputStream;
 
 import static com.pack.pack.application.AppController.TOPIC_ID_KEY;
 import static com.pack.pack.application.AppController.UPLOAD_ENTITY_ID_KEY;
@@ -54,6 +71,9 @@ import static com.pack.pack.application.AppController.UPLOAD_ATTACHMENT_DESCRIPT
  *
  */
 public class UploadActivity extends Activity {
+
+    public static final String ATTACHMENT_UNDER_UPLOAD = "ATTACHMENT_UNDER_UPLOAD";
+    public static final String ATTACHMENT_UNDER_UPLOAD_IS_PHOTO = "ATTACHMENT_UNDER_UPLOAD_IS_PHOTO";
 
     private String topicId;
 
@@ -81,6 +101,10 @@ public class UploadActivity extends Activity {
 
     private static final String LOG_TAG = "UploadActivity";
 
+    private String newAttachmentId;
+
+    public static final String ATTACHMENT_ID = "ATTACHMENT_ID";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -92,8 +116,10 @@ public class UploadActivity extends Activity {
         uploadEntityId = getIntent().getStringExtra(UPLOAD_ENTITY_ID_KEY);
         uploadEntityType = getIntent().getStringExtra(UPLOAD_ENTITY_TYPE_KEY);
         mediaFilePath = getIntent().getStringExtra(UPLOAD_FILE_PATH);
+        newAttachmentId = getIntent().getStringExtra(ATTACHMENT_ID);
+
         //mediaBitmap = getIntent().getParcelableExtra(UPLOAD_FILE_BITMAP);
-        mediaBitmap = AppController.getInstance().getSelectedBitmapPhoto();
+        mediaBitmap = AppCache.INSTANCE.getSelectedAttachmentPhoto(newAttachmentId);
         if(mediaBitmap != null) {
             mediaBitmap = ImageUtil.downscaleBitmap(mediaBitmap, 1200, 900);
         }
@@ -131,9 +157,98 @@ public class UploadActivity extends Activity {
                     return;
                 }
                 upload_submit.setEnabled(false);
-                new UploadJob().execute();
+                if(!isPhotoUpload) {
+                    try {
+                        String selectedInputVideoFilePath = mediaFilePath;
+
+                        putAttachmentUploadInBackground(newAttachmentId, uploadEntityId, topicId, selectedInputVideoFilePath);
+
+                        /*CompressionStatusListenerImpl compressionStatusListener = new CompressionStatusListenerImpl(selectedVideoFile, file);
+                        ImageUtil.compressVideo(UploadActivity.this, selectedInputVideoFilePath, selectedVideoFile.getAbsolutePath(), compressionStatusListener);*/
+
+                        //String[] command = new String[]{"/system/bin/ls -li /data/user/0/com.pack.pack.application/files/ffmpeg"};
+                        /*String[] command = new String[]{"ffmpeg -h"};
+                        Process process = Runtime.getRuntime().exec(command);
+                        {
+                            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+                            int read;
+
+                            String output = "";
+
+                            String line;
+                            while ((line = reader.readLine()) != null) {
+                                output.concat(line + "\n");
+                                Log.w("myApp", "[[output]]:" + line);
+                            }
+                            reader.close();
+                        }
+
+                        {
+                            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+                            int read;
+
+                            String output = "";
+
+                            String line;
+                            while ((line = reader.readLine()) != null) {
+                                output.concat(line + "\n");
+                                Log.w("myApp", "[[Error]]:" + line);
+                            }
+                            reader.close();
+                        }
+
+                        compressionStatusListener = new CompressionStatusListenerImpl(selectedVideoFile, file);
+                        ImageUtil.compressVideo(UploadActivity.this, selectedInputVideoFilePath, selectedVideoFile.getAbsolutePath(), compressionStatusListener);*/
+
+                       // process.waitFor();
+
+                        /*while(!compressionStatusListener.isDone()) {
+
+                        }*/
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                } else {
+
+                    //new UploadJob(id, true).execute();
+                    putAttachmentUploadInBackground(newAttachmentId, uploadEntityId, topicId, null);
+                }
             }
         });
+    }
+
+    private void putAttachmentUploadInBackground(String id, String uploadEntityId, String topicId, String selectedInputVideoFilePath) {
+        if(JPackAttachment.class.getName().equals(uploadEntityType)) {
+            String attachmentType = null;
+            try {
+                if(isPhotoUpload) {
+                    attachmentType = PackAttachmentType.IMAGE.name();
+                    getIntent().putExtra(UploadImageAttachmentService.PACK_ID, uploadEntityId);
+                    getIntent().putExtra(UploadImageAttachmentService.TOPIC_ID, topicId);
+                } else {
+                    attachmentType = PackAttachmentType.VIDEO.name();
+                    getIntent().putExtra(UploadVideoAttachmentService.SELECTED_INPUT_VIDEO_FILE, selectedInputVideoFilePath);
+                    getIntent().putExtra(UploadVideoAttachmentService.PACK_ID, uploadEntityId);
+                    getIntent().putExtra(UploadVideoAttachmentService.TOPIC_ID, topicId);
+                }
+                JPackAttachment attachment = new JPackAttachment();
+                attachment.setId(id);
+                attachment.setTitle(title);
+                attachment.setDescription(description);
+                attachment.setLikes(0);
+                attachment.setViews(0);
+                attachment.setUploadProgress(true);
+                attachment.setAttachmentType(attachmentType);
+                attachment.setMimeType(attachmentType);
+                String json = JSONUtil.serialize(attachment);
+                getIntent().putExtra(ATTACHMENT_UNDER_UPLOAD_IS_PHOTO, isPhotoUpload);
+                getIntent().putExtra(ATTACHMENT_UNDER_UPLOAD, json);
+            } catch (PackPackException e) {
+                Log.d(LOG_TAG, e.getMessage(), e);
+            }
+        }
+        setResult(RESULT_OK, getIntent());
+        finish();
     }
 
     private void previewMedia() {
@@ -161,7 +276,37 @@ public class UploadActivity extends Activity {
         }
     }
 
-    private class UploadJob extends AsyncTask<Void, Integer, Void> {
+    /*private class UploadJob extends AsyncTask<Void, Integer, Object> implements Job {
+
+        JobChangeListener stateChangeListener;
+        boolean waitForListenerToAttach;
+
+        private Object signal = new Object();
+
+        private String id;
+
+        private boolean failed = false;
+
+        UploadJob(String id, boolean waitForListenerToAttach) {
+            this.waitForListenerToAttach = waitForListenerToAttach;
+            this.id = id;
+        }
+
+        @Override
+        public String getId() {
+            return this.id;
+        }
+
+        @Override
+        public void setStateChangeListener(JobChangeListener stateChangeListener) {
+            this.stateChangeListener = stateChangeListener;
+            if(!waitForListenerToAttach) {
+                return;
+            }
+            if(this.stateChangeListener != null) {
+                signal.notifyAll();
+            }
+        }
 
         @Override
         protected void onPreExecute() {
@@ -179,7 +324,8 @@ public class UploadActivity extends Activity {
         }
 
         @Override
-        protected Void doInBackground(Void... voids) {
+        protected Object doInBackground(Void... voids) {
+            Object result = null;
             try {
                 COMMAND command = null;
                 if(JPackAttachment.class.getName().equals(uploadEntityType)) {
@@ -225,24 +371,64 @@ public class UploadActivity extends Activity {
                             publishProgress(percentage);
                         }
                     };
-                    api.execute(null);
+
+                    if (waitForListenerToAttach) {
+                        JobRegistry.INSTANCE.register(this);
+                        synchronized (this) {
+                            if (stateChangeListener == null) {
+                                signal.wait();
+                            }
+                        }
+                    }
+
+                    result = api.execute(null);
                 }
             } catch (Exception e) {
                 Log.d(LOG_TAG, "Failed to upload attachment: " + e.getMessage());
+                failed = true;
+                if(stateChangeListener != null) {
+                    stateChangeListener.onError(id, "Failed to upload attachment");
+                }
             } finally {
                 AppController.getInstance().setSelectedBitmapPhoto(null);
                 AppController.getInstance().setSelectedGalleryVideo(null);
             }
-            return null;
+            return result;
         }
 
         @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
+        protected void onPostExecute(Object result) {
+            super.onPostExecute(result);
             upload_progressBar.setProgress(100);
             upload_txtPercentage.setText("100%");
+            if(stateChangeListener != null) {
+                if(failed) {
+                    stateChangeListener.onError(id, "Failed to upload attachment");
+                } else {
+                    stateChangeListener.onSuccess(id, result);
+                }
+            }
+            if(!JPackAttachment.class.getName().equals(uploadEntityType)) {
+                setResult(RESULT_OK, getIntent());
+                finish();
+            }
+           *//* if(JPackAttachment.class.getName().equals(uploadEntityType)) {
+                try {
+                    JPackAttachment attachment = new JPackAttachment();
+                    attachment.setTitle(title);
+                    attachment.setDescription(description);
+                    attachment.setLikes(0);
+                    attachment.setViews(0);
+                    attachment.setAttachmentType(attachmentType);
+                    attachment.setMimeType(attachmentType);
+                    String json = JSONUtil.serialize(attachment);
+                    getIntent().putExtra(ATTACHMENT_UNDER_UPLOAD, json);
+                } catch (PackPackException e) {
+                    Log.d(LOG_TAG, e.getMessage(), e);
+                }
+            }
             setResult(RESULT_OK, getIntent());
-            finish();
+            finish();*//*
         }
-    }
+    }*/
 }

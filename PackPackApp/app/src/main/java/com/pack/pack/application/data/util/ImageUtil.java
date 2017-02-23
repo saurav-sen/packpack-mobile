@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
+import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -11,6 +12,8 @@ import android.util.Log;
 
 import com.github.hiteshsondhi88.libffmpeg.FFmpeg;
 import com.github.hiteshsondhi88.libffmpeg.FFmpegExecuteResponseHandler;
+import com.github.hiteshsondhi88.libffmpeg.FFmpegLoadBinaryResponseHandler;
+import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegNotSupportedException;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -28,7 +31,40 @@ public class ImageUtil {
 
     private static final String LOG_TAG = "ImageUtil";
 
+    private static boolean ffMpegSupported = false;
+
     private ImageUtil() {
+    }
+
+    public static void loadFFMpeg(Context context) {
+        try {
+            FFmpeg.getInstance(context).loadBinary(new FFmpegLoadBinaryResponseHandler() {
+                @Override
+                public void onFailure() {
+                    Log.d(LOG_TAG, "Failed to load FFMpeg");
+                    ffMpegSupported = false;
+                }
+
+                @Override
+                public void onSuccess() {
+                    Log.d(LOG_TAG, "Successfully loaded FFMpeg");
+                    ffMpegSupported = true;
+                }
+
+                @Override
+                public void onStart() {
+
+                }
+
+                @Override
+                public void onFinish() {
+
+                }
+            });
+        } catch (FFmpegNotSupportedException e) {
+            Log.d(LOG_TAG, "[FFMpeg Not Supported] " + e.getMessage(), e);
+            ffMpegSupported = false;
+        }
     }
 
     public static Uri getOutputMediaFileUri(int type) {
@@ -107,36 +143,69 @@ public class ImageUtil {
         // Using H.264 AI backed compression to compromise minimum on quality
         // @ http://writingminds.github.io/ffmpeg-android-java/
         //final String cmd = "-i " + inputFilePath + " -c:v libx264 -crf 24 -b:v 1M -c:a aac " + outputFilePath;
-        final String cmd = "-i " + inputFilePath + " -vf scale=400:600 " + outputFilePath;
+        MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
+        mediaMetadataRetriever.setDataSource(inputFilePath);
+        int width = Integer.parseInt(mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH).trim());
+        int height = Integer.parseInt(mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT).trim());
+        String command = null;
+        if(ffMpegSupported) {
+            if (width <= 400 && height <= 600) {
+                command = null;
+            } else if (Math.abs(width - 400) > 10 && Math.abs(height - 600) > 10) {
+                int w = 400;
+                int h = 600;
+                if (width < 400) {
+                    w = width;
+                }
+                if (height < 600) {
+                    h = height;
+                }
+            /*int w = 200;
+            int h = 200;*/
+                command = "-i " + inputFilePath + " -vf scale=" + w + ":" + h + " " + outputFilePath + " -preset ultrafast";
+                //command = "-i " + inputFilePath + " -c:v libx264 -crf 24 -b:v 1M -c:a aac " + outputFilePath;
+            }
+        }
+        if(command == null) {
+            listener.onFailure("");
+            return;
+        }
+        final String cmd = command;
         String[] compress = new String[] {cmd};
+        if(FFmpeg.getInstance(context).isFFmpegCommandRunning()) {
+            FFmpeg.getInstance(context).killRunningProcesses();
+        }
         FFmpeg.getInstance(context).execute(compress, new FFmpegExecuteResponseHandler() {
             @Override
             public void onSuccess(String message) {
-                if(listener != null) {
+                Log.d(LOG_TAG, "Compression On Success :: " + message);
+                if (listener != null) {
                     listener.onSuccess(message);
                 }
             }
 
             @Override
             public void onProgress(String message) {
-
+                Log.d(LOG_TAG, "Compression On Progress :: " + message);
             }
 
             @Override
             public void onFailure(String message) {
-                if(listener != null) {
+                Log.d(LOG_TAG, "Compression Failed :: " + message);
+                if (listener != null) {
                     listener.onFailure(message);
                 }
             }
 
             @Override
             public void onStart() {
-
+                Log.d(LOG_TAG, "Compression Started.");
             }
 
             @Override
             public void onFinish() {
-                if(listener != null) {
+                Log.d(LOG_TAG, "Compression Finished.");
+                if (listener != null) {
                     listener.onFinish();
                 }
             }

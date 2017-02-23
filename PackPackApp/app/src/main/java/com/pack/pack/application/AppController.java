@@ -286,16 +286,6 @@ public class AppController extends Application {
         this.selectedBitmapPhoto = selectedBitmapPhoto;
     }
 
-    private ContentBody selectedGalleryVideo;
-
-    public ContentBody getSelectedGalleryVideo() {
-        return selectedGalleryVideo;
-    }
-
-    public void setSelectedGalleryVideo(ContentBody selectedGalleryVideo) {
-        this.selectedGalleryVideo = selectedGalleryVideo;
-    }
-
     private JCategories supportedCategories;
 
     public JCategories getSupportedCategories() {

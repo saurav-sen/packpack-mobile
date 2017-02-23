@@ -2,58 +2,36 @@ package com.pack.pack.application.activity;
 
 import android.Manifest;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.os.Bundle;
-import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.FrameLayout;
-import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.github.hiteshsondhi88.libffmpeg.FFmpeg;
-import com.github.hiteshsondhi88.libffmpeg.FFmpegExecuteResponseHandler;
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.Constants;
 import com.pack.pack.application.R;
-import com.pack.pack.application.data.util.ApiConstants;
-import com.pack.pack.application.data.util.CompressionStatusListener;
+import com.pack.pack.application.data.cache.AppCache;
 import com.pack.pack.application.data.util.FileUtil;
 import com.pack.pack.application.data.util.ImageUtil;
+import com.pack.pack.application.service.UploadImageAttachmentService;
+import com.pack.pack.application.service.UploadVideoAttachmentService;
 import com.pack.pack.application.topic.activity.model.UploadAttachmentData;
 import com.pack.pack.application.view.CameraPreview;
 
-import org.apache.http.entity.mime.content.ContentBody;
-import org.apache.http.entity.mime.content.InputStreamBody;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.UUID;
 
-import static com.pack.pack.application.AppController.APP_NAME;
 import static com.pack.pack.application.AppController.MEDIA_TYPE_IMAGE;
 import static com.pack.pack.application.AppController.MEDIA_TYPE_VIDEO;
 import static com.pack.pack.application.AppController.CAMERA_CAPTURE_PHOTO_REQUEST_CODE;
@@ -61,7 +39,6 @@ import static com.pack.pack.application.AppController.CAMERA_RECORD_VIDEO_REQUES
 import static com.pack.pack.application.AppController.UPLOAD_ENTITY_ID_KEY;
 import static com.pack.pack.application.AppController.UPLOAD_ENTITY_TYPE_KEY;
 import static com.pack.pack.application.AppController.UPLOAD_FILE_PATH;
-import static com.pack.pack.application.AppController.UPLOAD_FILE_BITMAP;
 import static com.pack.pack.application.AppController.UPLOAD_FILE_IS_PHOTO;
 import static com.pack.pack.application.AppController.TOPIC_ID_KEY;
 import static com.pack.pack.application.AppController.GALLERY_SELECT_PHOTO_REQUEST_CODE;
@@ -230,14 +207,13 @@ public class ImageVideoCaptureActivity extends Activity {
                     startUploadActivity(mediaFileUri.getPath(), false);*/
 
                     try {
-                        mediaFileUri = AppController.getInstance().getUploadAttachmentData().getMediaFileUri();
+                        //mediaFileUri = AppController.getInstance().getUploadAttachmentData().getMediaFileUri();
                         final String fileName = FileUtil.getFileNameFromUri(mediaFileUri, getApplicationContext());
                         String selectedInputVideoFilePath = FileUtil.getPath(this, mediaFileUri);
-                        File file = new File(selectedInputVideoFilePath);
-                        /*String selectedVideoFilePath = file.getParent();
-                        if(!selectedVideoFilePath.endsWith(File.separator)) {
-                            selectedVideoFilePath = selectedVideoFilePath + File.separator;
-                        }*/
+                        startUploadActivity(selectedInputVideoFilePath, false);
+
+                        /*File file = new File(selectedInputVideoFilePath);
+
                         File selectedVideoFileDir = this.getCacheDir();
                         final File selectedVideoFile = File.createTempFile(ApiConstants.APP_NAME, ".mp4", selectedVideoFileDir);
 
@@ -266,7 +242,7 @@ public class ImageVideoCaptureActivity extends Activity {
                             public void onFinish() {
 
                             }
-                        });
+                        });*/
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -310,14 +286,13 @@ public class ImageVideoCaptureActivity extends Activity {
                     String selectedVideoUriPath = getGalleryVideoPath(selectedVideoUri);*/
                     final Uri selectedVideoUri = data.getData();
                     try {
-                        //InputStream inputStream = getApplicationContext().getContentResolver().openInputStream(selectedVideoUri);
-                        final String fileName = FileUtil.getFileNameFromUri(selectedVideoUri, getApplicationContext());
+
+                        //final String fileName = FileUtil.getFileNameFromUri(selectedVideoUri, getApplicationContext());
                         String selectedInputVideoFilePath = FileUtil.getPath(this, selectedVideoUri);
-                        File file = new File(selectedInputVideoFilePath);
-                        /*String selectedVideoFilePath = file.getParent();
-                        if(!selectedVideoFilePath.endsWith(File.separator)) {
-                            selectedVideoFilePath = selectedVideoFilePath + File.separator;
-                        }*/
+                        startUploadActivity(selectedInputVideoFilePath, false);
+
+                        /*File file = new File(selectedInputVideoFilePath);
+
                         File selectedVideoFileDir = this.getCacheDir();
                         final File selectedVideoFile = File.createTempFile(ApiConstants.APP_NAME, ".mp4", selectedVideoFileDir);
 
@@ -346,7 +321,7 @@ public class ImageVideoCaptureActivity extends Activity {
                             public void onFinish() {
 
                             }
-                        });
+                        });*/
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -357,13 +332,34 @@ public class ImageVideoCaptureActivity extends Activity {
                 }
                 break;
             case Constants.PACK_ATTACHMENT_UPLOAD_REQUEST_CODE:
-                setResult(RESULT_OK, getIntent());
+               /* String json = data.getStringExtra(UploadActivity.ATTACHMENT_UNDER_UPLOAD);
+                boolean isPhotoUpload = data.getBooleanExtra(UploadActivity.ATTACHMENT_UNDER_UPLOAD_IS_PHOTO, false);
+                if(isPhotoUpload) {
+                    String packId = getIntent().getStringExtra(UploadImageAttachmentService.PACK_ID);
+                    String topicId = getIntent().getStringExtra(UploadImageAttachmentService.TOPIC_ID);
+
+                    getIntent().putExtra(UploadImageAttachmentService.PACK_ID, packId);
+                    getIntent().putExtra(UploadImageAttachmentService.TOPIC_ID, topicId);
+                } else {
+                    String selectedInputVideoFilePath = getIntent().getStringExtra(UploadVideoAttachmentService.SELECTED_INPUT_VIDEO_FILE);
+                    String packId = getIntent().getStringExtra(UploadVideoAttachmentService.PACK_ID);
+                    String topicId = getIntent().getStringExtra(UploadVideoAttachmentService.TOPIC_ID);
+
+                    getIntent().putExtra(UploadVideoAttachmentService.SELECTED_INPUT_VIDEO_FILE, selectedInputVideoFilePath);
+                    getIntent().putExtra(UploadVideoAttachmentService.PACK_ID, packId);
+                    getIntent().putExtra(UploadVideoAttachmentService.TOPIC_ID, topicId);
+                }
+                getIntent().putExtra(UploadActivity.ATTACHMENT_UNDER_UPLOAD, json);
+                setResult(RESULT_OK, getIntent());*/
+                setResult(RESULT_OK, data);
                 finish();
         }
     }
 
     private void startUploadActivity(String filePath, boolean isPhoto) {
         Intent intent = new Intent(this, UploadActivity.class);
+        String newAttachmentId = UUID.randomUUID().toString();
+        intent.putExtra(UploadActivity.ATTACHMENT_ID, newAttachmentId);
         UploadAttachmentData uploadAttachmentData = AppController.getInstance().getUploadAttachmentData();
         intent.putExtra(UPLOAD_FILE_PATH, filePath);
         intent.putExtra(TOPIC_ID_KEY, uploadAttachmentData.getTopicId());
@@ -376,10 +372,12 @@ public class ImageVideoCaptureActivity extends Activity {
     private void startUploadActivity(Bitmap bitmap) {
         Intent intent = new Intent(this, UploadActivity.class);
         //intent.putExtra(UPLOAD_FILE_BITMAP, bitmap);
-        AppController.getInstance().setSelectedBitmapPhoto(bitmap);
+        String newAttachmentId = UUID.randomUUID().toString();
+        AppCache.INSTANCE.addSelectedAttachmentPhoto(newAttachmentId, bitmap);
 
         UploadAttachmentData uploadAttachmentData = AppController.getInstance().getUploadAttachmentData();
 
+        intent.putExtra(UploadActivity.ATTACHMENT_ID, newAttachmentId);
         intent.putExtra(TOPIC_ID_KEY, uploadAttachmentData.getTopicId());
         intent.putExtra(UPLOAD_FILE_IS_PHOTO, true);
         intent.putExtra(UPLOAD_ENTITY_ID_KEY, uploadAttachmentData.getUploadEntityId());
@@ -407,7 +405,7 @@ public class ImageVideoCaptureActivity extends Activity {
         copyUploadData();
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         mediaFileUri = ImageUtil.getOutputMediaFileUri(MEDIA_TYPE_IMAGE);
-        AppController.getInstance().getUploadAttachmentData().setMediaFileUri(mediaFileUri);
+        //AppController.getInstance().getUploadAttachmentData().setMediaFileUri(mediaFileUri);
         intent.putExtra(MediaStore.EXTRA_OUTPUT, mediaFileUri);
         startActivityForResult(intent, CAMERA_CAPTURE_PHOTO_REQUEST_CODE);
     }
@@ -416,7 +414,7 @@ public class ImageVideoCaptureActivity extends Activity {
         copyUploadData();
         Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
         mediaFileUri = ImageUtil.getOutputMediaFileUri(MEDIA_TYPE_VIDEO);
-        AppController.getInstance().getUploadAttachmentData().setMediaFileUri(mediaFileUri);
+        //AppController.getInstance().getUploadAttachmentData().setMediaFileUri(mediaFileUri);
         intent.putExtra(MediaStore.EXTRA_OUTPUT, mediaFileUri);
         startActivityForResult(intent, CAMERA_RECORD_VIDEO_REQUEST_CODE);
     }
