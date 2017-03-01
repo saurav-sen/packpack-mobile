@@ -162,6 +162,7 @@ public class TopicDetailActivity extends AppCompatActivity implements OnMapReady
         invitePeople.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+               // https://github.com/BranchMetrics/Branch-Android-Invite-SDK
                 new SimpleInviteBuilder(TopicDetailActivity.this, "Inviting userID", "Inviting user Name").showInviteDialog();
             }
         });

@@ -14,7 +14,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.pack.pack.application.AppController;
-import com.pack.pack.application.data.cache.AppCache;
+import com.pack.pack.application.data.cache.PackAttachmentsCache;
 import com.pack.pack.application.data.util.ApiConstants;
 import com.pack.pack.application.data.util.CompressionStatusListener;
 import com.pack.pack.application.data.util.ImageUtil;
@@ -57,6 +57,14 @@ public class UploadVideoAttachmentService extends Service {
 
         String attachmentId = intent.getStringExtra(ATTACHMENT_ID);
 
+        JPackAttachment attachment = new JPackAttachment();
+        attachment.setId(attachmentId);
+        attachment.setUploadProgress(true);
+        attachment.setTitle(attachmentTitle);
+        attachment.setDescription(attachmentDescription);
+
+        PackAttachmentsCache.INSTANCE.addUploadInProgressAttachment(attachment, packId);
+
         upload(selectedInputVideoFilePath, attachmentId, packId, topicId, attachmentTitle, attachmentDescription);
 
         return START_REDELIVER_INTENT;
@@ -91,9 +99,10 @@ public class UploadVideoAttachmentService extends Service {
         notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());*/
     }
 
-    private void broadcastStatus(String oldAttachmentId, String newAttachmentId, boolean success) {
+    private void broadcastStatus(String packId, String oldAttachmentId, String newAttachmentId, boolean success) {
         Intent broadcast = new Intent("UPLOAD_ATTACHMENT");
         broadcast.putExtra(UploadResult.ATTACHMENT_OLD_ID, oldAttachmentId);
+        broadcast.putExtra(UploadResult.PACK_ID, packId);
         if(success) {
             broadcast.putExtra(UploadResult.STATUS, UploadResult.OK_STATUS);
             broadcast.putExtra(UploadResult.ATTACHMENT_NEW_ID, newAttachmentId);
@@ -155,9 +164,9 @@ public class UploadVideoAttachmentService extends Service {
             try {
                 InputStream inputStream = new FileInputStream(selectedVideoFile);
                 ContentBody contentBody = new InputStreamBody(inputStream, UUID.randomUUID().toString() + ".mp4");
-                AppCache.INSTANCE.addSelectedAttachmentVideo(attachmentId, contentBody);
+                PackAttachmentsCache.INSTANCE.addSelectedAttachmentVideo(attachmentId, contentBody);
 
-                ExecutorsPool.INSTANCE.submit(new ExecutorTask(attachmentId, packId, topicId, attachmentTitle, attachmentDescription));
+                ExecutorsPool.INSTANCE.submit(new ExecutorTask(attachmentId, packId, topicId, attachmentTitle, attachmentDescription, true));
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
@@ -170,9 +179,9 @@ public class UploadVideoAttachmentService extends Service {
             try {
                 InputStream inputStream = new FileInputStream(originalFile);
                 ContentBody contentBody = new InputStreamBody(inputStream, UUID.randomUUID().toString() + ".mp4");
-                AppCache.INSTANCE.addSelectedAttachmentVideo(attachmentId, contentBody);
+                PackAttachmentsCache.INSTANCE.addSelectedAttachmentVideo(attachmentId, contentBody);
 
-                ExecutorsPool.INSTANCE.submit(new ExecutorTask(attachmentId, packId, topicId, attachmentTitle, attachmentDescription));
+                ExecutorsPool.INSTANCE.submit(new ExecutorTask(attachmentId, packId, topicId, attachmentTitle, attachmentDescription, false));
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
@@ -197,13 +206,15 @@ public class UploadVideoAttachmentService extends Service {
         private String topicId;
         private String attachmentTitle;
         private String attachmentDescription;
+        private boolean isCompressed;
 
-        ExecutorTask(String attachmentId, String packId, String topicId, String attachmentTitle, String attachmentDescription) {
+        ExecutorTask(String attachmentId, String packId, String topicId, String attachmentTitle, String attachmentDescription, boolean isCompressed) {
             this.attachmentId = attachmentId;
             this.packId = packId;
             this.topicId = topicId;
             this.attachmentTitle = attachmentTitle;
             this.attachmentDescription = attachmentDescription;
+            this.isCompressed = isCompressed;
         }
 
         @Override
@@ -215,7 +226,7 @@ public class UploadVideoAttachmentService extends Service {
                                      String attachmentTitle, String attachmentDescription) {
             boolean success = true;
             String newAttachmentId = null;
-            ContentBody contentBody = AppCache.INSTANCE.getSelectedAttachmentVideo(attachmentId);
+            ContentBody contentBody = PackAttachmentsCache.INSTANCE.getSelectedAttachmentVideo(attachmentId);
             if(contentBody != null) {
                 try {
                     COMMAND command = COMMAND.ADD_VIDEO_TO_PACK;
@@ -227,6 +238,7 @@ public class UploadVideoAttachmentService extends Service {
                             .addApiParam(APIConstants.Attachment.FILE_ATTACHMENT, contentBody)
                             .addApiParam(APIConstants.Attachment.TITLE, attachmentTitle)
                             .addApiParam(APIConstants.Attachment.DESCRIPTION, attachmentDescription)
+                            .addApiParam(APIConstants.Attachment.IS_COMPRESSED, isCompressed)
                             .build();
                     JPackAttachment result = (JPackAttachment) api.execute(null);
                     if(result == null) {
@@ -234,15 +246,15 @@ public class UploadVideoAttachmentService extends Service {
                     } else {
                         success = true;
                         newAttachmentId = result.getId();
-                        AppCache.INSTANCE.successfullyUploadedAttachment(result);
+                        PackAttachmentsCache.INSTANCE.successfullyUploadedAttachment(result, packId, attachmentId);
                     }
                 } catch (Exception e) {
                     Log.d(LOG_TAG, e.getMessage(), e);
                     success = false;
                 } finally {
-                    AppCache.INSTANCE.removeSelectedAttachmentVideo(attachmentId);
+                    //PackAttachmentsCache.INSTANCE.removeSelectedAttachmentVideo(attachmentId);
                 }
-                broadcastStatus(attachmentId, newAttachmentId, success);
+                broadcastStatus(packId, attachmentId, newAttachmentId, success);
                 //notifyTargetIntent();
             }
         }

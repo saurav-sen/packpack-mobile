@@ -1,6 +1,8 @@
 package com.pack.pack.application.data.util;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
@@ -139,6 +141,34 @@ public class ImageUtil {
         return downscaleBitmap;
     }
 
+    private static void showAlert(Context context, String message) {
+        AlertDialog.Builder builder1 = new AlertDialog.Builder(context);
+        builder1.setMessage(message);
+        builder1.setCancelable(true);
+
+        builder1.setPositiveButton(
+                "Yes",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+
+        builder1.setNegativeButton(
+                "No",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+
+        AlertDialog alert11 = builder1.create();
+        alert11.show();
+    }
+
+    private static final int EXPECTED_MIN_VIDEO_WIDTH_FOR_COMPRESSION = 200;//400;
+    private static final int EXPECTED_MIN_VIDEO_HEIGHT_FOR_COMPRESSION = 200;//600;
+
     public static void compressVideo(final Context context, String inputFilePath, String outputFilePath, final CompressionStatusListener listener) throws Exception {
         // Using H.264 AI backed compression to compromise minimum on quality
         // @ http://writingminds.github.io/ffmpeg-android-java/
@@ -149,20 +179,20 @@ public class ImageUtil {
         int height = Integer.parseInt(mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT).trim());
         String command = null;
         if(ffMpegSupported) {
-            if (width <= 400 && height <= 600) {
+            if (width <= EXPECTED_MIN_VIDEO_WIDTH_FOR_COMPRESSION && height <= EXPECTED_MIN_VIDEO_HEIGHT_FOR_COMPRESSION) {
                 command = null;
-            } else if (Math.abs(width - 400) > 10 && Math.abs(height - 600) > 10) {
-                int w = 400;
-                int h = 600;
-                if (width < 400) {
+            } else if (Math.abs(width - EXPECTED_MIN_VIDEO_WIDTH_FOR_COMPRESSION) > 10 && Math.abs(height - EXPECTED_MIN_VIDEO_HEIGHT_FOR_COMPRESSION) > 10) {
+                int w = EXPECTED_MIN_VIDEO_WIDTH_FOR_COMPRESSION;
+                int h = EXPECTED_MIN_VIDEO_HEIGHT_FOR_COMPRESSION;
+                if (width < EXPECTED_MIN_VIDEO_WIDTH_FOR_COMPRESSION) {
                     w = width;
                 }
-                if (height < 600) {
+                if (height < EXPECTED_MIN_VIDEO_HEIGHT_FOR_COMPRESSION) {
                     h = height;
                 }
             /*int w = 200;
             int h = 200;*/
-                command = "-i " + inputFilePath + " -vf scale=" + w + ":" + h + " " + outputFilePath + " -preset ultrafast";
+                command = "-i " + inputFilePath + " -vf scale=" + w + ":" + h + " " + outputFilePath;// + " -preset ultrafast";
                 //command = "-i " + inputFilePath + " -c:v libx264 -crf 24 -b:v 1M -c:a aac " + outputFilePath;
             }
         }
@@ -182,6 +212,7 @@ public class ImageUtil {
                 if (listener != null) {
                     listener.onSuccess(message);
                 }
+                //showAlert(context, "FFMpeg Success");
             }
 
             @Override
@@ -195,6 +226,7 @@ public class ImageUtil {
                 if (listener != null) {
                     listener.onFailure(message);
                 }
+                //showAlert(context, "FFMpeg Failure");
             }
 
             @Override

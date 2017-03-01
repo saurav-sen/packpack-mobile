@@ -21,7 +21,7 @@ import android.widget.Toast;
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.Constants;
 import com.pack.pack.application.R;
-import com.pack.pack.application.data.cache.AppCache;
+import com.pack.pack.application.data.cache.PackAttachmentsCache;
 import com.pack.pack.application.data.util.FileUtil;
 import com.pack.pack.application.data.util.ImageUtil;
 import com.pack.pack.application.service.UploadImageAttachmentService;
@@ -373,7 +373,7 @@ public class ImageVideoCaptureActivity extends Activity {
         Intent intent = new Intent(this, UploadActivity.class);
         //intent.putExtra(UPLOAD_FILE_BITMAP, bitmap);
         String newAttachmentId = UUID.randomUUID().toString();
-        AppCache.INSTANCE.addSelectedAttachmentPhoto(newAttachmentId, bitmap);
+        PackAttachmentsCache.INSTANCE.addSelectedAttachmentPhoto(newAttachmentId, bitmap);
 
         UploadAttachmentData uploadAttachmentData = AppController.getInstance().getUploadAttachmentData();
 

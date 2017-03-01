@@ -33,7 +33,7 @@ import com.pack.pack.application.AppController;
 import com.pack.pack.application.Constants;
 import com.pack.pack.application.R;
 import com.pack.pack.application.adapters.PackAttachmentsAdapter;
-import com.pack.pack.application.data.cache.AppCache;
+import com.pack.pack.application.data.cache.PackAttachmentsCache;
 import com.pack.pack.application.data.util.AbstractNetworkTask;
 import com.pack.pack.application.db.DBUtil;
 import com.pack.pack.application.db.DbObject;
@@ -209,7 +209,7 @@ public class PackDetailActivity extends AppCompatActivity {
                     if(json != null && !json.trim().isEmpty()) {
                         JPackAttachment attachment = JSONUtil.deserialize(json, JPackAttachment.class, true);
                         adapter.getAttachments().add(attachment);
-                        adapter.notifyDataSetChanged();
+                        /*adapter.notifyDataSetChanged();
                         if(PackAttachmentType.IMAGE.name().equals(attachment.getMimeType())) {
                             String packId = data.getStringExtra(UploadImageAttachmentService.PACK_ID);
                             String topicId = data.getStringExtra(UploadImageAttachmentService.TOPIC_ID);
@@ -232,7 +232,18 @@ public class PackDetailActivity extends AppCompatActivity {
                             service.putExtra(UploadVideoAttachmentService.TOPIC_ID, topicId);
                             service.putExtra(UploadVideoAttachmentService.ATTACHMENT_ID, attachment.getId());
                             startService(service);
+                        }*/
+                        if(PackAttachmentType.IMAGE.name().equals(attachment.getMimeType())) {
+                            String packId = data.getStringExtra(UploadImageAttachmentService.PACK_ID);
+                            String topicId = data.getStringExtra(UploadImageAttachmentService.TOPIC_ID);
+                            adapter.scheduleAttachmentUpload(packId, topicId, attachment, null);
+                        } else if(PackAttachmentType.VIDEO.name().equals(attachment.getMimeType())) {
+                            String packId = data.getStringExtra(UploadVideoAttachmentService.PACK_ID);
+                            String topicId = data.getStringExtra(UploadVideoAttachmentService.TOPIC_ID);
+                            String selectedInputVideoFilePath = data.getStringExtra(UploadVideoAttachmentService.SELECTED_INPUT_VIDEO_FILE);
+                            adapter.scheduleAttachmentUpload(packId, topicId, attachment, selectedInputVideoFilePath);
                         }
+                        adapter.notifyDataSetChanged();
                     }
                 } catch (PackPackException e) {
                     Log.d(LOG_TAG, e.getMessage(), e);
@@ -346,6 +357,10 @@ public class PackDetailActivity extends AppCompatActivity {
                 List<JPackAttachment> attachments = page.getResult();
                 AppController.getInstance().getPackAttachments().clear();
                 AppController.getInstance().getPackAttachments().addAll(attachments);
+                List<JPackAttachment> uploadInProgressAttachments = PackAttachmentsCache.INSTANCE.getUploadInProgressAttachments(getInputObject().packId);
+                if(uploadInProgressAttachments != null) {
+                    attachments.addAll(uploadInProgressAttachments);
+                }
                 adapter.setAttachments(attachments);
                 adapter.notifyDataSetChanged();
                 if(currentScrollableObject != null) {
@@ -412,12 +427,18 @@ public class PackDetailActivity extends AppCompatActivity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
+            String packId = intent.getStringExtra(UploadResult.PACK_ID);
             String oldAttachmentId = intent.getStringExtra(UploadResult.ATTACHMENT_OLD_ID);
             String newAttachmentId = intent.getStringExtra(UploadResult.ATTACHMENT_NEW_ID);
             String status = intent.getStringExtra(UploadResult.STATUS);
             if(UploadResult.OK_STATUS.equals(status)) {
-                JPackAttachment newAttachment = AppCache.INSTANCE.getSuccessfullyUploadedAttachment(newAttachmentId);
-                adapter.onUploadSuccess(oldAttachmentId, newAttachment);
+                List<JPackAttachment> successfullyUploadedAttachments = PackAttachmentsCache.INSTANCE.getSuccessfullyUploadedAttachments(packId);
+                Map<String, JPackAttachment> successfullyUploadedAttachmentsMap = new HashMap<String, JPackAttachment>();
+                for(JPackAttachment successfullyUploadedAttachment : successfullyUploadedAttachments) {
+                    successfullyUploadedAttachmentsMap.put(successfullyUploadedAttachment.getId(), successfullyUploadedAttachment);
+                }
+                Map<String, String> inProgressVssuccessfulUploadAttachmentsMap = PackAttachmentsCache.INSTANCE.getSuccessfulUploadVsInProgressAttachmentsMap();
+                adapter.onUploadSuccess(packId, inProgressVssuccessfulUploadAttachmentsMap, successfullyUploadedAttachmentsMap);
                 //adapter.notifyDataSetChanged();
             } else {
                 adapter.onUploadError(oldAttachmentId);

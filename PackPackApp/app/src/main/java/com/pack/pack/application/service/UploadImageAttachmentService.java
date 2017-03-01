@@ -15,7 +15,7 @@ import android.util.Log;
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
 import com.pack.pack.application.activity.UploadActivity;
-import com.pack.pack.application.data.cache.AppCache;
+import com.pack.pack.application.data.cache.PackAttachmentsCache;
 import com.pack.pack.application.data.util.ApiConstants;
 import com.pack.pack.client.api.API;
 import com.pack.pack.client.api.APIBuilder;
@@ -27,6 +27,7 @@ import com.pack.pack.model.web.JPackAttachment;
 import org.apache.http.entity.mime.content.ContentBody;
 
 import java.io.ByteArrayOutputStream;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -54,6 +55,14 @@ public class UploadImageAttachmentService extends Service {
 
         String attachmentId = intent.getStringExtra(ATTACHMENT_ID);
 
+        JPackAttachment attachment = new JPackAttachment();
+        attachment.setId(attachmentId);
+        attachment.setUploadProgress(true);
+        attachment.setTitle(attachmentTitle);
+        attachment.setDescription(attachmentDescription);
+
+        PackAttachmentsCache.INSTANCE.addUploadInProgressAttachment(attachment, packId);
+
         upload(attachmentId, packId, topicId, attachmentTitle, attachmentDescription);
 
         return START_REDELIVER_INTENT;
@@ -77,9 +86,10 @@ public class UploadImageAttachmentService extends Service {
         notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());*/
     }
 
-    private void broadcastStatus(String oldAttachmentId, String newAttachmentId, boolean success) {
+    private void broadcastStatus(String packId, String oldAttachmentId, String newAttachmentId, boolean success) {
         Intent broadcast = new Intent("UPLOAD_ATTACHMENT");
         broadcast.putExtra(UploadResult.ATTACHMENT_OLD_ID, oldAttachmentId);
+        broadcast.putExtra(UploadResult.PACK_ID, packId);
         if(success) {
             broadcast.putExtra(UploadResult.STATUS, UploadResult.OK_STATUS);
             broadcast.putExtra(UploadResult.ATTACHMENT_NEW_ID, newAttachmentId);
@@ -125,7 +135,7 @@ public class UploadImageAttachmentService extends Service {
         public void run() {
             boolean success = true;
             String newAttachmentId = null;
-            Bitmap mediaBitmap = AppCache.INSTANCE.getSelectedAttachmentPhoto(attachmentId);
+            Bitmap mediaBitmap = PackAttachmentsCache.INSTANCE.getSelectedAttachmentPhoto(attachmentId);
             if(mediaBitmap != null) {
                 try {
                     ByteArrayOutputStream baOS = new ByteArrayOutputStream();
@@ -133,6 +143,7 @@ public class UploadImageAttachmentService extends Service {
                     byte[] bytes = baOS.toByteArray();
                     ByteBody byteBody = new ByteBody();
                     byteBody.setBytes(bytes);
+
 
                     COMMAND command = COMMAND.ADD_IMAGE_TO_PACK;
                     API api = APIBuilder.create(ApiConstants.BASE_URL).setAction(command)
@@ -153,16 +164,16 @@ public class UploadImageAttachmentService extends Service {
                             success = false;
                         } else {
                             success = true;
-                            AppCache.INSTANCE.successfullyUploadedAttachment(result);
+                            PackAttachmentsCache.INSTANCE.successfullyUploadedAttachment(result, packId, attachmentId);
                         }
                     }
                 } catch (Exception e) {
                     Log.d(LOG_TAG, e.getMessage(), e);
                     success = false;
                 } finally {
-                    AppCache.INSTANCE.removeSelectedAttachmentPhoto(attachmentId);
+                    //AppCache.INSTANCE.removeSelectedAttachmentPhoto(attachmentId);
                 }
-                broadcastStatus(attachmentId, newAttachmentId, success);
+                broadcastStatus(packId, attachmentId, newAttachmentId, success);
                 //notifyTargetIntent();
             }
         }

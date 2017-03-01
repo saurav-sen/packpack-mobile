@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,11 +22,13 @@ import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
 import com.pack.pack.application.activity.FullscreenAttachmentViewActivity;
 import com.pack.pack.application.activity.PackAttachmentCommentsActivity;
-import com.pack.pack.application.data.cache.AppCache;
+import com.pack.pack.application.data.cache.PackAttachmentsCache;
 import com.pack.pack.application.data.util.AbstractNetworkTask;
 import com.pack.pack.application.data.util.DateTimeUtil;
 import com.pack.pack.application.db.DBUtil;
 import com.pack.pack.application.image.loader.DownloadImageTask;
+import com.pack.pack.application.service.UploadImageAttachmentService;
+import com.pack.pack.application.service.UploadVideoAttachmentService;
 import com.pack.pack.application.view.CircleImageView;
 import com.pack.pack.client.api.API;
 import com.pack.pack.client.api.APIConstants;
@@ -40,8 +43,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.UUID;
 
 /**
@@ -56,6 +62,10 @@ public class PackAttachmentsAdapter extends ArrayAdapter<JPackAttachment> {
 
     private Map<String, AttachmentUnderUploadDetails> attachmentIdVsAttachmentDetails = new HashMap<String, AttachmentUnderUploadDetails>();
 
+    private Queue<AttachmentUploadTaskData> scheduledUploads = new LinkedList<AttachmentUploadTaskData>();
+
+    private boolean uploadTaskRunning = false;
+
     public PackAttachmentsAdapter(Activity activity, List<JPackAttachment> attachments) {
         super(activity, R.layout.activity_pack_detail_item, attachments);
         this.activity = activity;
@@ -67,6 +77,11 @@ public class PackAttachmentsAdapter extends ArrayAdapter<JPackAttachment> {
             attachments = new ArrayList<JPackAttachment>(10);
         }
         return attachments;
+    }
+
+    public void scheduleAttachmentUpload(String packId, String topicId, JPackAttachment attachment, String inputVideoFilePath) {
+        AttachmentUploadTaskData attachmentUploadTaskData = new AttachmentUploadTaskData(packId, topicId, attachment, inputVideoFilePath);
+        scheduledUploads.offer(attachmentUploadTaskData);
     }
 
     public void setAttachments(List<JPackAttachment> attachments) {
@@ -208,8 +223,18 @@ public class PackAttachmentsAdapter extends ArrayAdapter<JPackAttachment> {
                 attachmentUnderUploadDetails.setAttachment(attachment);
                 attachmentUnderUploadDetails.setImageView(pack_attachment_img);
                 attachmentUnderUploadDetails.setOverlayProgress(upload_in_progress_overlay);
+                if(PackAttachmentType.IMAGE.name().equals(attachment.getMimeType())) {
+                    Bitmap bitmap = PackAttachmentsCache.INSTANCE.getSelectedAttachmentPhoto(attachment.getId());
+                    if(bitmap != null) {
+                        pack_attachment_img.setImageBitmap(bitmap);
+                    }
+                }
 
                 attachmentIdVsAttachmentDetails.put(attachment.getId(), attachmentUnderUploadDetails);
+                if(!uploadTaskRunning) {
+                    uploadTaskRunning = true;
+                    new UploadTask().execute();
+                }
             } else {
                 upload_in_progress_overlay.setVisibility(View.GONE);
             }
@@ -286,12 +311,21 @@ public class PackAttachmentsAdapter extends ArrayAdapter<JPackAttachment> {
         notifyDataSetChanged();
     }
 
-    public void onUploadSuccess(String oldAttachmentId, JPackAttachment newAttachment) {
-        AttachmentUnderUploadDetails attachmentUnderUploadDetails = attachmentIdVsAttachmentDetails.get(oldAttachmentId);
-        attachmentUnderUploadDetails.setUploadSuccess(true);
-        replace(attachmentUnderUploadDetails.getAttachment(), newAttachment);
-        attachmentUnderUploadDetails.getAttachment().setUploadProgress(false);
-        AppCache.INSTANCE.removeFromCacheOfSuccessfullyUploadedAttachment(newAttachment);
+    public void onUploadSuccess(String packId, Map<String, String> oldVsNewAttachmentsMap, Map<String, JPackAttachment> successfullyUploadedAttachmentsMap) {
+        Iterator<String> itr = oldVsNewAttachmentsMap.keySet().iterator();
+        while(itr.hasNext()) {
+            String oldAttachmentId = itr.next();
+            String newAttachmentId = oldVsNewAttachmentsMap.get(oldAttachmentId);
+            JPackAttachment newAttachment = successfullyUploadedAttachmentsMap.get(newAttachmentId);
+            if(newAttachment == null) {
+                continue;
+            }
+            AttachmentUnderUploadDetails attachmentUnderUploadDetails = attachmentIdVsAttachmentDetails.get(oldAttachmentId);
+            attachmentUnderUploadDetails.setUploadSuccess(true);
+            replace(attachmentUnderUploadDetails.getAttachment(), newAttachment);
+            attachmentUnderUploadDetails.getAttachment().setUploadProgress(false);
+            PackAttachmentsCache.INSTANCE.removeFromCacheOfSuccessfullyUploadedAttachment(packId, newAttachment);
+        }
         notifyDataSetChanged();
     }
 
@@ -382,5 +416,94 @@ public class PackAttachmentsAdapter extends ArrayAdapter<JPackAttachment> {
         }
 
         private boolean uploadSuccess;
+    }
+
+    private class AttachmentUploadTaskData {
+
+        AttachmentUploadTaskData(String packId, String topicId, JPackAttachment attachment, String inputVideoFilePath) {
+            this.packId = packId;
+            this.topicId = topicId;
+            this.attachment = attachment;
+            this.inputVideoFilePath = inputVideoFilePath;
+        }
+
+        private String packId;
+
+        private String topicId;
+
+        private JPackAttachment attachment;
+
+        private String inputVideoFilePath;
+
+        public String getInputVideoFilePath() {
+            return inputVideoFilePath;
+        }
+
+        public void setInputVideoFilePath(String inputVideoFilePath) {
+            this.inputVideoFilePath = inputVideoFilePath;
+        }
+
+        public String getPackId() {
+            return packId;
+        }
+
+        public void setPackId(String packId) {
+            this.packId = packId;
+        }
+
+        public String getTopicId() {
+            return topicId;
+        }
+
+        public void setTopicId(String topicId) {
+            this.topicId = topicId;
+        }
+
+        public JPackAttachment getAttachment() {
+            return attachment;
+        }
+
+        public void setAttachment(JPackAttachment attachment) {
+            this.attachment = attachment;
+        }
+    }
+
+    private class UploadTask extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            try {
+                uploadTaskRunning = true;
+                AttachmentUploadTaskData attachmentUploadTaskData = null;
+                while((attachmentUploadTaskData = scheduledUploads.poll()) != null) {
+                    invokeUploadService(attachmentUploadTaskData.getPackId(), attachmentUploadTaskData.getTopicId(),
+                            attachmentUploadTaskData.getAttachment(), attachmentUploadTaskData.getInputVideoFilePath());
+                }
+            } finally {
+                uploadTaskRunning = false;
+            }
+            return null;
+        }
+
+        private void invokeUploadService(String packId, String topicId, JPackAttachment attachment, String selectedInputVideoFilePath) {
+            if(PackAttachmentType.IMAGE.name().equals(attachment.getMimeType())) {
+                Intent service = new Intent(getContext(), UploadImageAttachmentService.class);
+                service.putExtra(UploadImageAttachmentService.ATTACHMENT_TITLE, attachment.getTitle());
+                service.putExtra(UploadImageAttachmentService.ATTACHMENT_DESCRIPTION, attachment.getDescription());
+                service.putExtra(UploadImageAttachmentService.PACK_ID, packId);
+                service.putExtra(UploadImageAttachmentService.TOPIC_ID, topicId);
+                service.putExtra(UploadImageAttachmentService.ATTACHMENT_ID, attachment.getId());
+                getContext().startService(service);
+            } else if(PackAttachmentType.VIDEO.name().equals(attachment.getMimeType())) {
+                Intent service = new Intent(getContext(), UploadVideoAttachmentService.class);
+                service.putExtra(UploadVideoAttachmentService.SELECTED_INPUT_VIDEO_FILE, selectedInputVideoFilePath);
+                service.putExtra(UploadVideoAttachmentService.ATTACHMENT_TITLE,  attachment.getTitle());
+                service.putExtra(UploadVideoAttachmentService.ATTACHMENT_DESCRIPTION, attachment.getDescription());
+                service.putExtra(UploadVideoAttachmentService.PACK_ID, packId);
+                service.putExtra(UploadVideoAttachmentService.TOPIC_ID, topicId);
+                service.putExtra(UploadVideoAttachmentService.ATTACHMENT_ID, attachment.getId());
+                getContext().startService(service);
+            }
+        }
     }
 }

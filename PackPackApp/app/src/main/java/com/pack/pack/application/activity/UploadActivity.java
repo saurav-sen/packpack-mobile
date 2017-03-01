@@ -24,7 +24,7 @@ import android.widget.VideoView;
 
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
-import com.pack.pack.application.data.cache.AppCache;
+import com.pack.pack.application.data.cache.PackAttachmentsCache;
 import com.pack.pack.application.data.util.ApiConstants;
 import com.pack.pack.application.data.util.CompressionStatusListener;
 import com.pack.pack.application.data.util.FileUtil;
@@ -119,7 +119,7 @@ public class UploadActivity extends Activity {
         newAttachmentId = getIntent().getStringExtra(ATTACHMENT_ID);
 
         //mediaBitmap = getIntent().getParcelableExtra(UPLOAD_FILE_BITMAP);
-        mediaBitmap = AppCache.INSTANCE.getSelectedAttachmentPhoto(newAttachmentId);
+        mediaBitmap = PackAttachmentsCache.INSTANCE.getSelectedAttachmentPhoto(newAttachmentId);
         if(mediaBitmap != null) {
             mediaBitmap = ImageUtil.downscaleBitmap(mediaBitmap, 1200, 900);
         }
