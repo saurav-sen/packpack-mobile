@@ -24,6 +24,7 @@ import com.pack.pack.application.activity.FullscreenAttachmentViewActivity;
 import com.pack.pack.application.activity.PackAttachmentCommentsActivity;
 import com.pack.pack.application.data.cache.PackAttachmentsCache;
 import com.pack.pack.application.data.util.AbstractNetworkTask;
+import com.pack.pack.application.data.util.ApiConstants;
 import com.pack.pack.application.data.util.DateTimeUtil;
 import com.pack.pack.application.db.DBUtil;
 import com.pack.pack.application.image.loader.DownloadImageTask;
@@ -224,7 +225,7 @@ public class PackAttachmentsAdapter extends ArrayAdapter<JPackAttachment> {
                 attachmentUnderUploadDetails.setImageView(pack_attachment_img);
                 attachmentUnderUploadDetails.setOverlayProgress(upload_in_progress_overlay);
                 if(PackAttachmentType.IMAGE.name().equals(attachment.getMimeType())) {
-                    Bitmap bitmap = PackAttachmentsCache.INSTANCE.getSelectedAttachmentPhoto(attachment.getId());
+                    Bitmap bitmap = PackAttachmentsCache.open(getContext()).getSelectedAttachmentPhoto(attachment.getId());
                     if(bitmap != null) {
                         pack_attachment_img.setImageBitmap(bitmap);
                     }
@@ -240,7 +241,12 @@ public class PackAttachmentsAdapter extends ArrayAdapter<JPackAttachment> {
             }
 
             if(url != null) {
-                new DownloadImageTask(pack_attachment_img, 700, 600, PackAttachmentsAdapter.this.getContext(), pack_loading_progress)
+                boolean isIncludeOauthToken = false;
+                if(url.contains(ApiConstants.BASE_URL)) {
+                    isIncludeOauthToken = true;
+
+                }
+                new DownloadImageTask(pack_attachment_img, 700, 600, PackAttachmentsAdapter.this.getContext(), pack_loading_progress, isIncludeOauthToken)
                         .execute(url);
             }
         }
@@ -324,7 +330,7 @@ public class PackAttachmentsAdapter extends ArrayAdapter<JPackAttachment> {
             attachmentUnderUploadDetails.setUploadSuccess(true);
             replace(attachmentUnderUploadDetails.getAttachment(), newAttachment);
             attachmentUnderUploadDetails.getAttachment().setUploadProgress(false);
-            PackAttachmentsCache.INSTANCE.removeFromCacheOfSuccessfullyUploadedAttachment(packId, newAttachment);
+            PackAttachmentsCache.open(getContext()).removeFromCacheOfSuccessfullyUploadedAttachment(packId, newAttachment);
         }
         notifyDataSetChanged();
     }

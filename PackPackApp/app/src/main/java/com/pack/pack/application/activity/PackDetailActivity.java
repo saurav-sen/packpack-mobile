@@ -357,7 +357,9 @@ public class PackDetailActivity extends AppCompatActivity {
                 List<JPackAttachment> attachments = page.getResult();
                 AppController.getInstance().getPackAttachments().clear();
                 AppController.getInstance().getPackAttachments().addAll(attachments);
-                List<JPackAttachment> uploadInProgressAttachments = PackAttachmentsCache.INSTANCE.getUploadInProgressAttachments(getInputObject().packId);
+                List<JPackAttachment> uploadInProgressAttachments = PackAttachmentsCache
+                        .open(PackDetailActivity.this).getUploadInProgressAttachments(
+                                getInputObject().packId);
                 if(uploadInProgressAttachments != null) {
                     attachments.addAll(uploadInProgressAttachments);
                 }
@@ -432,12 +434,12 @@ public class PackDetailActivity extends AppCompatActivity {
             String newAttachmentId = intent.getStringExtra(UploadResult.ATTACHMENT_NEW_ID);
             String status = intent.getStringExtra(UploadResult.STATUS);
             if(UploadResult.OK_STATUS.equals(status)) {
-                List<JPackAttachment> successfullyUploadedAttachments = PackAttachmentsCache.INSTANCE.getSuccessfullyUploadedAttachments(packId);
+                List<JPackAttachment> successfullyUploadedAttachments = PackAttachmentsCache.open(context).getSuccessfullyUploadedAttachments(packId);
                 Map<String, JPackAttachment> successfullyUploadedAttachmentsMap = new HashMap<String, JPackAttachment>();
                 for(JPackAttachment successfullyUploadedAttachment : successfullyUploadedAttachments) {
                     successfullyUploadedAttachmentsMap.put(successfullyUploadedAttachment.getId(), successfullyUploadedAttachment);
                 }
-                Map<String, String> inProgressVssuccessfulUploadAttachmentsMap = PackAttachmentsCache.INSTANCE.getSuccessfulUploadVsInProgressAttachmentsMap();
+                Map<String, String> inProgressVssuccessfulUploadAttachmentsMap = PackAttachmentsCache.open(context).getSuccessfulUploadVsInProgressAttachmentsMap();
                 adapter.onUploadSuccess(packId, inProgressVssuccessfulUploadAttachmentsMap, successfullyUploadedAttachmentsMap);
                 //adapter.notifyDataSetChanged();
             } else {

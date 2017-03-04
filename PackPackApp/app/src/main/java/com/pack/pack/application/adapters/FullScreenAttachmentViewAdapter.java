@@ -17,6 +17,7 @@ import android.widget.VideoView;
 
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
+import com.pack.pack.application.data.util.ApiConstants;
 import com.pack.pack.application.image.loader.DownloadImageTask;
 import com.pack.pack.application.view.TouchImageView;
 import com.pack.pack.client.api.APIConstants;
@@ -76,13 +77,19 @@ public class FullScreenAttachmentViewAdapter extends PagerAdapter {
             JPackAttachment attachment = list.get(position);
             if(PackAttachmentType.IMAGE.name().equalsIgnoreCase(attachment.getAttachmentType())) {
                 videoView.setVisibility(View.GONE);
-                new DownloadImageTask(imgDisplay, 900, 900, FullScreenAttachmentViewAdapter.this.activity)
+                boolean isIncludeOauthToken = false;
+                if(attachment.getAttachmentUrl() != null && attachment.getAttachmentUrl().contains(ApiConstants.BASE_URL)) {
+                    isIncludeOauthToken = true;
+                }
+                new DownloadImageTask(imgDisplay, 900, 900, FullScreenAttachmentViewAdapter.this.activity, null, isIncludeOauthToken)
                          .execute(attachment.getAttachmentUrl());
             } else if(PackAttachmentType.VIDEO.name().equalsIgnoreCase(attachment.getAttachmentType())) {
                 imgDisplay.setVisibility(View.GONE);
                 videoView.setMediaController(mediaController);
                 Map<String, String> __HTTP_REQUEST_HEADERS = new HashMap<String, String>();
-                __HTTP_REQUEST_HEADERS.put(APIConstants.AUTHORIZATION_HEADER, AppController.getInstance().getoAuthToken());
+                if(attachment.getAttachmentUrl() != null && attachment.getAttachmentUrl().contains(ApiConstants.BASE_URL)) {
+                    __HTTP_REQUEST_HEADERS.put(APIConstants.AUTHORIZATION_HEADER, AppController.getInstance().getoAuthToken());
+                }
                 videoView.setVideoURI(Uri.parse(attachment.getAttachmentUrl()), __HTTP_REQUEST_HEADERS);
                 mediaController.setAnchorView(videoView);
                 videoView.requestFocus();

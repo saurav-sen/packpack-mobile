@@ -373,7 +373,7 @@ public class ImageVideoCaptureActivity extends Activity {
         Intent intent = new Intent(this, UploadActivity.class);
         //intent.putExtra(UPLOAD_FILE_BITMAP, bitmap);
         String newAttachmentId = UUID.randomUUID().toString();
-        PackAttachmentsCache.INSTANCE.addSelectedAttachmentPhoto(newAttachmentId, bitmap);
+        PackAttachmentsCache.open(this).addSelectedAttachmentPhoto(newAttachmentId, bitmap);
 
         UploadAttachmentData uploadAttachmentData = AppController.getInstance().getUploadAttachmentData();
 

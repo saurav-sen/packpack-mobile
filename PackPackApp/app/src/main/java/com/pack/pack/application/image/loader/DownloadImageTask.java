@@ -45,6 +45,8 @@ public class DownloadImageTask extends AbstractNetworkTask<String, Void, Bitmap>
 
     private ProgressBar progressBar;
 
+    private boolean includeOauthToken;
+
     private static final String LOG_TAG = "DownloadImageTask";
 
     public DownloadImageTask(ImageView imageView, Context context) {
@@ -62,11 +64,16 @@ public class DownloadImageTask extends AbstractNetworkTask<String, Void, Bitmap>
     }
 
     public DownloadImageTask(ImageView imageView, int imageWidth, int imageHeight, Context context, ProgressBar progressBar) {
+        this(imageView, imageWidth, imageHeight, context, progressBar, false);
+    }
+
+    public DownloadImageTask(ImageView imageView, int imageWidth, int imageHeight, Context context, ProgressBar progressBar, boolean includeOauthToken) {
         super(false, false, context);
         this.imageView = imageView;
         this.imageWidth = imageWidth;
         this.imageHeight = imageHeight;
         this.progressBar = progressBar;
+        this.includeOauthToken = includeOauthToken;
     }
 
     @Override
@@ -82,6 +89,7 @@ public class DownloadImageTask extends AbstractNetworkTask<String, Void, Bitmap>
         if(ApiConstants.IS_PRODUCTION_ENV) {
             Map<String, Object> apiParams = new HashMap<String, Object>();
             apiParams.put(APIConstants.ExternalResource.RESOURCE_URL, inputObject);
+            apiParams.put(APIConstants.ExternalResource.INCLUDE_OAUTH_TOKEN, String.valueOf(includeOauthToken));
             return apiParams;
         }
         Map<String, Object> apiParams = new HashMap<String, Object>();

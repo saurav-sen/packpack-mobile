@@ -61,7 +61,7 @@ public class UploadImageAttachmentService extends Service {
         attachment.setTitle(attachmentTitle);
         attachment.setDescription(attachmentDescription);
 
-        PackAttachmentsCache.INSTANCE.addUploadInProgressAttachment(attachment, packId);
+        PackAttachmentsCache.open(this).addUploadInProgressAttachment(attachment, packId);
 
         upload(attachmentId, packId, topicId, attachmentTitle, attachmentDescription);
 
@@ -135,7 +135,8 @@ public class UploadImageAttachmentService extends Service {
         public void run() {
             boolean success = true;
             String newAttachmentId = null;
-            Bitmap mediaBitmap = PackAttachmentsCache.INSTANCE.getSelectedAttachmentPhoto(attachmentId);
+            Bitmap mediaBitmap = PackAttachmentsCache.open(UploadImageAttachmentService.this)
+                    .getSelectedAttachmentPhoto(attachmentId);
             if(mediaBitmap != null) {
                 try {
                     ByteArrayOutputStream baOS = new ByteArrayOutputStream();
@@ -164,7 +165,8 @@ public class UploadImageAttachmentService extends Service {
                             success = false;
                         } else {
                             success = true;
-                            PackAttachmentsCache.INSTANCE.successfullyUploadedAttachment(result, packId, attachmentId);
+                            PackAttachmentsCache.open(UploadImageAttachmentService.this)
+                                    .successfullyUploadedAttachment(result, packId, attachmentId);
                         }
                     }
                 } catch (Exception e) {

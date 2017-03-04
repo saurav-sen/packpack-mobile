@@ -119,7 +119,7 @@ public class UploadActivity extends Activity {
         newAttachmentId = getIntent().getStringExtra(ATTACHMENT_ID);
 
         //mediaBitmap = getIntent().getParcelableExtra(UPLOAD_FILE_BITMAP);
-        mediaBitmap = PackAttachmentsCache.INSTANCE.getSelectedAttachmentPhoto(newAttachmentId);
+        mediaBitmap = PackAttachmentsCache.open(this).getSelectedAttachmentPhoto(newAttachmentId);
         if(mediaBitmap != null) {
             mediaBitmap = ImageUtil.downscaleBitmap(mediaBitmap, 1200, 900);
         }

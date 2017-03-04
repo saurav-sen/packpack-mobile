@@ -50,4 +50,6 @@ dependencies {
     compile 'io.branch.invite.sdk.android:library:0.1.+'
     compile 'org.jsoup:jsoup:1.8.3'
     compile 'com.writingminds:FFmpegAndroid:0.3.2'
+    compile 'com.jakewharton:disklrucache:2.0.2'
+    compile 'com.google.guava:guava:21.0'
 }

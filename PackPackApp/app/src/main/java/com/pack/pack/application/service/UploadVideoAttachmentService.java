@@ -63,7 +63,7 @@ public class UploadVideoAttachmentService extends Service {
         attachment.setTitle(attachmentTitle);
         attachment.setDescription(attachmentDescription);
 
-        PackAttachmentsCache.INSTANCE.addUploadInProgressAttachment(attachment, packId);
+        PackAttachmentsCache.open(this).addUploadInProgressAttachment(attachment, packId);
 
         upload(selectedInputVideoFilePath, attachmentId, packId, topicId, attachmentTitle, attachmentDescription);
 
@@ -164,7 +164,7 @@ public class UploadVideoAttachmentService extends Service {
             try {
                 InputStream inputStream = new FileInputStream(selectedVideoFile);
                 ContentBody contentBody = new InputStreamBody(inputStream, UUID.randomUUID().toString() + ".mp4");
-                PackAttachmentsCache.INSTANCE.addSelectedAttachmentVideo(attachmentId, contentBody);
+                PackAttachmentsCache.open(UploadVideoAttachmentService.this).addSelectedAttachmentVideo(attachmentId, contentBody);
 
                 ExecutorsPool.INSTANCE.submit(new ExecutorTask(attachmentId, packId, topicId, attachmentTitle, attachmentDescription, true));
             } catch (Exception e) {
@@ -179,7 +179,7 @@ public class UploadVideoAttachmentService extends Service {
             try {
                 InputStream inputStream = new FileInputStream(originalFile);
                 ContentBody contentBody = new InputStreamBody(inputStream, UUID.randomUUID().toString() + ".mp4");
-                PackAttachmentsCache.INSTANCE.addSelectedAttachmentVideo(attachmentId, contentBody);
+                PackAttachmentsCache.open(UploadVideoAttachmentService.this).addSelectedAttachmentVideo(attachmentId, contentBody);
 
                 ExecutorsPool.INSTANCE.submit(new ExecutorTask(attachmentId, packId, topicId, attachmentTitle, attachmentDescription, false));
             } catch (Exception e) {
@@ -226,7 +226,7 @@ public class UploadVideoAttachmentService extends Service {
                                      String attachmentTitle, String attachmentDescription) {
             boolean success = true;
             String newAttachmentId = null;
-            ContentBody contentBody = PackAttachmentsCache.INSTANCE.getSelectedAttachmentVideo(attachmentId);
+            ContentBody contentBody = PackAttachmentsCache.open(UploadVideoAttachmentService.this).getSelectedAttachmentVideo(attachmentId);
             if(contentBody != null) {
                 try {
                     COMMAND command = COMMAND.ADD_VIDEO_TO_PACK;
@@ -246,7 +246,7 @@ public class UploadVideoAttachmentService extends Service {
                     } else {
                         success = true;
                         newAttachmentId = result.getId();
-                        PackAttachmentsCache.INSTANCE.successfullyUploadedAttachment(result, packId, attachmentId);
+                        PackAttachmentsCache.open(UploadVideoAttachmentService.this).successfullyUploadedAttachment(result, packId, attachmentId);
                     }
                 } catch (Exception e) {
                     Log.d(LOG_TAG, e.getMessage(), e);
