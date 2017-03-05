@@ -8,7 +8,10 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
+import com.pack.pack.application.data.cache.HttpCache;
+import com.pack.pack.application.data.cache.HttpCacheFactory;
 import com.pack.pack.application.topic.activity.model.UploadAttachmentData;
+import com.pack.pack.client.api.APIConstants;
 import com.pack.pack.model.web.JCategories;
 import com.pack.pack.model.web.JPackAttachment;
 import com.pack.pack.model.web.JTopic;
@@ -171,6 +174,7 @@ public class AppController extends Application {
             new LoginTask().execute(userInfo);
         }*/
         mInstance = this;
+        System.setProperty(APIConstants.CACHE_STORAGE, HttpCacheFactory.class.getName());
         initializeBranchIO();
     }
 
