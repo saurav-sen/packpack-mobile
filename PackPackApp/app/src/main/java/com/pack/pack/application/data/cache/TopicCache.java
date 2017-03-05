@@ -5,6 +5,7 @@ import android.content.pm.PackageInfo;
 import android.util.Log;
 
 import com.pack.pack.application.cz.fhucho.android.util.SimpleDiskCache;
+import com.pack.pack.application.cz.fhucho.android.util.SimpleDiskCacheInitializer;
 import com.pack.pack.common.util.JSONUtil;
 import com.pack.pack.model.web.JPack;
 import com.pack.pack.model.web.JTopic;
@@ -25,9 +26,7 @@ public class TopicCache {
 
     private SimpleDiskCache diskCache;
 
-    private static Object lock = new Object();
-
-    private static final long MAX_SIZE = 1024 * 1024;
+    private static final Object lock = new Object();
 
     private static final String LOG_TAG = "TopicCache";
 
@@ -42,7 +41,8 @@ public class TopicCache {
                     instance = new TopicCache();
                 }
                 if (instance.diskCache == null) {
-                    instance.load(context);
+                    SimpleDiskCacheInitializer.prepare(context);
+                    instance.diskCache = SimpleDiskCache.getInstance();
                 }
             }
             return instance;
@@ -50,13 +50,6 @@ public class TopicCache {
             Log.d(LOG_TAG, e.getMessage(), e);
             throw new RuntimeException(e.getMessage());
         }
-    }
-
-    private void load(Context context) throws Exception {
-        PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
-        int appVersion = pInfo.versionCode;
-        File cacheDir = context.getCacheDir();
-        diskCache = SimpleDiskCache.open(cacheDir, appVersion, MAX_SIZE);
     }
 
     public List<JTopic> getAllTopics(String category) {

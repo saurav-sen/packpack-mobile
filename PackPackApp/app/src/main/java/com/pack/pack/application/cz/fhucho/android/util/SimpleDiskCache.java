@@ -21,20 +21,32 @@ public class SimpleDiskCache {
     private DiskLruCache diskLruCache;
     private int mAppVersion;
 
+    private static SimpleDiskCache instance;
+
+    private static final Object lock = new Object();
+
     private SimpleDiskCache(File dir, int appVersion, long maxSize) throws IOException {
         mAppVersion = appVersion;
         diskLruCache = DiskLruCache.open(dir, appVersion, 2, maxSize);
     }
 
-    public static synchronized SimpleDiskCache open(File dir, int appVersion, long maxSize)
+    static synchronized SimpleDiskCache open(File dir, int appVersion, long maxSize)
             throws IOException {
-        if (usedDirs.contains(dir)) {
-            throw new IllegalStateException("Cache dir " + dir.getAbsolutePath() + " was used before.");
+        synchronized (lock) {
+            if (instance == null) {
+                instance = new SimpleDiskCache(dir, appVersion, maxSize);
+                if (usedDirs.contains(dir)) {
+                    throw new IllegalStateException("Cache dir " + dir.getAbsolutePath() + " was used before.");
+                }
+
+                usedDirs.add(dir);
+            }
         }
+        return instance;
+    }
 
-        usedDirs.add(dir);
-
-        return new SimpleDiskCache(dir, appVersion, maxSize);
+    public static SimpleDiskCache getInstance() {
+        return instance;
     }
 
     /**
