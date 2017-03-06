@@ -2,8 +2,8 @@ package com.pack.pack.application.cz.fhucho.android.util;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import com.google.common.io.ByteStreams;
-import com.google.common.io.Closeables;
+//import com.google.common.io.ByteStreams;
+//import com.google.common.io.Closeables;
 import com.jakewharton.disklrucache.DiskLruCache;
 
 import java.io.*;
@@ -176,12 +176,41 @@ public class SimpleDiskCache {
         put(key, is, new HashMap<String, Serializable>());
     }
 
+    private byte[] createBuffer() {
+        return new byte[8192];
+    }
+
+    private <T> T checkNotNull(T reference) {
+        if (reference == null) {
+            throw new NullPointerException();
+        }
+        return reference;
+        }
+
+    private long copy(InputStream from, OutputStream to) throws IOException {
+        checkNotNull(from);
+        checkNotNull(to);
+
+        byte[] buf = createBuffer();
+        long total = 0;
+        while (true) {
+            int r = from.read(buf);
+            if (r == -1) {
+                break;
+            }
+            to.write(buf, 0, r);
+            total += r;
+        }
+        return total;
+    }
+
     public void put(String key, InputStream is, Map<String, Serializable> annotations) throws IOException {
         OutputStream os = null;
         try {
             os = openStream(key, annotations);
             //IOUtils.copy(is, os);
-            ByteStreams.copy(is, os);
+            //ByteStreams.copy(is, os);
+            copy(is, os);
         } finally {
             if (os != null) os.close();
         }
@@ -229,8 +258,9 @@ public class SimpleDiskCache {
             oos = new ObjectOutputStream(new BufferedOutputStream(editor.newOutputStream(METADATA_IDX)));
             oos.writeObject(metadata);
         } finally {
+            oos.close();
             //IOUtils.closeQuietly(oos);
-            Closeables.close(oos, true);
+            //Closeables.close(oos, true);
         }
     }
 
@@ -244,8 +274,9 @@ public class SimpleDiskCache {
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         } finally {
+            ois.close();
             //IOUtils.closeQuietly(ois);
-            Closeables.close(ois, true);
+            //Closeables.close(ois, true);
         }
     }
 
@@ -255,8 +286,9 @@ public class SimpleDiskCache {
             oos = new ObjectOutputStream(new BufferedOutputStream(editor.newOutputStream(METADATA_IDX)));
             oos.writeObject(array);
         } finally {
+            oos.close();
             //IOUtils.closeQuietly(oos);
-            Closeables.close(oos, true);
+            //Closeables.close(oos, true);
         }
     }
 
@@ -266,8 +298,9 @@ public class SimpleDiskCache {
             oos = new ObjectOutputStream(new BufferedOutputStream(editor.newOutputStream(METADATA_IDX)));
             oos.writeObject(array);
         } finally {
+            oos.close();
             //IOUtils.closeQuietly(oos);
-            Closeables.close(oos, true);
+            //Closeables.close(oos, true);
         }
     }
 
@@ -282,8 +315,9 @@ public class SimpleDiskCache {
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         } finally {
+            ois.close();
             //IOUtils.closeQuietly(ois);
-            Closeables.close(ois, true);
+            //Closeables.close(ois, true);
         }
     }
 
