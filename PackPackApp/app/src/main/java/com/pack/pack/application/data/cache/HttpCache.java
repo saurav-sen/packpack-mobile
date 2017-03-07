@@ -7,11 +7,10 @@ import android.util.Log;
 
 import com.pack.pack.application.cz.fhucho.android.util.SimpleDiskCache;
 import com.pack.pack.application.cz.fhucho.android.util.SimpleDiskCacheInitializer;
+import com.pack.pack.client.internal.response.cache.HttpCacheEntry;
+import com.pack.pack.client.internal.response.cache.HttpCacheUpdateCallback;
+import com.pack.pack.client.internal.response.cache.HttpCacheUpdateException;
 import com.pack.pack.client.internal.response.cache.HttpResponseCacheDelegate;
-
-import org.apache.http.client.cache.HttpCacheEntry;
-import org.apache.http.client.cache.HttpCacheUpdateCallback;
-import org.apache.http.client.cache.HttpCacheUpdateException;
 
 import java.io.File;
 import java.io.IOException;
@@ -57,12 +56,12 @@ public class HttpCache implements HttpResponseCacheDelegate {
     }
 
     @Override
-    public void putEntry(String s, HttpCacheEntry httpCacheEntry) throws IOException {
+    public void put(String s, HttpCacheEntry httpCacheEntry) throws IOException {
         inMemoryCache.put(s, new SoftReference<HttpCacheEntry>(httpCacheEntry));
     }
 
     @Override
-    public HttpCacheEntry getEntry(String s) throws IOException {
+    public HttpCacheEntry get(String s) throws IOException {
         SoftReference<HttpCacheEntry> ref = inMemoryCache.get(s);
         if(ref == null) {
             return null;
@@ -71,19 +70,19 @@ public class HttpCache implements HttpResponseCacheDelegate {
     }
 
     @Override
-    public void removeEntry(String s) throws IOException {
+    public void remove(String s) throws IOException {
         inMemoryCache.remove(s);
     }
 
     @Override
-    public void updateEntry(String s, HttpCacheUpdateCallback httpCacheUpdateCallback) throws IOException, HttpCacheUpdateException {
-        HttpCacheEntry entry = getEntry(s);
+    public void update(String s, HttpCacheUpdateCallback httpCacheUpdateCallback) throws IOException, HttpCacheUpdateException {
+        HttpCacheEntry entry = get(s);
         if(httpCacheUpdateCallback != null && entry != null) {
             entry = httpCacheUpdateCallback.update(entry);
             if(entry == null) {
                 inMemoryCache.remove(s);
             } else {
-                putEntry(s, entry);
+                put(s, entry);
             }
         }
     }
