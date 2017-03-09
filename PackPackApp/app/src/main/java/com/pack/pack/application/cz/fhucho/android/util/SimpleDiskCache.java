@@ -75,6 +75,23 @@ public class SimpleDiskCache {
         return new InputStreamEntry(snapshot, readMetadata(snapshot));
     }
 
+    public void put(String key, Bitmap bitmap) throws IOException {
+        OutputStream outputStream =  null;
+        try {
+            outputStream = openStream(key);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+            outputStream.flush();
+        } finally {
+            if(outputStream != null) {
+                outputStream.close();
+            }
+        }
+        BitmapEntry e = getBitmap(key);
+        if(e == null) {
+
+        }
+    }
+
     public BitmapEntry getBitmap(String key) throws IOException {
         DiskLruCache.Snapshot snapshot = diskLruCache.get(toInternalKey(key));
         if (snapshot == null) return null;

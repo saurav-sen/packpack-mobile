@@ -217,8 +217,10 @@ public class AppController extends Application {
     }
 
     public LruBitmapCache getLruBitmapCache() {
-        if (mLruBitmapCache == null)
+        if (mLruBitmapCache == null) {
+            SimpleDiskCacheInitializer.prepare(this);
             mLruBitmapCache = new LruBitmapCache();
+        }
         return this.mLruBitmapCache;
     }
 

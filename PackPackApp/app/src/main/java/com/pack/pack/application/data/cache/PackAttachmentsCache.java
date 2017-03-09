@@ -6,6 +6,8 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.util.Log;
 
+import com.pack.pack.application.AppController;
+import com.pack.pack.application.LruBitmapCache;
 import com.pack.pack.application.cz.fhucho.android.util.SimpleDiskCache;
 import com.pack.pack.application.cz.fhucho.android.util.SimpleDiskCacheInitializer;
 import com.pack.pack.common.util.JSONUtil;
@@ -35,7 +37,7 @@ public class PackAttachmentsCache {
 
     private Map<String, ContentBody> attachmentIdVsVideoMap = new HashMap<String, ContentBody>();
 
-    private Map<String, Bitmap> attachmentIdVsBitmap = new HashMap<String, Bitmap>();
+    //private Map<String, Bitmap> attachmentIdVsBitmap = new HashMap<String, Bitmap>();
 
     //private Map<String, List<JPackAttachment>> successfullyUploadedAttachmentsMap = new HashMap<String, List<JPackAttachment>>();
 
@@ -258,15 +260,17 @@ public class PackAttachmentsCache {
     }
 
     public Bitmap getSelectedAttachmentPhoto(String attachmentId) {
-        return attachmentIdVsBitmap.get(attachmentId);
+        LruBitmapCache lruBitmapCache = AppController.getInstance().getLruBitmapCache();
+        return lruBitmapCache.get(attachmentId);
     }
 
     public void addSelectedAttachmentPhoto(String attachmentId, Bitmap selectedBitmapPhoto) {
-        attachmentIdVsBitmap.put(attachmentId, selectedBitmapPhoto);
+        LruBitmapCache lruBitmapCache = AppController.getInstance().getLruBitmapCache();
+        lruBitmapCache.put(attachmentId, selectedBitmapPhoto);
     }
 
     public void removeSelectedAttachmentPhoto(String attachmentId) {
-        attachmentIdVsBitmap.remove(attachmentId);
+        //attachmentIdVsBitmap.remove(attachmentId);
     }
 
     public List<JPackAttachment> getSuccessfullyUploadedAttachments(String packId) {

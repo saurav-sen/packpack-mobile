@@ -12,13 +12,13 @@
     <ImageView
         android:id="@+id/imgDisplay"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:scaleType="fitCenter" />
 
     <VideoView
         android:id="@+id/videoDisplay"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:scaleType="fitCenter" />
 
 </LinearLayout>

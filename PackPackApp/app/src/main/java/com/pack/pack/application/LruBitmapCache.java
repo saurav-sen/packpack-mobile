@@ -1,12 +1,21 @@
 package com.pack.pack.application;
 
 import com.android.volley.toolbox.ImageLoader.ImageCache;
+import com.pack.pack.application.cz.fhucho.android.util.SimpleDiskCache;
 
 import android.graphics.Bitmap;
 import android.support.v4.util.LruCache;
+import android.util.Log;
+
+import java.io.IOException;
 
 public class LruBitmapCache extends LruCache<String, Bitmap> implements
         ImageCache {
+
+    //private SimpleDiskCache diskCache;
+
+    private static final String LOG_TAG = "LruBitmapCache";
+
     public static int getDefaultLruCacheSize() {
         final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
         final int cacheSize = maxMemory / 8;
@@ -20,6 +29,7 @@ public class LruBitmapCache extends LruCache<String, Bitmap> implements
 
     public LruBitmapCache(int sizeInKiloBytes) {
         super(sizeInKiloBytes);
+        //diskCache = SimpleDiskCache.getInstance()
     }
 
     @Override
@@ -29,11 +39,34 @@ public class LruBitmapCache extends LruCache<String, Bitmap> implements
 
     @Override
     public Bitmap getBitmap(String url) {
-        return get(url);
+        Bitmap bitmap = null;
+        try {
+            bitmap = get(url);
+            if(bitmap == null) {
+                SimpleDiskCache.BitmapEntry bitmapEntry = SimpleDiskCache.getInstance().getBitmap(url);
+                if(bitmapEntry == null) {
+                    return bitmap;
+                }
+                bitmap = bitmapEntry.getBitmap();
+                if(bitmap != null) {
+                    put(url, bitmap);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.d(LOG_TAG, e.getMessage(), e);
+        }
+        return bitmap;
     }
 
     @Override
     public void putBitmap(String url, Bitmap bitmap) {
         put(url, bitmap);
+        try {
+            SimpleDiskCache.getInstance().put(url, bitmap);
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.d(LOG_TAG, e.getMessage(), e);
+        }
     }
 }
