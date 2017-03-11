@@ -30,6 +30,22 @@ public class FullscreenAttachmentViewActivity extends Activity {
         adapter = new FullScreenAttachmentViewAdapter(this,
                 AppController.getInstance().getPackAttachments());
         fullscreen_attachment_view_pager.setAdapter(adapter);
+        fullscreen_attachment_view_pager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
 
         int currentIndex = getIntent().getIntExtra("index", 0);
         adapter.setCurrentIndex(currentIndex);

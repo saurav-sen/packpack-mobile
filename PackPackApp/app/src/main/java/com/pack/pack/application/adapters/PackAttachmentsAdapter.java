@@ -246,7 +246,7 @@ public class PackAttachmentsAdapter extends ArrayAdapter<JPackAttachment> {
                     isIncludeOauthToken = true;
 
                 }
-                new DownloadImageTask(pack_attachment_img, 700, 600, PackAttachmentsAdapter.this.getContext(), pack_loading_progress, isIncludeOauthToken)
+                new DownloadImageTask(pack_attachment_img, 900, 700, PackAttachmentsAdapter.this.getContext(), pack_loading_progress, isIncludeOauthToken)
                         .execute(url);
             }
         }

@@ -48,9 +48,7 @@ public class LruBitmapCache extends LruCache<String, Bitmap> implements
                     return bitmap;
                 }
                 bitmap = bitmapEntry.getBitmap();
-                if(bitmap != null) {
-                    put(url, bitmap);
-                }
+                put(url, bitmap);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -61,12 +59,15 @@ public class LruBitmapCache extends LruCache<String, Bitmap> implements
 
     @Override
     public void putBitmap(String url, Bitmap bitmap) {
-        put(url, bitmap);
+        if(url == null || bitmap == null) {
+            return;
+        }
         try {
             SimpleDiskCache.getInstance().put(url, bitmap);
         } catch (IOException e) {
             e.printStackTrace();
             Log.d(LOG_TAG, e.getMessage(), e);
         }
+        put(url, bitmap);
     }
 }

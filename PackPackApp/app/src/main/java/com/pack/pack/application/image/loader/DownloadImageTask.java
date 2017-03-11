@@ -100,10 +100,12 @@ public class DownloadImageTask extends AbstractNetworkTask<String, Void, Bitmap>
     }
 
     protected String lookupURL(String url) {
-        /*if(ApiConstants.IS_PRODUCTION_ENV) {
-            return url != null ? url.trim() : url;
-        }*/
-        return URLEncoder.encode(url) + "?w=" + imageWidth + "&h=" + imageHeight;
+        //if(ApiConstants.IS_PRODUCTION_ENV) {
+            url = url != null ? url.trim() : url;
+            url = url + "?w=" + imageWidth + "&h=" + imageHeight;
+        //}
+        //return URLEncoder.encode(url) + "?w=" + imageWidth + "&h=" + imageHeight;
+        return url;// + "?w=" + imageWidth + "&h=" + imageHeight;
     }
 
     @Override
@@ -113,8 +115,18 @@ public class DownloadImageTask extends AbstractNetworkTask<String, Void, Bitmap>
         try {
             String url = getInputObject();
             bitmap = AppController.getInstance().getLruBitmapCache().getBitmap(lookupURL(url));
-            if(bitmap != null)
+            if(bitmap != null) {
+                int ht = bitmap.getHeight();
+                int wd = bitmap.getWidth();
+                if(ht != imageHeight || wd != imageWidth) {
+                    if (imageWidth > 0 && imageHeight > 0) {
+                        bitmap = Bitmap.createScaledBitmap(bitmap, imageWidth, imageHeight, false);
+                    } else {
+                        bitmap = Bitmap.createScaledBitmap(bitmap, 900, 700, false);
+                    }
+                }
                 return bitmap;
+            }
             stream = (InputStream) api.execute();
             if(stream != null) {
                 bitmap = BitmapFactory.decodeStream(stream);
@@ -122,7 +134,7 @@ public class DownloadImageTask extends AbstractNetworkTask<String, Void, Bitmap>
                     if (imageWidth > 0 && imageHeight > 0) {
                         bitmap = Bitmap.createScaledBitmap(bitmap, imageWidth, imageHeight, false);
                     } else {
-                        bitmap = Bitmap.createScaledBitmap(bitmap, 800, 800, false);
+                        bitmap = Bitmap.createScaledBitmap(bitmap, 900, 700, false);
                     }
                 }
                 AppController.getInstance().getLruBitmapCache().putBitmap(lookupURL(url), bitmap);

@@ -75,13 +75,30 @@ public class SimpleDiskCache {
         return new InputStreamEntry(snapshot, readMetadata(snapshot));
     }
 
+   /* private boolean writeBitmapToFile( Bitmap bitmap, DiskLruCache.Editor editor )
+            throws IOException, FileNotFoundException {
+        OutputStream out = null;
+        try {
+            out = new BufferedOutputStream( editor.newOutputStream( 0 ), 8 * 1024 );
+            return bitmap.compress( Bitmap.CompressFormat.JPEG, 100, out );
+        } finally {
+            if ( out != null ) {
+                out.close();
+            }
+        }
+    }*/
+
     public void put(String key, Bitmap bitmap) throws IOException {
         OutputStream outputStream =  null;
+        boolean success = false;
         try {
             outputStream = openStream(key);
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
-            outputStream.flush();
+            success = bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+            if(success) {
+                outputStream.flush();
+            }
         } finally {
+            diskLruCache.flush();
             if(outputStream != null) {
                 outputStream.close();
             }
