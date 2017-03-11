@@ -1,6 +1,7 @@
 package com.pack.pack.application.activity;
 
 import android.Manifest;
+import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
@@ -9,6 +10,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -20,11 +23,17 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.AbsListView;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -75,11 +84,24 @@ public class PackDetailActivity extends AppCompatActivity {
 
     private TextView activity_pack_title;
 
+    private TextView activity_pack_story;
+
+    private ImageButton activity_pack_see_more;
+
     private ListView activity_pack_attachments;
 
     private FloatingActionButton fab;
 
     private static final String LOG_TAG = "PackDetailActivity";
+
+    private boolean expanded = false;
+
+    private int descriptionLineCount = 0;
+
+    private String shortStory;
+    private String longStory;
+
+    private boolean expandable = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,9 +128,55 @@ public class PackDetailActivity extends AppCompatActivity {
         });
 
         activity_pack_title = (TextView) findViewById(R.id.activity_pack_title);
-        TextView activity_pack_story = (TextView) findViewById(R.id.activity_pack_story);
+        activity_pack_story = (TextView) findViewById(R.id.activity_pack_story);
         activity_pack_title.setText(pack.getTitle());
-        activity_pack_story.setText(pack.getStory());
+
+        activity_pack_see_more = (ImageButton) findViewById(R.id.activity_pack_see_more);
+
+        activity_pack_story.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                if (expandable && descriptionLineCount > 3) {
+                    activity_pack_see_more.setVisibility(View.VISIBLE);
+                    ObjectAnimator animation = ObjectAnimator.ofInt(activity_pack_story, "maxLines", 3);
+                    animation.setDuration(0).start();
+                    expandable = false;
+                }
+            }
+        });
+
+        activity_pack_see_more.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!expanded) {
+                    expanded = true;
+                    ObjectAnimator animation = ObjectAnimator.ofInt(activity_pack_story, "maxLines", descriptionLineCount);
+                    animation.setDuration(100).start();
+                    activity_pack_story.setText(longStory);
+                    activity_pack_see_more.setImageDrawable(ContextCompat.getDrawable(PackDetailActivity.this, R.drawable.ic_expand_less));
+                } else {
+                    expanded = false;
+                    activity_pack_story.setText(shortStory);
+                    ObjectAnimator animation = ObjectAnimator.ofInt(activity_pack_story, "maxLines", 3);
+                    animation.setDuration(100).start();
+                    activity_pack_see_more.setImageDrawable(ContextCompat.getDrawable(PackDetailActivity.this,R.drawable.ic_expand_more));
+                }
+            }
+        });
+
+        longStory = pack.getStory();
+
+        String[] split = longStory.split("[\n|\r]");
+        descriptionLineCount = split.length;
+
+        if(descriptionLineCount > 3) {
+            shortStory = new StringBuilder().append(split[0]).append("\n").append(split[1]).toString();
+        } else {
+            shortStory = longStory;
+            activity_pack_see_more.setVisibility(View.GONE);
+        }
+
+        activity_pack_story.setText(shortStory);
 
         activity_pack_attachments = (ListView) findViewById(R.id.activity_pack_attachments);
         adapter = new PackAttachmentsAdapter(this, new ArrayList<JPackAttachment>(10));
