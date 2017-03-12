@@ -170,7 +170,20 @@ public class PackDetailActivity extends AppCompatActivity {
         descriptionLineCount = split.length;
 
         if(descriptionLineCount > 3) {
-            shortStory = new StringBuilder().append(split[0]).append("\n").append(split[1]).toString();
+            //shortStory = new StringBuilder().append(split[0]).append("\n").append(split[1]).toString();
+            StringBuilder str = new StringBuilder();
+            int lineCount = 0;
+            for(int i=0; lineCount < 2 && i<descriptionLineCount; i++) {
+                String s = split[i];
+                if(s.trim().length() > 0) {
+                    if(lineCount > 0) {
+                        str.append("\n");
+                    }
+                    lineCount++;
+                }
+                str.append(s);
+            }
+            shortStory = str.toString();
         } else {
             shortStory = longStory;
             activity_pack_see_more.setVisibility(View.GONE);
