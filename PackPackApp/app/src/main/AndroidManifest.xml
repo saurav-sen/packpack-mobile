@@ -64,6 +64,11 @@
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="Squill"
             android:theme="@style/FullscreenTheme" />
+        <activity
+            android:name=".activity.FullScreenPlayVideoActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="Squill"
+            android:theme="@style/FullscreenTheme" />
         <activity android:name=".activity.MainActivity" />
         <activity android:name=".activity.SignupActivity" />
         <activity android:name=".activity.ResetPasswordActivity" />

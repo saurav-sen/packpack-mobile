@@ -107,9 +107,26 @@ public class TopicDetailAdapter extends ArrayAdapter<JPack> {
         if(position < packs.size()) {
             JPack pack = packs.get(position);
             packTitle.setText(pack.getTitle());
-            StringBuilder story = new StringBuilder(pack.getStory());
-            String storyContent = story.toString();
-            packStory.setText(storyContent);//pack.getStory());
+
+            String storyContent = pack.getStory();
+            String[] split = storyContent.split("[\n|\r]");
+            int storyContentLineCount = split.length;
+
+            if(storyContentLineCount > 3) {
+                StringBuilder str = new StringBuilder();
+                for(int i=0; i<storyContentLineCount; i++) {
+                    String s = split[i];
+                    str.append(s);
+                    if(s.trim().length() > 0) {
+                        str.append("\n");
+                    }
+                }
+                storyContent = str.toString();
+            }
+
+            packStory.setText(storyContent);
+
+            //pack.getStory());
            /* if(storyContent.length() > 1000) {
                 packStoryContinue.setText(Html.fromHtml("<a href=\\\"#\\\">Continue</a> "));
                 packStoryContinue.setTextColor(0x0a80d1);

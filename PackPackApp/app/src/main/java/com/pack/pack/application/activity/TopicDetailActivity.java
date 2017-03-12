@@ -1,6 +1,7 @@
 package com.pack.pack.application.activity;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -36,9 +37,18 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.Constants;
 import com.pack.pack.application.R;
+import com.pack.pack.application.data.util.AbstractNetworkTask;
 import com.pack.pack.application.image.loader.DownloadImageTask;
 import com.pack.pack.application.topic.activity.model.ParcelableTopic;
+import com.pack.pack.client.api.API;
+import com.pack.pack.client.api.APIConstants;
+import com.pack.pack.client.api.COMMAND;
 import com.pack.pack.model.web.EntityType;
+import com.pack.pack.model.web.JTopic;
+import com.pack.pack.model.web.JUser;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import io.branch.invite.SimpleInviteBuilder;
 import io.branch.referral.Branch;
@@ -130,8 +140,27 @@ public class TopicDetailActivity extends AppCompatActivity implements OnMapReady
         TextView topic_name_text = (TextView) findViewById(R.id.topic_name_text);
         topic_name_text.setText((topic.getTopicName() + "").trim());
 
+        String longStory = topic.getDescription() + "";
+
+        String[] split = longStory.split("[\n|\r]");
+        int longStoryLineCount = split.length;
+
         TextView topic_description_text = (TextView) findViewById(R.id.topic_description_text);
-        topic_description_text.setText((topic.getDescription() + "").trim());
+        topic_description_text.setMinLines(longStoryLineCount);
+
+        if(longStoryLineCount > 3) {
+            StringBuilder str = new StringBuilder();
+            for(int i=0; i<longStoryLineCount; i++) {
+                String s = split[i];
+                str.append(s);
+                if(s.trim().length() > 0) {
+                    str.append("\n");
+                }
+            }
+            longStory = str.toString();
+        }
+
+        topic_description_text.setText(longStory);
 
         ImageView topic_wallpaper_img = (ImageView) findViewById(R.id.topic_wallpaper_img);
 
@@ -154,7 +183,7 @@ public class TopicDetailActivity extends AppCompatActivity implements OnMapReady
         followTopic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                new FollowTopicTask(TopicDetailActivity.this).execute(topic.getTopicId());
             }
         });
 
@@ -246,5 +275,42 @@ public class TopicDetailActivity extends AppCompatActivity implements OnMapReady
         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 8);
         gMap.moveCamera(cameraUpdate);
         gMap.addMarker(new MarkerOptions().position(latLng).anchor(0.5f, 0.5f)).setTitle(topic.getAddress());
+    }
+
+    private class FollowTopicTask extends AbstractNetworkTask<String, Integer, Void> {
+
+        public FollowTopicTask(Context context) {
+            super(false, false, false, context);
+        }
+
+        @Override
+        protected String getContainerIdForObjectStore() {
+            return null;
+        }
+
+        @Override
+        protected Void executeApi(API api) throws Exception {
+            api.execute();
+            return null;
+        }
+
+        @Override
+        protected COMMAND command() {
+            return COMMAND.FOLLOW_TOPIC;
+        }
+
+        @Override
+        protected Map<String, Object> prepareApiParams(String inputObject) {
+            JUser user = AppController.getInstance().getUser();
+            Map<String, Object> apiParams = new HashMap<String, Object>();
+            apiParams.put(APIConstants.User.ID, user.getId());
+            apiParams.put(APIConstants.Topic.ID, inputObject);
+            return apiParams;
+        }
+
+        @Override
+        protected String getFailureMessage() {
+            return "Failed following topic command";
+        }
     }
 }

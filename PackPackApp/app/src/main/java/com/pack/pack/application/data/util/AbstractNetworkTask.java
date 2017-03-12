@@ -220,7 +220,10 @@ public abstract class AbstractNetworkTask<X, Y, Z> extends AsyncTask<X, Y, Z> {
     }
 
     protected DbObject convertObjectForStore(Z successResult, String containerIdForObjectStore) {
-        return DBUtil.convert(successResult, getContainerIdForObjectStore());
+        String cIdObjStore = getContainerIdForObjectStore();
+        if(cIdObjStore == null)
+            return null;
+        return DBUtil.convert(successResult, cIdObjStore);
     }
 
     protected String getPaginationContainerId() {
