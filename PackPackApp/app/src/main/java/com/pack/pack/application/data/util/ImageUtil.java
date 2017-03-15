@@ -5,7 +5,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Matrix;
+import android.graphics.Paint;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Environment;
@@ -16,6 +18,7 @@ import com.github.hiteshsondhi88.libffmpeg.FFmpeg;
 import com.github.hiteshsondhi88.libffmpeg.FFmpegExecuteResponseHandler;
 import com.github.hiteshsondhi88.libffmpeg.FFmpegLoadBinaryResponseHandler;
 import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegNotSupportedException;
+import com.google.android.gms.maps.model.Circle;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -243,4 +246,12 @@ public class ImageUtil {
             }
         });
     }
+
+    /*public static Bitmap getCirculerBitmap(Bitmap bitmap) {
+        Bitmap target = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(target);
+
+        Paint paint = new Paint();
+        canvas.drawCircle();
+    }*/
 }

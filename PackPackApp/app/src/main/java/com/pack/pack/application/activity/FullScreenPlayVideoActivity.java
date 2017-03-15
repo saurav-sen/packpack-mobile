@@ -9,7 +9,13 @@ import android.util.Log;
 import android.widget.MediaController;
 import android.widget.VideoView;
 
+import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
+import com.pack.pack.application.data.util.ApiConstants;
+import com.pack.pack.client.api.APIConstants;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by Saurav on 12-03-2017.
@@ -45,10 +51,12 @@ public class FullScreenPlayVideoActivity extends Activity {
             if(videoURL == null || videoURL.trim().isEmpty()) {
                 throw new Exception("VIDEO_URL can't be null");
             }
-            Uri video = Uri.parse(videoURL);
+            final Map<String, String> __HTTP_REQUEST_HEADERS = new HashMap<String, String>();
+            if(videoURL != null && videoURL.contains(ApiConstants.BASE_URL)) {
+                __HTTP_REQUEST_HEADERS.put(APIConstants.AUTHORIZATION_HEADER, AppController.getInstance().getoAuthToken());
+            }
             videoDisplay.setMediaController(mediacontroller);
-            videoDisplay.setVideoURI(video);
-
+            videoDisplay.setVideoURI(Uri.parse(videoURL), __HTTP_REQUEST_HEADERS);
         } catch (Exception e) {
             Log.d(LOG_TAG, e.getMessage());
             e.printStackTrace();

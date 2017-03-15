@@ -28,6 +28,7 @@ import static com.pack.pack.application.AppController.MEDIA_TYPE_IMAGE;
  */
 public class ProfilePicturePreference extends Preference implements SettingsActivity.SettingsChangeListener {
 
+    //private ImageView profile_picture_pref;
     private CircleImageView profile_picture_pref;
 
     public ProfilePicturePreference(Context context, AttributeSet attrs) {
@@ -74,6 +75,7 @@ public class ProfilePicturePreference extends Preference implements SettingsActi
     @Override
     protected void onBindView(View view) {
         super.onBindView(view);
+       // profile_picture_pref = (ImageView) view.findViewById(R.id.profile_picture_pref);
         profile_picture_pref = (CircleImageView) view.findViewById(R.id.profile_picture_pref);
         ImageButton profile_picture_pref_camera = (ImageButton) view.findViewById(R.id.profile_picture_pref_camera);
         profile_picture_pref_camera.setOnClickListener(new View.OnClickListener() {

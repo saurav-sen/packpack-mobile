@@ -39,12 +39,17 @@
             android:label="Squill"
             android:theme="@style/AppTheme.NoActionBar" />
 
-            <intent-filter>
-                <data android:scheme="squill" android:host="open" />
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-            </intent-filter>
+        <intent-filter>
+            <data
+                android:host="open"
+                android:scheme="squill" />
+
+            <action android:name="android.intent.action.VIEW" />
+
+            <category android:name="android.intent.category.DEFAULT" />
+            <category android:name="android.intent.category.BROWSABLE" />
+        </intent-filter>
+
         <activity
             android:name=".activity.PackDetailActivity"
             android:label="Squill"
@@ -76,9 +81,8 @@
         <service
             android:name=".service.FetchAddressIntentService"
             android:exported="false" />
-
-        <service android:name=".service.UploadVideoAttachmentService"/>
-        <service android:name=".service.UploadImageAttachmentService"/>
+        <service android:name=".service.UploadVideoAttachmentService" />
+        <service android:name=".service.UploadImageAttachmentService" />
 
         <activity
             android:name=".activity.TopicCreateActivity"
@@ -100,7 +104,6 @@
         <activity
             android:name=".activity.FollowCategoryActivity"
             android:label="FollowCategoryActivity" />
-
         <activity
             android:name=".activity.SettingsActivity"
             android:label="Settings" />
@@ -110,10 +113,16 @@
             android:value="AIzaSyATxB4S4Vi5K8QP_Ly5-kW-oL5mid40Fy0" />
 
         <!-- Add this meta-data below, and change "key_live_xxxxxxx" to your actual live Branch key -->
-        <meta-data android:name="io.branch.sdk.BranchKey" android:value="key_live_iiDjEJlqZfawGqyQWfhfgjmcsFgs5Isy" />
+        <meta-data
+            android:name="io.branch.sdk.BranchKey"
+            android:value="key_live_iiDjEJlqZfawGqyQWfhfgjmcsFgs5Isy" />
 
         <!-- For your test app, if you have one; Again, use your actual test Branch key -->
-        <meta-data android:name="io.branch.sdk.BranchKey.test" android:value="key_test_akDeFGmEZpkwPvzP2oamkidkyqpB0SwI" />
+        <meta-data
+            android:name="io.branch.sdk.BranchKey.test"
+            android:value="key_test_akDeFGmEZpkwPvzP2oamkidkyqpB0SwI" />
+
+        <activity android:name=".activity.PreSignupActivity"></activity>
     </application>
 
 </manifest>

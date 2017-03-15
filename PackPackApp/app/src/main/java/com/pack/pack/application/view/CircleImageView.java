@@ -277,6 +277,8 @@ public class CircleImageView extends ImageView {
 
     @Override
     public void setImageBitmap(Bitmap bm) {
+        if(bm == null)
+            return;
         super.setImageBitmap(bm);
         initializeBitmap();
     }

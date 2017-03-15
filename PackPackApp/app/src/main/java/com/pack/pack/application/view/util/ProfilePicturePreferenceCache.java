@@ -34,7 +34,7 @@ public class ProfilePicturePreferenceCache {
     }
 
     public void downloadUserProfilePicutre(ImageView imageView, Context context, JUser user) {
-        new DownloadImageTask(imageView, context).execute(user.getProfilePictureUrl());
+        new DownloadImageTask(imageView, 50, 50, context).execute(user.getProfilePictureUrl());
     }
 
     public void uploadUserProfilePicture(Context context, Bitmap profilePicture) {
