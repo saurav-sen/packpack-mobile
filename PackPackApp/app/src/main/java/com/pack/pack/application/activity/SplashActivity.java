@@ -122,11 +122,13 @@ public class SplashActivity extends Activity implements IAsyncTaskStatusListener
 
     private void startLoginActivity() {
         Intent intent = new Intent(SplashActivity.this, LoginActivity.class);
+        finish();
         startActivity(intent);
     }
 
     private void startMainActivity() {
         Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+        finish();
         startActivity(intent);
     }
 

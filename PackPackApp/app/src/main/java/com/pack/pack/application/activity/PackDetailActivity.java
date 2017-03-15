@@ -42,6 +42,7 @@ import com.pack.pack.application.AppController;
 import com.pack.pack.application.Constants;
 import com.pack.pack.application.R;
 import com.pack.pack.application.adapters.PackAttachmentsAdapter;
+import com.pack.pack.application.data.cache.InMemory;
 import com.pack.pack.application.data.cache.PackAttachmentsCache;
 import com.pack.pack.application.data.util.AbstractNetworkTask;
 import com.pack.pack.application.db.DBUtil;
@@ -51,6 +52,7 @@ import com.pack.pack.application.service.UploadImageAttachmentService;
 import com.pack.pack.application.service.UploadResult;
 import com.pack.pack.application.service.UploadVideoAttachmentService;
 import com.pack.pack.application.topic.activity.model.ParcelablePack;
+import com.pack.pack.application.topic.activity.model.ParcelableTopic;
 import com.pack.pack.client.api.API;
 import com.pack.pack.client.api.APIBuilder;
 import com.pack.pack.client.api.APIConstants;
@@ -114,6 +116,7 @@ public class PackDetailActivity extends AppCompatActivity {
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         pack = (ParcelablePack) getIntent().getParcelableExtra(AppController.PACK_PARCELABLE_KEY);
+        ParcelableTopic topic = InMemory.INSTANCE.get(pack.getParentTopicId());
 
         fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -126,6 +129,12 @@ public class PackDetailActivity extends AppCompatActivity {
                 startActivityForResult(intent, Constants.IMAGE_VIDEO_CAPTURE_REQUEST_CODE);
             }
         });
+
+        if(topic != null && !topic.isFollowing()) {
+            fab.setVisibility(View.GONE);
+        } else {
+            fab.setVisibility(View.VISIBLE);
+        }
 
         activity_pack_title = (TextView) findViewById(R.id.activity_pack_title);
         activity_pack_story = (TextView) findViewById(R.id.activity_pack_story);

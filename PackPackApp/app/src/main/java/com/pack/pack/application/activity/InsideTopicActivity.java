@@ -21,6 +21,7 @@ import com.pack.pack.application.AppController;
 import com.pack.pack.application.Constants;
 import com.pack.pack.application.R;
 import com.pack.pack.application.adapters.TopicDetailAdapter;
+import com.pack.pack.application.data.cache.InMemory;
 import com.pack.pack.application.data.util.AbstractNetworkTask;
 import com.pack.pack.application.db.DBUtil;
 import com.pack.pack.application.db.PaginationInfo;
@@ -70,6 +71,11 @@ public class InsideTopicActivity extends AppCompatActivity {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        topic = (ParcelableTopic) getIntent().getParcelableExtra(AppController.TOPIC_PARCELABLE_KEY);
+        this.topicId = topic.getTopicId();
+
+        InMemory.INSTANCE.add(topic);
+
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
 
@@ -80,8 +86,21 @@ public class InsideTopicActivity extends AppCompatActivity {
                 Intent intent = new Intent(InsideTopicActivity.this, CreatePackActivity.class);
                 intent.putExtra(TOPIC_ID_KEY, topic.getTopicId());
                 startActivityForResult(intent, Constants.PACK_CREATE_REQUEST_CODE);
+                /*if(topic.isFollowing()) {
+                    Intent intent = new Intent(InsideTopicActivity.this, CreatePackActivity.class);
+                    intent.putExtra(TOPIC_ID_KEY, topic.getTopicId());
+                    startActivityForResult(intent, Constants.PACK_CREATE_REQUEST_CODE);
+                } else {
+                    Toast.makeText(InsideTopicActivity.this, "You are not following the topic.", Toast.LENGTH_LONG).show();
+                }*/
             }
         });
+
+        if(topic.isFollowing()) {
+            fab.setVisibility(View.VISIBLE);
+        } else {
+            fab.setVisibility(View.GONE);
+        }
 
         adapter = new TopicDetailAdapter(this, new ArrayList<JPack>());
         final ListView listView = (ListView) findViewById(R.id.topic_detail_list);
@@ -104,8 +123,6 @@ public class InsideTopicActivity extends AppCompatActivity {
             }
         });
 
-        topic = (ParcelableTopic) getIntent().getParcelableExtra(AppController.TOPIC_PARCELABLE_KEY);
-        this.topicId = topic.getTopicId();
         new LoadPackTask().execute(topic);
     }
 

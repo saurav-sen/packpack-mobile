@@ -50,6 +50,16 @@ public class ParcelableTopic implements Parcelable {
         this.latitude = latitude;
     }
 
+    private boolean isFollowing;
+
+    public boolean isFollowing() {
+        return isFollowing;
+    }
+
+    public void setIsFollowing(boolean isFollowing) {
+        this.isFollowing = isFollowing;
+    }
+
     public ParcelableTopic() {
     }
 
@@ -63,10 +73,13 @@ public class ParcelableTopic implements Parcelable {
             setLongitude(topic.getLongitude());
             setLatitude(topic.getLatitude());
             setAddress(topic.getAddress() + "");
+            setIsFollowing(topic.isFollowing());
         }
     }
 
-    public ParcelableTopic(String topicId, String topicCategory, String wallpaperUrl, String description, String name, double longitude, double latitude, String address) {
+    public ParcelableTopic(String topicId, String topicCategory, String wallpaperUrl,
+                           String description, String name, double longitude, double latitude,
+                           String address, boolean isFollowing) {
         this.topicId = topicId + "";
         this.topicCategory = topicCategory + "";
         this.wallpaperUrl = wallpaperUrl + "";
@@ -75,6 +88,7 @@ public class ParcelableTopic implements Parcelable {
         this.longitude = longitude;
         this.latitude = latitude;
         this.address = address + "";
+        this.isFollowing = isFollowing;
     }
 
     public String getTopicId() {
@@ -132,6 +146,7 @@ public class ParcelableTopic implements Parcelable {
         parcel.writeDouble(longitude);
         parcel.writeDouble(latitude);
         parcel.writeString(address);
+        parcel.writeString(String.valueOf(isFollowing));
     }
 
     public static final Parcelable.Creator<ParcelableTopic> CREATOR = new Parcelable.Creator<ParcelableTopic>() {
@@ -145,7 +160,9 @@ public class ParcelableTopic implements Parcelable {
             double longitude = parcel.readDouble();
             double latitude = parcel.readDouble();
             String address = parcel.readString();
-            return new ParcelableTopic(topicId, topicCategory, wallpaperUrl, description, name, longitude, latitude, address);
+            boolean isFollowing = Boolean.parseBoolean(parcel.readString().trim());
+            return new ParcelableTopic(topicId, topicCategory, wallpaperUrl, description,
+                    name, longitude, latitude, address, isFollowing);
         }
 
         @Override
