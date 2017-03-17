@@ -25,7 +25,7 @@ import com.pack.pack.oauth1.client.AccessToken;
  * @author Saurav
  *
  */
-public class LoginActivity extends AppCompatActivity implements IAsyncTaskStatusListener {
+public class LoginActivity extends AbstractAppCompatActivity implements IAsyncTaskStatusListener {
 
     private EditText input_email;
     private EditText input_password;

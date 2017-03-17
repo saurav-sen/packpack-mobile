@@ -58,7 +58,7 @@ import io.branch.referral.Branch;
  * @author Saurav
  *
  */
-public class TopicDetailActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class TopicDetailActivity extends AbstractAppCompatActivity implements OnMapReadyCallback {
 
     private ParcelableTopic topic;
 

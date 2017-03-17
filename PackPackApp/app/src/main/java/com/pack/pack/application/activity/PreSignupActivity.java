@@ -28,7 +28,7 @@ import com.pack.pack.oauth1.client.AccessToken;
 
 import java.util.Calendar;
 
-public class PreSignupActivity extends AppCompatActivity  implements IAsyncTaskStatusListener {
+public class PreSignupActivity extends AbstractAppCompatActivity  implements IAsyncTaskStatusListener {
 
     private DatePicker input_dob;
 

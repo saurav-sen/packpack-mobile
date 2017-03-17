@@ -28,7 +28,7 @@ import com.pack.pack.model.web.JPack;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CreatePackActivity extends AppCompatActivity implements IAsyncTaskStatusListener {
+public class CreatePackActivity extends AbstractAppCompatActivity implements IAsyncTaskStatusListener {
 
     private String topicId;
 

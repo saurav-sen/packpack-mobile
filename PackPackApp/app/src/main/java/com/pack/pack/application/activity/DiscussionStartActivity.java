@@ -18,7 +18,7 @@ import com.pack.pack.model.web.JDiscussion;
 /**
  * Created by Saurav on 21-10-2016.
  */
-public class DiscussionStartActivity extends Activity implements IAsyncTaskStatusListener {
+public class DiscussionStartActivity extends AbstractActivity implements IAsyncTaskStatusListener {
 
     private EditText discussion_title0;
 

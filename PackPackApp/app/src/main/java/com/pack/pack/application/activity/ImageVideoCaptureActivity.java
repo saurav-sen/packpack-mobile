@@ -49,7 +49,7 @@ import static com.pack.pack.application.AppController.GALLERY_SELECT_VIDEO_REQUE
  * @author Saurav
  *
  */
-public class ImageVideoCaptureActivity extends Activity {
+public class ImageVideoCaptureActivity extends AbstractActivity {
 
     private CameraPreview cameraPreview;
 

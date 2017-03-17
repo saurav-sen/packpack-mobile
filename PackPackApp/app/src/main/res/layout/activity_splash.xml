@@ -6,7 +6,8 @@
     android:layout_height="match_parent"
     tools:context="com.pack.pack.application.activity.SplashActivity"
     tools:showIn="@layout/activity_splash"
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+    android:id="@+id/mainLayout">
 
     <!--ImageView
         android:id="@+id/splash_image"

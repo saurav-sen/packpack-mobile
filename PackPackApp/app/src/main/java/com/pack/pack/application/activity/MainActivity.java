@@ -32,7 +32,7 @@ import static com.pack.pack.application.AppController.CREATE_TOPIC_REQUSET_CODE;
 /**
  *
  */
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AbstractAppCompatActivity {
 
     private ViewPager pager;
 

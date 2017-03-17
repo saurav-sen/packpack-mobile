@@ -31,7 +31,7 @@ import java.util.List;
  * @author Saurav
  *
  */
-public class DiscussionViewActivity extends AppCompatActivity implements IAsyncTaskStatusListener {
+public class DiscussionViewActivity extends AbstractAppCompatActivity implements IAsyncTaskStatusListener {
 
     private ListView discussionView;
 

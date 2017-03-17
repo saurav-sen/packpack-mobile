@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context=".activity.DiscussionCreateActivity">
+    tools:context=".activity.DiscussionCreateActivity"
+    android:id="@+id/mainLayout">
 
     <LinearLayout android:orientation="vertical"
         android:layout_width="match_parent"

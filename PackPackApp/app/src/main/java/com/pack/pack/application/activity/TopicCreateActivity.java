@@ -49,7 +49,7 @@ import static com.pack.pack.application.AppController.IMAGE_PICK_REQUSET_CODE;
  * @author Saurav
  *
  */
-public class TopicCreateActivity extends AppCompatActivity implements IAsyncTaskStatusListener {
+public class TopicCreateActivity extends AbstractAppCompatActivity implements IAsyncTaskStatusListener {
 
     private EditText topic_create_name;
     private EditText topic_create_description;

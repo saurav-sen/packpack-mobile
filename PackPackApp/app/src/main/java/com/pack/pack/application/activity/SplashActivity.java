@@ -23,7 +23,7 @@ import com.pack.pack.oauth1.client.AccessToken;
  * @author Saurav
  *
  */
-public class SplashActivity extends Activity implements IAsyncTaskStatusListener {
+public class SplashActivity extends AbstractActivity implements IAsyncTaskStatusListener {
 
     //private ImageView splash_image;
 

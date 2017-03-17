@@ -37,7 +37,7 @@ import static com.pack.pack.application.data.util.ApiConstants.*;
 /**
  * Created by Saurav on 16-08-2016.
  */
-public class FollowCategoryActivity extends Activity {
+public class FollowCategoryActivity extends AbstractActivity {
 
     private Map<Integer, Boolean> map = new HashMap<Integer, Boolean>();
 

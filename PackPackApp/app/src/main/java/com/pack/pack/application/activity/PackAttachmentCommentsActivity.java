@@ -23,7 +23,7 @@ import com.pack.pack.model.web.JPackAttachment;
  *
  * Created by Saurav on 03-06-2016.
  */
-public class PackAttachmentCommentsActivity extends AppCompatActivity {
+public class PackAttachmentCommentsActivity extends AbstractAppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

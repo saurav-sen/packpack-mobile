@@ -20,7 +20,7 @@ import java.util.Map;
 /**
  * Created by Saurav on 12-03-2017.
  */
-public class FullScreenPlayVideoActivity extends Activity {
+public class FullScreenPlayVideoActivity extends AbstractActivity {
 
     ProgressDialog pDialog;
     VideoView videoDisplay;

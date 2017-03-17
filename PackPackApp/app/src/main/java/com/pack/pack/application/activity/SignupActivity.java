@@ -52,7 +52,7 @@ import static com.pack.pack.application.AppController.PLACE_AUTO_COMPLETE_REQ_CO
  * @author Saurav
  *
  */
-public class SignupActivity extends AppCompatActivity {
+public class SignupActivity extends AbstractAppCompatActivity {
 
     private EditText input_name;
     private EditText input_email;

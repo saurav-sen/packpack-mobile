@@ -5,7 +5,7 @@ import android.os.Bundle;
 
 import com.pack.pack.application.R;
 
-public class ResetPasswordActivity extends AppCompatActivity {
+public class ResetPasswordActivity extends AbstractAppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

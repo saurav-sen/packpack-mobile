@@ -50,7 +50,7 @@ import static com.pack.pack.application.AppController.UPLOAD_ENTITY_TYPE_KEY;
  * @author Saurav
  *
  */
-public class InsideTopicActivity extends AppCompatActivity {
+public class InsideTopicActivity extends AbstractAppCompatActivity {
 
     private Pagination<JPack> page;
 

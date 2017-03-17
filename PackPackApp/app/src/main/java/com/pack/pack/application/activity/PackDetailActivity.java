@@ -74,7 +74,7 @@ import static com.pack.pack.application.AppController.TOPIC_ID_KEY;
 import static com.pack.pack.application.AppController.UPLOAD_ENTITY_ID_KEY;
 import static com.pack.pack.application.AppController.UPLOAD_ENTITY_TYPE_KEY;
 
-public class PackDetailActivity extends AppCompatActivity {
+public class PackDetailActivity extends AbstractAppCompatActivity {
 
     private PackAttachmentsAdapter adapter;
 

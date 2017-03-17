@@ -21,7 +21,7 @@ import java.util.List;
  * @author Saurav
  *
  */
-public class FullscreenAttachmentViewActivity extends Activity {
+public class FullscreenAttachmentViewActivity extends AbstractActivity {
 
     private AttachmentViewPager fullscreen_attachment_view_pager;
     private FullScreenAttachmentViewAdapter adapter;

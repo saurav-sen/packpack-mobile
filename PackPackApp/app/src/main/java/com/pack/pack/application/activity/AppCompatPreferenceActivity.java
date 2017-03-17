@@ -1,10 +1,14 @@
 package com.pack.pack.application.activity;
 
+import android.content.IntentFilter;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.Toolbar;
@@ -13,12 +17,20 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.pack.pack.application.R;
+import com.pack.pack.application.service.CheckNetworkService;
+import com.pack.pack.application.service.events.NetworkStatusListener;
+
 /**
  * Created by Saurav on 03-09-2016.
  */
-public abstract class AppCompatPreferenceActivity extends PreferenceActivity {
+public abstract class AppCompatPreferenceActivity extends PreferenceActivity implements NetworkBasedActivity {
 
     private AppCompatDelegate mDelegate;
+
+    private NetworkStatusListener broadcastListener;
+
+    private Snackbar err;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,5 +127,43 @@ public abstract class AppCompatPreferenceActivity extends PreferenceActivity {
             mDelegate = AppCompatDelegate.create(this, null);
         }
         return mDelegate;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(broadcastListener == null) {
+            broadcastListener = new NetworkStatusListener(this);
+        }
+        LocalBroadcastManager.getInstance(this).registerReceiver(
+                broadcastListener, new IntentFilter(
+                        CheckNetworkService.CHECK_INTERNET));
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if(broadcastListener != null) {
+            LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastListener);
+        }
+    }
+
+    @Override
+    public void onNetworkConnect() {
+        if(this.err != null && this.err.isShown()) {
+            this.err.dismiss();
+        }
+    }
+
+    @Override
+    public void onNetworkDisconnect() {
+        View mainLayout = findViewById(R.id.mainLayout);
+        if(mainLayout != null && (this.err == null || !this.err.isShown())) {
+            this.err = Snackbar.make(mainLayout, "No Internet Connection",
+                    Snackbar.LENGTH_INDEFINITE);
+            View errView = this.err.getView();
+            errView.setBackgroundColor(Color.RED);
+            this.err.show();
+        }
     }
 }

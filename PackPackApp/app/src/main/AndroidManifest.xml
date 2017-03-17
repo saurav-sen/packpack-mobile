@@ -122,7 +122,12 @@
             android:name="io.branch.sdk.BranchKey.test"
             android:value="key_test_akDeFGmEZpkwPvzP2oamkidkyqpB0SwI" />
 
-        <activity android:name=".activity.PreSignupActivity"></activity>
+        <activity android:name=".activity.PreSignupActivity" />
+
+        <service
+            android:name=".service.CheckNetworkService"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>

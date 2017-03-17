@@ -70,7 +70,7 @@ import static com.pack.pack.application.AppController.UPLOAD_ATTACHMENT_DESCRIPT
  * @author Saurav
  *
  */
-public class UploadActivity extends Activity {
+public class UploadActivity extends AbstractActivity {
 
     public static final String ATTACHMENT_UNDER_UPLOAD = "ATTACHMENT_UNDER_UPLOAD";
     public static final String ATTACHMENT_UNDER_UPLOAD_IS_PHOTO = "ATTACHMENT_UNDER_UPLOAD_IS_PHOTO";

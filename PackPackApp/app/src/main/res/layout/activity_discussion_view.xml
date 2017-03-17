@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="com.pack.pack.application.activity.DiscussionViewActivity">
+    tools:context="com.pack.pack.application.activity.DiscussionViewActivity"
+    android:id="@+id/mainLayout">
 
     <RelativeLayout
         android:layout_width="match_parent"

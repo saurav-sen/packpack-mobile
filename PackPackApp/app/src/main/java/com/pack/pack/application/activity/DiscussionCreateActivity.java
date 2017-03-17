@@ -25,7 +25,7 @@ import com.pack.pack.model.web.JDiscussion;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 
-public class DiscussionCreateActivity extends Activity implements RTFListener, IAsyncTaskStatusListener {
+public class DiscussionCreateActivity extends AbstractActivity implements RTFListener, IAsyncTaskStatusListener {
 
     private RTFEditor editor;
     private String rtfText;
