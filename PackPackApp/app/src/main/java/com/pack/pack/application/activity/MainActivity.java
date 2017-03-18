@@ -155,7 +155,7 @@ public class MainActivity extends AbstractAppCompatActivity {
                 if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     AppController.getInstance().cameraPermissionGranted();
                     finish();
-                    startActivity(getIntent());
+                    //startActivity(getIntent());
                 } else {
                     AppController.getInstance().cameraPermisionDenied();
                 }
@@ -164,7 +164,7 @@ public class MainActivity extends AbstractAppCompatActivity {
                 if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     AppController.getInstance().externalReadGranted();
                     finish();
-                    startActivity(getIntent());
+                    //startActivity(getIntent());
                 } else {
                     AppController.getInstance().externalReadDenied();
                 }
