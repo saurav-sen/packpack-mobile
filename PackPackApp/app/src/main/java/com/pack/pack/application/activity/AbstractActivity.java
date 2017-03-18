@@ -1,6 +1,7 @@
 package com.pack.pack.application.activity;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
 import android.support.design.widget.Snackbar;

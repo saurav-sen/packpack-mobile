@@ -46,6 +46,9 @@ public class UploadImageAttachmentService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        if(intent == null) {
+            return START_REDELIVER_INTENT;
+        }
         String packId = intent.getStringExtra(PACK_ID);
         String topicId = intent.getStringExtra(TOPIC_ID);
         String attachmentTitle = intent.getStringExtra(ATTACHMENT_TITLE);

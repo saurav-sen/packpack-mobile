@@ -2,6 +2,10 @@ package com.pack.pack.application.activity;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -15,6 +19,8 @@ import com.pack.pack.application.db.UserInfo;
 import com.pack.pack.application.db.DBUtil;
 import com.pack.pack.application.data.util.IAsyncTaskStatusListener;
 import com.pack.pack.application.data.util.LoginTask;
+import com.pack.pack.application.service.CheckNetworkService;
+import com.pack.pack.application.service.SquillNTPService;
 import com.pack.pack.model.web.JUser;
 import com.pack.pack.oauth1.client.AccessToken;
 
@@ -29,10 +35,15 @@ public class SplashActivity extends AbstractActivity implements IAsyncTaskStatus
 
     private ProgressDialog progressDialog;
 
+    private int ntpJobId = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
+
+        startNetworkChecker();
+        startNTPService();
 
         /*splash_image = (ImageView) findViewById(R.id.splash_image);
         Snackbar.make(splash_image, "Zxuluk from DryDock", Snackbar.LENGTH_LONG);*/
@@ -46,6 +57,28 @@ public class SplashActivity extends AbstractActivity implements IAsyncTaskStatus
 
         ImageUtil.loadFFMpeg(this);
         verify();
+    }
+
+    /*private void startNTPService() {
+        ComponentName serviceComponent = new ComponentName(this, SquillNTPService.class);
+        int oneMinute = 60 * 60 * 1000;
+        JobInfo jobInfo = new JobInfo.Builder(ntpJobId++, serviceComponent)
+                .setMinimumLatency(oneMinute).setOverrideDeadline(5 * oneMinute)
+                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY).setRequiresDeviceIdle(false)
+                .setRequiresCharging(false).build();
+        JobScheduler jobScheduler = (JobScheduler) getApplication()
+                .getSystemService(Context.JOB_SCHEDULER_SERVICE);
+        jobScheduler.schedule(jobInfo);
+    }*/
+
+    private void startNTPService() {
+        Intent intent = new Intent(this, SquillNTPService.class);
+        startService(intent);
+    }
+
+    private void startNetworkChecker() {
+        Intent intent = new Intent(this, CheckNetworkService.class);
+        startService(intent);
     }
 
     private void verify() {

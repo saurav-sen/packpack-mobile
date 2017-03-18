@@ -22,6 +22,7 @@ import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
 import com.pack.pack.application.activity.FullscreenAttachmentViewActivity;
 import com.pack.pack.application.activity.PackAttachmentCommentsActivity;
+import com.pack.pack.application.data.cache.InMemory;
 import com.pack.pack.application.data.cache.PackAttachmentsCache;
 import com.pack.pack.application.data.util.AbstractNetworkTask;
 import com.pack.pack.application.data.util.ApiConstants;
@@ -122,7 +123,9 @@ public class PackAttachmentsAdapter extends ArrayAdapter<JPackAttachment> {
             JUser creator = attachment.getCreator();
             if(creator != null) {
                 user_name.setText(creator.getName());
-                attachment_create_time.setText(DateTimeUtil.sentencify(attachment.getCreationTime()));
+                long t1 = attachment.getCreationTime();
+                long t2 = InMemory.INSTANCE.getServerCurrentTimeInMillis();
+                attachment_create_time.setText(DateTimeUtil.sentencify(t1, t2));
                 if(creator.getProfilePictureUrl() != null
                         && !creator.getProfilePictureUrl().trim().isEmpty()) {
                     new DownloadImageTask(user_profile_picture, getContext()).execute(creator.getProfilePictureUrl());

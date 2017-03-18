@@ -127,6 +127,10 @@
         <service
             android:name=".service.CheckNetworkService"
             android:enabled="true"
+            android:exported="true" />
+        <service
+            android:name=".service.SquillNTPService"
+            android:enabled="true"
             android:exported="true"></service>
     </application>
 

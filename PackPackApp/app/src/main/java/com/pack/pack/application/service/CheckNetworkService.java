@@ -8,6 +8,9 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 public class CheckNetworkService extends Service {
 
     public static final String CHECK_INTERNET = "CHECK_INTERNET";
@@ -17,13 +20,23 @@ public class CheckNetworkService extends Service {
     public static final String CONNECTION_STATUS_CONNECTED = "CONNECTED";
     public static final String CONNECTION_STATUS_NOT_CONNECTED = "NOT_CONNECTED";
 
+    private Timer timer = new Timer();
+
     public CheckNetworkService() {
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        broadcastStatus(checkConnectivity());
+        timer.scheduleAtFixedRate(new CheckNetworkTask(), 0, 1000);
         return START_STICKY;
+    }
+
+    private class CheckNetworkTask extends TimerTask {
+
+        @Override
+        public void run() {
+            broadcastStatus(checkConnectivity());
+        }
     }
 
     private boolean checkConnectivity() {
