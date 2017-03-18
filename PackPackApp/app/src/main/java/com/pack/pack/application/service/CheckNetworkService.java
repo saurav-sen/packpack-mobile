@@ -27,7 +27,7 @@ public class CheckNetworkService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        timer.scheduleAtFixedRate(new CheckNetworkTask(), 0, 1000);
+        timer.scheduleAtFixedRate(new CheckNetworkTask(), 0, 10 * 1000);
         return START_STICKY;
     }
 

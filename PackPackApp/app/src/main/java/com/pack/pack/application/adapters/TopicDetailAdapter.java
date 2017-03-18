@@ -19,6 +19,7 @@ import android.widget.TextView;
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
 import com.pack.pack.application.activity.PackDetailActivity;
+import com.pack.pack.application.data.cache.InMemory;
 import com.pack.pack.application.data.util.AbstractNetworkTask;
 import com.pack.pack.application.data.util.DateTimeUtil;
 import com.pack.pack.application.db.DBUtil;
@@ -133,17 +134,17 @@ public class TopicDetailAdapter extends ArrayAdapter<JPack> {
 
                 stripUnderlines(packStoryContinue);
             }*/
-            pack_create_time.setText(DateTimeUtil.sentencify(pack.getCreationTime()));
+            pack_create_time.setText(DateTimeUtil.sentencify(pack.getCreationTime(),
+                    InMemory.INSTANCE.getServerCurrentTimeInMillis()));
             JUser creator = pack.getCreator();
             if(creator != null) {
                 if(creator.getName() != null) {
                     pack_creator_name.setText(creator.getName());
                 }
                 String profilePictureUrl = creator.getProfilePictureUrl();
+                pack_creator_picture.setImageResource(R.drawable.default_profile_picture_big);
                 if(profilePictureUrl != null && !profilePictureUrl.trim().isEmpty()) {
                     new DownloadImageTask(pack_creator_picture, getContext()).execute(profilePictureUrl);
-                } else {
-                    pack_creator_picture.setImageResource(R.drawable.default_profile_picture_big);
                 }
             }
             new LoadPackAttachmentsTask(packAttachmentsGrid).execute(pack);

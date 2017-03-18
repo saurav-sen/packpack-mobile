@@ -126,11 +126,10 @@ public class PackAttachmentsAdapter extends ArrayAdapter<JPackAttachment> {
                 long t1 = attachment.getCreationTime();
                 long t2 = InMemory.INSTANCE.getServerCurrentTimeInMillis();
                 attachment_create_time.setText(DateTimeUtil.sentencify(t1, t2));
+                user_profile_picture.setImageResource(R.drawable.default_profile_picture_big);
                 if(creator.getProfilePictureUrl() != null
                         && !creator.getProfilePictureUrl().trim().isEmpty()) {
                     new DownloadImageTask(user_profile_picture, getContext()).execute(creator.getProfilePictureUrl());
-                } else {
-                    user_profile_picture.setImageResource(R.drawable.default_profile_picture_big);
                 }
             }
         }
