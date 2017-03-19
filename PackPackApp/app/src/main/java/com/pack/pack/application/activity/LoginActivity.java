@@ -17,6 +17,8 @@ import com.pack.pack.application.data.LoggedInUserInfo;
 import com.pack.pack.application.db.UserInfo;
 import com.pack.pack.application.data.util.IAsyncTaskStatusListener;
 import com.pack.pack.application.data.util.LoginTask;
+import com.pack.pack.application.image.loader.DownloadImageTask;
+import com.pack.pack.application.image.loader.DownloadProfilePictureTask;
 import com.pack.pack.model.web.JUser;
 import com.pack.pack.oauth1.client.AccessToken;
 
@@ -142,6 +144,9 @@ public class LoginActivity extends AbstractAppCompatActivity implements IAsyncTa
         LoggedInUserInfo userInfo = (LoggedInUserInfo)data;
         AccessToken token = userInfo.getAccessToken();
         JUser user = userInfo.getUser();
+        if(user.getProfilePictureUrl() != null && !user.getProfilePictureUrl().trim().isEmpty()) {
+            new DownloadProfilePictureTask().execute(user.getProfilePictureUrl());
+        }
         getIntent().putExtra("loginStatus", true);
         finish();
         startMainActivity();

@@ -89,6 +89,11 @@ public class ProfilePicturePreference extends Preference implements SettingsActi
             ProfilePicturePreferenceCache.INSTANCE.downloadUserProfilePicutre(profile_picture_pref, getContext(), user);
         }
 
+        /*if(downloadImageInProgress) {
+            profile_picture_pref.setImageResource(R.drawable.default_profile_picture_big);
+            return;
+        }*/
+
         if(ProfilePicturePreferenceCache.INSTANCE.getProfilePicture() != null){
             profile_picture_pref.setImageBitmap(ProfilePicturePreferenceCache.INSTANCE.getProfilePicture());
         } else {

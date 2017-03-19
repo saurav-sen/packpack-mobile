@@ -7,7 +7,9 @@ import android.util.Log;
 import android.widget.ImageView;
 
 import com.pack.pack.application.AppController;
+import com.pack.pack.application.R;
 import com.pack.pack.application.data.util.ApiConstants;
+import com.pack.pack.application.data.util.IAsyncTaskStatusListener;
 import com.pack.pack.application.image.loader.DownloadImageTask;
 import com.pack.pack.client.api.API;
 import com.pack.pack.client.api.APIBuilder;
@@ -33,8 +35,14 @@ public class ProfilePicturePreferenceCache {
         return profilePicture;
     }
 
+    public void setProfilePicture(Bitmap profilePicture) {
+        this.profilePicture = profilePicture;
+    }
+
     public void downloadUserProfilePicutre(ImageView imageView, Context context, JUser user) {
-        new DownloadImageTask(imageView, 50, 50, context).execute(user.getProfilePictureUrl());
+        DownloadImageTask downloadImageTask = new DownloadImageTask(imageView, 300, 300, context);
+        downloadImageTask.addListener(new DownloadProfilePictureTaskListener(imageView));
+        downloadImageTask.execute(user.getProfilePictureUrl());
     }
 
     public void uploadUserProfilePicture(Context context, Bitmap profilePicture) {
@@ -76,6 +84,38 @@ public class ProfilePicturePreferenceCache {
                 AppController.getInstance().setUser(jUser);
             }
             super.onPostExecute(jUser);
+        }
+    }
+
+    private class DownloadProfilePictureTaskListener implements IAsyncTaskStatusListener {
+
+        ImageView profilePictureImageView;
+
+        DownloadProfilePictureTaskListener(ImageView profilePictureImageView) {
+            this.profilePictureImageView = profilePictureImageView;
+        }
+
+        @Override
+        public void onPreStart() {
+
+        }
+
+        @Override
+        public void onSuccess(Object data) {
+            if(data != null && (data instanceof Bitmap)) {
+                profilePicture = (Bitmap)data;
+                profilePictureImageView.setImageBitmap(profilePicture);
+            }
+        }
+
+        @Override
+        public void onFailure(String errorMsg) {
+            profilePictureImageView.setImageResource(R.drawable.default_profile_picture_big);
+        }
+
+        @Override
+        public void onPostComplete() {
+
         }
     }
 }

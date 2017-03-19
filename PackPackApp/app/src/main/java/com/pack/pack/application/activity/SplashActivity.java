@@ -19,6 +19,7 @@ import com.pack.pack.application.db.UserInfo;
 import com.pack.pack.application.db.DBUtil;
 import com.pack.pack.application.data.util.IAsyncTaskStatusListener;
 import com.pack.pack.application.data.util.LoginTask;
+import com.pack.pack.application.image.loader.DownloadProfilePictureTask;
 import com.pack.pack.application.service.CheckNetworkService;
 import com.pack.pack.application.service.SquillNTPService;
 import com.pack.pack.model.web.JUser;
@@ -116,6 +117,9 @@ public class SplashActivity extends AbstractActivity implements IAsyncTaskStatus
         LoggedInUserInfo userInfo = (LoggedInUserInfo) data;
         AccessToken token = userInfo.getAccessToken();
         JUser user = userInfo.getUser();
+        if(user.getProfilePictureUrl() != null && !user.getProfilePictureUrl().trim().isEmpty()) {
+            new DownloadProfilePictureTask().execute(user.getProfilePictureUrl());
+        }
         getIntent().putExtra("loginStatus", true);
         finish();
         startMainActivity();
