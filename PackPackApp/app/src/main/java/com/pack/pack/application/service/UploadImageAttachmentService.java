@@ -71,22 +71,35 @@ public class UploadImageAttachmentService extends Service {
         return START_REDELIVER_INTENT;
     }
 
-    private void notifyTargetIntent() {
-        /*NotificationCompat.Builder notificationBuilder =
+    private void showNotification(final ExecutorStatus status) {
+        if(status == null) {
+            return;
+        }
+        final int NOTIFICATION_ID = 1338;
+        final NotificationManager notificationManager =
+                (NotificationManager) getSystemService(
+                        Context.NOTIFICATION_SERVICE);
+        final NotificationCompat.Builder notificationBuilder =
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(R.drawable.logo)
                         .setContentTitle("Uploading")
-                        .setContentText("Upload is in progress");
-
-        int NOTIFICATION_ID = 1338;
-
-        Intent targetIntent = new Intent(this, UploadActivity.class);
-
-        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, targetIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        notificationBuilder.setContentIntent(contentIntent);
-
-        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());*/
+                        .setContentText("Photo Upload is in progress");
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                notificationBuilder.setProgress(100, 10, true);
+                notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());
+                while(!status.isComplete()) {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        Log.d(LOG_TAG, e.getMessage(), e);
+                    }
+                }
+                notificationBuilder.setProgress(100, 100, true);
+                notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());
+            }
+        }).start();
     }
 
     private void broadcastStatus(String packId, String oldAttachmentId, String newAttachmentId, boolean success) {
@@ -104,7 +117,7 @@ public class UploadImageAttachmentService extends Service {
     }
 
     private void upload(String attachmentId, String packId, String topicId, String attachmentTitle, String attachmentDescription) {
-        ExecutorsPool.INSTANCE.submit(new ExecutorTask(attachmentId, packId, topicId, attachmentTitle, attachmentDescription));
+        ExecutorsPool.INSTANCE.submit(new ExecutorTask(attachmentId, packId, topicId, attachmentTitle, attachmentDescription, new ExecutorStatus()));
     }
 
     @Nullable
@@ -126,17 +139,22 @@ public class UploadImageAttachmentService extends Service {
         private String attachmentTitle;
         private String attachmentDescription;
 
-        ExecutorTask(String attachmentId, String packId, String topicId, String attachmentTitle, String attachmentDescription) {
+        private ExecutorStatus status;
+
+        ExecutorTask(String attachmentId, String packId, String topicId, String attachmentTitle,
+                     String attachmentDescription, ExecutorStatus status) {
             this.attachmentId = attachmentId;
             this.packId = packId;
             this.topicId = topicId;
             this.attachmentTitle = attachmentTitle;
             this.attachmentDescription = attachmentDescription;
+            this.status = status;
         }
 
         @Override
         public void run() {
             boolean success = true;
+            showNotification(status);
             String newAttachmentId = null;
             Bitmap mediaBitmap = PackAttachmentsCache.open(UploadImageAttachmentService.this)
                     .getSelectedAttachmentPhoto(attachmentId);
@@ -178,9 +196,33 @@ public class UploadImageAttachmentService extends Service {
                 } finally {
                     //AppCache.INSTANCE.removeSelectedAttachmentPhoto(attachmentId);
                 }
+                status.setSuccess(success);
+                status.setComplete(true);
                 broadcastStatus(packId, attachmentId, newAttachmentId, success);
-                //notifyTargetIntent();
             }
+        }
+    }
+
+    private class ExecutorStatus {
+
+        private boolean complete = false;
+
+        private boolean success = false;
+
+        public boolean isComplete() {
+            return complete;
+        }
+
+        public void setComplete(boolean complete) {
+            this.complete = complete;
+        }
+
+        public boolean isSuccess() {
+            return success;
+        }
+
+        public void setSuccess(boolean success) {
+            this.success = success;
         }
     }
 }

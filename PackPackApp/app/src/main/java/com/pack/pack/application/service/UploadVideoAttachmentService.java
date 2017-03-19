@@ -14,6 +14,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.pack.pack.application.AppController;
+import com.pack.pack.application.R;
 import com.pack.pack.application.data.cache.PackAttachmentsCache;
 import com.pack.pack.application.data.util.ApiConstants;
 import com.pack.pack.application.data.util.CompressionStatusListener;
@@ -84,22 +85,35 @@ public class UploadVideoAttachmentService extends Service {
         super.onDestroy();
     }
 
-    private void notifyTargetIntent() {
-        /*NotificationCompat.Builder notificationBuilder =
+    private void showNotification(final ExecutorStatus status) {
+        if(status == null) {
+            return;
+        }
+        final int NOTIFICATION_ID = 1439;
+        final NotificationManager notificationManager =
+                (NotificationManager) getSystemService(
+                        Context.NOTIFICATION_SERVICE);
+        final NotificationCompat.Builder notificationBuilder =
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(R.drawable.logo)
                         .setContentTitle("Uploading")
-                        .setContentText("Upload is in progress");
-
-        int NOTIFICATION_ID = 1337;
-
-        Intent targetIntent = new Intent(this, UploadActivity.class);
-
-        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, targetIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        notificationBuilder.setContentIntent(contentIntent);
-
-        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());*/
+                        .setContentText("Video Upload is in progress");
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                notificationBuilder.setProgress(100, 10, true);
+                notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());
+                while(!status.isComplete()) {
+                    try {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException e) {
+                        Log.d(LOG_TAG, e.getMessage(), e);
+                    }
+                }
+                notificationBuilder.setProgress(100, 100, true);
+                notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());
+            }
+        }).start();
     }
 
     private void broadcastStatus(String packId, String oldAttachmentId, String newAttachmentId, boolean success) {
@@ -169,7 +183,7 @@ public class UploadVideoAttachmentService extends Service {
                 ContentBody contentBody = new InputStreamBody(inputStream, UUID.randomUUID().toString() + ".mp4");
                 PackAttachmentsCache.open(UploadVideoAttachmentService.this).addSelectedAttachmentVideo(attachmentId, contentBody);
 
-                ExecutorsPool.INSTANCE.submit(new ExecutorTask(attachmentId, packId, topicId, attachmentTitle, attachmentDescription, true));
+                ExecutorsPool.INSTANCE.submit(new ExecutorTask(attachmentId, packId, topicId, attachmentTitle, attachmentDescription, true, new ExecutorStatus()));
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
@@ -184,7 +198,7 @@ public class UploadVideoAttachmentService extends Service {
                 ContentBody contentBody = new InputStreamBody(inputStream, UUID.randomUUID().toString() + ".mp4");
                 PackAttachmentsCache.open(UploadVideoAttachmentService.this).addSelectedAttachmentVideo(attachmentId, contentBody);
 
-                ExecutorsPool.INSTANCE.submit(new ExecutorTask(attachmentId, packId, topicId, attachmentTitle, attachmentDescription, false));
+                ExecutorsPool.INSTANCE.submit(new ExecutorTask(attachmentId, packId, topicId, attachmentTitle, attachmentDescription, false, new ExecutorStatus()));
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
@@ -211,13 +225,17 @@ public class UploadVideoAttachmentService extends Service {
         private String attachmentDescription;
         private boolean isCompressed;
 
-        ExecutorTask(String attachmentId, String packId, String topicId, String attachmentTitle, String attachmentDescription, boolean isCompressed) {
+        private ExecutorStatus status;
+
+        ExecutorTask(String attachmentId, String packId, String topicId, String attachmentTitle,
+                     String attachmentDescription, boolean isCompressed, ExecutorStatus status) {
             this.attachmentId = attachmentId;
             this.packId = packId;
             this.topicId = topicId;
             this.attachmentTitle = attachmentTitle;
             this.attachmentDescription = attachmentDescription;
             this.isCompressed = isCompressed;
+            this.status = status;
         }
 
         @Override
@@ -228,6 +246,7 @@ public class UploadVideoAttachmentService extends Service {
         private void invokeUploadApi(String attachmentId, String packId, String topicId,
                                      String attachmentTitle, String attachmentDescription) {
             boolean success = true;
+            showNotification(status);
             String newAttachmentId = null;
             ContentBody contentBody = PackAttachmentsCache.open(UploadVideoAttachmentService.this).getSelectedAttachmentVideo(attachmentId);
             if(contentBody != null) {
@@ -260,6 +279,29 @@ public class UploadVideoAttachmentService extends Service {
                 broadcastStatus(packId, attachmentId, newAttachmentId, success);
                 //notifyTargetIntent();
             }
+        }
+    }
+
+    private class ExecutorStatus {
+
+        private boolean complete = false;
+
+        private boolean success = false;
+
+        public boolean isComplete() {
+            return complete;
+        }
+
+        public void setComplete(boolean complete) {
+            this.complete = complete;
+        }
+
+        public boolean isSuccess() {
+            return success;
+        }
+
+        public void setSuccess(boolean success) {
+            this.success = success;
         }
     }
 }
