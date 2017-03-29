@@ -363,7 +363,7 @@ public class PackDetailActivity extends AbstractAppCompatActivity {
         private String errorMsg;
 
         public LoadPackDetailTask() {
-            super(true, true, PackDetailActivity.this);
+            super(true, true, PackDetailActivity.this, false);
         }
 
         @Override

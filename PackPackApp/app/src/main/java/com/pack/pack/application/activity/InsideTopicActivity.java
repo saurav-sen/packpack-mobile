@@ -213,7 +213,7 @@ public class InsideTopicActivity extends AbstractAppCompatActivity {
     private class LoadPackTask extends AbstractNetworkTask<ParcelableTopic, Integer, Pagination<JPack>> {
 
         public LoadPackTask() {
-            super(true, true, InsideTopicActivity.this);
+            super(true, true, InsideTopicActivity.this, false);
         }
 
         @Override

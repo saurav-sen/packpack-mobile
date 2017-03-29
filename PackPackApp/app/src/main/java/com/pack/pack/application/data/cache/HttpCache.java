@@ -17,6 +17,8 @@ import java.io.IOException;
 import java.lang.ref.SoftReference;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Created by Saurav on 05-03-2017.
@@ -25,33 +27,36 @@ public class HttpCache implements HttpResponseCacheDelegate {
 
     private static HttpCache instance;
 
-    private static final Object lock = new Object();
+    private static final ReentrantLock lock = new ReentrantLock();
 
     private static final String LOG_TAG = "HttpCache";
 
    // private SimpleDiskCache diskCache;
 
     private Map<String, SoftReference<HttpCacheEntry>> inMemoryCache
-            = new HashMap<String, SoftReference<HttpCacheEntry>>();
+            = new ConcurrentHashMap<String, SoftReference<HttpCacheEntry>>();
 
     private HttpCache() {
     }
 
     static final HttpResponseCacheDelegate open(Context context) {
         try {
+            lock.lock();
             if(instance == null) {
-                synchronized (lock) {
-                    instance = new HttpCache();
-                    /*if (instance.diskCache == null) {
-                        SimpleDiskCacheInitializer.prepare(context);
-                        instance.diskCache = SimpleDiskCache.getInstance();
-                    }*/
-                }
+                instance = new HttpCache();
+                /*if (instance.diskCache == null) {
+                    SimpleDiskCacheInitializer.prepare(context);
+                    instance.diskCache = SimpleDiskCache.getInstance();
+                }*/
             }
             return instance;
         } catch (Exception e) {
             Log.d(LOG_TAG, e.getMessage(), e);
             throw new RuntimeException(e.getMessage());
+        } finally {
+            if(lock.isLocked()) {
+                lock.unlock();
+            }
         }
     }
 
@@ -85,5 +90,9 @@ public class HttpCache implements HttpResponseCacheDelegate {
                 put(s, entry);
             }
         }
+    }
+
+    public void flushAll() {
+        inMemoryCache.clear();
     }
 }

@@ -15,4 +15,9 @@ public class PhotographyViewFragment extends TopicViewFragment {
         ParcelableTopic parcel = new ParcelableTopic(topic);
         openDetailActivity(AppController.TOPIC_PARCELABLE_KEY, parcel, TopicDetailActivity.class);
     }
+
+    @Override
+    protected TabType initTabType() {
+        return TabType.PHOTOGRAPHY;
+    }
 }

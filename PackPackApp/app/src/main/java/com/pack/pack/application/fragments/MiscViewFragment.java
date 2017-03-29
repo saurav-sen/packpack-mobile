@@ -15,4 +15,9 @@ public class MiscViewFragment extends TopicViewFragment {
         ParcelableTopic parcel = new ParcelableTopic(topic);
         openDetailActivity(AppController.TOPIC_PARCELABLE_KEY, parcel, TopicDetailActivity.class);
     }
+
+    @Override
+    protected TabType initTabType() {
+        return TabType.OTHERS;
+    }
 }

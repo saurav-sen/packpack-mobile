@@ -27,10 +27,22 @@ public enum TabType {
 
     private Class<?> fragmentClass;
 
+    private boolean recreate = true;
+
+    public void setRecreate(boolean recreate) {
+        this.recreate = recreate;
+    }
+
     public Fragment getFragment() {
         try {
-            if(fragment == null && fragmentClass != null) {
-                fragment = (Fragment) fragmentClass.newInstance();
+            if(fragmentClass != null) {
+                if(fragment == null) {
+                    fragment = (Fragment) fragmentClass.newInstance();
+                    recreate = false;
+                } else if(recreate) {
+                    fragment = (Fragment) fragmentClass.newInstance();
+                    recreate = false;
+                }
             }
         } catch (InstantiationException e) {
             e.printStackTrace();

@@ -11,6 +11,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
@@ -71,9 +72,12 @@ public class UploadImageAttachmentService extends Service {
         return START_REDELIVER_INTENT;
     }
 
-    private void showNotification(final ExecutorStatus status) {
+    private void showNotification(final ExecutorStatus status, String message) {
         if(status == null) {
             return;
+        }
+        if(message == null) {
+            message = "Photo Upload is in progress";
         }
         final int NOTIFICATION_ID = 1338;
         final NotificationManager notificationManager =
@@ -83,7 +87,7 @@ public class UploadImageAttachmentService extends Service {
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(R.drawable.logo)
                         .setContentTitle("Uploading")
-                        .setContentText("Photo Upload is in progress");
+                        .setContentText(message);
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -154,11 +158,12 @@ public class UploadImageAttachmentService extends Service {
         @Override
         public void run() {
             boolean success = true;
-            showNotification(status);
+
             String newAttachmentId = null;
             Bitmap mediaBitmap = PackAttachmentsCache.open(UploadImageAttachmentService.this)
                     .getSelectedAttachmentPhoto(attachmentId);
             if(mediaBitmap != null) {
+                //showNotification(status);
                 try {
                     ByteArrayOutputStream baOS = new ByteArrayOutputStream();
                     mediaBitmap.compress(Bitmap.CompressFormat.JPEG, 60, baOS);
@@ -166,6 +171,7 @@ public class UploadImageAttachmentService extends Service {
                     ByteBody byteBody = new ByteBody();
                     byteBody.setBytes(bytes);
 
+                    showNotification(status, null);
 
                     COMMAND command = COMMAND.ADD_IMAGE_TO_PACK;
                     API api = APIBuilder.create(ApiConstants.BASE_URL).setAction(command)
@@ -191,9 +197,11 @@ public class UploadImageAttachmentService extends Service {
                         }
                     }
                 } catch (Exception e) {
+                    showNotification(status, e.getMessage());
                     Log.d(LOG_TAG, e.getMessage(), e);
                     success = false;
                 } finally {
+                    mediaBitmap.recycle();
                     //AppCache.INSTANCE.removeSelectedAttachmentPhoto(attachmentId);
                 }
                 status.setSuccess(success);

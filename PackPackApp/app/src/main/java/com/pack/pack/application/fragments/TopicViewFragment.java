@@ -114,8 +114,13 @@ public abstract class TopicViewFragment extends Fragment {
     protected abstract void handleItemClick(JTopic topic);
 
     private String getCategoryType() {
+        if(tabType == null) {
+            tabType = initTabType();
+        }
         return tabType.getType();
     }
+
+    protected abstract TabType initTabType();
 
     private int getViewLayoutId() {
         return ViewUtil.getViewLayoutId(getCategoryType());
@@ -130,7 +135,7 @@ public abstract class TopicViewFragment extends Fragment {
         private String errorMsg;
 
         public LoadTopicTask() {
-            super(true, true, getActivity());
+            super(true, true, getActivity(), false);
         }
 
         /*@Override

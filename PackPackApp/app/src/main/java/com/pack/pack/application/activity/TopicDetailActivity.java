@@ -280,7 +280,7 @@ public class TopicDetailActivity extends AbstractAppCompatActivity implements On
     private class FollowTopicTask extends AbstractNetworkTask<String, Integer, Void> {
 
         public FollowTopicTask(Context context) {
-            super(false, false, false, context);
+            super(false, false, false, context, true);
         }
 
         @Override

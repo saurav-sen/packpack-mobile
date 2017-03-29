@@ -122,7 +122,7 @@ public class CreatePackActivity extends AbstractAppCompatActivity implements IAs
         private String errorMsg;
 
         CreatePackTasK(Context context, IAsyncTaskStatusListener listener) {
-            super(true, true, context);
+            super(true, true, context, true);
             addListener(listener);
         }
 

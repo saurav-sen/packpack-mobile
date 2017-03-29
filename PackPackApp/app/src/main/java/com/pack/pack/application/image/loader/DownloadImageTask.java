@@ -68,7 +68,7 @@ public class DownloadImageTask extends AbstractNetworkTask<String, Void, Bitmap>
     }
 
     public DownloadImageTask(ImageView imageView, int imageWidth, int imageHeight, Context context, ProgressBar progressBar, boolean includeOauthToken) {
-        super(false, false, context);
+        super(false, false, context, false);
         this.imageView = imageView;
         this.imageWidth = imageWidth;
         this.imageHeight = imageHeight;

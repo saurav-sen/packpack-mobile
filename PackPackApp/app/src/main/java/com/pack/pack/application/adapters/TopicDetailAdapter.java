@@ -180,7 +180,7 @@ public class TopicDetailAdapter extends ArrayAdapter<JPack> {
         private GridView packAttachmentsGrid;
 
         LoadPackAttachmentsTask(GridView packAttachmentsGrid) {
-            super(true, true, TopicDetailAdapter.this.activity);
+            super(true, true, TopicDetailAdapter.this.activity, false);
             this.packAttachmentsGrid = packAttachmentsGrid;
         }
 

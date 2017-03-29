@@ -49,11 +49,11 @@ public class LoginTask extends AbstractNetworkTask<UserInfo, Integer, AccessToke
     private List<UserOwnedTopicInfo> userOwnedTopicInfos = new ArrayList<UserOwnedTopicInfo>();
 
     public LoginTask(Context context) {
-        super(false, true, context);
+        super(false, true, context, false);
     }
 
     public LoginTask(Context context, IAsyncTaskStatusListener listener, boolean refreshToken) {
-        super(false, true, context);
+        super(false, true, context, false);
         addListener(listener);
         this.refreshToken = refreshToken;
     }

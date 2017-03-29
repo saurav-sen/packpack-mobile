@@ -31,11 +31,13 @@ import com.pack.pack.application.topic.activity.model.ParcelableTopic;
 import com.pack.pack.client.api.API;
 import com.pack.pack.client.api.APIBuilder;
 import com.pack.pack.client.api.APIConstants;
+import com.pack.pack.client.api.ByteBody;
 import com.pack.pack.client.api.COMMAND;
 import com.pack.pack.client.api.MultipartRequestProgressListener;
 import com.pack.pack.model.web.JCategory;
 import com.pack.pack.model.web.JTopic;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -65,7 +67,9 @@ public class TopicCreateActivity extends AbstractAppCompatActivity implements IA
 
     private AppCompatButton topic_create_submit;
 
-    private File mediaFile;
+    // private File mediaFile;
+
+    private Bitmap selectedWallpaper;
 
     private static final String LOG_TAG = "TopicCreateActivity";
 
@@ -129,21 +133,23 @@ public class TopicCreateActivity extends AbstractAppCompatActivity implements IA
                     if(bitmap == null) {
                         return;
                     }
-                    bitmap = ImageUtil.downscaleBitmap(bitmap, 1200, 900);
+                    Bitmap downscaleBitmap = ImageUtil.downscaleBitmap(bitmap, 1200, 900);
                     topic_create_wallpaper.setVisibility(View.VISIBLE);
-                    topic_create_wallpaper.setImageBitmap(bitmap);
+                    topic_create_wallpaper.setImageBitmap(downscaleBitmap);
+
+                    selectedWallpaper = bitmap;
 
                     /*String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss",
                             Locale.getDefault()).format(new Date());
                     File tempFile = new File(this.getFilesDir().getAbsolutePath(), timeStamp);
                     tempFile.createNewFile();*/
-                    String path = FileUtil.getPath(this, uri);
+                    /*String path = FileUtil.getPath(this, uri);
                     if(path == null) {
                         Toast.makeText(this, "Problem reading the file",
                                 Toast.LENGTH_LONG).show();
                     } else {
                         mediaFile = new File(path);
-                    }
+                    }*/
                 } catch (IOException e) {
                     Log.d(LOG_TAG, "Failed Reading wallpaper (preview) :: " + e.getMessage());
                 }
@@ -217,7 +223,7 @@ public class TopicCreateActivity extends AbstractAppCompatActivity implements IA
             Toast.makeText(TopicCreateActivity.this, "Country can't be empty.",
                     Toast.LENGTH_LONG).show();
             return;
-        } else if(mediaFile == null) {
+        } else if(selectedWallpaper == null) {
             Toast.makeText(TopicCreateActivity.this, "Please select topic wallpaper",
                     Toast.LENGTH_LONG).show();
             return;
@@ -245,7 +251,7 @@ public class TopicCreateActivity extends AbstractAppCompatActivity implements IA
         private String errorMsg;
 
         public TopicCreateTask(IAsyncTaskStatusListener listener) {
-            super(false, true, TopicCreateActivity.this);
+            super(false, true, TopicCreateActivity.this, true);
             addListener(listener);
         }
 
@@ -313,7 +319,17 @@ public class TopicCreateActivity extends AbstractAppCompatActivity implements IA
             apiParams.put(APIConstants.Topic.LOCALITY_ADDRESS, localityAddr);
             apiParams.put(APIConstants.Topic.CITY, city);
             apiParams.put(APIConstants.Topic.COUNTRY, country);
-            apiParams.put(APIConstants.Topic.WALLPAPER, mediaFile);
+
+            if(selectedWallpaper == null) {
+                throw new RuntimeException("Could NOT read selected wallpaper");
+            }
+            ByteArrayOutputStream baOS = new ByteArrayOutputStream();
+            selectedWallpaper.compress(Bitmap.CompressFormat.JPEG, 60, baOS);
+            byte[] bytes = baOS.toByteArray();
+            ByteBody byteBody = new ByteBody();
+            byteBody.setBytes(bytes);
+
+            apiParams.put(APIConstants.Topic.WALLPAPER, byteBody);
             return apiParams;
         }
 

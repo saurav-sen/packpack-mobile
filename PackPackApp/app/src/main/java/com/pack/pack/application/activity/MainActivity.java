@@ -3,6 +3,7 @@ package com.pack.pack.application.activity;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
@@ -38,6 +39,9 @@ public class MainActivity extends AbstractAppCompatActivity {
 
     private int pageCurrentItemIndex;
 
+    public static final String PAGE_CURRENT_INDEX = "pageCurrentItemIndex";
+    public static final String RECREATE = "RECREATE";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,17 +64,20 @@ public class MainActivity extends AbstractAppCompatActivity {
             map.put(l, __OBJECT);
         }
 
+        boolean recreate = getIntent().getBooleanExtra(RECREATE, false);
+
         List<TabType> types = new ArrayList<TabType>();
         types.add(TabType.HOME);
         for(TabType value : values) {
             if(map.get(value.getType()) == null)
                 continue;
+            value.setRecreate(recreate);
             types.add(value);
         }
 
         pager = (ViewPager)findViewById(R.id.pager);
         pager.setAdapter(new MainActivityAdapter(getSupportFragmentManager(), types.toArray(new TabType[types.size()])));
-        int itemIndex = getIntent().getIntExtra("pageCurrentItemIndex", -1);
+        int itemIndex = getIntent().getIntExtra(PAGE_CURRENT_INDEX, -1);
         if(itemIndex >= 0 && itemIndex < list.size()) {
             pageCurrentItemIndex = itemIndex;
             pager.setCurrentItem(pageCurrentItemIndex);
@@ -138,13 +145,13 @@ public class MainActivity extends AbstractAppCompatActivity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         pageCurrentItemIndex = pager.getCurrentItem();
-        outState.putInt("pageCurrentItemIndex", pageCurrentItemIndex);
+        outState.putInt(PAGE_CURRENT_INDEX, pageCurrentItemIndex);
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        pageCurrentItemIndex = savedInstanceState.getInt("pageCurrentItemIndex");
+        pageCurrentItemIndex = savedInstanceState.getInt(PAGE_CURRENT_INDEX);
     }
 
     @Override
@@ -177,11 +184,17 @@ public class MainActivity extends AbstractAppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == CREATE_TOPIC_REQUSET_CODE) {
             if(resultCode == RESULT_OK && data != null) {
-                // TODO -- Refresh the list with newly created topic.
                 ParcelableTopic pTopic = (ParcelableTopic) data.getParcelableExtra(TopicCreateActivity.RESULT_KEY);
-                finish();
-                getIntent().putExtra("pageCurrentItemIndex", pageCurrentItemIndex);
-                startActivity(getIntent());
+                if(Build.VERSION.SDK_INT >= 11) {
+                    getIntent().putExtra(PAGE_CURRENT_INDEX, pageCurrentItemIndex);
+                    getIntent().putExtra(RECREATE, true);
+                    recreate();
+                } else {
+                    finish();
+                    getIntent().putExtra(PAGE_CURRENT_INDEX, pageCurrentItemIndex);
+                    getIntent().putExtra(RECREATE, true);
+                    startActivity(getIntent());
+                }
             }
             else {
                 Toast.makeText(MainActivity.this, "Sorry!! Failed creating new topic",

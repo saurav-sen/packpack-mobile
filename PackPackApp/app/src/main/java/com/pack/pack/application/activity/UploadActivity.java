@@ -121,7 +121,8 @@ public class UploadActivity extends AbstractActivity {
         //mediaBitmap = getIntent().getParcelableExtra(UPLOAD_FILE_BITMAP);
         mediaBitmap = PackAttachmentsCache.open(this).getSelectedAttachmentPhoto(newAttachmentId);
         if(mediaBitmap != null) {
-            mediaBitmap = ImageUtil.downscaleBitmap(mediaBitmap, 1200, 900);
+            mediaBitmap = ImageUtil.downscaleBitmap(mediaBitmap, 1200, 900, false);
+            PackAttachmentsCache.open(this).addSelectedAttachmentPhoto(newAttachmentId, mediaBitmap);
         }
         isPhotoUpload = getIntent().getBooleanExtra(UPLOAD_FILE_IS_PHOTO, true);
         title = getIntent().getStringExtra(UPLOAD_ATTACHMENT_TITLE) + "";

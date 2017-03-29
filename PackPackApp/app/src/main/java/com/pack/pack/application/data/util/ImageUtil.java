@@ -125,6 +125,10 @@ public class ImageUtil {
     }*/
 
     public static Bitmap downscaleBitmap(Bitmap bitmap, int preferredWidth, int preferredHeight) {
+        return downscaleBitmap(bitmap, preferredWidth, preferredHeight, false);
+    }
+
+    public static Bitmap downscaleBitmap(Bitmap bitmap, int preferredWidth, int preferredHeight, boolean recycle) {
         int originalWidth = bitmap.getWidth();
         int originalHeight = bitmap.getHeight();
 
@@ -140,7 +144,9 @@ public class ImageUtil {
         transformation.postScale(widthScaleRatio, heightScaleRatio);
 
         Bitmap downscaleBitmap = Bitmap.createBitmap(bitmap, 0, 0, originalWidth, originalHeight, transformation, true);
-        bitmap.recycle();
+        if(recycle) {
+            bitmap.recycle();
+        }
         return downscaleBitmap;
     }
 

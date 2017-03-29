@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.os.AsyncTask;
 
 import com.pack.pack.application.AppController;
+import com.pack.pack.application.data.cache.HttpCacheEvictionHandler;
 import com.pack.pack.application.db.DBUtil;
 import com.pack.pack.application.db.DbObject;
 import com.pack.pack.application.db.PaginationInfo;
@@ -48,15 +49,18 @@ public abstract class AbstractNetworkTask<X, Y, Z> extends AsyncTask<X, Y, Z> {
 
     private X x;
 
-    public AbstractNetworkTask(boolean tryRetrievingFromDB, boolean storeResultsInDB, Context context) {
-        this(tryRetrievingFromDB, storeResultsInDB, false, context);
+    private boolean flushHttpCache;
+
+    public AbstractNetworkTask(boolean tryRetrievingFromDB, boolean storeResultsInDB, Context context, boolean flushHttpCache) {
+        this(tryRetrievingFromDB, storeResultsInDB, false, context, flushHttpCache);
     }
 
-    public AbstractNetworkTask(boolean tryRetrievingFromDB, boolean storeResultsInDB, boolean updateExistingObjectInDB, Context context) {
+    public AbstractNetworkTask(boolean tryRetrievingFromDB, boolean storeResultsInDB, boolean updateExistingObjectInDB, Context context, boolean flushHttpCache) {
         this.tryRetrievingFromDB = tryRetrievingFromDB;
         this.storeResultsInDB = storeResultsInDB;
         this.updateExistingObjectInDB = updateExistingObjectInDB;
         this.context = context;
+        this.flushHttpCache = flushHttpCache;
         squillDbHelper = new SquillDbHelper(context);
     }
 
@@ -100,6 +104,7 @@ public abstract class AbstractNetworkTask<X, Y, Z> extends AsyncTask<X, Y, Z> {
     }
 
     protected void fireOnSuccess(Object data) {
+        HttpCacheEvictionHandler.INSTANCE.evict(context, command(), data, flushHttpCache);
         for(IAsyncTaskStatusListener listener : listeners) {
             listener.onSuccess(data);
         }

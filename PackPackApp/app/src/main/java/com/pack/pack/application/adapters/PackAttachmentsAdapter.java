@@ -340,7 +340,7 @@ public class PackAttachmentsAdapter extends ArrayAdapter<JPackAttachment> {
     private class AddLikeTask extends AbstractNetworkTask<String, Void, Void> {
 
         public AddLikeTask() {
-            super(false, false, true, PackAttachmentsAdapter.this.activity);
+            super(false, false, true, PackAttachmentsAdapter.this.activity, false);
         }
 
         @Override
