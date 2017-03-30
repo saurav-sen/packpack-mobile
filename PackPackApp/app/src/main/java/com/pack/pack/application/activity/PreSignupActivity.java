@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.v7.widget.AppCompatButton;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,7 +34,7 @@ public class PreSignupActivity extends AbstractAppCompatActivity  implements IAs
     private DatePicker input_dob;
 
     private AppCompatButton btn_signup;
-    private TextView link_login;
+    //private TextView link_login;
 
     private String email;
     private String passwd;
@@ -65,7 +66,7 @@ public class PreSignupActivity extends AbstractAppCompatActivity  implements IAs
         input_dob = (DatePicker) findViewById(R.id.input_dob);
 
         btn_signup = (AppCompatButton) findViewById(R.id.btn_signup);
-        link_login = (TextView) findViewById(R.id.link_login);
+        //link_login = (TextView) findViewById(R.id.link_login);
 
         final Calendar c = Calendar.getInstance();
         int year = 1978;//c.get(Calendar.YEAR);
@@ -82,13 +83,13 @@ public class PreSignupActivity extends AbstractAppCompatActivity  implements IAs
             }
         });
 
-        link_login.setOnClickListener(new View.OnClickListener() {
+        /*link_login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(PreSignupActivity.this, LoginActivity.class);
                 startActivity(intent);
             }
-        });
+        });*/
     }
 
     private void showProgressDialog() {

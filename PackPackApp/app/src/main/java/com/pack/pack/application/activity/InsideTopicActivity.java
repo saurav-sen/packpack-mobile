@@ -3,6 +3,7 @@ package com.pack.pack.application.activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -184,8 +185,12 @@ public class InsideTopicActivity extends AbstractAppCompatActivity {
                 intent.putExtra(UPLOAD_ENTITY_ID_KEY, pack.getId());
                 intent.putExtra(UPLOAD_ENTITY_TYPE_KEY, JPackAttachment.class.getName());
                 startActivityForResult(intent, Constants.PACK_ATTACHMENT_UPLOAD_REQUEST_CODE);*/
-                finish();
-                startActivity(getIntent());
+                if(Build.VERSION.SDK_INT >= 11) {
+                    recreate();
+                } else {
+                    finish();
+                    startActivity(getIntent());
+                }
             } else if(resultCode == RESULT_CANCELED) {
                 String errorMsg = data.getStringExtra(Constants.ERROR_MSG);
                 if(errorMsg == null || errorMsg.trim().isEmpty()) {
