@@ -161,8 +161,12 @@ public class MainActivity extends AbstractAppCompatActivity {
             case AppController.CAMERA_ACCESS_REQUEST_CODE:
                 if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     AppController.getInstance().cameraPermissionGranted();
-                    finish();
-                    //startActivity(getIntent());
+                    /*if(Build.VERSION.SDK_INT >= 11) {
+                        recreate();
+                    } else {
+                        finish();
+                        startActivity(getIntent());
+                    }*/
                 } else {
                     AppController.getInstance().cameraPermisionDenied();
                 }
@@ -170,8 +174,12 @@ public class MainActivity extends AbstractAppCompatActivity {
             case AppController.APP_EXTERNAL_STORAGE_READ_REQUEST_CODE:
                 if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     AppController.getInstance().externalReadGranted();
-                    finish();
-                    //startActivity(getIntent());
+                    /*if(Build.VERSION.SDK_INT >= 11) {
+                        recreate();
+                    } else {
+                        finish();
+                        startActivity(getIntent());
+                    }*/
                 } else {
                     AppController.getInstance().externalReadDenied();
                 }
