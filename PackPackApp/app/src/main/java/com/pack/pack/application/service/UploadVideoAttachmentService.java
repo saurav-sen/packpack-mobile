@@ -50,7 +50,8 @@ public class UploadVideoAttachmentService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if(intent == null) {
-            return START_REDELIVER_INTENT;
+            return START_STICKY;
+            //return START_REDELIVER_INTENT;
         }
         String packId = intent.getStringExtra(PACK_ID);
         String topicId = intent.getStringExtra(TOPIC_ID);
@@ -71,7 +72,8 @@ public class UploadVideoAttachmentService extends Service {
 
         upload(selectedInputVideoFilePath, attachmentId, packId, topicId, attachmentTitle, attachmentDescription);
 
-        return START_REDELIVER_INTENT;
+        return START_STICKY;
+        //return START_REDELIVER_INTENT;
     }
 
     @Nullable
@@ -146,6 +148,45 @@ public class UploadVideoAttachmentService extends Service {
         }
     }
 
+    private void showNotification(final ExecutorStatus status, String message) {
+        if(status == null) {
+            return;
+        }
+        if(message == null) {
+            message = "Video Upload is in progress";
+        }
+        final int NOTIFICATION_ID = 1338;
+        final NotificationManager notificationManager =
+                (NotificationManager) getSystemService(
+                        Context.NOTIFICATION_SERVICE);
+        final NotificationCompat.Builder notificationBuilder =
+                new NotificationCompat.Builder(this)
+                        .setSmallIcon(R.drawable.logo)
+                        .setContentTitle("Uploading")
+                        .setContentText(message);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                notificationBuilder.setProgress(100, 10, true);
+                notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());
+                while(!status.isComplete()) {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        Log.d(LOG_TAG, e.getMessage(), e);
+                    }
+                }
+                if(status.isSuccess()) {
+                    notificationBuilder.setContentText("Upload Photo Completed Successfully");
+                } else {
+                    notificationBuilder.setContentText("Upload Photo Failed");
+                }
+                notificationBuilder.setProgress(100, 100, false);
+                notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());
+            }
+        }).start();
+    }
+
     private class CompressionStatusListenerImpl implements CompressionStatusListener {
 
         private File originalFile;
@@ -200,7 +241,7 @@ public class UploadVideoAttachmentService extends Service {
 
                 ExecutorsPool.INSTANCE.submit(new ExecutorTask(attachmentId, packId, topicId, attachmentTitle, attachmentDescription, false, new ExecutorStatus()));
             } catch (Exception e) {
-                e.printStackTrace();
+                Log.e(LOG_TAG, e.getMessage(), e);
             } finally {
                 isDone = true;
             }
@@ -246,11 +287,12 @@ public class UploadVideoAttachmentService extends Service {
         private void invokeUploadApi(String attachmentId, String packId, String topicId,
                                      String attachmentTitle, String attachmentDescription) {
             boolean success = true;
-            showNotification(status);
+            //showNotification(status);
             String newAttachmentId = null;
             ContentBody contentBody = PackAttachmentsCache.open(UploadVideoAttachmentService.this).getSelectedAttachmentVideo(attachmentId);
             if(contentBody != null) {
                 try {
+                    showNotification(status, null);
                     COMMAND command = COMMAND.ADD_VIDEO_TO_PACK;
                     API api = APIBuilder.create(ApiConstants.BASE_URL).setAction(command)
                             .setOauthToken(AppController.getInstance().getoAuthToken())
@@ -271,11 +313,14 @@ public class UploadVideoAttachmentService extends Service {
                         PackAttachmentsCache.open(UploadVideoAttachmentService.this).successfullyUploadedAttachment(result, packId, attachmentId);
                     }
                 } catch (Exception e) {
+                    //showNotification(status, "Failed to upload Video");
                     Log.d(LOG_TAG, e.getMessage(), e);
                     success = false;
                 } finally {
                     //PackAttachmentsCache.INSTANCE.removeSelectedAttachmentVideo(attachmentId);
                 }
+                status.setSuccess(success);
+                status.setComplete(true);
                 broadcastStatus(packId, attachmentId, newAttachmentId, success);
                 //notifyTargetIntent();
             }

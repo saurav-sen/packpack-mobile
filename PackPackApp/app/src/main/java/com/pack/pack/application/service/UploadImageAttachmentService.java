@@ -48,7 +48,8 @@ public class UploadImageAttachmentService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if(intent == null) {
-            return START_REDELIVER_INTENT;
+            return START_STICKY;
+            //return START_REDELIVER_INTENT;
         }
         String packId = intent.getStringExtra(PACK_ID);
         String topicId = intent.getStringExtra(TOPIC_ID);
@@ -69,7 +70,8 @@ public class UploadImageAttachmentService extends Service {
 
         upload(attachmentId, packId, topicId, attachmentTitle, attachmentDescription);
 
-        return START_REDELIVER_INTENT;
+        return START_STICKY;
+        //return START_REDELIVER_INTENT;
     }
 
     private void showNotification(final ExecutorStatus status, String message) {
@@ -100,7 +102,12 @@ public class UploadImageAttachmentService extends Service {
                         Log.d(LOG_TAG, e.getMessage(), e);
                     }
                 }
-                notificationBuilder.setProgress(100, 100, true);
+                if(status.isSuccess()) {
+                    notificationBuilder.setContentText("Upload Photo Completed Successfully");
+                } else {
+                    notificationBuilder.setContentText("Upload Photo Failed");
+                }
+                notificationBuilder.setProgress(100, 100, false);
                 notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());
             }
         }).start();
@@ -164,6 +171,7 @@ public class UploadImageAttachmentService extends Service {
                     .getSelectedAttachmentPhoto(attachmentId);
             if(mediaBitmap != null) {
                 //showNotification(status);
+                boolean started = false;
                 try {
                     ByteArrayOutputStream baOS = new ByteArrayOutputStream();
                     mediaBitmap.compress(Bitmap.CompressFormat.JPEG, 60, baOS);
@@ -172,6 +180,7 @@ public class UploadImageAttachmentService extends Service {
                     byteBody.setBytes(bytes);
 
                     showNotification(status, null);
+                    started = true;
 
                     COMMAND command = COMMAND.ADD_IMAGE_TO_PACK;
                     API api = APIBuilder.create(ApiConstants.BASE_URL).setAction(command)
@@ -197,11 +206,13 @@ public class UploadImageAttachmentService extends Service {
                         }
                     }
                 } catch (Exception e) {
-                    showNotification(status, e.getMessage());
-                    Log.d(LOG_TAG, e.getMessage(), e);
+                    if(!started) {
+                        showNotification(status, "Failed to upload Photo");
+                    }
+                    Log.e(LOG_TAG, e.getMessage(), e);
                     success = false;
                 } finally {
-                    mediaBitmap.recycle();
+                    //mediaBitmap.recycle();
                     //AppCache.INSTANCE.removeSelectedAttachmentPhoto(attachmentId);
                 }
                 status.setSuccess(success);
