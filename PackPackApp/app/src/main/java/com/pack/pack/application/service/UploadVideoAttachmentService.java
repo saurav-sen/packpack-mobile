@@ -287,12 +287,13 @@ public class UploadVideoAttachmentService extends Service {
         private void invokeUploadApi(String attachmentId, String packId, String topicId,
                                      String attachmentTitle, String attachmentDescription) {
             boolean success = true;
-            //showNotification(status);
+            boolean started = false;
             String newAttachmentId = null;
             ContentBody contentBody = PackAttachmentsCache.open(UploadVideoAttachmentService.this).getSelectedAttachmentVideo(attachmentId);
             if(contentBody != null) {
                 try {
                     showNotification(status, null);
+                    started = true;
                     COMMAND command = COMMAND.ADD_VIDEO_TO_PACK;
                     API api = APIBuilder.create(ApiConstants.BASE_URL).setAction(command)
                             .setOauthToken(AppController.getInstance().getoAuthToken())
@@ -313,7 +314,9 @@ public class UploadVideoAttachmentService extends Service {
                         PackAttachmentsCache.open(UploadVideoAttachmentService.this).successfullyUploadedAttachment(result, packId, attachmentId);
                     }
                 } catch (Exception e) {
-                    //showNotification(status, "Failed to upload Video");
+                    if(!started) {
+                        showNotification(status, "Failed to upload Video");
+                    }
                     Log.d(LOG_TAG, e.getMessage(), e);
                     success = false;
                 } finally {
@@ -322,7 +325,6 @@ public class UploadVideoAttachmentService extends Service {
                 status.setSuccess(success);
                 status.setComplete(true);
                 broadcastStatus(packId, attachmentId, newAttachmentId, success);
-                //notifyTargetIntent();
             }
         }
     }
