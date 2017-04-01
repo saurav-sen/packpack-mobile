@@ -87,8 +87,8 @@ public class PackAttachmentsCache {
             throw new RuntimeException("[PackAttachmentsCache] Cache NOT loaded yet");
         }
 
+        inProgressVsSuccessfulUploadAttachmentsMap = new HashMap<String, String>();
         try {
-            inProgressVsSuccessfulUploadAttachmentsMap = new HashMap<String, String>();
             SimpleDiskCache.StringEntry stringEntry = diskCache.getString(InProgressVsSuccessfulUploadAttachmentsMap_KEY);
             if(stringEntry != null) {
                 String json = stringEntry.getString();
@@ -116,7 +116,7 @@ public class PackAttachmentsCache {
         } catch (Exception e) {
             Log.d(LOG_TAG, e.getMessage(), e);
         }
-        return null;
+        return inProgressVsSuccessfulUploadAttachmentsMap;
     }
 
     private List<JPackAttachment> getAttachments(String packId, String keySuffix) {
