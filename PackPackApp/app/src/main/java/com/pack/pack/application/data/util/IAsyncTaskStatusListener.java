@@ -8,11 +8,11 @@ import com.pack.pack.oauth1.client.AccessToken;
  */
 public interface IAsyncTaskStatusListener {
 
-    public void onPreStart();
+    public void onPreStart(String taskID);
 
-    public void onSuccess(Object data);
+    public void onSuccess(String taskID, Object data);
 
-    public void onFailure(String errorMsg);
+    public void onFailure(String taskID, String errorMsg);
 
-    public void onPostComplete();
+    public void onPostComplete(String taskID);
 }

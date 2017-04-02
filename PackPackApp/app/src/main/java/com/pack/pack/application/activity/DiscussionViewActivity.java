@@ -146,17 +146,17 @@ public class DiscussionViewActivity extends AbstractAppCompatActivity implements
     }
 
     @Override
-    public void onPreStart() {
+    public void onPreStart(String taskID) {
         showProgressDialog();
     }
 
     @Override
-    public void onPostComplete() {
+    public void onPostComplete(String taskID) {
         hideProgressDialog();
     }
 
     @Override
-    public void onSuccess(Object data) {
+    public void onSuccess(String taskID, Object data) {
         Pagination<JDiscussion> page = (Pagination<JDiscussion>)data;
         if(page != null) {
             List<JDiscussion> discussions = page.getResult();
@@ -168,7 +168,7 @@ public class DiscussionViewActivity extends AbstractAppCompatActivity implements
     }
 
     @Override
-    public void onFailure(String errorMsg) {
+    public void onFailure(String taskID, String errorMsg) {
         Snackbar.make(discussionView, errorMsg, Snackbar.LENGTH_LONG).show();
     }
 

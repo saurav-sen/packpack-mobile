@@ -79,22 +79,22 @@ public class DiscussionStartActivity extends AbstractActivity implements IAsyncT
     }
 
     @Override
-    public void onPreStart() {
+    public void onPreStart(String taskID) {
         showProgressDialog();
     }
 
     @Override
-    public void onFailure(String errorMsg) {
+    public void onFailure(String taskID, String errorMsg) {
         Toast.makeText(this, "Failed to create discussion", Toast.LENGTH_SHORT);
     }
 
     @Override
-    public void onPostComplete() {
+    public void onPostComplete(String taskID) {
         hideProgressDialog();
     }
 
     @Override
-    public void onSuccess(Object data) {
+    public void onSuccess(String taskID, Object data) {
         if(data != null && (data instanceof JDiscussion)) {
             done((JDiscussion)data);
         }

@@ -38,6 +38,7 @@ import com.pack.pack.application.AppController;
 import com.pack.pack.application.Constants;
 import com.pack.pack.application.R;
 import com.pack.pack.application.data.util.AbstractNetworkTask;
+import com.pack.pack.application.data.util.IAsyncTaskStatusListener;
 import com.pack.pack.application.image.loader.DownloadImageTask;
 import com.pack.pack.application.topic.activity.model.ParcelableTopic;
 import com.pack.pack.client.api.API;
@@ -179,13 +180,29 @@ public class TopicDetailActivity extends AbstractAppCompatActivity implements On
             }
         });
 
-        ImageButton followTopic = (ImageButton) findViewById(R.id.follow_not_follow_topic);
-        followTopic.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                new FollowTopicTask(TopicDetailActivity.this).execute(topic.getTopicId());
-            }
-        });
+        final ImageButton followTopic = (ImageButton) findViewById(R.id.follow_not_follow_topic);
+        if(!topic.isFollowing()) {
+            followTopic.setImageResource(R.drawable.follow_topic);
+        } else {
+            followTopic.setImageResource(R.drawable.neglect_topic);
+        }
+
+        String userId = AppController.getInstance().getUserId();
+        String topicOwnerId = topic.getOwnerId();
+
+        if(userId.equals(topicOwnerId)) {
+            followTopic.setAlpha(0.4f);
+            followTopic.setClickable(false);
+        } else {
+            followTopic.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    FollowTopicTask task = new FollowTopicTask(TopicDetailActivity.this, topic);
+                    task.addListener(new FollowTopicTaskListener(task.getTaskID(), followTopic, topic.isFollowing()));
+                    task.execute(topic.getTopicId());
+                }
+            });
+        }
 
         invitePeople = (ImageButton) findViewById(R.id.invite_people);
         invitePeople.setOnClickListener(new View.OnClickListener() {
@@ -196,13 +213,13 @@ public class TopicDetailActivity extends AbstractAppCompatActivity implements On
             }
         });
 
-        ImageButton promoteTopic = (ImageButton) findViewById(R.id.promote_topic);
+        /*ImageButton promoteTopic = (ImageButton) findViewById(R.id.promote_topic);
         promoteTopic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
             }
-        });
+        });*/
 
         ImageButton shareTopic = (ImageButton) findViewById(R.id.share_topic);
         shareTopic.setOnClickListener(new View.OnClickListener() {
@@ -279,8 +296,11 @@ public class TopicDetailActivity extends AbstractAppCompatActivity implements On
 
     private class FollowTopicTask extends AbstractNetworkTask<String, Integer, Void> {
 
-        public FollowTopicTask(Context context) {
-            super(false, false, false, context, true);
+        private ParcelableTopic topic;
+
+        public FollowTopicTask(Context context, ParcelableTopic topic) {
+            super(false, false, false, context, true, true);
+            this.topic = topic;
         }
 
         @Override
@@ -296,7 +316,16 @@ public class TopicDetailActivity extends AbstractAppCompatActivity implements On
 
         @Override
         protected COMMAND command() {
-            return COMMAND.FOLLOW_TOPIC;
+            if(!topic.isFollowing()) {
+                return COMMAND.FOLLOW_TOPIC;
+            }
+            return COMMAND.NEGLECT_TOPIC;
+        }
+
+        @Override
+        protected void fireOnSuccess(Object data) {
+            topic.setIsFollowing(!topic.isFollowing());
+            super.fireOnSuccess(data);
         }
 
         @Override
@@ -311,6 +340,50 @@ public class TopicDetailActivity extends AbstractAppCompatActivity implements On
         @Override
         protected String getFailureMessage() {
             return "Failed following topic command";
+        }
+    }
+
+    private class FollowTopicTaskListener implements IAsyncTaskStatusListener {
+
+        private String taskID;
+
+        private ImageButton imageButton;
+
+        private boolean isFollow;
+
+        FollowTopicTaskListener(String taskID, ImageButton imageButton, boolean isFollow) {
+            this.taskID = taskID;
+            this.imageButton = imageButton;
+            this.isFollow = isFollow;
+        }
+
+        @Override
+        public void onPreStart(String taskID) {
+
+        }
+
+        @Override
+        public void onSuccess(String taskID, Object data) {
+            TopicDetailActivity.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (isFollow) {
+                        imageButton.setImageResource(R.drawable.follow_topic);
+                    } else {
+                        imageButton.setImageResource(R.drawable.neglect_topic);
+                    }
+                }
+            });
+        }
+
+        @Override
+        public void onFailure(String taskID, String errorMsg) {
+
+        }
+
+        @Override
+        public void onPostComplete(String taskID) {
+
         }
     }
 }

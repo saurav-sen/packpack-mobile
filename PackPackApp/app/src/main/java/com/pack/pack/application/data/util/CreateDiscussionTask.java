@@ -12,8 +12,11 @@ import com.pack.pack.model.web.JDiscussion;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 
 public class CreateDiscussionTask extends AsyncTask<CreateDiscussionTask.CreateInfo, Integer, JDiscussion> {
+
+    private String taskID;
 
     public static class CreateInfo {
         public String entityId;
@@ -31,13 +34,14 @@ public class CreateDiscussionTask extends AsyncTask<CreateDiscussionTask.CreateI
 
     public CreateDiscussionTask(IAsyncTaskStatusListener listener) {
         addListener(listener);
+        taskID = UUID.randomUUID().toString();
     }
 
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
         for(IAsyncTaskStatusListener listener : listeners) {
-            listener.onPreStart();
+            listener.onPreStart(taskID);
         }
     }
 
@@ -93,11 +97,11 @@ public class CreateDiscussionTask extends AsyncTask<CreateDiscussionTask.CreateI
     protected void onPostExecute(JDiscussion jDiscussion) {
         super.onPostExecute(jDiscussion);
         for(IAsyncTaskStatusListener listener : listeners) {
-            listener.onSuccess(jDiscussion);
+            listener.onSuccess(taskID, jDiscussion);
         }
         for(IAsyncTaskStatusListener listener : listeners) {
-            listener.onPostComplete();
-            listener.onSuccess(jDiscussion);
+            listener.onPostComplete(taskID);
+            listener.onSuccess(taskID, jDiscussion);
         }
         listeners.clear();
         listeners = null;

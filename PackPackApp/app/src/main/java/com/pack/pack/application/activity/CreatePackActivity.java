@@ -64,7 +64,7 @@ public class CreatePackActivity extends AbstractAppCompatActivity implements IAs
     }
 
     @Override
-    public void onSuccess(Object data) {
+    public void onSuccess(String taskID, Object data) {
         JPack pack = (JPack) data;
         ParcelablePack parcelablePack = new ParcelablePack(pack);
         Intent resultant = new Intent();
@@ -74,7 +74,7 @@ public class CreatePackActivity extends AbstractAppCompatActivity implements IAs
     }
 
     @Override
-    public void onFailure(String errorMsg) {
+    public void onFailure(String taskID, String errorMsg) {
         pack_create_submit.setEnabled(true);
         Intent resultant = new Intent();
         resultant.putExtra(Constants.ERROR_MSG, errorMsg);
@@ -83,11 +83,11 @@ public class CreatePackActivity extends AbstractAppCompatActivity implements IAs
     }
 
     @Override
-    public void onPreStart() {
+    public void onPreStart(String taskID) {
     }
 
     @Override
-    public void onPostComplete() {
+    public void onPostComplete(String taskID) {
     }
 
     private class PackCreateInfo {

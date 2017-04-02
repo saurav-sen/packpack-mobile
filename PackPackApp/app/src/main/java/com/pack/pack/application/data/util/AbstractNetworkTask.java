@@ -1,5 +1,6 @@
 package com.pack.pack.application.data.util;
 
+import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -23,6 +24,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Created by Saurav on 12-06-2016.
@@ -51,17 +53,37 @@ public abstract class AbstractNetworkTask<X, Y, Z> extends AsyncTask<X, Y, Z> {
 
     private boolean flushHttpCache;
 
+    private boolean showProgressDialog;
+
+    private ProgressDialog progressDialog = null;
+
+    private boolean loadedFromDB = false;
+
+    private String taskID;
+
     public AbstractNetworkTask(boolean tryRetrievingFromDB, boolean storeResultsInDB, Context context, boolean flushHttpCache) {
         this(tryRetrievingFromDB, storeResultsInDB, false, context, flushHttpCache);
     }
 
-    public AbstractNetworkTask(boolean tryRetrievingFromDB, boolean storeResultsInDB, boolean updateExistingObjectInDB, Context context, boolean flushHttpCache) {
+    public AbstractNetworkTask(boolean tryRetrievingFromDB, boolean storeResultsInDB, boolean updateExistingObjectInDB,
+                               Context context, boolean flushHttpCache) {
+        this(tryRetrievingFromDB, storeResultsInDB, updateExistingObjectInDB, context, flushHttpCache, false);
+    }
+
+    public AbstractNetworkTask(boolean tryRetrievingFromDB, boolean storeResultsInDB, boolean updateExistingObjectInDB,
+                               Context context, boolean flushHttpCache, boolean showProgressDialog) {
         this.tryRetrievingFromDB = tryRetrievingFromDB;
         this.storeResultsInDB = storeResultsInDB;
         this.updateExistingObjectInDB = updateExistingObjectInDB;
         this.context = context;
         this.flushHttpCache = flushHttpCache;
         squillDbHelper = new SquillDbHelper(context);
+        this.showProgressDialog = showProgressDialog;
+        taskID = UUID.randomUUID().toString();
+    }
+
+    public String getTaskID() {
+        return taskID;
     }
 
     protected boolean isStoreResultsInDB() {
@@ -85,40 +107,55 @@ public abstract class AbstractNetworkTask<X, Y, Z> extends AsyncTask<X, Y, Z> {
         return context;
     }
 
-    public void addListener(IAsyncTaskStatusListener listener) {
-        if(listener == null)
-            return;
-        listeners.add(listener);
+    public AsyncTask<X, Y, Z> addListener(IAsyncTaskStatusListener listener) {
+        if(listener != null) {
+            listeners.add(listener);
+        }
+        return this;
     }
 
     @Override
     protected void onPreExecute() {
-        fireOnPreStart();
-        super.onPreExecute();
+        try {
+            if(showProgressDialog) {
+                progressDialog = new ProgressDialog(context);
+                progressDialog.setMessage("Please Wait...");
+                progressDialog.setIndeterminate(true);
+                progressDialog.show();
+            }
+            fireOnPreStart();
+            super.onPreExecute();
+        } catch (Throwable e) {
+            if(progressDialog != null) {
+                progressDialog.dismiss();
+                progressDialog = null;
+            }
+            throw e;
+        }
     }
 
     protected void fireOnPreStart() {
         for(IAsyncTaskStatusListener listener : listeners) {
-            listener.onPreStart();
+            listener.onPreStart(getTaskID());
         }
     }
 
     protected void fireOnSuccess(Object data) {
         HttpCacheEvictionHandler.INSTANCE.evict(context, command(), data, flushHttpCache);
         for(IAsyncTaskStatusListener listener : listeners) {
-            listener.onSuccess(data);
+            listener.onSuccess(getTaskID(), data);
         }
     }
 
     protected void fireOnFailure(String errorMsg) {
         for(IAsyncTaskStatusListener listener : listeners) {
-            listener.onFailure(errorMsg);
+            listener.onFailure(getTaskID(), errorMsg);
         }
     }
 
     protected void fireOnPostComplete() {
         for(IAsyncTaskStatusListener listener : listeners) {
-            listener.onPostComplete();
+            listener.onPostComplete(getTaskID());
         }
     }
 
@@ -130,22 +167,28 @@ public abstract class AbstractNetworkTask<X, Y, Z> extends AsyncTask<X, Y, Z> {
         this.x = x;
     }
 
-    private boolean loadedFromDB = false;
-
     @Override
     protected Z doInBackground(X... xes) {
-        if(xes == null || xes.length == 0)
-            return null;
-        X x = xes[0];
-        setInputObject(x);
         Z z = null;
-        if(isTryRetrievingFromDB()) {
-            z = doRetrieveFromDB(squillDbHelper.getReadableDatabase(), getInputObject());
-        }
-        if(z == null) {
-            z = doExecuteInBackground(x);
-        } else {
-            loadedFromDB = true;
+        try {
+            if(xes == null || xes.length == 0)
+                return null;
+            X x = xes[0];
+            setInputObject(x);
+            z = null;
+            if(isTryRetrievingFromDB()) {
+                z = doRetrieveFromDB(squillDbHelper.getReadableDatabase(), getInputObject());
+            }
+            if(z == null) {
+                z = doExecuteInBackground(x);
+            } else {
+                loadedFromDB = true;
+            }
+        } finally {
+            if(progressDialog != null) {
+                progressDialog.dismiss();
+                progressDialog = null;
+            }
         }
         return z;
     }

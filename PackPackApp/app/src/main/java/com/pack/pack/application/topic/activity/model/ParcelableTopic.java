@@ -10,6 +10,8 @@ import com.pack.pack.model.web.JTopic;
  */
 public class ParcelableTopic implements Parcelable {
 
+    private String ownerId;
+
     private String topicId;
 
     private String topicCategory;
@@ -24,6 +26,18 @@ public class ParcelableTopic implements Parcelable {
 
     private double latitude;
 
+    private String address;
+
+    private boolean isFollowing;
+
+    public String getOwnerId() {
+        return ownerId;
+    }
+
+    public void setOwnerId(String ownerId) {
+        this.ownerId = ownerId;
+    }
+
     public String getAddress() {
         return address;
     }
@@ -31,8 +45,6 @@ public class ParcelableTopic implements Parcelable {
     public void setAddress(String address) {
         this.address = address;
     }
-
-    private String address;
 
     public double getLongitude() {
         return longitude;
@@ -50,8 +62,6 @@ public class ParcelableTopic implements Parcelable {
         this.latitude = latitude;
     }
 
-    private boolean isFollowing;
-
     public boolean isFollowing() {
         return isFollowing;
     }
@@ -66,6 +76,7 @@ public class ParcelableTopic implements Parcelable {
     public ParcelableTopic(JTopic topic) {
         if(topic != null) {
             setTopicId(topic.getId() + "");
+            setOwnerId(topic.getOwnerId() + "");
             setDescription(topic.getDescription() + "");
             setTopicCategory(topic.getCategory() + "");
             setWallpaperUrl(topic.getWallpaperUrl() + "");
@@ -77,10 +88,11 @@ public class ParcelableTopic implements Parcelable {
         }
     }
 
-    public ParcelableTopic(String topicId, String topicCategory, String wallpaperUrl,
+    public ParcelableTopic(String topicId, String ownerId, String topicCategory, String wallpaperUrl,
                            String description, String name, double longitude, double latitude,
                            String address, boolean isFollowing) {
         this.topicId = topicId + "";
+        this.ownerId = ownerId + "";
         this.topicCategory = topicCategory + "";
         this.wallpaperUrl = wallpaperUrl + "";
         this.description = description + "";
@@ -139,6 +151,7 @@ public class ParcelableTopic implements Parcelable {
     @Override
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeString(topicId);
+        parcel.writeString(ownerId);
         parcel.writeString(topicCategory);
         parcel.writeString(wallpaperUrl);
         parcel.writeString(description);
@@ -153,6 +166,7 @@ public class ParcelableTopic implements Parcelable {
         @Override
         public ParcelableTopic createFromParcel(Parcel parcel) {
             String topicId = parcel.readString();
+            String ownerId = parcel.readString();
             String topicCategory = parcel.readString();
             String wallpaperUrl = parcel.readString();
             String description = parcel.readString();
@@ -161,7 +175,7 @@ public class ParcelableTopic implements Parcelable {
             double latitude = parcel.readDouble();
             String address = parcel.readString();
             boolean isFollowing = Boolean.parseBoolean(parcel.readString().trim());
-            return new ParcelableTopic(topicId, topicCategory, wallpaperUrl, description,
+            return new ParcelableTopic(topicId, ownerId, topicCategory, wallpaperUrl, description,
                     name, longitude, latitude, address, isFollowing);
         }
 

@@ -161,11 +161,11 @@ public class TopicCreateActivity extends AbstractAppCompatActivity implements IA
     }
 
     @Override
-    public void onPreStart() {
+    public void onPreStart(String taskID) {
     }
 
     @Override
-    public void onSuccess(Object data) {
+    public void onSuccess(String taskID, Object data) {
         Toast.makeText(this, "Successfully created new topic",
                 Toast.LENGTH_LONG).show();
         JTopic jTopic = (JTopic) data;
@@ -177,7 +177,7 @@ public class TopicCreateActivity extends AbstractAppCompatActivity implements IA
     }
 
     @Override
-    public void onFailure(String errorMsg) {
+    public void onFailure(String taskID, String errorMsg) {
         wallpaper_select.setEnabled(true);
         topic_create_submit.setEnabled(true);
         Toast.makeText(this, errorMsg, Toast.LENGTH_LONG).show();
@@ -188,7 +188,7 @@ public class TopicCreateActivity extends AbstractAppCompatActivity implements IA
     }
 
     @Override
-    public void onPostComplete() {
+    public void onPostComplete(String taskID) {
     }
 
     private void doCreateTopic() {

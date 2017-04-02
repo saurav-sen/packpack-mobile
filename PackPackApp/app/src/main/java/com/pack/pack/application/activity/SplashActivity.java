@@ -108,12 +108,12 @@ public class SplashActivity extends AbstractActivity implements IAsyncTaskStatus
     }
 
     @Override
-    public void onPreStart() {
+    public void onPreStart(String taskID) {
         showProgressDialog();
     }
 
     @Override
-    public void onSuccess(Object data) {
+    public void onSuccess(String taskID, Object data) {
         LoggedInUserInfo userInfo = (LoggedInUserInfo) data;
         AccessToken token = userInfo.getAccessToken();
         JUser user = userInfo.getUser();
@@ -126,7 +126,7 @@ public class SplashActivity extends AbstractActivity implements IAsyncTaskStatus
     }
 
     @Override
-    public void onPostComplete() {
+    public void onPostComplete(String taskID) {
 
     }
 
@@ -152,7 +152,8 @@ public class SplashActivity extends AbstractActivity implements IAsyncTaskStatus
         super.onDestroy();
     }
 
-    public void onFailure(String errorMsg) {
+    @Override
+    public void onFailure(String taskID, String errorMsg) {
         hideProgressDialog();
         startLoginActivity();
     }

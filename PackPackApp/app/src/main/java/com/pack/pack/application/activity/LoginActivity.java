@@ -135,12 +135,12 @@ public class LoginActivity extends AbstractAppCompatActivity implements IAsyncTa
     }
 
     @Override
-    public void onPreStart() {
+    public void onPreStart(String taskID) {
         showProgressDialog();
     }
 
     @Override
-    public void onSuccess(Object data) {
+    public void onSuccess(String taskID, Object data) {
         LoggedInUserInfo userInfo = (LoggedInUserInfo)data;
         AccessToken token = userInfo.getAccessToken();
         JUser user = userInfo.getUser();
@@ -153,11 +153,12 @@ public class LoginActivity extends AbstractAppCompatActivity implements IAsyncTa
     }
 
     @Override
-    public void onPostComplete() {
+    public void onPostComplete(String taskID) {
 
     }
 
-    public void onFailure(String errorMsg) {
+    @Override
+    public void onFailure(String taskID, String errorMsg) {
         hideProgressDialog();
         getIntent().putExtra("email", input_email.getText().toString());
         getIntent().putExtra("passwd", input_password.getText().toString());

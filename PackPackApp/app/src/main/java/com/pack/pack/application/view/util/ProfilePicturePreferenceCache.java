@@ -96,12 +96,12 @@ public class ProfilePicturePreferenceCache {
         }
 
         @Override
-        public void onPreStart() {
+        public void onPreStart(String taskID) {
 
         }
 
         @Override
-        public void onSuccess(Object data) {
+        public void onSuccess(String taskID, Object data) {
             if(data != null && (data instanceof Bitmap)) {
                 profilePicture = (Bitmap)data;
                 profilePictureImageView.setImageBitmap(profilePicture);
@@ -109,12 +109,12 @@ public class ProfilePicturePreferenceCache {
         }
 
         @Override
-        public void onFailure(String errorMsg) {
+        public void onFailure(String taskID, String errorMsg) {
             profilePictureImageView.setImageResource(R.drawable.default_profile_picture_big);
         }
 
         @Override
-        public void onPostComplete() {
+        public void onPostComplete(String taskID) {
 
         }
     }
