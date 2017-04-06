@@ -205,7 +205,7 @@ public class MainActivity extends AbstractAppCompatActivity {
                 }
             }
             else {
-                Toast.makeText(MainActivity.this, "Sorry!! Failed creating new topic",
+                Toast.makeText(MainActivity.this, "Sorry!! Failed creating new gallery",
                         Toast.LENGTH_LONG).show();;
             }
         }

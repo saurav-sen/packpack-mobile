@@ -192,9 +192,9 @@ public class InsideTopicActivity extends AbstractAppCompatActivity {
                     startActivity(getIntent());
                 }
             } else if(resultCode == RESULT_CANCELED) {
-                String errorMsg = data.getStringExtra(Constants.ERROR_MSG);
+                String errorMsg = data != null ? data.getStringExtra(Constants.ERROR_MSG) : null;
                 if(errorMsg == null || errorMsg.trim().isEmpty()) {
-                    errorMsg = "Cancelled to create new pack";
+                    errorMsg = "You have cancelled to create new album";
                 }
                 Toast.makeText(this, errorMsg, Toast.LENGTH_LONG).show();
             }
