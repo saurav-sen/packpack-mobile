@@ -194,6 +194,7 @@ public class ImageVideoCaptureActivity extends AbstractActivity {
                         e.printStackTrace();
                     }
                 } else {
+                    AppController.getInstance().setUploadAttachmentData(null);
                     Toast.makeText(getApplicationContext(),
                             "You have cancelled photo capture", Toast.LENGTH_SHORT)
                             .show();
@@ -247,6 +248,7 @@ public class ImageVideoCaptureActivity extends AbstractActivity {
                         e.printStackTrace();
                     }
                 } else {
+                    AppController.getInstance().setUploadAttachmentData(null);
                     Toast.makeText(getApplicationContext(),
                             "You have cancelled video recording", Toast.LENGTH_SHORT)
                             .show();
@@ -273,6 +275,7 @@ public class ImageVideoCaptureActivity extends AbstractActivity {
                         e.printStackTrace();
                     }
                 } else {
+                    AppController.getInstance().setUploadAttachmentData(null);
                     Toast.makeText(getApplicationContext(),
                             "You have cancelled photo selection", Toast.LENGTH_SHORT)
                             .show();
@@ -326,6 +329,7 @@ public class ImageVideoCaptureActivity extends AbstractActivity {
                         e.printStackTrace();
                     }
                 } else {
+                    AppController.getInstance().setUploadAttachmentData(null);
                     Toast.makeText(getApplicationContext(),
                             "You have cancelled video selection", Toast.LENGTH_SHORT)
                             .show();
