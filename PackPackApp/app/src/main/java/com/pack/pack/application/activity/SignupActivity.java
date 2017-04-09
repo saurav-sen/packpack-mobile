@@ -230,14 +230,14 @@ public class SignupActivity extends AbstractAppCompatActivity {
         }
 
         if(count > timeout) {
-            Snackbar.make(input_email, "[Timed OUT]: Failed validating EMail.", Snackbar.LENGTH_LONG).show();
+            Snackbar.make(input_email, "[Timed OUT]: Failed validating EMail", Snackbar.LENGTH_LONG).show();
             return;
         }
 
         if(!listener.isValidUserName()) {
             String errorMsg = listener.getErrorMsg();
             if(errorMsg == null || errorMsg.trim().isEmpty()) {
-                errorMsg = "Email ID is already registered with us.";
+                errorMsg = "Email ID is already registered with us";
             }
             Snackbar.make(input_email, errorMsg, Snackbar.LENGTH_LONG).show();
             return;
@@ -245,7 +245,7 @@ public class SignupActivity extends AbstractAppCompatActivity {
         valid = valid & listener.isValidUserName();
 
         if(!valid) {
-            Snackbar.make(input_email, "Sorry something went wrong.", Snackbar.LENGTH_LONG).show();
+            Snackbar.make(input_email, "Sorry something went wrong", Snackbar.LENGTH_LONG).show();
             return;
         }
         /*LocalAddress addr = null;
