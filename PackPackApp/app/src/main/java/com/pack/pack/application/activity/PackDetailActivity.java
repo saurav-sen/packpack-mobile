@@ -33,6 +33,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ListView;
@@ -204,7 +205,7 @@ public class PackDetailActivity extends AbstractAppCompatActivity {
         activity_pack_story.setText(shortStory);
 
         activity_pack_attachments = (ListView) findViewById(R.id.activity_pack_attachments);
-        adapter = new PackAttachmentsAdapter(this, new ArrayList<JPackAttachment>(10));
+        adapter = new PackAttachmentsAdapter(this, new ArrayList<JPackAttachment>(10), topic, pack);
         activity_pack_attachments.setAdapter(adapter);
         activity_pack_attachments.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
@@ -217,10 +218,6 @@ public class PackDetailActivity extends AbstractAppCompatActivity {
 
             }
         });
-
-        if(AppController.getInstance().getUserId().equals(topic.getOwnerId())) {
-            registerForContextMenu(activity_pack_attachments);
-        }
 
         currentScrollableObject = new ScrollablePackDetail();
         currentScrollableObject.packId = pack.getId();
@@ -236,24 +233,6 @@ public class PackDetailActivity extends AbstractAppCompatActivity {
         }
 
         new LoadPackDetailTask().execute(currentScrollableObject);
-    }
-
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
-        menu.add(0, DELETE_MENU_ITEM, 0, "Delete");
-    }
-
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        if(item.getItemId() == DELETE_MENU_ITEM) {
-            JPackAttachment attachment = (JPackAttachment)activity_pack_attachments.getSelectedItem();
-            int selectedItemPosition = activity_pack_attachments.getSelectedItemPosition();
-            AttachmentToDelete attachmentToDelete = new AttachmentToDelete(pack.getParentTopicId(),
-                    pack.getId(), attachment, selectedItemPosition);
-            new DeleteAttachment().execute(attachmentToDelete);
-        }
-        return true;
     }
 
     @Override
@@ -563,150 +542,4 @@ public class PackDetailActivity extends AbstractAppCompatActivity {
             }
         }
     };
-
-    private class DeleteAttachment extends AbstractNetworkTask<AttachmentToDelete, Integer, Void> {
-
-        private String errorMsg;
-
-        public DeleteAttachment() {
-            super(true, true, PackDetailActivity.this, true);
-        }
-
-        @Override
-        protected void onPreExecute() {
-            showProgressDialog();
-            super.onPreExecute();
-        }
-
-        @Override
-        protected COMMAND command() {
-            return COMMAND.DELETE_ATTACHMENT;
-        }
-
-        @Override
-        protected Map<String, Object> prepareApiParams(AttachmentToDelete inputObject) {
-            Map<String, Object> apiParams = new HashMap<String, Object>();
-            if(inputObject == null) {
-                return apiParams;
-            }
-            apiParams.put(APIConstants.PackAttachment.ID, inputObject.getAttachment().getId());
-            apiParams.put(APIConstants.Pack.ID, inputObject.getPackId());
-            apiParams.put(APIConstants.Topic.ID, inputObject.getTopicId());
-            return apiParams;
-        }
-
-        @Override
-        protected Void executeApi(API api) throws Exception {
-            try {
-                api.execute();
-            } catch (Exception e) {
-                Log.e(LOG_TAG, e.getMessage(), e);
-                errorMsg = "Failed to delete attachment";
-            }
-            return null;
-        }
-
-        @Override
-        protected String getFailureMessage() {
-            return errorMsg;
-        }
-
-        @Override
-        protected String getContainerIdForObjectStore() {
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            try {
-                super.onPostExecute(aVoid);
-            } finally {
-                hideProgressDialog();
-            }
-        }
-
-        @Override
-        protected void fireOnSuccess(Object data) {
-            AttachmentToDelete attachmentToDelete = getInputObject();
-            if(attachmentToDelete != null) {
-                List<JPackAttachment> attahments = adapter.getAttachments();
-                attahments.remove(attachmentToDelete.getSelectedItemPosition());
-                adapter.notifyDataSetChanged();
-            }
-            super.fireOnSuccess(data);
-        }
-
-        private void showProgressDialog() {
-            PackDetailActivity.this.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    progressDialog = new ProgressDialog(PackDetailActivity.this);
-                    progressDialog.setMessage("Loading...");
-                    progressDialog.show();
-                }
-            });
-        }
-
-        private void hideProgressDialog() {
-            PackDetailActivity.this.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    if (progressDialog != null) {
-                        progressDialog.dismiss();
-                        progressDialog = null;
-                    }
-                }
-            });
-        }
-    }
-
-    private class AttachmentToDelete {
-
-        AttachmentToDelete(String topicId, String packId, JPackAttachment attachment, int selectedItemPosition) {
-            setTopicId(topicId);
-            setPackId(packId);
-            setAttachment(attachment);
-            setSelectedItemPosition(selectedItemPosition);
-        }
-
-        private int selectedItemPosition;
-
-        public int getSelectedItemPosition() {
-            return selectedItemPosition;
-        }
-
-        public void setSelectedItemPosition(int selectedItemPosition) {
-            this.selectedItemPosition = selectedItemPosition;
-        }
-
-        private String topicId;
-
-        public String getTopicId() {
-            return topicId;
-        }
-
-        public void setTopicId(String topicId) {
-            this.topicId = topicId;
-        }
-
-        private String packId;
-
-        public String getPackId() {
-            return packId;
-        }
-
-        public void setPackId(String packId) {
-            this.packId = packId;
-        }
-
-        public JPackAttachment getAttachment() {
-            return attachment;
-        }
-
-        public void setAttachment(JPackAttachment attachment) {
-            this.attachment = attachment;
-        }
-
-        private JPackAttachment attachment;
-    }
 }

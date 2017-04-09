@@ -1,6 +1,7 @@
 package com.pack.pack.application.adapters;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
@@ -8,11 +9,13 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -31,6 +34,8 @@ import com.pack.pack.application.db.DBUtil;
 import com.pack.pack.application.image.loader.DownloadImageTask;
 import com.pack.pack.application.service.UploadImageAttachmentService;
 import com.pack.pack.application.service.UploadVideoAttachmentService;
+import com.pack.pack.application.topic.activity.model.ParcelablePack;
+import com.pack.pack.application.topic.activity.model.ParcelableTopic;
 import com.pack.pack.application.view.CircleImageView;
 import com.pack.pack.client.api.API;
 import com.pack.pack.client.api.APIConstants;
@@ -68,10 +73,18 @@ public class PackAttachmentsAdapter extends ArrayAdapter<JPackAttachment> {
 
     private boolean uploadTaskRunning = false;
 
-    public PackAttachmentsAdapter(Activity activity, List<JPackAttachment> attachments) {
+    private ParcelableTopic topic;
+
+    private ParcelablePack pack;
+
+    private static final String LOG_TAG = "PackAttachmentsAdapter";
+
+    public PackAttachmentsAdapter(Activity activity, List<JPackAttachment> attachments, ParcelableTopic topic, ParcelablePack pack) {
         super(activity, R.layout.activity_pack_detail_item, attachments);
         this.activity = activity;
         this.attachments = attachments;
+        this.topic = topic;
+        this.pack = pack;
     }
 
     public List<JPackAttachment> getAttachments() {
@@ -117,6 +130,22 @@ public class PackAttachmentsAdapter extends ArrayAdapter<JPackAttachment> {
         final CircleImageView user_profile_picture = (CircleImageView) convertView.findViewById(R.id.user_profile_picture);
         final TextView user_name = (TextView) convertView.findViewById(R.id.user_name);
         final TextView attachment_create_time = (TextView) convertView.findViewById(R.id.attachment_create_time);
+
+        final ImageButton  deleteAttachment = (ImageButton) convertView.findViewById(R.id.deleteAttachment);
+        if(AppController.getInstance().getUserId().equals(topic.getOwnerId())) {
+            deleteAttachment.setVisibility(View.VISIBLE);
+            deleteAttachment.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    JPackAttachment attachment = (JPackAttachment)getItem(position);
+                    AttachmentToDelete attachmentToDelete = new AttachmentToDelete(pack.getParentTopicId(),
+                            pack.getId(), attachment, position);
+                    new DeleteAttachment(getContext()).execute(attachmentToDelete);
+                }
+            });
+        } else {
+            deleteAttachment.setVisibility(View.GONE);
+        }
 
         JPackAttachment attachment = getItem(position);
         if(attachment != null) {
@@ -513,5 +542,113 @@ public class PackAttachmentsAdapter extends ArrayAdapter<JPackAttachment> {
                 getContext().startService(service);
             }
         }
+    }
+
+    private class DeleteAttachment extends AbstractNetworkTask<AttachmentToDelete, Integer, Void> {
+
+        private String errorMsg;
+
+        public DeleteAttachment(Context context) {
+            super(false, false, false, context, true, true);
+        }
+
+        @Override
+        protected COMMAND command() {
+            return COMMAND.DELETE_ATTACHMENT;
+        }
+
+        @Override
+        protected Map<String, Object> prepareApiParams(AttachmentToDelete inputObject) {
+            Map<String, Object> apiParams = new HashMap<String, Object>();
+            if(inputObject == null) {
+                return apiParams;
+            }
+            apiParams.put(APIConstants.PackAttachment.ID, inputObject.getAttachment().getId());
+            apiParams.put(APIConstants.Pack.ID, inputObject.getPackId());
+            apiParams.put(APIConstants.Topic.ID, inputObject.getTopicId());
+            return apiParams;
+        }
+
+        @Override
+        protected Void executeApi(API api) throws Exception {
+            try {
+                api.execute();
+            } catch (Exception e) {
+                Log.e(LOG_TAG, e.getMessage(), e);
+                errorMsg = "Failed to delete attachment";
+            }
+            return null;
+        }
+
+        @Override
+        protected String getFailureMessage() {
+            return errorMsg;
+        }
+
+        @Override
+        protected String getContainerIdForObjectStore() {
+            return null;
+        }
+
+        @Override
+        protected void fireOnSuccess(Object data) {
+            AttachmentToDelete attachmentToDelete = getInputObject();
+            if(attachmentToDelete != null) {
+                List<JPackAttachment> attahments = PackAttachmentsAdapter.this.getAttachments();
+                attahments.remove(attachmentToDelete.getSelectedItemPosition());
+                PackAttachmentsAdapter.this.notifyDataSetChanged();
+            }
+            super.fireOnSuccess(data);
+        }
+    }
+
+    private class AttachmentToDelete {
+
+        AttachmentToDelete(String topicId, String packId, JPackAttachment attachment, int selectedItemPosition) {
+            setTopicId(topicId);
+            setPackId(packId);
+            setAttachment(attachment);
+            setSelectedItemPosition(selectedItemPosition);
+        }
+
+        private int selectedItemPosition;
+
+        public int getSelectedItemPosition() {
+            return selectedItemPosition;
+        }
+
+        public void setSelectedItemPosition(int selectedItemPosition) {
+            this.selectedItemPosition = selectedItemPosition;
+        }
+
+        private String topicId;
+
+        public String getTopicId() {
+            return topicId;
+        }
+
+        public void setTopicId(String topicId) {
+            this.topicId = topicId;
+        }
+
+        private String packId;
+
+        public String getPackId() {
+            return packId;
+        }
+
+        public void setPackId(String packId) {
+            this.packId = packId;
+        }
+
+        public JPackAttachment getAttachment() {
+            return attachment;
+        }
+
+        public void setAttachment(JPackAttachment attachment) {
+            this.attachment = attachment;
+        }
+
+        private JPackAttachment attachment;
     }
 }

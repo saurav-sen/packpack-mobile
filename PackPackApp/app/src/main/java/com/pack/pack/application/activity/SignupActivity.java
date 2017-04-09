@@ -215,12 +215,12 @@ public class SignupActivity extends AbstractAppCompatActivity {
         if(!valid)
             return;
 
-        UsernameExistenceListener listener = new UsernameExistenceListener();
-        new UsernameExistenceTestTask().addListener(listener).execute(email);
+        UsernameExistenceTestTask task = new UsernameExistenceTestTask();
+        task.execute(email);
 
-        long timeout = 60 * 1000;
+        long timeout = 3 * 60 * 1000;
         long count = 0;
-        while (!listener.isValidationComplete() && count <= timeout) {
+        while (!task.isValidationComplete() && count <= timeout) {
             try {
                 Thread.sleep(100);
                 count = count + 100;
@@ -234,15 +234,15 @@ public class SignupActivity extends AbstractAppCompatActivity {
             return;
         }
 
-        if(!listener.isValidUserName()) {
-            String errorMsg = listener.getErrorMsg();
+        if(!task.isValidUserName()) {
+            String errorMsg = task.getErrorMsg();
             if(errorMsg == null || errorMsg.trim().isEmpty()) {
                 errorMsg = "Email ID is already registered with us";
             }
             Snackbar.make(input_email, errorMsg, Snackbar.LENGTH_LONG).show();
             return;
         }
-        valid = valid & listener.isValidUserName();
+        valid = valid & task.isValidUserName();
 
         if(!valid) {
             Snackbar.make(input_email, "Sorry something went wrong", Snackbar.LENGTH_LONG).show();
@@ -262,7 +262,7 @@ public class SignupActivity extends AbstractAppCompatActivity {
         startActivity(intent);
     }
 
-    private class UsernameExistenceListener implements IAsyncTaskStatusListener {
+    private class UsernameExistenceTestTask extends AbstractNetworkTask<String, Integer, JStatus> {
 
         private boolean validationComplete;
 
@@ -282,36 +282,8 @@ public class SignupActivity extends AbstractAppCompatActivity {
 
         private boolean isValidUserName;
 
-        @Override
-        public void onPreStart(String taskID) {
-
-        }
-
-        @Override
-        public void onSuccess(String taskID, Object data) {
-            validationComplete = true;
-            isValidUserName = true;
-        }
-
-        @Override
-        public void onFailure(String taskID, String errorMsg) {
-            validationComplete = true;
-            this.errorMsg = errorMsg;
-            isValidUserName = false;
-        }
-
-        @Override
-        public void onPostComplete(String taskID) {
-            validationComplete = true;
-        }
-    }
-
-    private class UsernameExistenceTestTask extends AbstractNetworkTask<String, Integer, Boolean> {
-
-        private String errorMsg;
-
         public UsernameExistenceTestTask() {
-            super(false, false, false, SignupActivity.this, false);
+            super(false, false, false, SignupActivity.this, false, true);
         }
 
         @Override
@@ -340,18 +312,25 @@ public class SignupActivity extends AbstractAppCompatActivity {
         }
 
         @Override
-        protected Boolean executeApi(API api) throws Exception {
+        protected JStatus executeApi(API api) throws Exception {
             JStatus status = null;
             try {
                 status = (JStatus) api.execute();
             } catch (Exception e) {
                 Log.e(LOG_TAG, e.getMessage(), e);
                 errorMsg = "Failed while validating EMail existence check.";
+            } finally {
+                validationComplete = true;
             }
-            if(status == null || status.getStatus() == StatusType.ERROR) {
-                return false;
+            if(errorMsg == null) {
+                isValidUserName = (status.getStatus() == StatusType.OK);
+                if (!isValidUserName) {
+                    errorMsg = status.getInfo();
+                }
+            } else {
+                isValidUserName = false;
             }
-            return true;
+            return status;
         }
     }
 }
