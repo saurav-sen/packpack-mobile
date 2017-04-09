@@ -68,7 +68,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
-                android:src="@android:drawable/ic_menu_delete" />
+                android:src="@android:drawable/ic_menu_delete"
+                android:visibility="gone" />
         </RelativeLayout>
 
         <TextView
