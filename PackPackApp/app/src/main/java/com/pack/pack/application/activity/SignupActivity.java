@@ -2,6 +2,7 @@ package com.pack.pack.application.activity;
 
 import android.Manifest;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
@@ -26,6 +27,7 @@ import android.widget.Toast;
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
 import com.pack.pack.application.data.LoggedInUserInfo;
+import com.pack.pack.application.data.util.AbstractNetworkTask;
 import com.pack.pack.application.data.util.ApiConstants;
 import com.pack.pack.application.data.util.IAsyncTaskStatusListener;
 import com.pack.pack.application.data.util.LoginTask;
@@ -35,10 +37,14 @@ import com.pack.pack.client.api.API;
 import com.pack.pack.client.api.APIBuilder;
 import com.pack.pack.client.api.APIConstants;
 import com.pack.pack.client.api.COMMAND;
+import com.pack.pack.model.web.JStatus;
 import com.pack.pack.model.web.JUser;
+import com.pack.pack.model.web.StatusType;
 import com.pack.pack.oauth1.client.AccessToken;
 
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.pack.pack.application.AppController.FAILURE_RESULT;
 import static com.pack.pack.application.AppController.LOCATION_PARCELABLE_ADDRESS_KEY;
@@ -205,8 +211,43 @@ public class SignupActivity extends AbstractAppCompatActivity {
             Snackbar.make(input_country, "Country is empty", Snackbar.LENGTH_LONG).show();
             valid = false;
         }
+
         if(!valid)
             return;
+
+        UsernameExistenceListener listener = new UsernameExistenceListener();
+        new UsernameExistenceTestTask().addListener(listener).execute(email);
+
+        long timeout = 60 * 1000;
+        long count = 0;
+        while (!listener.isValidationComplete() && count <= timeout) {
+            try {
+                Thread.sleep(100);
+                count = count + 100;
+            } catch (InterruptedException e) {
+                // ignore it.
+            }
+        }
+
+        if(count > timeout) {
+            Snackbar.make(input_email, "[Timed OUT]: Failed validating EMail.", Snackbar.LENGTH_LONG).show();
+            return;
+        }
+
+        if(!listener.isValidUserName()) {
+            String errorMsg = listener.getErrorMsg();
+            if(errorMsg == null || errorMsg.trim().isEmpty()) {
+                errorMsg = "Email ID is already registered with us.";
+            }
+            Snackbar.make(input_email, errorMsg, Snackbar.LENGTH_LONG).show();
+            return;
+        }
+        valid = valid & listener.isValidUserName();
+
+        if(!valid) {
+            Snackbar.make(input_email, "Sorry something went wrong.", Snackbar.LENGTH_LONG).show();
+            return;
+        }
         /*LocalAddress addr = null;
         if(address != null) {
             addr = new LocalAddress(null, null, address.getCountryName(), address.getLocality());
@@ -219,5 +260,98 @@ public class SignupActivity extends AbstractAppCompatActivity {
         intent.putExtra(PreSignupActivity.COUNTRY, country);
         finish();
         startActivity(intent);
+    }
+
+    private class UsernameExistenceListener implements IAsyncTaskStatusListener {
+
+        private boolean validationComplete;
+
+        private String errorMsg;
+
+        public boolean isValidationComplete() {
+            return validationComplete;
+        }
+
+        public String getErrorMsg() {
+            return errorMsg;
+        }
+
+        public boolean isValidUserName() {
+            return isValidUserName;
+        }
+
+        private boolean isValidUserName;
+
+        @Override
+        public void onPreStart(String taskID) {
+
+        }
+
+        @Override
+        public void onSuccess(String taskID, Object data) {
+            validationComplete = true;
+            isValidUserName = true;
+        }
+
+        @Override
+        public void onFailure(String taskID, String errorMsg) {
+            validationComplete = true;
+            this.errorMsg = errorMsg;
+            isValidUserName = false;
+        }
+
+        @Override
+        public void onPostComplete(String taskID) {
+            validationComplete = true;
+        }
+    }
+
+    private class UsernameExistenceTestTask extends AbstractNetworkTask<String, Integer, Boolean> {
+
+        private String errorMsg;
+
+        public UsernameExistenceTestTask() {
+            super(false, false, false, SignupActivity.this, false);
+        }
+
+        @Override
+        protected String getContainerIdForObjectStore() {
+            return null;
+        }
+
+        @Override
+        protected String getFailureMessage() {
+            return errorMsg;
+        }
+
+        @Override
+        protected COMMAND command() {
+            return COMMAND.VALIDATE_USER_NAME;
+        }
+
+        @Override
+        protected Map<String, Object> prepareApiParams(String inputObject) {
+            Map<String, Object> apiParams = new HashMap<String, Object>();
+            if(inputObject == null) {
+                return apiParams;
+            }
+            apiParams.put(APIConstants.User.USERNAME, inputObject);
+            return apiParams;
+        }
+
+        @Override
+        protected Boolean executeApi(API api) throws Exception {
+            JStatus status = null;
+            try {
+                status = (JStatus) api.execute();
+            } catch (Exception e) {
+                Log.e(LOG_TAG, e.getMessage(), e);
+                errorMsg = "Failed while validating EMail existence check.";
+            }
+            if(status == null || status.getStatus() == StatusType.ERROR) {
+                return false;
+            }
+            return true;
+        }
     }
 }
