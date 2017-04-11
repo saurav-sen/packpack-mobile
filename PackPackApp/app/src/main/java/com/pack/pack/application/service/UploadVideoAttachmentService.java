@@ -320,7 +320,7 @@ public class UploadVideoAttachmentService extends Service {
                     Log.d(LOG_TAG, e.getMessage(), e);
                     success = false;
                 } finally {
-                    //PackAttachmentsCache.INSTANCE.removeSelectedAttachmentVideo(attachmentId);
+                    PackAttachmentsCache.open(UploadVideoAttachmentService.this).removeSelectedAttachmentVideo(attachmentId);
                 }
                 status.setSuccess(success);
                 status.setComplete(true);
