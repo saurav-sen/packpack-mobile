@@ -44,6 +44,9 @@ public class SquillNTPService extends Service {
         @Override
         public void run() {
             try {
+                if(!NetworkUtil.checkConnectivity(SquillNTPService.this)) {
+                    return;
+                }
                 API api = APIBuilder.create(ApiConstants.BASE_URL)
                         .setAction(COMMAND.SYNC_TIME).build();
                 long serverCurrentTimeInMillis = (long) api.execute();

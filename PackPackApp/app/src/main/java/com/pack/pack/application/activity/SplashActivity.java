@@ -7,6 +7,8 @@ import android.app.job.JobScheduler;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 
@@ -21,6 +23,7 @@ import com.pack.pack.application.data.util.IAsyncTaskStatusListener;
 import com.pack.pack.application.data.util.LoginTask;
 import com.pack.pack.application.image.loader.DownloadProfilePictureTask;
 import com.pack.pack.application.service.CheckNetworkService;
+import com.pack.pack.application.service.NetworkUtil;
 import com.pack.pack.application.service.SquillNTPService;
 import com.pack.pack.model.web.JUser;
 import com.pack.pack.oauth1.client.AccessToken;
@@ -42,6 +45,11 @@ public class SplashActivity extends AbstractActivity implements IAsyncTaskStatus
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
+
+        if(!NetworkUtil.checkConnectivity(this)) {
+            startNoConnectionEmptyActivity();
+            return;
+        }
 
         startNetworkChecker();
         startNTPService();
@@ -71,6 +79,12 @@ public class SplashActivity extends AbstractActivity implements IAsyncTaskStatus
                 .getSystemService(Context.JOB_SCHEDULER_SERVICE);
         jobScheduler.schedule(jobInfo);
     }*/
+
+    private void startNoConnectionEmptyActivity() {
+        Intent intent = new Intent(this, NoConnectionEmptyActivity.class);
+        startActivity(intent);
+        finish();
+    }
 
     private void startNTPService() {
         Intent intent = new Intent(this, SquillNTPService.class);

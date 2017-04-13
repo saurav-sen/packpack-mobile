@@ -131,7 +131,9 @@
         <service
             android:name=".service.SquillNTPService"
             android:enabled="true"
-            android:exported="true"></service>
+            android:exported="true" />
+
+        <activity android:name=".activity.NoConnectionEmptyActivity"></activity>
     </application>
 
 </manifest>

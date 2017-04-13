@@ -35,14 +35,8 @@ public class CheckNetworkService extends Service {
 
         @Override
         public void run() {
-            broadcastStatus(checkConnectivity());
+            broadcastStatus(NetworkUtil.checkConnectivity(CheckNetworkService.this));
         }
-    }
-
-    private boolean checkConnectivity() {
-        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-        return networkInfo != null && networkInfo.isConnected();
     }
 
     private void broadcastStatus(boolean isConnected) {
