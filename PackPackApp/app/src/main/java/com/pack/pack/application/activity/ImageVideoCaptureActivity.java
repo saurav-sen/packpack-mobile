@@ -187,8 +187,10 @@ public class ImageVideoCaptureActivity extends AbstractActivity {
                     /*mediaFileUri = AppController.getInstance().getUploadAttachmentData().getMediaFileUri();
                     startUploadActivity(mediaFileUri.getPath(), true);*/
                     try {
+                        /*Bitmap bitmap = MediaStore.Images.Media.getBitmap(
+                                getContentResolver(), data.getData());*/
                         Bitmap bitmap = MediaStore.Images.Media.getBitmap(
-                                getContentResolver(), data.getData());
+                                getContentResolver(), mediaFileUri);
                         startUploadActivity(bitmap);
                     } catch (IOException e) {
                         e.printStackTrace();

@@ -177,9 +177,9 @@ public class UploadVideoAttachmentService extends Service {
                     }
                 }
                 if(status.isSuccess()) {
-                    notificationBuilder.setContentText("Upload Photo Completed Successfully");
+                    notificationBuilder.setContentText("Upload Video Completed Successfully");
                 } else {
-                    notificationBuilder.setContentText("Upload Photo Failed");
+                    notificationBuilder.setContentText("Upload Video Failed");
                 }
                 notificationBuilder.setProgress(100, 100, false);
                 notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());
