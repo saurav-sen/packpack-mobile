@@ -32,6 +32,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -94,7 +96,11 @@ public class PackDetailActivity extends AbstractAppCompatActivity {
 
     private ListView activity_pack_attachments;
 
-    private FloatingActionButton fab;
+    private FloatingActionButton fab_edit;
+
+    private FloatingActionButton fab_upload;
+
+    private FloatingActionButton fab_copy_link;
 
     private static final String LOG_TAG = "PackDetailActivity";
 
@@ -109,6 +115,13 @@ public class PackDetailActivity extends AbstractAppCompatActivity {
 
     private static final int DELETE_MENU_ITEM = 1;
 
+    private Animation fab_open;
+    private Animation fab_close;
+    private Animation rotate_forward;
+    private Animation rotate_backward;
+
+    private boolean showFab = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -122,8 +135,44 @@ public class PackDetailActivity extends AbstractAppCompatActivity {
         pack = (ParcelablePack) getIntent().getParcelableExtra(AppController.PACK_PARCELABLE_KEY);
         ParcelableTopic topic = InMemory.INSTANCE.get(pack.getParentTopicId());
 
-        fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        fab_open = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_open);
+        fab_close = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_close);
+        rotate_forward = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.rotate_forward);
+        rotate_backward = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.rotate_backward);
+
+        fab_edit = (FloatingActionButton) findViewById(R.id.fab_edit);
+        fab_edit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+               /* if(fab_edit.getTag().equals("SHOW")) {
+                    fab_upload.setVisibility(View.VISIBLE);
+                    fab_copy_link.setVisibility(View.VISIBLE);
+                    fab_edit.setTag("HIDE");
+                } else if(fab_edit.getTag().equals("HIDE")) {
+                    fab_upload.setVisibility(View.GONE);
+                    fab_copy_link.setVisibility(View.GONE);
+                    fab_edit.setTag("SHOW");
+                }*/
+                if(showFab){
+                    fab_edit.startAnimation(rotate_backward);
+                    fab_upload.startAnimation(fab_close);
+                    fab_copy_link.startAnimation(fab_close);
+                    fab_upload.setClickable(false);
+                    fab_copy_link.setClickable(false);
+                    showFab = false;
+                } else {
+                    fab_edit.startAnimation(rotate_forward);
+                    fab_upload.startAnimation(fab_open);
+                    fab_copy_link.startAnimation(fab_open);
+                    fab_upload.setClickable(true);
+                    fab_copy_link.setClickable(true);
+                    showFab = true;
+                }
+            }
+        });
+
+        fab_upload = (FloatingActionButton) findViewById(R.id.fab_upload);
+        fab_upload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(PackDetailActivity.this, ImageVideoCaptureActivity.class);
@@ -134,10 +183,18 @@ public class PackDetailActivity extends AbstractAppCompatActivity {
             }
         });
 
+        fab_copy_link = (FloatingActionButton) findViewById(R.id.fab_copy_link);
+        fab_copy_link.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+
         if(topic != null && !topic.isFollowing()) {
-            fab.setVisibility(View.GONE);
+            fab_edit.setVisibility(View.GONE);
         } else {
-            fab.setVisibility(View.VISIBLE);
+            fab_edit.setVisibility(View.VISIBLE);
         }
 
         activity_pack_title = (TextView) findViewById(R.id.activity_pack_title);

@@ -136,13 +136,19 @@ public class UploadVideoAttachmentService extends Service {
         try {
             final File originalFile = new File(selectedInputVideoFilePath);
 
-            File selectedVideoFileDir = UploadVideoAttachmentService.this.getCacheDir();
+            InputStream inputStream = new FileInputStream(originalFile);
+            ContentBody contentBody = new InputStreamBody(inputStream, UUID.randomUUID().toString() + ".mp4");
+            PackAttachmentsCache.open(UploadVideoAttachmentService.this).addSelectedAttachmentVideo(attachmentId, contentBody);
+
+            ExecutorsPool.INSTANCE.submit(new ExecutorTask(attachmentId, packId, topicId, attachmentTitle, attachmentDescription, false, new ExecutorStatus()));
+
+            /*File selectedVideoFileDir = UploadVideoAttachmentService.this.getCacheDir();
             final File selectedVideoFile = File.createTempFile(ApiConstants.APP_NAME, ".mp4", selectedVideoFileDir);
 
             CompressionStatusListenerImpl compressionStatusListener = new CompressionStatusListenerImpl(
                     selectedVideoFile, originalFile, attachmentId, packId, topicId, attachmentTitle, attachmentDescription);
             ImageUtil.compressVideo(UploadVideoAttachmentService.this, selectedInputVideoFilePath,
-                    selectedVideoFile.getAbsolutePath(), compressionStatusListener);
+                    selectedVideoFile.getAbsolutePath(), compressionStatusListener);*/
         } catch (Exception e) {
             Log.d(LOG_TAG, e.getMessage(), e);
         }
@@ -187,7 +193,7 @@ public class UploadVideoAttachmentService extends Service {
         }).start();
     }
 
-    private class CompressionStatusListenerImpl implements CompressionStatusListener {
+   /* private class CompressionStatusListenerImpl implements CompressionStatusListener {
 
         private File originalFile;
 
@@ -255,7 +261,7 @@ public class UploadVideoAttachmentService extends Service {
         boolean isDone() {
             return isDone;
         }
-    }
+    }*/
 
     private class ExecutorTask implements Runnable {
 

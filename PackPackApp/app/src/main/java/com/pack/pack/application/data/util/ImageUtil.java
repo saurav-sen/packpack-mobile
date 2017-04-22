@@ -14,10 +14,10 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 
-import com.github.hiteshsondhi88.libffmpeg.FFmpeg;
+/*import com.github.hiteshsondhi88.libffmpeg.FFmpeg;
 import com.github.hiteshsondhi88.libffmpeg.FFmpegExecuteResponseHandler;
 import com.github.hiteshsondhi88.libffmpeg.FFmpegLoadBinaryResponseHandler;
-import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegNotSupportedException;
+import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegNotSupportedException;*/
 import com.google.android.gms.maps.model.Circle;
 
 import java.io.File;
@@ -42,7 +42,7 @@ public class ImageUtil {
     }
 
     public static void loadFFMpeg(Context context) {
-        try {
+        /*try {
             FFmpeg.getInstance(context).loadBinary(new FFmpegLoadBinaryResponseHandler() {
                 @Override
                 public void onFailure() {
@@ -69,7 +69,7 @@ public class ImageUtil {
         } catch (FFmpegNotSupportedException e) {
             Log.d(LOG_TAG, "[FFMpeg Not Supported] " + e.getMessage(), e);
             ffMpegSupported = false;
-        }
+        }*/
     }
 
     public static Uri getOutputMediaFileUri(int type) {
@@ -211,7 +211,7 @@ public class ImageUtil {
         }
         final String cmd = command;
         String[] compress = new String[] {cmd};
-        if(FFmpeg.getInstance(context).isFFmpegCommandRunning()) {
+        /*if(FFmpeg.getInstance(context).isFFmpegCommandRunning()) {
             FFmpeg.getInstance(context).killRunningProcesses();
         }
         FFmpeg.getInstance(context).execute(compress, new FFmpegExecuteResponseHandler() {
@@ -250,7 +250,7 @@ public class ImageUtil {
                     listener.onFinish();
                 }
             }
-        });
+        });*/
     }
 
     /*public static Bitmap getCirculerBitmap(Bitmap bitmap) {

@@ -18,4 +18,7 @@
     <color name="upload_txt_font">#4e5572</color>
 
     <color name="black_overlay">#66000000</color>
+
+    <color name="fab_upload">#2196F3</color>
+    <color name="fab_copy_link">#43F0BB</color>
 </resources>
