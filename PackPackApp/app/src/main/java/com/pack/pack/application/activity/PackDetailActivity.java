@@ -3,6 +3,7 @@ package com.pack.pack.application.activity;
 import android.Manifest;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -37,8 +38,11 @@ import android.view.animation.AnimationUtils;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -49,9 +53,11 @@ import com.pack.pack.application.adapters.PackAttachmentsAdapter;
 import com.pack.pack.application.data.cache.InMemory;
 import com.pack.pack.application.data.cache.PackAttachmentsCache;
 import com.pack.pack.application.data.util.AbstractNetworkTask;
+import com.pack.pack.application.data.util.IAsyncTaskStatusListener;
 import com.pack.pack.application.db.DBUtil;
 import com.pack.pack.application.db.DbObject;
 import com.pack.pack.application.db.PaginationInfo;
+import com.pack.pack.application.image.loader.DownloadImageTask;
 import com.pack.pack.application.service.UploadImageAttachmentService;
 import com.pack.pack.application.service.UploadResult;
 import com.pack.pack.application.service.UploadVideoAttachmentService;
@@ -65,6 +71,7 @@ import com.pack.pack.common.util.JSONUtil;
 import com.pack.pack.model.web.EntityType;
 import com.pack.pack.model.web.JPack;
 import com.pack.pack.model.web.JPackAttachment;
+import com.pack.pack.model.web.JRssFeed;
 import com.pack.pack.model.web.PackAttachmentType;
 import com.pack.pack.model.web.Pagination;
 import com.pack.pack.services.exception.PackPackException;
@@ -144,15 +151,6 @@ public class PackDetailActivity extends AbstractAppCompatActivity {
         fab_edit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-               /* if(fab_edit.getTag().equals("SHOW")) {
-                    fab_upload.setVisibility(View.VISIBLE);
-                    fab_copy_link.setVisibility(View.VISIBLE);
-                    fab_edit.setTag("HIDE");
-                } else if(fab_edit.getTag().equals("HIDE")) {
-                    fab_upload.setVisibility(View.GONE);
-                    fab_copy_link.setVisibility(View.GONE);
-                    fab_edit.setTag("SHOW");
-                }*/
                 if(showFab){
                     fab_edit.startAnimation(rotate_backward);
                     fab_upload.startAnimation(fab_close);
@@ -187,7 +185,74 @@ public class PackDetailActivity extends AbstractAppCompatActivity {
         fab_copy_link.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                final Dialog copyLinkDialog = new Dialog(PackDetailActivity.this);
+                copyLinkDialog.setContentView(R.layout.copy_link);
+                copyLinkDialog.setTitle("Share External Link");
 
+                final EditText copy_link_url = (EditText) copyLinkDialog.findViewById(R.id.copy_link_url);
+                Button copy_link_ok = (Button) copyLinkDialog.findViewById(R.id.copy_link_ok);
+
+                final RelativeLayout feed_display = (RelativeLayout) copyLinkDialog.findViewById(R.id.feed_display);
+                final ImageView feed_image = (ImageView) copyLinkDialog.findViewById(R.id.feed_image);
+                final TextView feed_title = (TextView) copyLinkDialog.findViewById(R.id.feed_title);
+                final TextView feed_description = (TextView) copyLinkDialog.findViewById(R.id.feed_description);
+
+                final Button copy_link_done = (Button) copyLinkDialog.findViewById(R.id.copy_link_done);
+                copy_link_done.setClickable(false);
+
+                final IAsyncTaskStatusListener listener = new IAsyncTaskStatusListener() {
+                    @Override
+                    public void onPreStart(String taskID) {
+                        copy_link_done.setClickable(false);
+                    }
+
+                    @Override
+                    public void onSuccess(String taskID, Object data) {
+                        JRssFeed feed = null;
+                        if(data != null) {
+                            feed_display.setVisibility(View.VISIBLE);
+                            copy_link_done.setVisibility(View.VISIBLE);
+                            feed = (JRssFeed) data;
+                            feed_display.setTag(feed.getOgUrl());
+                        }
+                        if(feed != null) {
+                            new DownloadImageTask(feed_image, 200, 200, PackDetailActivity.this).execute(feed.getOgImage());
+                            feed_title.setText(feed.getOgTitle());
+                            feed_description.setText(feed.getOgDescription());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(String taskID, String errorMsg) {
+                        feed_display.setVisibility(View.GONE);
+                        copy_link_done.setVisibility(View.GONE);
+                        feed_display.setTag(null);
+                    }
+
+                    @Override
+                    public void onPostComplete(String taskID) {
+
+                    }
+                };
+
+                copy_link_ok.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        String url = copy_link_url.getText() != null ? copy_link_url.getText().toString() : null;
+                        if(url != null && !url.trim().isEmpty()) {
+                            new ReadCopiedLink(PackDetailActivity.this, listener).execute(url);
+                        }
+                    }
+                });
+
+                copy_link_done.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        copyLinkDialog.dismiss();
+                    }
+                });
+
+                copyLinkDialog.show();
             }
         });
 
@@ -599,4 +664,47 @@ public class PackDetailActivity extends AbstractAppCompatActivity {
             }
         }
     };
+
+    private class ReadCopiedLink extends AbstractNetworkTask<String, Integer, JRssFeed> {
+
+        private String errorMsg;
+
+        ReadCopiedLink(Context context, IAsyncTaskStatusListener listener) {
+            super(false, false, false,context, false, true);
+            addListener(listener);
+        }
+
+        @Override
+        protected COMMAND command() {
+            return COMMAND.CRAWL_FEED;
+        }
+
+        @Override
+        protected String getFailureMessage() {
+            return errorMsg;
+        }
+
+        @Override
+        protected JRssFeed executeApi(API api) throws Exception {
+            JRssFeed feed = null;
+            try {
+                feed = (JRssFeed) api.execute();
+            } catch (Exception e) {
+                errorMsg = "Failed reading from external link";
+            }
+            return feed;
+        }
+
+        @Override
+        protected String getContainerIdForObjectStore() {
+            return null;
+        }
+
+        @Override
+        protected Map<String, Object> prepareApiParams(String inputObject) {
+            Map<String, Object> apiParams = new HashMap<String, Object>();
+            apiParams.put(APIConstants.ExternalResource.RESOURCE_URL, inputObject);
+            return apiParams;
+        }
+    }
 }
