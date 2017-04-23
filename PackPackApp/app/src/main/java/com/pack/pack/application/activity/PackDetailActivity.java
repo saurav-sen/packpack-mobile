@@ -129,6 +129,8 @@ public class PackDetailActivity extends AbstractAppCompatActivity {
 
     private boolean showFab = false;
 
+    private JRssFeed selectedFeedForUpload;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -185,6 +187,7 @@ public class PackDetailActivity extends AbstractAppCompatActivity {
         fab_copy_link.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                selectedFeedForUpload = null;
                 final Dialog copyLinkDialog = new Dialog(PackDetailActivity.this);
                 copyLinkDialog.setContentView(R.layout.copy_link);
                 copyLinkDialog.setTitle("Share External Link");
@@ -195,30 +198,27 @@ public class PackDetailActivity extends AbstractAppCompatActivity {
                 final RelativeLayout feed_display = (RelativeLayout) copyLinkDialog.findViewById(R.id.feed_display);
                 final ImageView feed_image = (ImageView) copyLinkDialog.findViewById(R.id.feed_image);
                 final TextView feed_title = (TextView) copyLinkDialog.findViewById(R.id.feed_title);
-                final TextView feed_description = (TextView) copyLinkDialog.findViewById(R.id.feed_description);
+                //final TextView feed_description = (TextView) copyLinkDialog.findViewById(R.id.feed_description);
 
                 final Button copy_link_done = (Button) copyLinkDialog.findViewById(R.id.copy_link_done);
-                copy_link_done.setClickable(false);
 
-                final IAsyncTaskStatusListener listener = new IAsyncTaskStatusListener() {
+                final IAsyncTaskStatusListener testLinkListener = new IAsyncTaskStatusListener() {
                     @Override
                     public void onPreStart(String taskID) {
-                        copy_link_done.setClickable(false);
                     }
 
                     @Override
                     public void onSuccess(String taskID, Object data) {
-                        JRssFeed feed = null;
                         if(data != null) {
                             feed_display.setVisibility(View.VISIBLE);
                             copy_link_done.setVisibility(View.VISIBLE);
-                            feed = (JRssFeed) data;
-                            feed_display.setTag(feed.getOgUrl());
+                            selectedFeedForUpload = (JRssFeed) data;
+                            feed_display.setTag(selectedFeedForUpload.getOgUrl());
                         }
-                        if(feed != null) {
-                            new DownloadImageTask(feed_image, 200, 200, PackDetailActivity.this).execute(feed.getOgImage());
-                            feed_title.setText(feed.getOgTitle());
-                            feed_description.setText(feed.getOgDescription());
+                        if(selectedFeedForUpload != null) {
+                            new DownloadImageTask(feed_image, 200, 200, PackDetailActivity.this).execute(selectedFeedForUpload.getOgImage());
+                            feed_title.setText(selectedFeedForUpload.getOgTitle());
+                            //feed_description.setText(selectedFeedForUpload.getOgDescription());
                         }
                     }
 
@@ -240,15 +240,57 @@ public class PackDetailActivity extends AbstractAppCompatActivity {
                     public void onClick(View v) {
                         String url = copy_link_url.getText() != null ? copy_link_url.getText().toString() : null;
                         if(url != null && !url.trim().isEmpty()) {
-                            new ReadCopiedLink(PackDetailActivity.this, listener).execute(url);
+                            new ReadCopiedLink(PackDetailActivity.this, testLinkListener).execute(url);
                         }
                     }
                 });
 
+                final IAsyncTaskStatusListener uploadLinkListener = new IAsyncTaskStatusListener() {
+                    @Override
+                    public void onPreStart(String taskID) {
+
+                    }
+
+                    @Override
+                    public void onSuccess(String taskID, Object data) {
+                        copyLinkDialog.dismiss();
+                        if(data != null && (data instanceof JPackAttachment)) {
+                            JPackAttachment attachment = (JPackAttachment) data;
+                            adapter.getAttachments().add(attachment);
+                            adapter.notifyDataSetChanged();
+                        } else {
+                            Snackbar.make(activity_pack_title, "Failed to upload link", Snackbar.LENGTH_LONG).show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(String taskID, String errorMsg) {
+                        copyLinkDialog.dismiss();
+                        Snackbar.make(activity_pack_title, "Failed to upload link", Snackbar.LENGTH_LONG).show();
+                    }
+
+                    @Override
+                    public void onPostComplete(String taskID) {
+
+                    }
+                };
+
                 copy_link_done.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        copyLinkDialog.dismiss();
+                        if(selectedFeedForUpload != null) {
+                            ExternalLinkAttchmentData uploadData = new ExternalLinkAttchmentData();
+                            uploadData.setTopicId(pack.getParentTopicId());
+                            uploadData.setPackId(pack.getId());
+                            uploadData.setUserId(AppController.getInstance().getUserId());
+                            uploadData.setTitle(selectedFeedForUpload.getOgTitle());
+                            uploadData.setDescription(selectedFeedForUpload.getOgDescription());
+                            uploadData.setAttachmentUrl(selectedFeedForUpload.getOgUrl());
+                            uploadData.setAttachmentThumbnailUrl(selectedFeedForUpload.getOgImage());
+
+                            new UploadExternalLink(PackDetailActivity.this, uploadLinkListener).execute(uploadData);
+                        }
+                        selectedFeedForUpload = null;
                     }
                 });
 
@@ -705,6 +747,128 @@ public class PackDetailActivity extends AbstractAppCompatActivity {
             Map<String, Object> apiParams = new HashMap<String, Object>();
             apiParams.put(APIConstants.ExternalResource.RESOURCE_URL, inputObject);
             return apiParams;
+        }
+    }
+
+    private class UploadExternalLink extends AbstractNetworkTask<ExternalLinkAttchmentData, Integer, JPackAttachment> {
+
+        private String errorMsg;
+
+        UploadExternalLink(Context context, IAsyncTaskStatusListener listener) {
+            super(false, false, false,context, true, true);
+            addListener(listener);
+        }
+
+        @Override
+        protected COMMAND command() {
+            return COMMAND.ADD_VIDEO_TO_PACK_EXTERNAL_LINK;
+        }
+
+        @Override
+        protected String getFailureMessage() {
+            return errorMsg;
+        }
+
+        @Override
+        protected JPackAttachment executeApi(API api) throws Exception {
+            JPackAttachment attachment = null;
+            try {
+                attachment = (JPackAttachment) api.execute();
+            } catch (Exception e) {
+                errorMsg = "Failed reading to upload new attachment";
+            }
+            return attachment;
+        }
+
+        @Override
+        protected String getContainerIdForObjectStore() {
+            return null;
+        }
+
+        @Override
+        protected Map<String, Object> prepareApiParams(ExternalLinkAttchmentData inputObject) {
+            Map<String, Object> apiParams = new HashMap<String, Object>();
+            apiParams.put(APIConstants.Topic.ID, inputObject.getTopicId());
+            apiParams.put(APIConstants.Pack.ID, inputObject.getPackId());
+            apiParams.put(APIConstants.User.ID, inputObject.getUserId());
+            apiParams.put(APIConstants.Attachment.TITLE, inputObject.getTitle());
+            apiParams.put(APIConstants.Attachment.DESCRIPTION, inputObject.getDescription());
+            apiParams.put(APIConstants.Attachment.ATTACHMENT_URL, inputObject.getAttachmentUrl());
+            apiParams.put(APIConstants.Attachment.ATTACHMENT_THUMBNAIL_URL, inputObject.getAttachmentThumbnailUrl());
+            return apiParams;
+        }
+    }
+
+    private class ExternalLinkAttchmentData {
+
+        private String topicId;
+
+        private String packId;
+
+        private String userId;
+
+        private String title;
+
+        private String description;
+
+        private String attachmentUrl;
+
+        private String attachmentThumbnailUrl;
+
+        public String getTopicId() {
+            return topicId;
+        }
+
+        public void setTopicId(String topicId) {
+            this.topicId = topicId;
+        }
+
+        public String getPackId() {
+            return packId;
+        }
+
+        public void setPackId(String packId) {
+            this.packId = packId;
+        }
+
+        public String getUserId() {
+            return userId;
+        }
+
+        public void setUserId(String userId) {
+            this.userId = userId;
+        }
+
+        public String getTitle() {
+            return title;
+        }
+
+        public void setTitle(String title) {
+            this.title = title;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public void setDescription(String description) {
+            this.description = description;
+        }
+
+        public String getAttachmentUrl() {
+            return attachmentUrl;
+        }
+
+        public void setAttachmentUrl(String attachmentUrl) {
+            this.attachmentUrl = attachmentUrl;
+        }
+
+        public String getAttachmentThumbnailUrl() {
+            return attachmentThumbnailUrl;
+        }
+
+        public void setAttachmentThumbnailUrl(String attachmentThumbnailUrl) {
+            this.attachmentThumbnailUrl = attachmentThumbnailUrl;
         }
     }
 }
