@@ -23,6 +23,8 @@ public interface ApiConstants {
 
     public static final int MIN_DESC_FIELD_LENGTH = 5;
 
+    public static final String YOUTUBE_API_KEY = "AIzaSyBSnFkEf4FvMUq0jPIewO-t3J2EyLBAplA";
+
     /*public static final String[] SUPPORTED_CATEGORIES = new String[] {
             LIFESTYLE, ART, PHOTOGRAPHY, MUSIC, EDUCATION, FUN,
             SPIRITUAL};*/

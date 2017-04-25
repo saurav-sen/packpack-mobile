@@ -257,6 +257,7 @@ public class PackDetailActivity extends AbstractAppCompatActivity {
                         if(data != null && (data instanceof JPackAttachment)) {
                             JPackAttachment attachment = (JPackAttachment) data;
                             adapter.getAttachments().add(attachment);
+                            AppController.getInstance().getPackAttachments().add(attachment);
                             adapter.notifyDataSetChanged();
                         } else {
                             Snackbar.make(activity_pack_title, "Failed to upload link", Snackbar.LENGTH_LONG).show();

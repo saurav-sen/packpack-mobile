@@ -117,9 +117,22 @@ public class FullScreenAttachmentViewAdapter extends PagerAdapter {
             @Override
             public void onClick(View v) {
                 JPackAttachment attachment = attachments.get(currentIndex);
-                Intent intent = new Intent(activity, FullScreenPlayVideoActivity.class);
-                intent.putExtra(FullScreenPlayVideoActivity.VIDEO_URL, attachment.getAttachmentUrl());
-                activity.startActivity(intent);
+                boolean isExternalLink = attachment.isExternalLink();
+
+                if(isExternalLink) {
+                    //String VIDEO_ID = attachment.getExtraMetaData().get("YOUTUBE_VIDEO_ID");
+                    //if((VIDEO_ID != null && !VIDEO_ID.isEmpty())) {
+                    //Intent intent = YouTubeStandalonePlayer.createVideoIntent(activity, ApiConstants.YOUTUBE_API_KEY, VIDEO_ID);
+                    //activity.startActivity(intent);
+                    //}
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setData(Uri.parse(attachment.getAttachmentUrl()));
+                    activity.startActivity(intent);
+                } else {
+                    Intent intent = new Intent(activity, FullScreenPlayVideoActivity.class);
+                    intent.putExtra(FullScreenPlayVideoActivity.VIDEO_URL, attachment.getAttachmentUrl());
+                    activity.startActivity(intent);
+                }
             }
         });
 

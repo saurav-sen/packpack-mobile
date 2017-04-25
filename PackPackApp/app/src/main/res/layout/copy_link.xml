@@ -16,7 +16,10 @@
             android:layout_margin="5dp"
             android:padding="3dp"
             android:layout_weight="0.80"
-            android:hint="Paste or type URL"/>
+            android:hint="Paste or type URL"
+            android:inputType="textMultiLine"
+            android:maxLines="5"
+            android:minLines="1"/>
 
         <Button
             android:id="@+id/copy_link_ok"
