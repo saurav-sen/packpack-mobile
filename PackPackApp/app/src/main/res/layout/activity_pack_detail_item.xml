@@ -84,6 +84,31 @@
         <RelativeLayout
             android:layout_alignParentTop="true"
             android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp">
+            <ImageButton
+                android:id="@+id/edit_story"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/oval_button"
+                android:src="@drawable/edit_story"
+                android:layout_alignParentLeft="true"
+                android:visibility="gone"/>
+            <ImageButton
+                android:id="@+id/read_story"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/oval_button"
+                android:src="@drawable/read_story"
+                android:layout_toRightOf="@id/edit_story"
+                android:layout_alignParentRight="true"
+                android:visibility="gone"/>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_alignParentTop="true"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/pack_attachment_view">
             <ImageView

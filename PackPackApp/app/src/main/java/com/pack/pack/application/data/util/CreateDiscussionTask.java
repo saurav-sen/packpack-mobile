@@ -1,6 +1,7 @@
 package com.pack.pack.application.data.util;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.pack.pack.application.AppController;
 import com.pack.pack.client.api.API;
@@ -17,6 +18,8 @@ import java.util.UUID;
 public class CreateDiscussionTask extends AsyncTask<CreateDiscussionTask.CreateInfo, Integer, JDiscussion> {
 
     private String taskID;
+
+    private static final String LOG_TAG = "CreateDiscussionTask";
 
     public static class CreateInfo {
         public String entityId;
@@ -88,7 +91,7 @@ public class CreateDiscussionTask extends AsyncTask<CreateDiscussionTask.CreateI
             API api = apiBuilder.build();
             discussion = (JDiscussion) api.execute();
         } catch (Exception e) {
-            // e.printStackTrace();
+            Log.d(LOG_TAG, e.getMessage(), e);
         }
         return discussion;
     }

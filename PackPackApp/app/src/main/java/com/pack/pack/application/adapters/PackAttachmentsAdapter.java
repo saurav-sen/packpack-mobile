@@ -22,7 +22,10 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.pack.pack.application.AppController;
+import com.pack.pack.application.Constants;
 import com.pack.pack.application.R;
+import com.pack.pack.application.activity.AttachmentStoryEditActivity;
+import com.pack.pack.application.activity.AttachmentStoryReaderActivity;
 import com.pack.pack.application.activity.FullscreenAttachmentViewActivity;
 import com.pack.pack.application.activity.PackAttachmentCommentsActivity;
 import com.pack.pack.application.data.cache.InMemory;
@@ -30,6 +33,7 @@ import com.pack.pack.application.data.cache.PackAttachmentsCache;
 import com.pack.pack.application.data.util.AbstractNetworkTask;
 import com.pack.pack.application.data.util.ApiConstants;
 import com.pack.pack.application.data.util.DateTimeUtil;
+import com.pack.pack.application.data.util.EditAttachmentStoryTask;
 import com.pack.pack.application.db.DBUtil;
 import com.pack.pack.application.image.loader.DownloadImageTask;
 import com.pack.pack.application.service.UploadImageAttachmentService;
@@ -131,6 +135,30 @@ public class PackAttachmentsAdapter extends ArrayAdapter<JPackAttachment> {
         final TextView user_name = (TextView) convertView.findViewById(R.id.user_name);
         final TextView attachment_create_time = (TextView) convertView.findViewById(R.id.attachment_create_time);
 
+        final ImageButton edit_story = (ImageButton) convertView.findViewById(R.id.edit_story);
+        final ImageButton read_story = (ImageButton) convertView.findViewById(R.id.read_story);
+
+        edit_story.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                JPackAttachment attachment = (JPackAttachment)getItem(position);
+                Intent intent = new Intent(activity, AttachmentStoryEditActivity.class);
+                intent.putExtra(Constants.ATTACHMENT_ID, attachment.getId());
+                activity.startActivity(intent);
+                //activity.startActivityForResult(intent, Constants.ATTACHMENT_LONG_STORY_EDIT_REQUEST_CODE);
+            }
+        });
+
+        read_story.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                JPackAttachment attachment = (JPackAttachment)getItem(position);
+                Intent intent = new Intent(activity, AttachmentStoryReaderActivity.class);
+                intent.putExtra(Constants.ATTACHMENT_ID, attachment.getId());
+                activity.startActivity(intent);
+            }
+        });
+
         final ImageButton  deleteAttachment = (ImageButton) convertView.findViewById(R.id.deleteAttachment);
         if(AppController.getInstance().getUserId().equals(topic.getOwnerId())) {
             deleteAttachment.setVisibility(View.VISIBLE);
@@ -151,6 +179,9 @@ public class PackAttachmentsAdapter extends ArrayAdapter<JPackAttachment> {
         if(attachment != null) {
             JUser creator = attachment.getCreator();
             if(creator != null) {
+                if(AppController.getInstance().getUserId().equals(creator.getId())) {
+                    edit_story.setVisibility(View.VISIBLE);
+                }
                 user_name.setText(creator.getName());
                 long t1 = attachment.getCreationTime();
                 long t2 = InMemory.INSTANCE.getServerCurrentTimeInMillis();
@@ -160,6 +191,9 @@ public class PackAttachmentsAdapter extends ArrayAdapter<JPackAttachment> {
                         && !creator.getProfilePictureUrl().trim().isEmpty()) {
                     new DownloadImageTask(user_profile_picture, getContext()).execute(creator.getProfilePictureUrl());
                 }
+            }
+            if(attachment.getStoryId() != null) {
+                read_story.setVisibility(View.VISIBLE);
             }
         }
 

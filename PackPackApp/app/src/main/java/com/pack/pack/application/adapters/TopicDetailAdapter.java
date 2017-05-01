@@ -224,7 +224,11 @@ public class TopicDetailAdapter extends ArrayAdapter<JPack> {
                 List<String> imageUrls = new ArrayList<String>();
                 for(int j=0; j<attachments.size(); j++) {
                     JPackAttachment attachment = attachments.get(j);
-                    imageUrls.add(attachment.getAttachmentUrl());//.getAttachmentThumbnailUrl());
+                    if("VIDEO".equalsIgnoreCase(attachment.getMimeType())) {
+                        imageUrls.add(attachment.getAttachmentThumbnailUrl());
+                    } else {
+                        imageUrls.add(attachment.getAttachmentUrl());
+                    }
                 }
                 adapter.getImageUrls().addAll(imageUrls);
                 packAttachmentsGrid.setAdapter(adapter);
