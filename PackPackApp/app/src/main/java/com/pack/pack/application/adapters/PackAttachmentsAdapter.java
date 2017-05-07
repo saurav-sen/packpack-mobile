@@ -9,6 +9,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
+import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,6 +35,7 @@ import com.pack.pack.application.data.util.AbstractNetworkTask;
 import com.pack.pack.application.data.util.ApiConstants;
 import com.pack.pack.application.data.util.DateTimeUtil;
 import com.pack.pack.application.data.util.EditAttachmentStoryTask;
+import com.pack.pack.application.data.util.IAsyncTaskStatusListener;
 import com.pack.pack.application.db.DBUtil;
 import com.pack.pack.application.image.loader.DownloadImageTask;
 import com.pack.pack.application.service.UploadImageAttachmentService;
@@ -42,11 +44,13 @@ import com.pack.pack.application.topic.activity.model.ParcelablePack;
 import com.pack.pack.application.topic.activity.model.ParcelableTopic;
 import com.pack.pack.application.view.CircleImageView;
 import com.pack.pack.client.api.API;
+import com.pack.pack.client.api.APIBuilder;
 import com.pack.pack.client.api.APIConstants;
 import com.pack.pack.client.api.COMMAND;
 import com.pack.pack.model.web.JPackAttachment;
 import com.pack.pack.model.web.JUser;
 import com.pack.pack.model.web.PackAttachmentType;
+import com.pack.pack.model.web.PromoteStatus;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -80,6 +84,8 @@ public class PackAttachmentsAdapter extends ArrayAdapter<JPackAttachment> {
     private ParcelableTopic topic;
 
     private ParcelablePack pack;
+
+    private View view;
 
     private static final String LOG_TAG = "PackAttachmentsAdapter";
 
@@ -128,6 +134,10 @@ public class PackAttachmentsAdapter extends ArrayAdapter<JPackAttachment> {
         if(convertView == null) {
             convertView = inflater.inflate(R.layout.activity_pack_detail_item, null);
         }
+        if(view == null) {
+            this.view = convertView;
+        }
+
         final TextView pack_attachment_title = (TextView) convertView.findViewById(R.id.pack_attachment_title);
         final TextView pack_attachment_description = (TextView) convertView.findViewById(R.id.pack_attachment_description);
 
@@ -257,7 +267,8 @@ public class PackAttachmentsAdapter extends ArrayAdapter<JPackAttachment> {
         pack_attachment_share.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                shareImage(position);
+                //shareImage(position);
+                shareJPackAttachment(position);
             }
         });
 
@@ -338,40 +349,140 @@ public class PackAttachmentsAdapter extends ArrayAdapter<JPackAttachment> {
         new AddLikeTask().execute(id);
     }
 
+    private void shareJPackAttachment(int position) {
+        JPackAttachment attachment = getItem(position);
+        PromoteAttachmentTask task = new PromoteAttachmentTask(getContext());
+        task.addListener(new IAsyncTaskStatusListener() {
+            @Override
+            public void onPreStart(String taskID) {
+            }
+
+            @Override
+            public void onSuccess(String taskID, Object data) {
+                String publicUrl = (String) data;
+                shareUrl(publicUrl);
+            }
+
+            @Override
+            public void onFailure(String taskID, String errorMsg) {
+                Snackbar.make(view, errorMsg, Snackbar.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onPostComplete(String taskID) {
+            }
+        });
+        task.execute(attachment);
+        /*String userId = AppController.getInstance().getUserId();
+        API api = APIBuilder.create(ApiConstants.PUBLIC_ENDPOINT_BASE_URL)
+                .setAction(COMMAND.PROMOTE_PACK_ATTACHMENT)
+                .addApiParam(APIConstants.PackAttachment.ID, attachment.getId())
+                .addApiParam(APIConstants.User.ID, userId)
+                .build();*/
+    }
+
+    private class PromoteAttachmentTask extends AbstractNetworkTask<JPackAttachment, Integer, String> {
+
+        public PromoteAttachmentTask(Context context) {
+            super(false, false, false, context, false, true);
+        }
+
+        private String errorMsg;
+
+        @Override
+        protected String getContainerIdForObjectStore() {
+            return null;
+        }
+
+        @Override
+        protected String getBaseUrl() {
+            return ApiConstants.PUBLIC_ENDPOINT_BASE_URL;
+        }
+
+        @Override
+        protected COMMAND command() {
+            return COMMAND.PROMOTE_PACK_ATTACHMENT;
+        }
+
+        @Override
+        protected Map<String, Object> prepareApiParams(JPackAttachment inputObject) {
+            String userId = AppController.getInstance().getUserId();
+            Map<String, Object> apiParams = new HashMap<String, Object>();
+            apiParams.put(APIConstants.PackAttachment.ID, inputObject.getId());
+            apiParams.put(APIConstants.User.ID, userId);
+            return apiParams;
+        }
+
+        @Override
+        protected String executeApi(API api) throws Exception {
+            PromoteStatus status = null;
+            try {
+                status = (PromoteStatus) api.execute();
+                if(status != null) {
+                    return status.getPublicUrl();
+                }
+                return null;
+            } catch (Exception e) {
+                errorMsg = "Failed generating publicly accessible URL";
+                throw e;
+            }
+        }
+
+        @Override
+        protected String getFailureMessage() {
+            return errorMsg;
+        }
+    }
+
+    private void shareUrl(String url) {
+        Intent share = new Intent(Intent.ACTION_SEND);
+        share.setType("text/plain");
+        share.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+
+        share.putExtra(Intent.EXTRA_TEXT, url);
+
+        getContext().startActivity(share);
+    }
+
     private void shareImage(int position) {
         Intent share = new Intent(Intent.ACTION_SEND);
         share.setType("image/*");
         JPackAttachment attachment = getItem(position);
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        if("VIDEO".equalsIgnoreCase(attachment.getMimeType())) {
+
+        }
         Bitmap bitmap = AppController.getInstance().getLruBitmapCache().getBitmap(attachment.getAttachmentUrl());
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 60, byteArrayOutputStream);
-        String fileName = attachment.getTitle();
-        if(fileName == null) {
-            fileName = UUID.randomUUID().toString();
-        }
-        File shareFile = new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_DOWNLOADS) +
-                File.separator + fileName + ".jpeg");
-       // File shareFile = null;
-        FileOutputStream fileOutputStream = null;
-        try {
-            boolean bool = shareFile.createNewFile();
-            if(!bool) {
-                return;
+        if(bitmap != null) {
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 60, byteArrayOutputStream);
+            String fileName = attachment.getTitle();
+            if(fileName == null) {
+                fileName = UUID.randomUUID().toString();
             }
-            fileOutputStream = new FileOutputStream(shareFile);
-            fileOutputStream.write(byteArrayOutputStream.toByteArray());
-            fileOutputStream.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+            File shareFile = new File(Environment.getExternalStoragePublicDirectory(
+                    Environment.DIRECTORY_DOWNLOADS) +
+                    File.separator + fileName + ".jpeg");
+            // File shareFile = null;
+            FileOutputStream fileOutputStream = null;
+            try {
+                boolean bool = shareFile.createNewFile();
+                if(!bool) {
+                    return;
+                }
+                fileOutputStream = new FileOutputStream(shareFile);
+                fileOutputStream.write(byteArrayOutputStream.toByteArray());
+                fileOutputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
-        if(shareFile != null) {
-            Uri fileUri = Uri.fromFile(shareFile);
-            share.putExtra(Intent.EXTRA_STREAM, fileUri);
-            share.putExtra(Intent.EXTRA_SUBJECT, attachment.getTitle());
+            if(shareFile != null) {
+                Uri fileUri = Uri.fromFile(shareFile);
+                share.putExtra(Intent.EXTRA_STREAM, fileUri);
+                share.putExtra(Intent.EXTRA_SUBJECT, attachment.getTitle());
 
-            getContext().startActivity(share);
+                getContext().startActivity(share);
+            }
         }
     }
 

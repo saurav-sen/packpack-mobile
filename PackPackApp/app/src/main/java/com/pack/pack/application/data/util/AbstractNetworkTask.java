@@ -355,7 +355,7 @@ public abstract class AbstractNetworkTask<X, Y, Z> extends AsyncTask<X, Y, Z> {
     protected final Z doExecuteInBackground(X x) {
         try {
             String oAuthToken = AppController.getInstance().getoAuthToken();
-            APIBuilder builder = APIBuilder.create(ApiConstants.BASE_URL).setAction(command())
+            APIBuilder builder = APIBuilder.create(getBaseUrl()).setAction(command())
                     .setOauthToken(oAuthToken);
             Map<String, Object> apiParams = prepareApiParams(x);
             if(apiParams != null && !apiParams.isEmpty()) {
@@ -373,6 +373,10 @@ public abstract class AbstractNetworkTask<X, Y, Z> extends AsyncTask<X, Y, Z> {
             e.printStackTrace();;
         }
         return successResult;
+    }
+
+    protected String getBaseUrl() {
+        return ApiConstants.BASE_URL;
     }
 
     private Z doExecuteApi(API api) throws Exception {
