@@ -3,6 +3,10 @@ package com.pack.pack.application.activity;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.os.Environment;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -13,6 +17,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -48,8 +53,14 @@ import com.pack.pack.model.web.EntityType;
 import com.pack.pack.model.web.JTopic;
 import com.pack.pack.model.web.JUser;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import io.branch.invite.SimpleInviteBuilder;
 import io.branch.referral.Branch;
@@ -70,6 +81,8 @@ public class TopicDetailActivity extends AbstractAppCompatActivity implements On
     private GoogleMap gMap;
 
     private ImageButton invitePeople;
+
+    private static final String LOG_TAG = "TopicDetailActivity";
 
    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -225,7 +238,8 @@ public class TopicDetailActivity extends AbstractAppCompatActivity implements On
         shareTopic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                File file = createScreenCast(view);
+                shareImage(file);
             }
         });
 
@@ -242,6 +256,58 @@ public class TopicDetailActivity extends AbstractAppCompatActivity implements On
         if(gMapAvailable) {
             initializeGMap();
         }
+    }
+
+    private void shareImage(File file) {
+        if(file == null || !file.exists()) {
+            return;
+        }
+
+        Uri uri = Uri.fromFile(file);
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_SEND);
+        intent.setType("image/*");
+
+        intent.putExtra(Intent.EXTRA_SUBJECT, "");
+        intent.putExtra(Intent.EXTRA_TEXT, "Checkout my vision " + topic.getTopicName() + " @ SQUILL");
+        intent.putExtra(Intent.EXTRA_STREAM, uri);
+
+        startActivity(Intent.createChooser(intent, "Share My Vision"));
+    }
+
+    private File createScreenCast(View view) {
+        File file = null;
+        View rootView = getWindow().getDecorView().findViewById(R.id.mainLayout);
+        View screenView = rootView.getRootView();
+        screenView.setDrawingCacheEnabled(true);
+        Bitmap screenCast = Bitmap.createBitmap(screenView.getDrawingCache());
+        screenView.setDrawingCacheEnabled(false);
+        //String dirPath = TopicDetailActivity.this.getCacheDir().getAbsolutePath() + File.separator + "screencasts";
+        String dirPath = Environment.getExternalStorageDirectory() + File.separator + "screencasts";
+        File dir = new File(dirPath);
+        if(!dir.exists()) {
+            dir.mkdir();
+        }
+        String fileName = UUID.randomUUID().toString() + ".jpg";
+        file = new File(dirPath + File.separator + fileName);
+        OutputStream outputStream = null;
+        try {
+            outputStream = new FileOutputStream(file);
+            screenCast.compress(Bitmap.CompressFormat.JPEG, 85, outputStream);
+            outputStream.flush();
+        } catch (IOException e) {
+            Log.e(LOG_TAG, "Failed To Save Screencast", e);
+            Snackbar.make(view, "Failed To Share", Snackbar.LENGTH_LONG);
+        } finally {
+            try {
+                if(outputStream != null) {
+                    outputStream.close();
+                }
+            } catch (IOException e) {
+                Log.e(LOG_TAG, "Failed Closing Output Stream", e);
+            }
+        }
+        return file;
     }
 
     @Override
