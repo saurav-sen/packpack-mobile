@@ -1,39 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:fitsSystemWindows="true"
+    tools:context="com.pack.pack.application.activity.PackDetailActivity"
     android:id="@+id/mainLayout">
 
-    <TextView
+    <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/pack_attachment_like_count_box"
-        android:text=""
-        android:maxLines="1"
-        android:minLines="1"
-        android:layout_margin="16dp"
-        android:layout_weight="0"/>
+        android:theme="@style/AppTheme.AppBarOverlay">
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="0.2dp"
-        android:id="@+id/divider"
-        android:background="@color/light_dark"
-        android:layout_weight="0"/>
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:popupTheme="@style/AppTheme.PopupOverlay" />
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/pack_attachment_comment_recycler_view"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"/>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="0.2dp"
-        android:id="@+id/divider2"
-        android:background="@color/light_dark"
-        android:layout_weight="0"/>
+    </android.support.design.widget.AppBarLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -46,10 +33,11 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:id="@+id/pack_attachment_comment_edit_text"
-            android:background="@null"
+            android:background="@drawable/edit_text_border"
             android:paddingLeft="16dp"
             android:textSize="16sp"
-            android:maxLines="4"
+            android:maxLines="8"
+            android:minLines="5"
             android:inputType="textMultiLine"
             android:hint="Add a comment here" />
 
@@ -58,8 +46,99 @@
             android:layout_height="40dp"
             android:id="@+id/pack_attachment_add_comment_btn"
             android:src="@drawable/ic_action_send_now"
+            android:background="@drawable/oval_button"
+            android:layout_margin="3dp"
             android:layout_weight="0" />
 
     </LinearLayout>
 
-</LinearLayout>
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingBottom="5dp"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="5dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        tools:context="com.pack.pack.application.activity.PackAttachmentCommentsActivity"
+        tools:showIn="@layout/activity_attachment_comments"
+        android:orientation="vertical">
+
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/attachment_comments_list"
+            android:paddingTop="10dp"
+            android:scaleType="fitXY"
+            android:divider="@null"/>
+
+    </LinearLayout>
+
+</android.support.design.widget.CoordinatorLayout>
+
+    <!--LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical" android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        android:id="@+id/mainLayout">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/pack_attachment_like_count_box"
+            android:text=""
+            android:maxLines="1"
+            android:minLines="1"
+            android:layout_margin="16dp"
+            android:layout_weight="0"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.2dp"
+            android:id="@+id/divider"
+            android:background="@color/light_dark"
+            android:layout_weight="0"/>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/pack_attachment_comment_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.2dp"
+            android:id="@+id/divider2"
+            android:background="@color/light_dark"
+            android:layout_weight="0"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0"
+            android:orientation="horizontal">
+
+            <EditText
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:id="@+id/pack_attachment_comment_edit_text"
+                android:background="@null"
+                android:paddingLeft="16dp"
+                android:textSize="16sp"
+                android:maxLines="5"
+                android:inputType="textMultiLine"
+                android:hint="Add a comment here" />
+
+            <ImageButton
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:id="@+id/pack_attachment_add_comment_btn"
+                android:src="@drawable/ic_action_send_now"
+                android:layout_weight="0" />
+
+        </LinearLayout>
+
+    </LinearLayout-->

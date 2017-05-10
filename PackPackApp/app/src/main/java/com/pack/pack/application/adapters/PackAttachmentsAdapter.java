@@ -481,7 +481,11 @@ public class PackAttachmentsAdapter extends ArrayAdapter<JPackAttachment> {
                 share.putExtra(Intent.EXTRA_STREAM, fileUri);
                 share.putExtra(Intent.EXTRA_SUBJECT, attachment.getTitle());
 
-                getContext().startActivity(share);
+                if(attachment.getMimeType().equals("VIDEO")) {
+                    getContext().startActivity(Intent.createChooser(share, "Share Video"));
+                } else {
+                    getContext().startActivity(Intent.createChooser(share, "Share Photograps"));
+                }
             }
         }
     }
