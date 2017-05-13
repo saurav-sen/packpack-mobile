@@ -3,12 +3,15 @@ package com.pack.pack.application.activity;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
@@ -29,6 +32,8 @@ import com.pack.pack.model.web.JComments;
 import com.pack.pack.model.web.JPackAttachment;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -51,10 +56,16 @@ public class PackAttachmentCommentsActivity extends AbstractAppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_attachment_comments);
 
+        /*Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);*/
+
         this.packAttachmentId = getIntent().getStringExtra(AppController.PACK_ATTACHMENT_ID_KEY);
         if(packAttachmentId != null && !packAttachmentId.trim().isEmpty()) {
             pack_attachment_comment_edit_text = (EditText) findViewById(R.id.pack_attachment_comment_edit_text);
-            ImageButton pack_attachment_add_comment_btn = (ImageButton) findViewById(R.id.pack_attachment_add_comment_btn);
+            Button pack_attachment_add_comment_btn = (Button) findViewById(R.id.pack_attachment_add_comment_btn);
             pack_attachment_add_comment_btn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -125,6 +136,12 @@ public class PackAttachmentCommentsActivity extends AbstractAppCompatActivity {
             }
             JComments comments = (JComments) data;
             if(comments != null) {
+                Collections.sort(comments.getComments(), new Comparator<JComment>() {
+                    @Override
+                    public int compare(JComment lhs, JComment rhs) {
+                        return (int) (lhs.getDateTime() - rhs.getDateTime());
+                    }
+                });
                 commentsAdapter.getComments().addAll(comments.getComments());
                 commentsAdapter.notifyDataSetChanged();
             }
@@ -170,7 +187,7 @@ public class PackAttachmentCommentsActivity extends AbstractAppCompatActivity {
 
         @Override
         protected COMMAND command() {
-            return COMMAND.GET_PACK_ATTACHMENT_BY_ID;
+            return COMMAND.GET_ALL_ATTACHMENT_COMMENTS;
         }
     }
 
@@ -281,6 +298,7 @@ public class PackAttachmentCommentsActivity extends AbstractAppCompatActivity {
                 commentsAdapter.getComments().add(comment);
                 commentsAdapter.notifyDataSetChanged();
             }
+            pack_attachment_comment_edit_text.setText("");
         }
     }
 }

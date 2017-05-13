@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="com.pack.pack.application.activity.PackDetailActivity"
+    tools:context="com.pack.pack.application.activity.PackAttachmentCommentsActivity"
     android:id="@+id/mainLayout">
 
     <android.support.design.widget.AppBarLayout
@@ -22,36 +22,6 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="0"
-        android:orientation="horizontal">
-
-        <EditText
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:id="@+id/pack_attachment_comment_edit_text"
-            android:background="@drawable/edit_text_border"
-            android:paddingLeft="16dp"
-            android:textSize="16sp"
-            android:maxLines="8"
-            android:minLines="5"
-            android:inputType="textMultiLine"
-            android:hint="Add a comment here" />
-
-        <ImageButton
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:id="@+id/pack_attachment_add_comment_btn"
-            android:src="@drawable/ic_action_send_now"
-            android:background="@drawable/oval_button"
-            android:layout_margin="3dp"
-            android:layout_weight="0" />
-
-    </LinearLayout>
-
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
@@ -62,13 +32,43 @@
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:paddingTop="5dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        tools:context="com.pack.pack.application.activity.PackAttachmentCommentsActivity"
-        tools:showIn="@layout/activity_attachment_comments"
         android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:id="@+id/pack_attachment_comment_edit_text"
+                android:background="@drawable/edit_text_border"
+                android:paddingLeft="16dp"
+                android:textSize="16sp"
+                android:maxLines="8"
+                android:minLines="5"
+                android:inputType="textMultiLine"
+                android:hint="Add a comment here" />
+
+            <Button
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:id="@+id/pack_attachment_add_comment_btn"
+                android:text="Go"
+                android:textAllCaps="false"
+                android:textStyle="normal"
+                android:background="@drawable/oval_button"
+                android:layout_gravity="center_vertical"
+                android:layout_margin="3dp"
+                android:layout_weight="0" />
+
+        </LinearLayout>
 
         <ListView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:id="@+id/attachment_comments_list"
             android:paddingTop="10dp"
             android:scaleType="fitXY"
