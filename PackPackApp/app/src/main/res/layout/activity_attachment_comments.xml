@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     tools:context="com.pack.pack.application.activity.PackAttachmentCommentsActivity"
-    android:id="@+id/mainLayout">
+    android:id="@+id/mainLayout_comment">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
