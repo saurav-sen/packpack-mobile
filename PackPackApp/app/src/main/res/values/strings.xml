@@ -34,4 +34,17 @@
         <item>fun</item>
         <item>spiritual</item>
     </string-array>
+
+    <string name="next">Next</string>
+    <string name="skip">Skip</string>
+    <string name="start">GOT IT</string>
+
+    <string name="intro_slide_1_title">Explore</string>
+    <string name="intro_slide_1_desc">Explore the Network Of Artists, Painters, Musician, Philosopher and many more..</string>
+
+    <string name="intro_slide_2_title">Vision</string>
+    <string name="intro_slide_2_desc">Launch your own vision of work of art and drag followers</string>
+
+    <string name="intro_slide_3_title">Stay Updated</string>
+    <string name="intro_slide_3_desc">With SQUILL stay updated with latest happening and know-how in the world of art and culture</string>
 </resources>

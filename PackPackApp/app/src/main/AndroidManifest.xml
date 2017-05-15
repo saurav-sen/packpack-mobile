@@ -24,11 +24,11 @@
             android:name=".activity.SplashActivity"
             android:label="Squill"
             android:theme="@style/splashScreenTheme">
-            <intent-filter>
+            <!--intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+            </intent-filter-->
         </activity>
         <activity
             android:name=".activity.LoginActivity"
@@ -135,7 +135,19 @@
 
         <activity android:name=".activity.NoConnectionEmptyActivity" />
         <activity android:name=".activity.AttachmentStoryEditActivity" />
-        <activity android:name=".activity.AttachmentStoryReaderActivity"></activity>
+        <activity android:name=".activity.AttachmentStoryReaderActivity" />
+        <activity android:name=".activity.IntroMainActivity"
+            android:label="Squill"
+            android:theme="@style/introMainScreenTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".activity.WelcomeActivity"
+            android:label="Squill"
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>
