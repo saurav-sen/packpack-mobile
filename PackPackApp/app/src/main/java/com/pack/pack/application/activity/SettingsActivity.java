@@ -23,6 +23,7 @@ import android.widget.BaseAdapter;
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
 import com.pack.pack.application.data.util.ApiConstants;
+import com.pack.pack.application.data.util.UserUtil;
 import com.pack.pack.application.topic.activity.model.ParcelableTopic;
 import com.pack.pack.application.view.ProfilePicturePreference;
 import com.pack.pack.client.api.API;
@@ -74,6 +75,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             String key = preference.getKey();
             String value = o.toString();
             preference.setDefaultValue(value);
+            preference.setTitle(value);
             ParcelableTopic topic = (ParcelableTopic) preference.getExtras().getParcelable(PARCELABLE_TOPIC_KEY);
             if(topic != null) {
                 key = key.substring(key.indexOf(".")+1);
@@ -82,6 +84,10 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 new UpdateTopicSettingsTask().execute(topicPreferenceSettingses);
             } else if(UserSettings.DISPLAY_NAME.equals(key) || UserSettings.USER_ADDRESS.equals(key)){
                 PreferenceObj preferenceObj = new PreferenceObj(key, value);
+                JUser user = AppController.getInstance().getUser();
+                if(UserSettings.DISPLAY_NAME.equals(key)) {
+                    user.setDisplayName(value);
+                }
                 new UpdateUserSettings().execute(preferenceObj);
             }
             return true;
@@ -175,10 +181,17 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             Preference displayName = findPreference(UserSettings.DISPLAY_NAME);
             JUser user = AppController.getInstance().getUser();
             if(user != null) {
-                displayName.setDefaultValue(user.getName());
-                displayName.setTitle(user.getName());
+                displayName.setDefaultValue(UserUtil.resolveUserDisplayName(user));
+                displayName.setTitle(UserUtil.resolveUserDisplayName(user));
             }
             bindPreferenceSummaryToValue(displayName);
+
+            /*Preference userName = findPreference(UserSettings.USER_NAME);
+            if(user != null) {
+                userName.setDefaultValue(user.getName());
+                userName.setTitle(user.getName());
+            }
+            bindPreferenceSummaryToValue(userName);*/
 
             Preference user_addr = findPreference(UserSettings.USER_ADDRESS);
             if(user != null) {

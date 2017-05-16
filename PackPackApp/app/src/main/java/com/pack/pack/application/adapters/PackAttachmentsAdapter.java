@@ -36,6 +36,7 @@ import com.pack.pack.application.data.util.ApiConstants;
 import com.pack.pack.application.data.util.DateTimeUtil;
 import com.pack.pack.application.data.util.EditAttachmentStoryTask;
 import com.pack.pack.application.data.util.IAsyncTaskStatusListener;
+import com.pack.pack.application.data.util.UserUtil;
 import com.pack.pack.application.db.DBUtil;
 import com.pack.pack.application.image.loader.DownloadImageTask;
 import com.pack.pack.application.service.UploadImageAttachmentService;
@@ -192,7 +193,7 @@ public class PackAttachmentsAdapter extends ArrayAdapter<JPackAttachment> {
                 if(AppController.getInstance().getUserId().equals(creator.getId())) {
                     edit_story.setVisibility(View.VISIBLE);
                 }
-                user_name.setText(creator.getName());
+                user_name.setText(UserUtil.resolveUserDisplayName(creator));
                 long t1 = attachment.getCreationTime();
                 long t2 = InMemory.INSTANCE.getServerCurrentTimeInMillis();
                 attachment_create_time.setText(DateTimeUtil.sentencify(t1, t2));

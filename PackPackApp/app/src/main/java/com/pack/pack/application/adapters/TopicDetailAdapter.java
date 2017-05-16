@@ -22,6 +22,7 @@ import com.pack.pack.application.activity.PackDetailActivity;
 import com.pack.pack.application.data.cache.InMemory;
 import com.pack.pack.application.data.util.AbstractNetworkTask;
 import com.pack.pack.application.data.util.DateTimeUtil;
+import com.pack.pack.application.data.util.UserUtil;
 import com.pack.pack.application.db.DBUtil;
 import com.pack.pack.application.image.loader.DownloadImageTask;
 import com.pack.pack.application.topic.activity.model.ParcelablePack;
@@ -139,7 +140,7 @@ public class TopicDetailAdapter extends ArrayAdapter<JPack> {
             JUser creator = pack.getCreator();
             if(creator != null) {
                 if(creator.getName() != null) {
-                    pack_creator_name.setText(creator.getName());
+                    pack_creator_name.setText(UserUtil.resolveUserDisplayName(creator));
                 }
                 String profilePictureUrl = creator.getProfilePictureUrl();
                 pack_creator_picture.setImageResource(R.drawable.default_profile_picture_big);

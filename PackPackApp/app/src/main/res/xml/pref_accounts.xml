@@ -6,6 +6,14 @@
         android:key="profilePicPref"
         android:summary="" />
 
+    <!--EditTextPreference
+        android:capitalize="words"
+        android:defaultValue=""
+        android:inputType="textCapWords"
+        android:maxLines="1"
+        android:singleLine="true"
+        android:key="user_name"/-->
+
     <EditTextPreference
         android:capitalize="words"
         android:defaultValue=""
