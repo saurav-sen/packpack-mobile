@@ -1,5 +1,7 @@
 package com.pack.pack.application.data.util;
 
+import android.util.Patterns;
+
 import com.pack.pack.model.web.JUser;
 
 /**
@@ -17,5 +19,12 @@ public class UserUtil {
             return user.getName();
         }
         return displayName;
+    }
+
+    public static final boolean isValidEmailAddressFormat(CharSequence emailAddr) {
+        if(emailAddr == null) {
+            return false;
+        }
+        return Patterns.EMAIL_ADDRESS.matcher(emailAddr).matches();
     }
 }

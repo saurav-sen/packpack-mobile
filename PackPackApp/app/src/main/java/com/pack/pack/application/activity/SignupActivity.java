@@ -31,6 +31,7 @@ import com.pack.pack.application.data.util.AbstractNetworkTask;
 import com.pack.pack.application.data.util.ApiConstants;
 import com.pack.pack.application.data.util.IAsyncTaskStatusListener;
 import com.pack.pack.application.data.util.LoginTask;
+import com.pack.pack.application.data.util.UserUtil;
 import com.pack.pack.application.db.UserInfo;
 import com.pack.pack.application.service.FetchAddressIntentService;
 import com.pack.pack.client.api.API;
@@ -63,6 +64,7 @@ public class SignupActivity extends AbstractAppCompatActivity {
     private EditText input_name;
     private EditText input_email;
     private EditText input_password;
+    private EditText input_password_confirm;
     private EditText input_city;
     private EditText input_country;
     private AppCompatButton btn_signup;
@@ -92,6 +94,7 @@ public class SignupActivity extends AbstractAppCompatActivity {
         input_name = (EditText) findViewById(R.id.input_name);
         input_email = (EditText) findViewById(R.id.input_email);
         input_password = (EditText) findViewById(R.id.input_password);
+        input_password_confirm = (EditText) findViewById(R.id.input_password_confirm);
         input_city = (EditText) findViewById(R.id.input_city);
         input_country = (EditText) findViewById(R.id.input_country);
         btn_signup = (AppCompatButton) findViewById(R.id.btn_signup);
@@ -186,30 +189,51 @@ public class SignupActivity extends AbstractAppCompatActivity {
     private void goToNextPage() {
         String email = input_email.getText() != null ? input_email.getText().toString().trim() : null;
         String passwd = input_password.getText() != null ? input_password.getText().toString().trim() : null;
+        String passwd2 = input_password_confirm.getText() != null ? input_password_confirm.getText().toString().trim() : null;
         String name = input_name.getText() != null ? input_name.getText().toString().trim() : null;
         String city = input_city.getText() != null ? input_city.getText().toString().trim() : null;
         String country = input_country.getText() != null ? input_country.getText().toString().trim() : null;
 
         boolean valid = true;
-        if(email == null || email.isEmpty()) {
+        boolean isPasswd = true;
+        boolean isPasswd2 = true;
+        if(email == null || email.trim().isEmpty()) {
             Snackbar.make(input_email, "Email is empty", Snackbar.LENGTH_LONG).show();
             valid = false;
         }
-        if(passwd == null || passwd.isEmpty()) {
+        if(passwd == null || passwd.trim().isEmpty()) {
             Snackbar.make(input_password, "Password is empty", Snackbar.LENGTH_LONG).show();
             valid = false;
+            isPasswd = false;
         }
-        if(name == null || name.isEmpty()) {
+        if(passwd2 == null || passwd2.trim().isEmpty()) {
+            Snackbar.make(input_password_confirm, "Confirm Password is empty", Snackbar.LENGTH_LONG).show();
+            valid = false;
+            isPasswd2 = false;
+        }
+        if(name == null || name.trim().isEmpty()) {
             Snackbar.make(input_name, "Name is empty", Snackbar.LENGTH_LONG).show();
             valid = false;
         }
-        if(city == null || city.isEmpty()) {
+        if(city == null || city.trim().isEmpty()) {
             Snackbar.make(input_city, "City is empty", Snackbar.LENGTH_LONG).show();
             valid = false;
         }
-        if(country == null || country.isEmpty()) {
+        if(country == null || country.trim().isEmpty()) {
             Snackbar.make(input_country, "Country is empty", Snackbar.LENGTH_LONG).show();
             valid = false;
+        }
+
+        if(isPasswd && isPasswd2 && !passwd.equals(passwd2)) {
+            Snackbar.make(input_password, "Password did not match", Snackbar.LENGTH_LONG).show();
+            valid = false;
+        }
+
+        if(valid) {
+            if(!UserUtil.isValidEmailAddressFormat(email)) {
+                Snackbar.make(input_email, "Email address is invalid", Snackbar.LENGTH_LONG).show();
+                valid = false;
+            }
         }
 
         if(!valid)

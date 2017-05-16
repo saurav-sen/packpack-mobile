@@ -91,7 +91,7 @@
                 android:id="@+id/edit_story"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/oval_button"
+                android:background="@null"
                 android:src="@drawable/edit_story"
                 android:layout_alignParentLeft="true"
                 android:visibility="gone"/>
@@ -99,7 +99,7 @@
                 android:id="@+id/read_story"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/oval_button"
+                android:background="@null"
                 android:src="@drawable/read_story"
                 android:layout_toRightOf="@id/edit_story"
                 android:layout_alignParentRight="true"

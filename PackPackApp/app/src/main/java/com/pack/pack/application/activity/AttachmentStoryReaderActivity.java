@@ -10,6 +10,8 @@ import com.pack.pack.application.data.util.FetchAttachmentStoryTask;
 import com.pack.pack.application.data.util.IAsyncTaskStatusListener;
 import com.pack.pack.application.view.RTFListener;
 
+import org.apache.commons.lang3.StringEscapeUtils;
+
 public class AttachmentStoryReaderActivity extends AbstractActivity implements IAsyncTaskStatusListener {
 
     private static final String HTML_START_TEXT = "<html><head>\n" +
@@ -42,7 +44,11 @@ public class AttachmentStoryReaderActivity extends AbstractActivity implements I
 
     @Override
     public void onSuccess(String taskID, Object data) {
-        String html = (String) data;
+        String html = (String) data + "";
+
+        html = html.replaceAll("&amp;", "&");
+        html = StringEscapeUtils.unescapeHtml4(html);
+
         html = HTML_START_TEXT + data + HTML_END_TEXT;
         story_reader_view.loadDataWithBaseURL("", html, "text/html", "UTF-8", "");
     }
