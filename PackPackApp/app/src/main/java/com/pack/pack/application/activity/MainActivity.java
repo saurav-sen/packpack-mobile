@@ -67,9 +67,13 @@ public class MainActivity extends AbstractAppCompatActivity {
         boolean recreate = getIntent().getBooleanExtra(RECREATE, false);
 
         List<TabType> types = new ArrayList<TabType>();
-        types.add(TabType.HOME);
+        //types.add(TabType.HOME);
+        //types.add(TabType.OTHERS);
         for(TabType value : values) {
-            if(map.get(value.getType()) == null)
+            //Disabling filtering tabs
+            /*if(map.get(value.getType()) == null)
+                continue;*/
+            if(!value.isEnabled())
                 continue;
             value.setRecreate(recreate);
             types.add(value);

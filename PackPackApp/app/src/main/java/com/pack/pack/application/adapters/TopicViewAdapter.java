@@ -16,7 +16,9 @@ import com.pack.pack.application.image.loader.DownloadImageTask;
 import com.pack.pack.application.view.util.ViewUtil;
 import com.pack.pack.model.web.JTopic;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Saurav on 08-04-2016.
@@ -26,12 +28,21 @@ public class TopicViewAdapter extends ArrayAdapter<JTopic> {
     private Activity activity;
     private LayoutInflater inflater;
 
+    private Map<String, JTopic> topicsMap = new HashMap<String, JTopic>();
+
     public List<JTopic> getTopics() {
         return topics;
     }
 
     public void setTopics(List<JTopic> topics) {
-        this.topics = topics;
+        for(JTopic topic : topics) {
+            if(topicsMap.containsKey(topic.getId())) {
+                continue;
+            }
+            this.topics.add(topic);
+            topicsMap.put(topic.getId(), topic);
+        }
+        //this.topics = topics;
     }
 
     private List<JTopic> topics;
@@ -43,6 +54,9 @@ public class TopicViewAdapter extends ArrayAdapter<JTopic> {
         this.activity = activity;
         this.topics = topics;
         this.categoryType = categoryType;
+        for(JTopic topic : topics) {
+            topicsMap.put(topic.getId(), topic);
+        }
     }
 
     @Override

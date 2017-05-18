@@ -15,6 +15,7 @@ import android.widget.ListView;
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.adapters.TopicViewAdapter;
 import com.pack.pack.application.data.util.AbstractNetworkTask;
+import com.pack.pack.application.data.util.IAsyncTaskStatusListener;
 import com.pack.pack.application.db.DBUtil;
 import com.pack.pack.application.db.PaginationInfo;
 import com.pack.pack.application.db.UserInfo;
@@ -23,6 +24,7 @@ import com.pack.pack.application.view.util.ViewUtil;
 import com.pack.pack.client.api.API;
 import com.pack.pack.client.api.APIConstants;
 import com.pack.pack.client.api.COMMAND;
+import com.pack.pack.common.util.CommonConstants;
 import com.pack.pack.model.web.JTopic;
 import com.pack.pack.model.web.Pagination;
 
@@ -44,7 +46,7 @@ public abstract class TopicViewFragment extends Fragment {
 
     private TopicViewAdapter adapter;
 
-    private Pagination<JTopic> page;
+    private Map<String, PageInfo> pagesMap = new HashMap<String, PageInfo>();
 
     public void setTabType(TabType tabType) {
         this.tabType = tabType;
@@ -74,7 +76,11 @@ public abstract class TopicViewFragment extends Fragment {
                 int count = listView.getCount();
                 if (scrollState == SCROLL_STATE_IDLE) {
                     if (listView.getLastVisiblePosition() > count - 1) {
-                        new LoadTopicTask().execute();
+                        String[] categories = getSimilarCategoriesList();
+                        TopicLoadListener listener = new TopicLoadListener(categories.length);
+                        for(String category : categories) {
+                            new LoadTopicTask(category).addListener(listener).execute();
+                        }
                     }
                 }
             }
@@ -100,8 +106,25 @@ public abstract class TopicViewFragment extends Fragment {
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
         if(isVisibleToUser) {
-            page = null;
-            new LoadTopicTask().execute(AppController.getInstance().getUserId());
+            //page = null;
+            String[] categories = getSimilarCategoriesList();
+            TopicLoadListener listener = new TopicLoadListener(categories.length);
+            //boolean found = false;
+            int count = adapter == null ? 0 : adapter.getCount();
+            for(String category : categories) {
+                PageInfo pageInfo = pagesMap.get(category);
+                //pagesMap.remove(category);
+                if(count == 0) {
+                    pagesMap.remove(category);
+                    pageInfo = null;
+                }
+                if(pageInfo != null && (pageInfo.getNextLink() == null
+                        || CommonConstants.END_OF_PAGE.equalsIgnoreCase(pageInfo.getNextLink()))) {
+                    continue;
+                }
+                //found = true;
+                new LoadTopicTask(category).addListener(listener).execute(AppController.getInstance().getUserId());
+            }
         }
     }
 
@@ -120,6 +143,13 @@ public abstract class TopicViewFragment extends Fragment {
         return tabType.getType();
     }
 
+    private String[] getSimilarCategoriesList() {
+        if(tabType == null) {
+            tabType = initTabType();
+        }
+        return tabType.getSimilarCategories();
+    }
+
     protected abstract TabType initTabType();
 
     private int getViewLayoutId() {
@@ -130,12 +160,50 @@ public abstract class TopicViewFragment extends Fragment {
         return ViewUtil.getListViewId(getCategoryType());
     }
 
+    private class TopicLoadListener implements IAsyncTaskStatusListener {
+
+        private int countOfTasks;
+
+        TopicLoadListener(int countOfTasks) {
+            this.countOfTasks = countOfTasks;
+        }
+
+        @Override
+        public void onPreStart(String taskID) {
+
+        }
+
+        @Override
+        public void onFailure(String taskID, String errorMsg) {
+            countOfTasks--;
+            if(countOfTasks == 0) {
+                adapter.notifyDataSetChanged();
+            }
+        }
+
+        @Override
+        public void onSuccess(String taskID, Object data) {
+            countOfTasks--;
+            if(countOfTasks == 0) {
+                adapter.notifyDataSetChanged();
+            }
+        }
+
+        @Override
+        public void onPostComplete(String taskID) {
+
+        }
+    }
+
     private class LoadTopicTask extends AbstractNetworkTask<String, Integer, Pagination<JTopic>> {
 
         private String errorMsg;
 
-        public LoadTopicTask() {
-            super(true, true, getActivity(), false);
+        private String category;
+
+        public LoadTopicTask(String category) {
+            super(false, false, getActivity(), false);
+            this.category = category;
         }
 
         /*@Override
@@ -199,14 +267,14 @@ public abstract class TopicViewFragment extends Fragment {
 
         @Override
         protected void onPostExecute(Pagination<JTopic> jTopicPagination) {
-            super.onPostExecute(jTopicPagination);
             if(jTopicPagination != null) {
                 List<JTopic> topics = jTopicPagination.getResult();
                 if(topics != null) {
                     adapter.setTopics(topics);
-                    adapter.notifyDataSetChanged();
+                    //adapter.notifyDataSetChanged();
                 }
             }
+            super.onPostExecute(jTopicPagination);
             hideProgressDialog();
         }
 
@@ -217,9 +285,11 @@ public abstract class TopicViewFragment extends Fragment {
 
         @Override
         protected Pagination<JTopic> executeApi(API api) throws Exception {
+            Pagination<JTopic> page = null;
             try {
                 showProgressDialog();
                 page = (Pagination<JTopic>) api.execute();
+                pagesMap.put(this.category, new PageInfo(page.getNextLink(), page.getPreviousLink()));
             } catch (Exception e) {
                 errorMsg = e.getMessage();
             } finally {
@@ -233,8 +303,15 @@ public abstract class TopicViewFragment extends Fragment {
             Map<String, Object> apiParams = new HashMap<String, Object>();
             String userId = inputObject;//AppController.getInstance().getUserId();
             apiParams.put(APIConstants.User.ID, userId);
+            //Pagination<JTopic> page = pagesMap.get(this.category);
+            PageInfo page = pagesMap.get(this.category);
             String nextLink = page != null ? page.getNextLink() : "";
-            String categoryName = getCategoryType();
+            nextLink = nextLink + "";
+            if("NOT_FOLLOWINGEND_OF_PAGE".equalsIgnoreCase(nextLink)) {
+                nextLink = "FIRST_PAGE";
+            }
+            //String categoryName = getCategoryType();
+            String categoryName = this.category;
             apiParams.put(APIConstants.PageInfo.PAGE_LINK, nextLink);
             apiParams.put(APIConstants.Topic.CATEGORY, categoryName);
             return apiParams;
@@ -281,5 +358,25 @@ public abstract class TopicViewFragment extends Fragment {
                 }
             }
         });*/
+    }
+
+    private class PageInfo {
+
+        private String nextLink;
+
+        private String prevLink;
+
+        PageInfo(String nextLink, String prevLink) {
+            this.nextLink = nextLink;
+            this.prevLink = prevLink;
+        }
+
+        private String getNextLink() {
+            return nextLink;
+        }
+
+        private String getPrevLink() {
+            return prevLink;
+        }
     }
 }
