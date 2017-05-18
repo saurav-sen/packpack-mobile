@@ -20,7 +20,7 @@ public class IntroMainActivity extends AbstractActivity {
 
         PreferenceManager prefManager = new PreferenceManager(getApplicationContext());
         if(prefManager.isFirstTimeLaunch()) {
-            prefManager.setFirstTimeLaunch(false);
+            //prefManager.setFirstTimeLaunch(false);
             startActivity(new Intent(IntroMainActivity.this, WelcomeActivity.class));
             finish();
         } else {
