@@ -27,4 +27,8 @@ public class UserUtil {
         }
         return Patterns.EMAIL_ADDRESS.matcher(emailAddr).matches();
     }
+
+    public static final String applyPasswordPolicy(String passwd) {
+        return null;
+    }
 }

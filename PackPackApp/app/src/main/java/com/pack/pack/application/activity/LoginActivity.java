@@ -104,7 +104,7 @@ public class LoginActivity extends AbstractAppCompatActivity implements IAsyncTa
     }
 
     private void doResetPassword() {
-        Intent intent = new Intent(this, ResetPasswordActivity.class);
+        Intent intent = new Intent(this, PasswordResetActivity.class);
         startActivityForResult(intent, RESET_PASSWD_ACTIVITY_REQUEST_CODE);
     }
 

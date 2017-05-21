@@ -32,6 +32,7 @@ import com.pack.pack.application.data.util.ApiConstants;
 import com.pack.pack.application.data.util.IAsyncTaskStatusListener;
 import com.pack.pack.application.data.util.LoginTask;
 import com.pack.pack.application.data.util.UserUtil;
+import com.pack.pack.application.data.util.UsernameExistenceTestTask;
 import com.pack.pack.application.db.UserInfo;
 import com.pack.pack.application.service.FetchAddressIntentService;
 import com.pack.pack.client.api.API;
@@ -200,11 +201,21 @@ public class SignupActivity extends AbstractAppCompatActivity {
         if(email == null || email.trim().isEmpty()) {
             Snackbar.make(input_email, "Email is empty", Snackbar.LENGTH_LONG).show();
             valid = false;
+            return;
         }
         if(passwd == null || passwd.trim().isEmpty()) {
             Snackbar.make(input_password, "Password is empty", Snackbar.LENGTH_LONG).show();
             valid = false;
             isPasswd = false;
+            return;
+        }
+        if(isPasswd) {
+            String errMsg = UserUtil.applyPasswordPolicy(passwd);
+            if(errMsg != null) {
+                Snackbar.make(input_password, errMsg, Snackbar.LENGTH_LONG).show();
+                valid = false;
+                return;
+            }
         }
         if(passwd2 == null || passwd2.trim().isEmpty()) {
             Snackbar.make(input_password_confirm, "Confirm Password is empty", Snackbar.LENGTH_LONG).show();
@@ -239,7 +250,7 @@ public class SignupActivity extends AbstractAppCompatActivity {
         if(!valid)
             return;
 
-        UsernameExistenceTestTask task = new UsernameExistenceTestTask();
+        UsernameExistenceTestTask task = new UsernameExistenceTestTask(SignupActivity.this);
         task.execute(email);
 
         long timeout = 3 * 60 * 1000;
@@ -284,77 +295,5 @@ public class SignupActivity extends AbstractAppCompatActivity {
         intent.putExtra(PreSignupActivity.COUNTRY, country);
         finish();
         startActivity(intent);
-    }
-
-    private class UsernameExistenceTestTask extends AbstractNetworkTask<String, Integer, JStatus> {
-
-        private boolean validationComplete;
-
-        private String errorMsg;
-
-        public boolean isValidationComplete() {
-            return validationComplete;
-        }
-
-        public String getErrorMsg() {
-            return errorMsg;
-        }
-
-        public boolean isValidUserName() {
-            return isValidUserName;
-        }
-
-        private boolean isValidUserName;
-
-        public UsernameExistenceTestTask() {
-            super(false, false, false, SignupActivity.this, false, true);
-        }
-
-        @Override
-        protected String getContainerIdForObjectStore() {
-            return null;
-        }
-
-        @Override
-        protected String getFailureMessage() {
-            return errorMsg;
-        }
-
-        @Override
-        protected COMMAND command() {
-            return COMMAND.VALIDATE_USER_NAME;
-        }
-
-        @Override
-        protected Map<String, Object> prepareApiParams(String inputObject) {
-            Map<String, Object> apiParams = new HashMap<String, Object>();
-            if(inputObject == null) {
-                return apiParams;
-            }
-            apiParams.put(APIConstants.User.USERNAME, inputObject);
-            return apiParams;
-        }
-
-        @Override
-        protected JStatus executeApi(API api) throws Exception {
-            JStatus status = null;
-            try {
-                status = (JStatus) api.execute();
-            } catch (Exception e) {
-                Log.e(LOG_TAG, e.getMessage(), e);
-                errorMsg = "Failed while validating EMail existence check.";
-            } finally {
-                validationComplete = true;
-            }
-            if(errorMsg == null) {
-                isValidUserName = (status.getStatus() == StatusType.OK);
-                if (!isValidUserName) {
-                    errorMsg = status.getInfo();
-                }
-            } else {
-                isValidUserName = false;
-            }
-            return status;
-        }
     }
 }
