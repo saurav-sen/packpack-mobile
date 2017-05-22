@@ -27,6 +27,8 @@ public interface ApiConstants {
 
     public static final String YOUTUBE_API_KEY = "AIzaSyBSnFkEf4FvMUq0jPIewO-t3J2EyLBAplA";
 
+    public static final int UPLOAD_SIZE_LIMIT_IN_MB = 20;
+
     /*public static final String[] SUPPORTED_CATEGORIES = new String[] {
             LIFESTYLE, ART, PHOTOGRAPHY, MUSIC, EDUCATION, FUN,
             SPIRITUAL};*/

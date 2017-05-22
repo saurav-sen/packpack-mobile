@@ -154,7 +154,8 @@
             android:label="Squill"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".activity.PasswordResetActivity" />
-        <activity android:name=".data.util.PasswordResetVerifierActivity"></activity>
+        <activity android:name=".data.util.PasswordResetVerifierActivity" />
+        <activity android:name=".activity.PreSignupActivity2"></activity>
     </application>
 
 </manifest>

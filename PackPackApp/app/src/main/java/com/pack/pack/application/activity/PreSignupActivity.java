@@ -1,35 +1,27 @@
 package com.pack.pack.application.activity;
 
-import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.AppCompatButton;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.DatePicker;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.pack.pack.application.R;
-import com.pack.pack.application.data.LoggedInUserInfo;
-import com.pack.pack.application.data.util.ApiConstants;
+import com.pack.pack.application.data.util.AbstractNetworkTask;
 import com.pack.pack.application.data.util.IAsyncTaskStatusListener;
-import com.pack.pack.application.data.util.LoginTask;
-import com.pack.pack.application.db.UserInfo;
 import com.pack.pack.client.api.API;
-import com.pack.pack.client.api.APIBuilder;
 import com.pack.pack.client.api.APIConstants;
 import com.pack.pack.client.api.COMMAND;
-import com.pack.pack.model.web.JUser;
-import com.pack.pack.oauth1.client.AccessToken;
+import com.pack.pack.model.web.JStatus;
 
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
-public class PreSignupActivity extends AbstractAppCompatActivity  implements IAsyncTaskStatusListener {
+public class PreSignupActivity extends AbstractAppCompatActivity implements IAsyncTaskStatusListener {
 
     private DatePicker input_dob;
 
@@ -49,8 +41,6 @@ public class PreSignupActivity extends AbstractAppCompatActivity  implements IAs
     public static final String COUNTRY = "COUNTRY";
 
     private static final String LOG_TAG = "PreSignupActivity";
-
-    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,7 +69,8 @@ public class PreSignupActivity extends AbstractAppCompatActivity  implements IAs
         btn_signup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                doSignUp();
+                IssueVerificationCodeInfo dto = new IssueVerificationCodeInfo(email, name);
+                new IssueSignupVerifier(PreSignupActivity.this).addListener(PreSignupActivity.this).execute(dto);
             }
         });
 
@@ -92,48 +83,19 @@ public class PreSignupActivity extends AbstractAppCompatActivity  implements IAs
         });*/
     }
 
-    private void showProgressDialog() {
-        if(progressDialog != null)
-            progressDialog.dismiss();
-        progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage("Signing Up...");
-        progressDialog.show();
-    }
-
-    private void hideProgressDialog() {
-        if(progressDialog == null)
-            return;
-        progressDialog.dismiss();
-        progressDialog = null;
-    }
-
     @Override
     public void onPreStart(String taskID) {
-        showProgressDialog();
+
     }
 
     @Override
     public void onSuccess(String taskID, Object data) {
-        LoggedInUserInfo userInfo = (LoggedInUserInfo)data;
-        AccessToken token = userInfo.getAccessToken();
-        JUser user = userInfo.getUser();
-        getIntent().putExtra("loginStatus", true);
-        finish();
-        //startMainActivity();
-        startFollowCategoryActivity();
+        goToNext();
     }
 
-    protected void onSignUpSuccess() {
-        UserInfo userInfo = new UserInfo(email.toString(), passwd.toString());
-        doLogin(userInfo);
-    }
-
-    private void doLogin(UserInfo userInfo) {
-        new LoginTask(this, this, false).execute(userInfo);
-    }
-
-    protected void onSignUpFailure(String errorMsg) {
-        Toast.makeText(PreSignupActivity.this, errorMsg, Toast.LENGTH_LONG).show();
+    @Override
+    public void onFailure(String taskID, String errorMsg) {
+        Snackbar.make(input_dob, errorMsg, Snackbar.LENGTH_LONG).show();
     }
 
     @Override
@@ -141,24 +103,7 @@ public class PreSignupActivity extends AbstractAppCompatActivity  implements IAs
 
     }
 
-    @Override
-    public void onFailure(String taskID, String errorMsg) {
-        hideProgressDialog();
-        /*Intent intent = new Intent(this, LoginActivity.class);
-        intent.putExtra("email", input_email.getText().toString());
-        intent.putExtra("passwd", input_password.getText().toString());
-        intent.putExtra("loginStatus", false);
-        finish();
-        startActivity(intent);*/
-    }
-
-    private void startFollowCategoryActivity() {
-        Intent intent = new Intent(this, FollowCategoryActivity.class);
-        finish();
-        startActivity(intent);
-    }
-
-    private void doSignUp() {
+    private void goToNext() {
         StringBuilder dob = new StringBuilder();
         dob.append(input_dob.getDayOfMonth());
         dob.append("/");
@@ -170,134 +115,77 @@ public class PreSignupActivity extends AbstractAppCompatActivity  implements IAs
         if(address != null) {
             addr = new LocalAddress(null, null, address.getCountryName(), address.getLocality());
         }*/
-        UserSignUpInfo userSignUpInfo = new UserSignUpInfo(name, email, passwd, city, country, dob.toString());
-        new SignUpTask().execute(userSignUpInfo);
+        Intent intent = new Intent(PreSignupActivity.this, PreSignupActivity2.class);
+        intent.putExtra(EMAIL, email);
+        intent.putExtra(PASSWD, passwd);
+        intent.putExtra(NAME, name);
+        intent.putExtra(CITY, city);
+        intent.putExtra(COUNTRY, country);
+        intent.putExtra(PreSignupActivity2.DOB, dob.toString());
+        finish();
+        startActivity(intent);
     }
 
-    private class UserSignUpInfo {
-        private String name;
+    private class IssueVerificationCodeInfo {
+
         private String email;
-        private String passwd;
-        private String city;
-        private String country;
-        private String dob;
 
-        UserSignUpInfo(String name, String email, String passwd, String city, String country, String dob) {
-            this.name = name;
+        private String nameOfUser;
+
+        IssueVerificationCodeInfo(String email, String nameOfUser) {
             this.email = email;
-            this.passwd = passwd;
-            this.city = city;
-            this.dob = dob;
-            this.country = country;
+            this.nameOfUser = nameOfUser;
         }
 
-        String getName() {
-            return name;
-        }
-
-        String getEmail() {
+        public String getEmail() {
             return email;
         }
 
-        String getPasswd() {
-            return passwd;
-        }
-
-        String getCity() {
-            return city;
-        }
-
-        String getCountry() {
-            return country;
-        }
-
-        String getDob() {
-            return dob;
+        public String getNameOfUser() {
+            return nameOfUser;
         }
     }
 
-    private class LocalAddress {
-        private String city;
-        private String state;
-        private String country;
-        private String locality;
+    private class IssueSignupVerifier extends AbstractNetworkTask<IssueVerificationCodeInfo, Integer, JStatus> {
 
-        LocalAddress(String city, String state, String country, String locality) {
-            this.city = city;
-            this.state = state;
-            this.country = country;
-            this.locality = locality;
-        }
+        private String errMsg;
 
-        String getCity() {
-            return city;
-        }
-
-        String getState() {
-            return  state;
-        }
-
-        String getCountry() {
-            return country;
-        }
-
-        String getLocality() {
-            return locality;
-        }
-    }
-
-    private class SignUpTask extends AsyncTask<UserSignUpInfo, Void, Void> {
-
-        private String errorMsg;
-
-        @Override
-        protected void onPreExecute() {
-            showProgressDialog();
-            super.onPreExecute();
+        public IssueSignupVerifier(Context context) {
+            super(false, false, false, context, false, true);
         }
 
         @Override
-        protected Void doInBackground(UserSignUpInfo... userSignUpInfos) {
-            if(userSignUpInfos == null || userSignUpInfos.length == 0)
-                return null;
-            UserSignUpInfo userSignUpInfo = userSignUpInfos[0];
+        protected String getFailureMessage() {
+            return errMsg;
+        }
+
+        @Override
+        protected COMMAND command() {
+            return COMMAND.ISSUE_SIGNUP_VERIFIER;
+        }
+
+        @Override
+        protected Map<String, Object> prepareApiParams(IssueVerificationCodeInfo inputObject) {
+            Map<String, Object> apiParams = new HashMap<String, Object>();
+            apiParams.put(APIConstants.User.Register.EMAIL, inputObject.getEmail());
+            apiParams.put(APIConstants.User.Register.NAME, inputObject.getNameOfUser());
+            return apiParams;
+        }
+
+        @Override
+        protected JStatus executeApi(API api) throws Exception {
             try {
-                String name = userSignUpInfo.getName();
-                String username = userSignUpInfo.getEmail();
-                String passwd = userSignUpInfo.getPasswd();
-                String city = userSignUpInfo.getCity();
-                String country = userSignUpInfo.getCountry();
-                String dob = userSignUpInfo.getDob();
-                API api = APIBuilder.create(ApiConstants.BASE_URL).setAction(COMMAND.SIGN_UP)
-                        .addApiParam(APIConstants.User.Register.NAME, name)
-                        .addApiParam(APIConstants.User.Register.EMAIL, username)
-                        .addApiParam(APIConstants.User.Register.PASSWORD, passwd)
-                                //.addApiParam(APIConstants.User.Register.LOCALITY, locality)
-                        .addApiParam(APIConstants.User.Register.CITY, city)
-                        .addApiParam(APIConstants.User.Register.COUNTRY, country)
-                                //.addApiParam(APIConstants.User.Register.STATE, state)
-                                //.addApiParam(APIConstants.User.Register.COUNTRY, country)
-                        .addApiParam(APIConstants.User.Register.DOB, dob)
-                                //.addApiParam(APIConstants.User.Register.PROFILE_PICTURE, null)
-                        .build();
-                api.execute();
+                return (JStatus) api.execute();
             } catch (Exception e) {
-                Log.i(LOG_TAG, e.getMessage());
-                errorMsg = "ERROR: " + e.getMessage();
+                Log.e(LOG_TAG, e.getMessage(), e);
+                errMsg = "Failed Issing Verification Code";
+                return null;
             }
-            return null;
         }
 
         @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-            hideProgressDialog();
-            if(errorMsg == null) {
-                onSignUpSuccess();
-            }
-            else {
-                onSignUpFailure(errorMsg);
-            }
+        protected String getContainerIdForObjectStore() {
+            return null;
         }
     }
 }

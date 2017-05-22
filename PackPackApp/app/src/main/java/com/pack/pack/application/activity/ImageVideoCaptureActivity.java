@@ -4,9 +4,11 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.provider.OpenableColumns;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -22,6 +24,7 @@ import com.pack.pack.application.AppController;
 import com.pack.pack.application.Constants;
 import com.pack.pack.application.R;
 import com.pack.pack.application.data.cache.PackAttachmentsCache;
+import com.pack.pack.application.data.util.ApiConstants;
 import com.pack.pack.application.data.util.FileUtil;
 import com.pack.pack.application.data.util.ImageUtil;
 import com.pack.pack.application.service.UploadImageAttachmentService;
@@ -177,6 +180,16 @@ public class ImageVideoCaptureActivity extends AbstractActivity {
         uploadEntityType = savedInstanceState.getString(UPLOAD_ENTITY_TYPE_KEY);
     }*/
 
+    private boolean checkUploadSize(Uri mediaFileUri) {
+        Cursor cursor = getContentResolver().query(mediaFileUri, null, null, null, null);
+        int sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE);
+        long sizeInMb = cursor.getLong(sizeIndex)/ (1024*1024);
+        if(sizeInMb > ApiConstants.UPLOAD_SIZE_LIMIT_IN_MB) {
+            return false;
+        }
+        return true;
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -184,6 +197,10 @@ public class ImageVideoCaptureActivity extends AbstractActivity {
             case CAMERA_CAPTURE_PHOTO_REQUEST_CODE:
             {
                 if(resultCode == RESULT_OK) {
+                    if(!checkUploadSize(mediaFileUri)) {
+                        Toast.makeText(ImageVideoCaptureActivity.this, "Selected file larger than 20MB", Toast.LENGTH_LONG).show();
+                        return;
+                    }
                     /*mediaFileUri = AppController.getInstance().getUploadAttachmentData().getMediaFileUri();
                     startUploadActivity(mediaFileUri.getPath(), true);*/
                     try {
@@ -208,6 +225,11 @@ public class ImageVideoCaptureActivity extends AbstractActivity {
                 if(resultCode == RESULT_OK) {
                    /* mediaFileUri = AppController.getInstance().getUploadAttachmentData().getMediaFileUri();
                     startUploadActivity(mediaFileUri.getPath(), false);*/
+
+                    if(!checkUploadSize(mediaFileUri)) {
+                        Toast.makeText(ImageVideoCaptureActivity.this, "Selected file larger than 20MB", Toast.LENGTH_LONG).show();
+                        return;
+                    }
 
                     try {
                         //mediaFileUri = AppController.getInstance().getUploadAttachmentData().getMediaFileUri();
@@ -260,8 +282,13 @@ public class ImageVideoCaptureActivity extends AbstractActivity {
             case GALLERY_SELECT_PHOTO_REQUEST_CODE:
                 if(resultCode == RESULT_OK) {
                     try {
+                        Uri uri = data.getData();
+                        if(!checkUploadSize(uri)) {
+                            Toast.makeText(ImageVideoCaptureActivity.this, "Selected file larger than 20MB", Toast.LENGTH_LONG).show();
+                            return;
+                        }
                         Bitmap bitmap = MediaStore.Images.Media.getBitmap(
-                                getContentResolver(), data.getData());
+                                getContentResolver(), uri);
                         startUploadActivity(bitmap);
                        /* if(!ApiConstants.IS_PRODUCTION_ENV) {
                             Bitmap bitmap = MediaStore.Images.Media.getBitmap(
@@ -291,7 +318,10 @@ public class ImageVideoCaptureActivity extends AbstractActivity {
                     String selectedVideoUriPath = getGalleryVideoPath(selectedVideoUri);*/
                     final Uri selectedVideoUri = data.getData();
                     try {
-
+                        if(!checkUploadSize(selectedVideoUri)) {
+                            Toast.makeText(ImageVideoCaptureActivity.this, "Selected file larger than 20MB", Toast.LENGTH_LONG).show();
+                            return;
+                        }
                         //final String fileName = FileUtil.getFileNameFromUri(selectedVideoUri, getApplicationContext());
                         String selectedInputVideoFilePath = FileUtil.getPath(this, selectedVideoUri);
                         startUploadActivity(selectedInputVideoFilePath, false);
