@@ -27,12 +27,14 @@ public class AttachmentStoryEditActivity  extends AbstractActivity implements RT
         setContentView(R.layout.activity_attachment_story_edit);
 
         editor = (RTFEditor) findViewById(R.id.discussion_editor);
+        editor.setEscapeHtml(false);
         editor.setOnSaveListener(this);
     }
 
     @Override
     public void onSave(String rtfText) {
-        attachmentStory = StringEscapeUtils.escapeHtml4(rtfText);
+        attachmentStory = rtfText;
+        //attachmentStory = StringEscapeUtils.escapeHtml4(rtfText);
 
         String attachmentId = getIntent().getStringExtra(Constants.ATTACHMENT_ID);
 

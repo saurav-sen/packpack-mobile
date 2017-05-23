@@ -46,10 +46,11 @@ public class AttachmentStoryReaderActivity extends AbstractActivity implements I
     public void onSuccess(String taskID, Object data) {
         String html = (String) data + "";
 
-        html = html.replaceAll("&amp;", "&");
-        html = StringEscapeUtils.unescapeHtml4(html);
+        //html = html.replaceAll("&amp;", "&");
+        //html = StringEscapeUtils.unescapeHtml4(html);
 
-        html = HTML_START_TEXT + data + HTML_END_TEXT;
+        //html = HTML_START_TEXT + data + HTML_END_TEXT;
+        html = "<br/><br/>" + data;
         story_reader_view.loadDataWithBaseURL("", html, "text/html", "UTF-8", "");
     }
 

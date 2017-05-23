@@ -25,6 +25,8 @@ public class RTFEditor extends WebView {
 
     private Context context;
 
+    private boolean escapeHtml = true;
+
     public RTFEditor(Context context) {
         this(context, null);
     }
@@ -48,6 +50,10 @@ public class RTFEditor extends WebView {
         //applyAttributes(context, attrs);
         addJavascriptInterface(new WebAppInterface(), "Squill");
         this.context = context;
+    }
+
+    public void setEscapeHtml(boolean escapeHtml) {
+        this.escapeHtml = escapeHtml;
     }
 
     private RTFListener rtfListener;
@@ -81,7 +87,11 @@ public class RTFEditor extends WebView {
 
         @JavascriptInterface
         public void doSaveContent(String htmlContent) {
-            onSave(StringEscapeUtils.escapeHtml4(htmlContent));
+            if(escapeHtml) {
+                onSave(StringEscapeUtils.escapeHtml4(htmlContent));
+            } else {
+                onSave(htmlContent);
+            }
         }
     }
 
