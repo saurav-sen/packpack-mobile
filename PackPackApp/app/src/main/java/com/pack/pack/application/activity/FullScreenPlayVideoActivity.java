@@ -9,6 +9,7 @@ import android.util.Log;
 import android.widget.MediaController;
 import android.widget.VideoView;
 
+import com.google.android.youtube.player.YouTubePlayerView;
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
 import com.pack.pack.application.data.util.ApiConstants;
@@ -22,18 +23,22 @@ import java.util.Map;
  */
 public class FullScreenPlayVideoActivity extends AbstractActivity {
 
-    ProgressDialog pDialog;
-    VideoView videoDisplay;
+    private ProgressDialog pDialog;
+    private VideoView videoDisplay;
+
+    //private YouTubePlayerView videoDisplayYoutube;
 
     private static final String LOG_TAG = "PlayVideo";
 
     public static final String VIDEO_URL = "VIDEO_URL";
+    //public static final String IS_YOUTUBE = "IS_YOUTUBE";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_play_video_fullscreen);
+        //videoDisplayYoutube = (YouTubePlayerView) findViewById(R.id.videoDisplayYoutube);
         videoDisplay = (VideoView) findViewById(R.id.videoDisplay);
 
         pDialog = new ProgressDialog(FullScreenPlayVideoActivity.this);

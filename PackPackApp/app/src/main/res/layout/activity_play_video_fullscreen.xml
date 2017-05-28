@@ -6,6 +6,14 @@
     android:layout_centerVertical="true"
     android:id="@+id/mainLayout">
 
+    <!--com.google.android.youtube.player.YouTubePlayerView
+        android:id="@+id/videoDisplayYoutube"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitCenter"
+        android:layout_gravity="center"
+        android:visibility="gone"/-->
+
     <VideoView
         android:id="@+id/videoDisplay"
         android:layout_width="match_parent"

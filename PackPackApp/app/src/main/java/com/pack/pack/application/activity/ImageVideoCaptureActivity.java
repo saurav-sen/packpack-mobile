@@ -13,6 +13,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -32,6 +33,7 @@ import com.pack.pack.application.service.UploadVideoAttachmentService;
 import com.pack.pack.application.topic.activity.model.UploadAttachmentData;
 import com.pack.pack.application.view.CameraPreview;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
 
@@ -181,12 +183,27 @@ public class ImageVideoCaptureActivity extends AbstractActivity {
     }*/
 
     private boolean checkUploadSize(Uri mediaFileUri) {
-        Cursor cursor = getContentResolver().query(mediaFileUri, null, null, null, null);
+        /*Cursor cursor = getContentResolver().query(mediaFileUri, null, null, null, null);
         int sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE);
         long sizeInMb = cursor.getLong(sizeIndex)/ (1024*1024);
         if(sizeInMb > ApiConstants.UPLOAD_SIZE_LIMIT_IN_MB) {
             return false;
-        }
+        }*/
+        /*try {
+            File file = new File(mediaFileUri.getPath());
+            if(!file.exists()) {
+                Log.e(LOG_TAG, "Error calculating file size. File handle not resolved correctly.");
+                return true;
+            }
+            long sizeInMb = file.length()/(1024*1024);
+            if(sizeInMb > ApiConstants.UPLOAD_SIZE_LIMIT_IN_MB) {
+                return false;
+            }
+            return true;
+        } catch (Throwable e) {
+            Log.e(LOG_TAG, "Error calculating file size. " + e.getMessage(), e);
+            return true;
+        }*/
         return true;
     }
 

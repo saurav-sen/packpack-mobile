@@ -28,6 +28,7 @@ import com.pack.pack.model.web.JPackAttachment;
 import org.apache.http.entity.mime.content.ContentBody;
 
 import java.io.ByteArrayOutputStream;
+import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -81,7 +82,7 @@ public class UploadImageAttachmentService extends Service {
         if(message == null) {
             message = "Photo Upload is in progress";
         }
-        final int NOTIFICATION_ID = 1338;
+        final int NOTIFICATION_ID = Math.abs(new Random().nextInt())%10000;
         final NotificationManager notificationManager =
                 (NotificationManager) getSystemService(
                         Context.NOTIFICATION_SERVICE);

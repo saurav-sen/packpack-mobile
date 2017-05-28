@@ -16,7 +16,7 @@ public enum TabType {
     ART(ApiConstants.ART, "Artists", R.drawable.art, ArtViewFragment.class, true, new String[]{ApiConstants.ART, ApiConstants.MUSIC}),
     PHOTOGRAPHY(ApiConstants.PHOTOGRAPHY, "Travellers", R.drawable.photography, PhotographyViewFragment.class, true, new String[]{ApiConstants.PHOTOGRAPHY, ApiConstants.LIFESTYLE}),
     EDUCATION(ApiConstants.EDUCATION, "Writters", R.drawable.education, EducationViewFragment.class, true, new String[]{ApiConstants.EDUCATION, ApiConstants.SPIRITUAL, ApiConstants.FUN}),
-    OTHERS(ApiConstants.OTHERS, "Miscellaneous", R.drawable.others, MiscViewFragment.class, false, new String[]{ApiConstants.OTHERS, ApiConstants.LIFESTYLE}),
+    OTHERS(ApiConstants.OTHERS, "Miscellaneous", R.drawable.others, MiscViewFragment.class, true, new String[]{ApiConstants.OTHERS, ApiConstants.LIFESTYLE}),
 
     //Tabs which are disabled
     LIFE_STYLE(ApiConstants.LIFESTYLE, "Lifestyle", R.drawable.lifestyle, LifestyleViewFragment.class, false, new String[]{ApiConstants.LIFESTYLE}),

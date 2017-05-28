@@ -512,6 +512,7 @@ public class PackAttachmentsAdapter extends ArrayAdapter<JPackAttachment> {
             replace(attachmentUnderUploadDetails.getAttachment(), newAttachment);
             attachmentUnderUploadDetails.getAttachment().setUploadProgress(false);
             PackAttachmentsCache.open(getContext()).removeFromCacheOfSuccessfullyUploadedAttachment(packId, newAttachment);
+            //itr.remove();
         }
         notifyDataSetChanged();
     }

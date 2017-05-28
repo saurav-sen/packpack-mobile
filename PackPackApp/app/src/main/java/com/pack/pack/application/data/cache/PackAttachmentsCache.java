@@ -87,7 +87,9 @@ public class PackAttachmentsCache {
             throw new RuntimeException("[PackAttachmentsCache] Cache NOT loaded yet");
         }
 
-        inProgressVsSuccessfulUploadAttachmentsMap = new HashMap<String, String>();
+        if(inProgressVsSuccessfulUploadAttachmentsMap == null) {
+            inProgressVsSuccessfulUploadAttachmentsMap = new HashMap<String, String>();
+        }
         try {
             SimpleDiskCache.StringEntry stringEntry = diskCache.getString(InProgressVsSuccessfulUploadAttachmentsMap_KEY);
             if(stringEntry != null) {

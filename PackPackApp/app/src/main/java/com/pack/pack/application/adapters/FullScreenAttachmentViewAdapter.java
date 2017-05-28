@@ -17,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.MediaController;
 import android.widget.VideoView;
 
+import com.google.android.youtube.player.YouTubeStandalonePlayer;
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
 import com.pack.pack.application.activity.FullScreenPlayVideoActivity;
@@ -120,14 +121,27 @@ public class FullScreenAttachmentViewAdapter extends PagerAdapter {
                 boolean isExternalLink = attachment.isExternalLink();
 
                 if(isExternalLink) {
-                    //String VIDEO_ID = attachment.getExtraMetaData().get("YOUTUBE_VIDEO_ID");
-                    //if((VIDEO_ID != null && !VIDEO_ID.isEmpty())) {
-                    //Intent intent = YouTubeStandalonePlayer.createVideoIntent(activity, ApiConstants.YOUTUBE_API_KEY, VIDEO_ID);
-                    //activity.startActivity(intent);
-                    //}
-                    Intent intent = new Intent(Intent.ACTION_VIEW);
-                    intent.setData(Uri.parse(attachment.getAttachmentUrl()));
-                    activity.startActivity(intent);
+                    String VIDEO_ID = attachment.getExtraMetaData().get("YOUTUBE_VIDEO_ID");
+                    if((VIDEO_ID != null && !VIDEO_ID.isEmpty())) {
+                        Intent intent = YouTubeStandalonePlayer.createVideoIntent(activity, ApiConstants.YOUTUBE_API_KEY, VIDEO_ID);
+                        activity.startActivity(intent);
+                    } else {
+                        String videoURL = attachment.getAttachmentUrl();
+                        if(videoURL.contains("youtube")) {
+                            String[] split = attachment.getAttachmentUrl().split("v=");
+                            if(split.length > 1) {
+                                VIDEO_ID = split[1];
+                            }
+                        }
+                        if((VIDEO_ID != null && !VIDEO_ID.isEmpty())) {
+                            Intent intent = YouTubeStandalonePlayer.createVideoIntent(activity, ApiConstants.YOUTUBE_API_KEY, VIDEO_ID);
+                            activity.startActivity(intent);
+                        } else {
+                            Intent intent = new Intent(Intent.ACTION_VIEW);
+                            intent.setData(Uri.parse(attachment.getAttachmentUrl()));
+                            activity.startActivity(intent);
+                        }
+                    }
                 } else {
                     Intent intent = new Intent(activity, FullScreenPlayVideoActivity.class);
                     intent.putExtra(FullScreenPlayVideoActivity.VIDEO_URL, attachment.getAttachmentUrl());

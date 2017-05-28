@@ -31,6 +31,7 @@ import org.apache.http.entity.mime.content.InputStreamBody;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.Random;
 import java.util.UUID;
 
 /**
@@ -91,7 +92,7 @@ public class UploadVideoAttachmentService extends Service {
         if(status == null) {
             return;
         }
-        final int NOTIFICATION_ID = 1439;
+        final int NOTIFICATION_ID = Math.abs(new Random().nextInt())%10000;
         final NotificationManager notificationManager =
                 (NotificationManager) getSystemService(
                         Context.NOTIFICATION_SERVICE);
