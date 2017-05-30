@@ -99,7 +99,7 @@ public class FullScreenAttachmentViewAdapter extends PagerAdapter {
             imgDisplay_play.setVisibility(View.GONE);
         }*/
 
-        List<JPackAttachment> list = AppController.getInstance().getPackAttachments();
+        List<JPackAttachment> list = attachments;
         if(list != null && !list.isEmpty() && position < list.size()) {
             final JPackAttachment attachment = list.get(position);
             if(PackAttachmentType.IMAGE.name().equalsIgnoreCase(attachment.getAttachmentType())) {
@@ -157,13 +157,13 @@ public class FullScreenAttachmentViewAdapter extends PagerAdapter {
     @Override
     public void setPrimaryItem(ViewGroup container, int position, Object object) {
         super.setPrimaryItem(container, position, object);
-        currentIndex = position;
         JPackAttachment attachment = attachments.get(position);
-        if(PackAttachmentType.IMAGE.name().equalsIgnoreCase(attachment.getAttachmentType())) {
+        if(PackAttachmentType.IMAGE.name().equalsIgnoreCase(attachment.getAttachmentType()) && (position == currentIndex)) {
             imgDisplay_play.setVisibility(View.GONE);
-        } else if(PackAttachmentType.VIDEO.name().equalsIgnoreCase(attachment.getAttachmentType())) {
+        } else if(PackAttachmentType.VIDEO.name().equalsIgnoreCase(attachment.getAttachmentType()) && (position == currentIndex)) {
             imgDisplay_play.setVisibility(View.VISIBLE);
         }
+        currentIndex = position;
     }
 
     private void prepareImageRender(JPackAttachment attachment, boolean thumbnail) {

@@ -23,7 +23,7 @@ public interface ApiConstants {
     public static final String SPIRITUAL = "spiritual";
     public static final String OTHERS = "others";
 
-    public static final int MIN_DESC_FIELD_LENGTH = 5;
+    public static final int MIN_DESC_FIELD_LENGTH = 50;
 
     public static final String YOUTUBE_API_KEY = "AIzaSyCEBFeUbTeBMtL4mNfpgANER7Da0Z_Gq5Q";
 

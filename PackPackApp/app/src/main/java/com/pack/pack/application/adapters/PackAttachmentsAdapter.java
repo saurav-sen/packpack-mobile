@@ -22,11 +22,13 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.google.android.youtube.player.YouTubeStandalonePlayer;
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.Constants;
 import com.pack.pack.application.R;
 import com.pack.pack.application.activity.AttachmentStoryEditActivity;
 import com.pack.pack.application.activity.AttachmentStoryReaderActivity;
+import com.pack.pack.application.activity.FullScreenPlayVideoActivity;
 import com.pack.pack.application.activity.FullscreenAttachmentViewActivity;
 import com.pack.pack.application.activity.PackAttachmentCommentsActivity;
 import com.pack.pack.application.data.cache.InMemory;
@@ -212,9 +214,14 @@ public class PackAttachmentsAdapter extends ArrayAdapter<JPackAttachment> {
         pack_attachment_img.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getContext(), FullscreenAttachmentViewActivity.class);
-                intent.putExtra("index", position);
-                getContext().startActivity(intent);
+                JPackAttachment attachment = getItem(position);
+                if(PackAttachmentType.IMAGE.name().equalsIgnoreCase(attachment.getAttachmentType())) {
+                    Intent intent = new Intent(getContext(), FullscreenAttachmentViewActivity.class);
+                    intent.putExtra("index", position);
+                    getContext().startActivity(intent);
+                } else {
+                    playVideo(attachment);
+                }
             }
         });
 
@@ -222,9 +229,11 @@ public class PackAttachmentsAdapter extends ArrayAdapter<JPackAttachment> {
         pack_attachment_video_play.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getContext(), FullscreenAttachmentViewActivity.class);
+                /*Intent intent = new Intent(getContext(), FullscreenAttachmentViewActivity.class);
                 intent.putExtra("index", position);
-                getContext().startActivity(intent);
+                getContext().startActivity(intent);*/
+                JPackAttachment attachment = getItem(position);
+                playVideo(attachment);
             }
         });
 
@@ -328,6 +337,38 @@ public class PackAttachmentsAdapter extends ArrayAdapter<JPackAttachment> {
             }
         }
         return convertView;
+    }
+
+    private void playVideo(JPackAttachment attachment) {
+        boolean isExternalLink = attachment.isExternalLink();
+
+        if (isExternalLink) {
+            String VIDEO_ID = attachment.getExtraMetaData().get("YOUTUBE_VIDEO_ID");
+            if ((VIDEO_ID != null && !VIDEO_ID.isEmpty())) {
+                Intent intent = YouTubeStandalonePlayer.createVideoIntent(activity, ApiConstants.YOUTUBE_API_KEY, VIDEO_ID);
+                activity.startActivity(intent);
+            } else {
+                String videoURL = attachment.getAttachmentUrl();
+                if (videoURL.contains("youtube")) {
+                    String[] split = attachment.getAttachmentUrl().split("v=");
+                    if (split.length > 1) {
+                        VIDEO_ID = split[1];
+                    }
+                }
+                if ((VIDEO_ID != null && !VIDEO_ID.isEmpty())) {
+                    Intent intent = YouTubeStandalonePlayer.createVideoIntent(activity, ApiConstants.YOUTUBE_API_KEY, VIDEO_ID);
+                    activity.startActivity(intent);
+                } else {
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setData(Uri.parse(attachment.getAttachmentUrl()));
+                    activity.startActivity(intent);
+                }
+            }
+        } else {
+            Intent intent = new Intent(activity, FullScreenPlayVideoActivity.class);
+            intent.putExtra(FullScreenPlayVideoActivity.VIDEO_URL, attachment.getAttachmentUrl());
+            activity.startActivity(intent);
+        }
     }
 
     private void replace(JPackAttachment oldAttachment, JPackAttachment newAttachment) {

@@ -78,7 +78,7 @@ public class ImageVideoCaptureActivity extends AbstractActivity {
 
     private Button btnUploadSelectPhoto;
 
-    private Button btnUploadSelectVideo;
+    //private Button btnUploadSelectVideo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,7 +111,7 @@ public class ImageVideoCaptureActivity extends AbstractActivity {
 
         fLayout = (FrameLayout) findViewById(R.id.camera_preview);
         FloatingActionButton capture_photo = (FloatingActionButton) findViewById(R.id.capture_photo);
-        FloatingActionButton record_video = (FloatingActionButton) findViewById(R.id.record_video);
+        //FloatingActionButton record_video = (FloatingActionButton) findViewById(R.id.record_video);
 
         capture_photo.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -119,12 +119,12 @@ public class ImageVideoCaptureActivity extends AbstractActivity {
                 capturePhoto();
             }
         });
-        record_video.setOnClickListener(new View.OnClickListener() {
+        /*record_video.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 recordVideo();
             }
-        });
+        });*/
 
         //initializeGalleryGridView();
 
@@ -135,13 +135,13 @@ public class ImageVideoCaptureActivity extends AbstractActivity {
                 selectPhotoFromGallery();
             }
         });
-        btnUploadSelectVideo = (Button) findViewById(R.id.btnUploadSelectVideo);
+        /*btnUploadSelectVideo = (Button) findViewById(R.id.btnUploadSelectVideo);
         btnUploadSelectVideo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 selectVideoFromGallery();
             }
-        });
+        });*/
     }
 
     private void selectPhotoFromGallery() {

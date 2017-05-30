@@ -16,7 +16,10 @@ import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
+import com.pack.pack.application.activity.FullScreenRssFeedViewActivity;
+import com.pack.pack.application.data.util.DownloadFeedImageTask;
 import com.pack.pack.application.image.loader.DownloadImageTask;
+import com.pack.pack.application.topic.activity.model.ParcellableRssFeed;
 import com.pack.pack.application.view.util.ViewUtil;
 import com.pack.pack.client.api.APIConstants;
 import com.pack.pack.client.api.COMMAND;
@@ -93,37 +96,17 @@ public class HomeActivityAdapter extends ArrayAdapter<JRssFeed> {
                 home_rss_feed_image.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        Intent intent = new Intent(Intent.ACTION_VIEW);
+                       /*Intent intent = new Intent(Intent.ACTION_VIEW);
                         intent.setData(Uri.parse(feed.getOgUrl()));
+                        getContext().startActivity(intent);*/
+
+                        Intent intent = new Intent(getContext(), FullScreenRssFeedViewActivity.class);
+                        intent.putExtra(FullScreenRssFeedViewActivity.PARCELLABLE_FEED, new ParcellableRssFeed(feed));
                         getContext().startActivity(intent);
                     }
                 });
             }
         }
         return convertView;
-    }
-
-    private class DownloadFeedImageTask extends DownloadImageTask {
-
-        public DownloadFeedImageTask(ImageView imageView, int imageWidth, int imageHeight, Context context, ProgressBar progressBar) {
-            super(imageView, imageWidth, imageHeight, context, progressBar);
-        }
-
-        @Override
-        protected String lookupURL(String url) {
-            return url != null ? url.trim() : url;
-        }
-
-        @Override
-        protected COMMAND command() {
-            return COMMAND.LOAD_EXTERNAL_RESOURCE;
-        }
-
-        @Override
-        protected Map<String, Object> prepareApiParams(String inputObject) {
-            Map<String, Object> apiParams = new HashMap<String, Object>();
-            apiParams.put(APIConstants.ExternalResource.RESOURCE_URL, inputObject);
-            return apiParams;
-        }
     }
 }

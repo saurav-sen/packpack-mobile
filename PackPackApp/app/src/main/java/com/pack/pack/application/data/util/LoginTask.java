@@ -128,6 +128,13 @@ public class LoginTask extends AbstractNetworkTask<UserInfo, Integer, AccessToke
                     .build();
             JCategories supportedCategories = (JCategories)api.execute();
             AppController.getInstance().setSupportedCategories(supportedCategories);
+
+            api = APIBuilder
+                    .create(ApiConstants.BASE_URL)
+                    .setAction(COMMAND.ANDROID_APK_URL)
+                    .build();
+            String apkUrl = (String) api.execute();
+            AppController.getInstance().setApkUrl(apkUrl);
         } catch (Exception e) {
             Log.i(LOG_TAG, e.getMessage());
             errorMsg = e.getMessage();

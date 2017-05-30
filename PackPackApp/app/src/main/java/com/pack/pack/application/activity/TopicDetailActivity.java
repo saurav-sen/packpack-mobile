@@ -80,7 +80,7 @@ public class TopicDetailActivity extends AbstractAppCompatActivity implements On
 
     private GoogleMap gMap;
 
-    private ImageButton invitePeople;
+    //private ImageButton invitePeople;
 
     private static final String LOG_TAG = "TopicDetailActivity";
 
@@ -217,14 +217,14 @@ public class TopicDetailActivity extends AbstractAppCompatActivity implements On
             });
         }
 
-        invitePeople = (ImageButton) findViewById(R.id.invite_people);
+        /*invitePeople = (ImageButton) findViewById(R.id.invite_people);
         invitePeople.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                // https://github.com/BranchMetrics/Branch-Android-Invite-SDK
                 new SimpleInviteBuilder(TopicDetailActivity.this, "Inviting userID", "Inviting user Name").showInviteDialog();
             }
-        });
+        });*/
 
         /*ImageButton promoteTopic = (ImageButton) findViewById(R.id.promote_topic);
         promoteTopic.setOnClickListener(new View.OnClickListener() {
@@ -269,7 +269,7 @@ public class TopicDetailActivity extends AbstractAppCompatActivity implements On
         intent.setType("image/*");
 
         intent.putExtra(Intent.EXTRA_SUBJECT, "");
-        intent.putExtra(Intent.EXTRA_TEXT, "Checkout my vision " + topic.getTopicName() + " @ SQUILL");
+        intent.putExtra(Intent.EXTRA_TEXT, "Checkout my vision " + topic.getTopicName() + " @ SQUILL (" + AppController.getInstance().getApkUrl() + ")");
         intent.putExtra(Intent.EXTRA_STREAM, uri);
 
         startActivity(Intent.createChooser(intent, "Share My Vision"));
@@ -321,9 +321,9 @@ public class TopicDetailActivity extends AbstractAppCompatActivity implements On
                 } else {
                     readContactsGranted = false;
                 }
-                if(invitePeople != null) {
+                /*if(invitePeople != null) {
                     invitePeople.setEnabled(readContactsGranted);
-                }
+                }*/
                 break;
         }
     }

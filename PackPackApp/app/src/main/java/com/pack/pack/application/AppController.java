@@ -93,6 +93,16 @@ public class AppController extends Application {
 
     private JUser user;
 
+    public String getApkUrl() {
+        return apkUrl;
+    }
+
+    public void setApkUrl(String apkUrl) {
+        this.apkUrl = apkUrl;
+    }
+
+    private String apkUrl;
+
     public List<JTopic> getUserOwnedTopics() {
         return userOwnedTopics;
     }
