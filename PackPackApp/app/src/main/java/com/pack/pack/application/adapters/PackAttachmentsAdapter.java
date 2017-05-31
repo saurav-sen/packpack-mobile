@@ -483,7 +483,9 @@ public class PackAttachmentsAdapter extends ArrayAdapter<JPackAttachment> {
 
         share.putExtra(Intent.EXTRA_TEXT, url);
 
-        getContext().startActivity(share);
+        //getContext().startActivity(share);
+
+        getContext().startActivity(Intent.createChooser(share, "Share From SQUILL"));
     }
 
     private void shareImage(int position) {
