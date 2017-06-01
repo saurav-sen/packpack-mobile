@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -71,7 +72,9 @@ public class TopicViewAdapter extends ArrayAdapter<JTopic> {
         ImageView poster = (ImageView) convertView.findViewById(ViewUtil.getViewId(categoryType, "topicPoster"));
         ProgressBar loadingProgres = (ProgressBar) convertView.findViewById(ViewUtil.getViewId(categoryType, "loading_progress"));
 
-        ImageView followSign = (ImageView) convertView.findViewById(ViewUtil.getViewId(categoryType, "follow_sign"));
+        //ImageView followSign = (ImageView) convertView.findViewById(ViewUtil.getViewId(categoryType, "follow_sign"));
+        Button followSign = (Button) convertView.findViewById(ViewUtil.getViewId(categoryType, "follow_sign"));
+        followSign.setClickable(false);
 
         if(position < topics.size()) {
             JTopic topic = topics.get(position);

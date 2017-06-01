@@ -43,14 +43,27 @@
                     android:textSize="@dimen/feed_item_profile_name"
                     android:textStyle="bold" />
 
-                <ImageView
+                <!--ImageView
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:scaleType="fitEnd"
                     android:layout_gravity="right"
                     android:id="@+id/others_follow_sign"
                     android:src="@drawable/ic_tick_circle"
-                    android:layout_alignParentRight="true"/>
+                    android:layout_alignParentRight="true"/-->
+
+                <Button
+                    android:id="@+id/others_follow_sign"
+                    android:layout_width="wrap_content"
+                    android:paddingRight="2dp"
+                    android:paddingLeft="2dp"
+                    android:layout_height="20dp"
+                    android:textColor="@color/colorPrimary"
+                    android:textStyle="bold"
+                    android:textAllCaps="false"
+                    android:layout_alignParentRight="true"
+                    android:background="@drawable/roundedfollobutton"
+                    android:text="Following" />
 
                 <!--TextView
                     android:id="@+id/topic_followers"

@@ -127,6 +127,12 @@ public class PasswordResetActivity extends AppCompatActivity implements IAsyncTa
             return;
         }
 
+        String validationError = UserUtil.applyPasswordPolicy(passwd);
+        if(validationError != null) {
+            Snackbar.make(passwd_reset_newPasswd, validationError.trim(), Snackbar.LENGTH_LONG).show();
+            return;
+        }
+
         boolean valid = true;
 
         UsernameExistenceTestTask task = new UsernameExistenceTestTask(PasswordResetActivity.this);

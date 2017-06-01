@@ -245,6 +245,13 @@ public class SignupActivity extends AbstractAppCompatActivity {
                 Snackbar.make(input_email, "Email address is invalid", Snackbar.LENGTH_LONG).show();
                 valid = false;
             }
+            else {
+                String validationError = UserUtil.applyPasswordPolicy(passwd);
+                if(validationError != null) {
+                    Snackbar.make(input_password, validationError.trim(), Snackbar.LENGTH_LONG).show();
+                    valid = false;
+                }
+            }
         }
 
         if(!valid)

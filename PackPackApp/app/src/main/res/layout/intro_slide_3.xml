@@ -1,26 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:background="#FFFFFF">
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:gravity="center_horizontal"
         android:orientation="vertical">
 
         <ImageView
-            android:layout_width="@dimen/intro_img_width_height"
-            android:layout_height="@dimen/intro_img_width_height"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:scaleType="fitStart"
             android:src="@drawable/intro_stay_updated" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/intro_slide_3_title"
-            android:textColor="@android:color/black"
+            android:textColor="#4d4d4d"
             android:textSize="@dimen/intro_slide_title"
             android:textStyle="bold" />
 
@@ -32,7 +33,7 @@
             android:paddingRight="@dimen/intro_desc_padding"
             android:text="@string/intro_slide_3_desc"
             android:textAlignment="center"
-            android:textColor="@android:color/black"
+            android:textColor="#666666"
             android:textSize="@dimen/intro_slide_desc" />
 
     </LinearLayout>

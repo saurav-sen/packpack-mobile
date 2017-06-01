@@ -52,13 +52,26 @@
                     android:textStyle="bold" /-->
             </LinearLayout>
 
-            <ImageView
+            <!--ImageView
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:scaleType="fitCenter"
                 android:layout_gravity="end"
                 android:id="@+id/lifestyle_follow_sign"
-                android:src="@drawable/ic_tick_circle"/>
+                android:src="@drawable/ic_tick_circle"/-->
+
+            <Button
+                android:id="@+id/lifestyle_follow_sign"
+                android:layout_width="wrap_content"
+                android:paddingRight="2dp"
+                android:paddingLeft="2dp"
+                android:layout_height="20dp"
+                android:textColor="@color/colorPrimary"
+                android:textStyle="bold"
+                android:textAllCaps="false"
+                android:layout_alignParentRight="true"
+                android:background="@drawable/roundedfollobutton"
+                android:text="Following" />
 
         </LinearLayout>
 

@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -47,6 +48,7 @@ public class FullScreenRssFeedViewActivity extends AppCompatActivity {
         TextView feed_descriptionText = (TextView) findViewById(R.id.feed_descriptionText);
 
         ImageButton feed_share = (ImageButton) findViewById(R.id.feed_share);
+        //Button feed_share = (Button) findViewById(R.id.feed_share);
         feed_share.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -90,7 +92,7 @@ public class FullScreenRssFeedViewActivity extends AppCompatActivity {
 
     private File createScreenCast(View view) {
         File file = null;
-        View rootView = getWindow().getDecorView().findViewById(R.id.mainLayout);
+        View rootView = getWindow().getDecorView().findViewById(R.id.full_screen_rss_feed_layout);
         View screenView = rootView.getRootView();
         screenView.setDrawingCacheEnabled(true);
         Bitmap screenCast = Bitmap.createBitmap(screenView.getDrawingCache());
