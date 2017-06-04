@@ -178,8 +178,14 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.pref_accounts);
 
-            Preference displayName = findPreference(UserSettings.DISPLAY_NAME);
+            Preference userFullName = findPreference(UserSettings.USER_NAME);
             JUser user = AppController.getInstance().getUser();
+            if(user != null) {
+                userFullName.setDefaultValue(user.getName());
+                userFullName.setTitle(user.getName());
+            }
+
+            Preference displayName = findPreference(UserSettings.DISPLAY_NAME);
             if(user != null) {
                 displayName.setDefaultValue(UserUtil.resolveUserDisplayName(user));
                 displayName.setTitle(UserUtil.resolveUserDisplayName(user));

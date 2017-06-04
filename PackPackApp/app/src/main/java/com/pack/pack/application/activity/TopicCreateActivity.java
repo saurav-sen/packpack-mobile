@@ -34,12 +34,14 @@ import com.pack.pack.client.api.APIConstants;
 import com.pack.pack.client.api.ByteBody;
 import com.pack.pack.client.api.COMMAND;
 import com.pack.pack.client.api.MultipartRequestProgressListener;
+import com.pack.pack.model.web.JCategories;
 import com.pack.pack.model.web.JCategory;
 import com.pack.pack.model.web.JTopic;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,6 +61,7 @@ public class TopicCreateActivity extends AbstractAppCompatActivity implements IA
     private EditText topic_create_city;
     private EditText topic_create_country;
     private AutoCompleteTextView topic_create_category;
+    private TextView topic_create_category_notes;
     private ImageView topic_create_wallpaper;
     private Button wallpaper_select;
 
@@ -75,6 +78,20 @@ public class TopicCreateActivity extends AbstractAppCompatActivity implements IA
 
     public static final String RESULT_KEY = "topic";
 
+    private List<String> getCategoryNames() {
+        List<String> result = new ArrayList<String>();
+        JCategories jCategories = AppController.getInstance().getSupportedCategories();
+        if(jCategories != null && jCategories.getCategories() != null && !jCategories.getCategories().isEmpty()) {
+            List<JCategory> categories = jCategories.getCategories();
+            for(JCategory c : categories) {
+                result.add(c.getLabel());
+            }
+        } else {
+            result = AppController.getInstance().getFollowedCategories();
+        }
+        return result;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,6 +100,7 @@ public class TopicCreateActivity extends AbstractAppCompatActivity implements IA
         topic_create_name = (EditText) findViewById(R.id.topic_create_name);
         topic_create_description = (EditText) findViewById(R.id.topic_create_description);
         topic_create_category = (AutoCompleteTextView) findViewById(R.id.topic_create_category);
+        topic_create_category_notes = (TextView) findViewById(R.id.topic_create_category_notes);
         topic_create_localityAddr = (EditText) findViewById(R.id.topic_create_localityAddr);
         topic_create_city = (EditText) findViewById(R.id.topic_create_city);
         topic_create_country = (EditText) findViewById(R.id.topic_create_country);
@@ -90,10 +108,21 @@ public class TopicCreateActivity extends AbstractAppCompatActivity implements IA
         wallpaper_select = (Button) findViewById(R.id.wallpaper_select);
 
         topic_create_category.setThreshold(1);
+        List<String>  followedCategories = getCategoryNames();
         ArrayAdapter<String> categoryAdapter = new ArrayAdapter<String>(this,
                 android.support.v7.appcompat.R.layout.select_dialog_item_material,
-                AppController.getInstance().getFollowedCategories());
+                followedCategories);
         topic_create_category.setAdapter(categoryAdapter);
+        String displayText = "Valid categories for you: [";
+        int len = followedCategories.size()-1;
+        for(int i=0; i<len; i++) {
+            displayText = displayText + followedCategories.get(i);
+            displayText = displayText + ", ";
+        }
+        displayText = displayText + followedCategories.get(len);
+        displayText = displayText + "]";
+
+        topic_create_category_notes.setText(displayText);
 
         /*SpannableString spannableString = new SpannableString("Select an image, as wallpaper of your topic");
         spannableString.setSpan(new UnderlineSpan(), 0, spannableString.length(), 0);
@@ -295,8 +324,8 @@ public class TopicCreateActivity extends AbstractAppCompatActivity implements IA
                 };
                 jTopic = (JTopic) api.execute(listener);
             } catch (Exception e) {
-                errorMsg = "Failed creating new topic";
-                Log.i(LOG_TAG, "Failed creating new topic :: " + e.getMessage());
+                errorMsg = "Failed creating new Vision";
+                Log.i(LOG_TAG, "Failed creating new Vision :: " + e.getMessage());
             }
             return jTopic;
         }

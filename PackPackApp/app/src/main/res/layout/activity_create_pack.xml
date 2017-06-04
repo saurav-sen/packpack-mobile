@@ -14,7 +14,7 @@
             android:id="@+id/pack_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Name of the pack"/>
+            android:hint="Name of the gallery/album"/>
 
         <EditText
             android:id="@+id/pack_description"
@@ -23,7 +23,7 @@
             android:inputType="textMultiLine"
             android:maxLines="20"
             android:minLines="10"
-            android:hint="Description of the Pack"/>
+            android:hint="Description of the gallery/album"/>
 
         <android.support.v7.widget.AppCompatButton
             android:id="@+id/pack_create_submit"

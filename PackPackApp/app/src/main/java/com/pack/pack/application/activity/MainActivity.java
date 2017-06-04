@@ -3,6 +3,7 @@ package com.pack.pack.application.activity;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Build;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
@@ -87,6 +88,7 @@ public class MainActivity extends AbstractAppCompatActivity {
         }
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        tabLayout.setSelectedTabIndicatorColor(Color.WHITE);
         tabLayout.setupWithViewPager(pager);
 
         int i=0;
@@ -209,7 +211,7 @@ public class MainActivity extends AbstractAppCompatActivity {
                 }
             }
             else {
-                Toast.makeText(MainActivity.this, "Sorry!! Failed creating new gallery",
+                Toast.makeText(MainActivity.this, "Sorry!! Failed creating new vision",
                         Toast.LENGTH_LONG).show();;
             }
         }

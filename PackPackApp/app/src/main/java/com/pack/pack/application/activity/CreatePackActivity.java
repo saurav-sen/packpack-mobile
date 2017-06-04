@@ -146,7 +146,7 @@ public class CreatePackActivity extends AbstractAppCompatActivity implements IAs
             try {
                 pack = (JPack) api.execute();
             } catch (Exception e) {
-                errorMsg = "Failed creating new pack";
+                errorMsg = "Failed creating new gallery";
             }
             return pack;
         }

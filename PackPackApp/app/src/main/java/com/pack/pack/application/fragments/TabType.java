@@ -14,7 +14,7 @@ public enum TabType {
     //Tabs which are enabled
     HOME("home", "Home", R.drawable.home, HomeViewFragment.class, true, new String[] {"home"}),
     ART(ApiConstants.ART, "Art", R.drawable.art, ArtViewFragment.class, true, new String[]{ApiConstants.ART, ApiConstants.MUSIC}),
-    PHOTOGRAPHY(ApiConstants.PHOTOGRAPHY, "Travel", R.drawable.photography, PhotographyViewFragment.class, true, new String[]{ApiConstants.PHOTOGRAPHY, ApiConstants.LIFESTYLE}),
+    PHOTOGRAPHY(ApiConstants.PHOTOGRAPHY, "Photo", R.drawable.photography, PhotographyViewFragment.class, true, new String[]{ApiConstants.PHOTOGRAPHY, ApiConstants.LIFESTYLE}),
     EDUCATION(ApiConstants.EDUCATION, "Writer", R.drawable.education, EducationViewFragment.class, true, new String[]{ApiConstants.EDUCATION, ApiConstants.SPIRITUAL, ApiConstants.FUN}),
     OTHERS(ApiConstants.OTHERS, "Misc", R.drawable.others, MiscViewFragment.class, true, new String[]{ApiConstants.OTHERS, ApiConstants.LIFESTYLE}),
 

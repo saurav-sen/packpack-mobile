@@ -45,6 +45,14 @@
             android:hint="Category"
             android:inputType="textAutoComplete" />
 
+        <TextView
+            android:id="@+id/topic_create_category_notes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAllCaps="false"
+            android:textSize="12dp"
+            android:textColor="@color/timestamp"/>
+
         <EditText
             android:id="@+id/topic_create_localityAddr"
             android:layout_width="match_parent"
