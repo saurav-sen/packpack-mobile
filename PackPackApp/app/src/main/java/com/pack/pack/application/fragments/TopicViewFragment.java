@@ -66,7 +66,7 @@ public abstract class TopicViewFragment extends Fragment {
         View view = inflater.inflate(getViewLayoutId(), container, false);
         listView = (ListView) view.findViewById(getListViewId());
         List<JTopic> topics = new ArrayList<JTopic>();
-        adapter = new TopicViewAdapter(getActivity(), topics, getCategoryType());
+        adapter = new TopicViewAdapter(getActivity(), this, topics, getCategoryType());
         listView.setAdapter(adapter);
         listView.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
@@ -88,9 +88,8 @@ public abstract class TopicViewFragment extends Fragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                JTopic topic = (JTopic) adapterView.getAdapter().getItem(i);
-                // JTopic topic = (JTopic) listView.getSelectedItem();
-                handleItemClick(topic);
+                //JTopic topic = (JTopic) adapterView.getAdapter().getItem(i);
+                //handleItemClick(topic);
             }
         });
         return view;
@@ -109,6 +108,10 @@ public abstract class TopicViewFragment extends Fragment {
         Intent intent = new Intent(getContext(), activityClass);
         intent.putExtra(parcelKey, parcel);
         startActivity(intent);
+    }
+
+    public void doHandleItemClick(JTopic topic) {
+        handleItemClick(topic);
     }
 
     protected abstract void handleItemClick(JTopic topic);

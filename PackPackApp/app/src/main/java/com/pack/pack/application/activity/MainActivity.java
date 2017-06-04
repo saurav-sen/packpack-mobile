@@ -92,6 +92,7 @@ public class MainActivity extends AbstractAppCompatActivity {
         int i=0;
         for(TabType value : types) {
             tabLayout.getTabAt(i).setIcon(value.getIcon());
+            tabLayout.getTabAt(i).setText(value.getDisplayName());
             i++;
         }
 

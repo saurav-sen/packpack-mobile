@@ -106,8 +106,12 @@ public class CreatePackActivity extends AbstractAppCompatActivity implements IAs
             Toast.makeText(CreatePackActivity.this, "Title should be of minimum 5 characters long.",
                     Toast.LENGTH_LONG).show();
             return;
-        } else if(story.length() < ApiConstants.MIN_DESC_FIELD_LENGTH) {
-            Toast.makeText(CreatePackActivity.this, "Story should be of minimum 50 characters long.",
+        } else if(story.length() < ApiConstants.MIN_GALLERY_DESC_FIELD_LENGTH) {
+            Toast.makeText(CreatePackActivity.this, "Story should be of minimum 10 characters long.",
+                    Toast.LENGTH_LONG).show();
+            return;
+        } else if(story.length() > ApiConstants.MAX_GALLERY_DESC_FIELD_LENGTH) {
+            Toast.makeText(CreatePackActivity.this, "Story is too long, max allowed 200.",
                     Toast.LENGTH_LONG).show();
             return;
         }

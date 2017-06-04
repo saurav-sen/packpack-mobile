@@ -152,8 +152,12 @@ public class UploadActivity extends AbstractActivity {
                     Toast.makeText(UploadActivity.this, "Title should be of minimum 5 characters long.",
                             Toast.LENGTH_LONG).show();
                     return;
-                } else if(description.length() < ApiConstants.MIN_DESC_FIELD_LENGTH) {
-                    Toast.makeText(UploadActivity.this, "Description should be of minimum 50 characters long.",
+                } else if(description.length() < ApiConstants.MIN_ATTACHMENT_DESC_FIELD_LENGTH) {
+                    Toast.makeText(UploadActivity.this, "Description should be of minimum 5 characters long.",
+                            Toast.LENGTH_LONG).show();
+                    return;
+                } else if(description.length() > ApiConstants.MAX_ATTACHMENT_DESC_FIELD_LENGTH) {
+                    Toast.makeText(UploadActivity.this, "Description is too long, max allowed 200.",
                             Toast.LENGTH_LONG).show();
                     return;
                 }

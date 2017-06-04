@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.android.volley.toolbox.NetworkImageView;
 import com.pack.pack.application.R;
+import com.pack.pack.application.fragments.TopicViewFragment;
 import com.pack.pack.application.image.loader.DownloadImageTask;
 import com.pack.pack.application.view.util.ViewUtil;
 import com.pack.pack.model.web.JTopic;
@@ -39,11 +40,14 @@ public class TopicViewAdapter extends ArrayAdapter<JTopic> {
 
     private String categoryType;
 
-    public TopicViewAdapter(Activity activity, List<JTopic> topics, String categoryType) {
+    private TopicViewFragment fragment;
+
+    public TopicViewAdapter(Activity activity, TopicViewFragment fragment, List<JTopic> topics, String categoryType) {
         super(activity, ViewUtil.getListViewLayoutId(categoryType), topics);
         this.activity = activity;
         this.topics = topics;
         this.categoryType = categoryType;
+        this.fragment = fragment;
     }
 
     @Override
@@ -68,8 +72,24 @@ public class TopicViewAdapter extends ArrayAdapter<JTopic> {
         NetworkImageView topicPicView = (NetworkImageView) convertView.findViewById(ViewUtil.getViewId(categoryType, "topicPic"));
         TextView nameTextView = (TextView) convertView.findViewById(ViewUtil.getViewId(categoryType, "topic_name"));
         TextView descriptionTextView = (TextView) convertView.findViewById(ViewUtil.getViewId(categoryType, "topic_description"));
+        descriptionTextView.setTag(position);
+        descriptionTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                JTopic topic = getItem((int)v.getTag());
+                fragment.doHandleItemClick(topic);
+            }
+        });
        // TextView followersTextView = (TextView) convertView.findViewById(R.id.topic_followers);
         ImageView poster = (ImageView) convertView.findViewById(ViewUtil.getViewId(categoryType, "topicPoster"));
+        poster.setTag(position);
+        poster.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                JTopic topic = getItem((int)v.getTag());
+                fragment.doHandleItemClick(topic);
+            }
+        });
         ProgressBar loadingProgres = (ProgressBar) convertView.findViewById(ViewUtil.getViewId(categoryType, "loading_progress"));
 
         //ImageView followSign = (ImageView) convertView.findViewById(ViewUtil.getViewId(categoryType, "follow_sign"));

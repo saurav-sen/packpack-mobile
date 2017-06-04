@@ -203,8 +203,12 @@ public class TopicCreateActivity extends AbstractAppCompatActivity implements IA
             Toast.makeText(TopicCreateActivity.this, "Name should be of minimum 5 characters long.",
                     Toast.LENGTH_LONG).show();
             return;
-        } else if(topicDescription.length() < ApiConstants.MIN_DESC_FIELD_LENGTH) {
+        } else if(topicDescription.length() < ApiConstants.MIN_VISION_DESC_FIELD_LENGTH) {
             Toast.makeText(TopicCreateActivity.this, "Description should be of minimum 50 characters long.",
+                    Toast.LENGTH_LONG).show();
+            return;
+        } else if(topicDescription.length() > ApiConstants.MAX_VISION_DESC_FIELD_LENGTH) {
+            Toast.makeText(TopicCreateActivity.this, "Description is too long, max allowed 50.",
                     Toast.LENGTH_LONG).show();
             return;
         } else if(!validateTopicCategory(topicCategory)) {
