@@ -24,6 +24,7 @@ import com.pack.pack.application.data.util.LoginTask;
 import com.pack.pack.application.image.loader.DownloadProfilePictureTask;
 import com.pack.pack.application.service.CheckNetworkService;
 import com.pack.pack.application.service.NetworkUtil;
+import com.pack.pack.application.service.NotificationReaderService;
 import com.pack.pack.application.service.SquillNTPService;
 import com.pack.pack.model.web.JUser;
 import com.pack.pack.oauth1.client.AccessToken;

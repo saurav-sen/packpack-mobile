@@ -1,6 +1,8 @@
 package com.pack.pack.application.activity;
 
 import android.Manifest;
+import android.app.job.JobInfo;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -21,6 +23,7 @@ import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
 import com.pack.pack.application.adapters.MainActivityAdapter;
 import com.pack.pack.application.fragments.TabType;
+import com.pack.pack.application.service.NotificationReaderService;
 import com.pack.pack.application.topic.activity.model.ParcelableTopic;
 
 import java.util.ArrayList;
@@ -117,6 +120,13 @@ public class MainActivity extends AbstractAppCompatActivity {
         } else {
 
         }
+
+        startNotificationReader();
+    }
+
+    private void startNotificationReader() {
+        Intent intent = new Intent(this, NotificationReaderService.class);
+        startService(intent);
     }
 
     @Override

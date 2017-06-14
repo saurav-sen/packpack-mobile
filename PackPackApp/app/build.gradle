@@ -7,10 +7,10 @@ android {
 
     defaultConfig {
         applicationId "com.pack.pack.application"
-        minSdkVersion 21
+        minSdkVersion 19
         targetSdkVersion 23
-        versionCode 1
-        versionName "1.0"
+        versionCode 4
+        versionName "1.0.0.1"
     }
     buildTypes {
         release {
@@ -62,4 +62,6 @@ dependencies {
     compile 'com.amazonaws:aws-android-sdk-s3:2.2.+'
     compile 'com.amazonaws:aws-android-sdk-ddb:2.2.+'
    // compile 'com.google.apis:google-api-services-youtube:v3-rev183-1.22.0'
+
+    compile 'com.rabbitmq:amqp-client:3.5.6'
 }

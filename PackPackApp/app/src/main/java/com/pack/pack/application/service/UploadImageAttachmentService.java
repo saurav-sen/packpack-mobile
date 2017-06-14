@@ -175,7 +175,7 @@ public class UploadImageAttachmentService extends Service {
                 boolean started = false;
                 try {
                     ByteArrayOutputStream baOS = new ByteArrayOutputStream();
-                    mediaBitmap.compress(Bitmap.CompressFormat.JPEG, 60, baOS);
+                    mediaBitmap.compress(Bitmap.CompressFormat.JPEG, 65, baOS);
                     byte[] bytes = baOS.toByteArray();
                     ByteBody byteBody = new ByteBody();
                     byteBody.setBytes(bytes);

@@ -4,6 +4,7 @@
     android:layout_height="match_parent"
     android:layout_centerHorizontal="true"
     android:layout_centerVertical="true"
+    android:background="@color/black"
     android:id="@+id/mainLayout">
 
    <!-- <com.pack.pack.application.view.TouchImageView

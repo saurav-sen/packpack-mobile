@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Point;
 import android.net.Uri;
 import android.os.Environment;
 import android.support.design.widget.Snackbar;
@@ -18,10 +19,12 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Display;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -181,6 +184,11 @@ public class TopicDetailActivity extends AbstractAppCompatActivity implements On
         ProgressBar topic_detail_loading_progress = (ProgressBar) findViewById(R.id.topic_detail_loading_progress);
         topic_detail_loading_progress.setVisibility(View.VISIBLE);
 
+       /* Display display = ((WindowManager) getSystemService(WINDOW_SERVICE)).getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        int imageWidth = (int)(size.x * 0.7f);
+        int imageHeight = (int)(size.y * 0.5f);*/
         new DownloadImageTask(topic_wallpaper_img, this, topic_detail_loading_progress).execute(topic.getWallpaperUrl());
 
         ImageButton enterTopic = (ImageButton) findViewById(R.id.enter_topic_detail);

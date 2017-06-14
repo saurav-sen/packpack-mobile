@@ -5,9 +5,12 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Point;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.view.Display;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
@@ -47,6 +50,8 @@ public class DownloadImageTask extends AbstractNetworkTask<String, Void, Bitmap>
 
     private boolean includeOauthToken;
 
+    private boolean blindResize;
+
     private static final String LOG_TAG = "DownloadImageTask";
 
     public DownloadImageTask(ImageView imageView, Context context) {
@@ -68,12 +73,17 @@ public class DownloadImageTask extends AbstractNetworkTask<String, Void, Bitmap>
     }
 
     public DownloadImageTask(ImageView imageView, int imageWidth, int imageHeight, Context context, ProgressBar progressBar, boolean includeOauthToken) {
+        this(imageView, imageWidth, imageHeight, context, progressBar, includeOauthToken, false);
+    }
+
+    public DownloadImageTask(ImageView imageView, int imageWidth, int imageHeight, Context context, ProgressBar progressBar, boolean includeOauthToken, boolean blindResize) {
         super(false, false, context, false);
         this.imageView = imageView;
         this.imageWidth = imageWidth;
         this.imageHeight = imageHeight;
         this.progressBar = progressBar;
         this.includeOauthToken = includeOauthToken;
+        this.blindResize = blindResize;
     }
 
     @Override
@@ -108,6 +118,68 @@ public class DownloadImageTask extends AbstractNetworkTask<String, Void, Bitmap>
         return url;// + "?w=" + imageWidth + "&h=" + imageHeight;
     }
 
+    private class ImageDimension {
+        private int newHeight;
+        private int newWidth;
+
+        ImageDimension(int newHeight, int newWidth) {
+            this.newHeight = newHeight;
+            this.newWidth = newWidth;
+        }
+    }
+
+    private ImageDimension calculateResizeDimensions(Bitmap bitmap) {
+        //int shortSideMax = 900;
+        //int longSideMax = 1440;
+
+        Display display = ((WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+
+        int shortSideMax = size.x;
+        int longSideMax = size.x+200;//(int)(size.y * 0.6f);
+
+        int height = bitmap.getHeight();
+        int width = bitmap.getWidth();
+
+        float aspectRatio = (float)width / (float)height;
+        if(aspectRatio >= 1.2f) {
+            longSideMax = size.x;
+            shortSideMax = (int) (longSideMax / 1.2f);
+        } else if(aspectRatio <= 0.8f) {
+            shortSideMax = size.x;
+            longSideMax = (int) (shortSideMax / 0.8f);
+        }
+
+        float resizeRatio = 1.0f;
+        if(width >= height) {
+            if(width <= longSideMax && height <= shortSideMax) {
+                float wRatio = (float)longSideMax / (float)width;
+                float hRatio = (float)shortSideMax / (float)height;
+                resizeRatio = Math.min(wRatio, hRatio);
+                //return new ImageDimension(height, width);
+            } else {
+                float wRatio = (float)longSideMax / (float)width;
+                float hRatio = (float)shortSideMax / (float)height;
+                resizeRatio = Math.min(wRatio, hRatio);
+            }
+        } else {
+            if(height <= longSideMax && width <= shortSideMax) {
+                float wRatio = (float)longSideMax / (float)width;
+                float hRatio = (float)shortSideMax / (float)height;
+                resizeRatio = Math.min(wRatio, hRatio);
+                //return new ImageDimension(height, width);
+            } else {
+                float wRatio = (float)shortSideMax / (float)width;
+                float hRatio = (float)longSideMax / (float)height;
+                resizeRatio = Math.min(wRatio, hRatio);
+            }
+        }
+        height = (int)(height * resizeRatio);
+        width = (int)(width * resizeRatio);
+        return new ImageDimension(height, width);
+    }
+
     @Override
     protected Bitmap executeApi(API api) throws Exception {
         InputStream stream = null;
@@ -118,12 +190,18 @@ public class DownloadImageTask extends AbstractNetworkTask<String, Void, Bitmap>
             if(bitmap != null) {
                 int ht = bitmap.getHeight();
                 int wd = bitmap.getWidth();
-                if(ht != imageHeight || wd != imageWidth) {
-                    if (imageWidth > 0 && imageHeight > 0) {
-                        bitmap = Bitmap.createScaledBitmap(bitmap, imageWidth, imageHeight, false);
+                if(ht == imageHeight && wd == imageWidth) {
+                    return bitmap;
+                }
+                ImageDimension dimension = calculateResizeDimensions(bitmap);
+                if(ht != dimension.newHeight || wd != dimension.newWidth) {
+                    /*if (imageWidth > 0 && imageHeight > 0) {
+                        bitmap = Bitmap.createScaledBitmap(bitmap, imageWidth, imageHeight, true);
                     } else {
-                        bitmap = Bitmap.createScaledBitmap(bitmap, 900, 700, false);
-                    }
+                        bitmap = Bitmap.createScaledBitmap(bitmap, 900, 700, true);
+                    }*/
+                    bitmap = Bitmap.createScaledBitmap(bitmap, dimension.newWidth, dimension.newHeight, true);
+                    AppController.getInstance().getLruBitmapCache().putBitmap(lookupURL(url), bitmap);
                 }
                 return bitmap;
             }
@@ -131,10 +209,16 @@ public class DownloadImageTask extends AbstractNetworkTask<String, Void, Bitmap>
             if(stream != null) {
                 bitmap = BitmapFactory.decodeStream(stream);
                 if(bitmap != null) {
-                    if (imageWidth > 0 && imageHeight > 0) {
-                        bitmap = Bitmap.createScaledBitmap(bitmap, imageWidth, imageHeight, false);
+                    /*if (imageWidth > 0 && imageHeight > 0) {
+                        bitmap = Bitmap.createScaledBitmap(bitmap, imageWidth, imageHeight, true);
                     } else {
-                        bitmap = Bitmap.createScaledBitmap(bitmap, 900, 700, false);
+                        bitmap = Bitmap.createScaledBitmap(bitmap, 900, 700, true);
+                    }*/
+                    if(blindResize && imageWidth > 0 && imageHeight > 0) {
+                        bitmap = Bitmap.createScaledBitmap(bitmap, imageWidth, imageHeight, true);
+                    } else {
+                        ImageDimension dimension = calculateResizeDimensions(bitmap);
+                        bitmap = Bitmap.createScaledBitmap(bitmap, dimension.newWidth, dimension.newHeight, true);
                     }
                 }
                 AppController.getInstance().getLruBitmapCache().putBitmap(lookupURL(url), bitmap);

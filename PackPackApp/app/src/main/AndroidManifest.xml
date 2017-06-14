@@ -156,7 +156,12 @@
         <activity android:name=".activity.PasswordResetActivity" />
         <activity android:name=".data.util.PasswordResetVerifierActivity" />
         <activity android:name=".activity.PreSignupActivity2" />
-        <activity android:name=".activity.FullScreenRssFeedViewActivity"></activity>
+        <activity android:name=".activity.FullScreenRssFeedViewActivity" />
+
+        <service
+            android:name=".service.NotificationReaderService"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>
