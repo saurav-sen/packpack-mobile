@@ -4,6 +4,8 @@ import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -33,6 +35,8 @@ import java.io.IOException;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class NotificationReaderService extends Service {
 
@@ -42,6 +46,8 @@ public class NotificationReaderService extends Service {
 
     private AmqpConnection amqpConnection;
 
+    //private ExecutorService executorService;
+
     public NotificationReaderService() {
         amqpConnection = new AmqpConnection();
     }
@@ -49,12 +55,18 @@ public class NotificationReaderService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         //new MessageSubscriber().execute(amqpConnection);
-        if(timer != null) {
+        /*if(executorService == null) {
+            executorService = Executors.newSingleThreadExecutor();
+        }*/
+        /*if(timer != null) {
             timer.cancel();
         } else {
             timer = new Timer();
+        }*/
+        if(timer == null) {
+            timer = new Timer();
         }
-        timer.scheduleAtFixedRate(new NotificationTimerTask(), 0, 2 * 60 * 1000);
+        timer.scheduleAtFixedRate(new NotificationTimerTask(), 0, 3 * 60 * 1000);
         return START_STICKY;
     }
 
@@ -193,6 +205,10 @@ public class NotificationReaderService extends Service {
                             .setContentText(message);
             Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
             notificationBuilder.setSound(alarmSound);
+
+            Bitmap largeIcon = BitmapFactory.decodeResource(getResources(), R.drawable.logo);
+            notificationBuilder.setLargeIcon(largeIcon);
+
             notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());
             /*new Thread(new Runnable() {
                 @Override

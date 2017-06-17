@@ -163,6 +163,9 @@ public class DownloadImageTask extends AbstractNetworkTask<String, Void, Bitmap>
                 float hRatio = (float)shortSideMax / (float)height;
                 resizeRatio = Math.min(wRatio, hRatio);
             }
+            /*if(resizeRatio == 1.0f) {
+                resizeRatio = 1.2f;
+            }*/
         } else {
             if(height <= longSideMax && width <= shortSideMax) {
                 float wRatio = (float)longSideMax / (float)width;
@@ -174,6 +177,9 @@ public class DownloadImageTask extends AbstractNetworkTask<String, Void, Bitmap>
                 float hRatio = (float)longSideMax / (float)height;
                 resizeRatio = Math.min(wRatio, hRatio);
             }
+            /*if(resizeRatio == 1.0f) {
+                resizeRatio = 1.2f;
+            }*/
         }
         height = (int)(height * resizeRatio);
         width = (int)(width * resizeRatio);

@@ -277,7 +277,7 @@ public class TopicDetailActivity extends AbstractAppCompatActivity implements On
         intent.setType("image/*");
 
         intent.putExtra(Intent.EXTRA_SUBJECT, "");
-        intent.putExtra(Intent.EXTRA_TEXT, "Checkout my vision " + topic.getTopicName() + " @ SQUILL (" + AppController.getInstance().getApkUrl() + ")");
+        intent.putExtra(Intent.EXTRA_TEXT, "Checkout my vision " + topic.getTopicName() + " @ SQUILL @ " + AppController.getInstance().getApkUrl());
         intent.putExtra(Intent.EXTRA_STREAM, uri);
 
         startActivity(Intent.createChooser(intent, "Share My Vision"));
