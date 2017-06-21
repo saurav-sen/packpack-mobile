@@ -17,8 +17,10 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.youtube.player.YouTubeStandalonePlayer;
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
+import com.pack.pack.application.activity.FullScreenPlayVideoActivity;
 import com.pack.pack.application.data.util.ApiConstants;
 import com.pack.pack.application.data.util.DownloadFeedImageTask;
 import com.pack.pack.application.data.util.ImageUtil;
@@ -49,6 +51,8 @@ public class FullScreenRssFeedViewAdapter extends PagerAdapter {
 
     private ImageView feed_imgDisplay;
 
+    private ImageView feed_imgDisplay_play;
+
     public FullScreenRssFeedViewAdapter(Activity activity, List<ParcellableRssFeed> feeds) {
         this.activity = activity;
         this.feeds = feeds;
@@ -77,7 +81,7 @@ public class FullScreenRssFeedViewAdapter extends PagerAdapter {
         View view = inflater.inflate(R.layout.layout_full_screen_rss_feed_view, container, false);
 
         feed_imgDisplay = (ImageView) view.findViewById(R.id.feed_imgDisplay);
-        ImageView feed_imgDisplay_play = (ImageView) view.findViewById(R.id.feed_imgDisplay_play);
+        feed_imgDisplay_play = (ImageView) view.findViewById(R.id.feed_imgDisplay_play);
         TextView feed_titleText = (TextView) view.findViewById(R.id.feed_titleText);
         TextView feed_descriptionText = (TextView) view.findViewById(R.id.feed_descriptionText);
 
@@ -106,6 +110,13 @@ public class FullScreenRssFeedViewAdapter extends PagerAdapter {
             String videoUrl = input.getVideoUrl();
             if(videoUrl != null && !videoUrl.trim().isEmpty()) {
                 feed_imgDisplay_play.setVisibility(View.VISIBLE);
+                feed_imgDisplay_play.setTag(videoUrl);
+                feed_imgDisplay_play.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        playVideo((String)feed_imgDisplay_play.getTag());
+                    }
+                });
             } else {
                 feed_imgDisplay_play.setVisibility(View.GONE);
             }
@@ -113,6 +124,30 @@ public class FullScreenRssFeedViewAdapter extends PagerAdapter {
 
         ((ViewPager)container).addView(view);
         return view;
+    }
+
+    private void playVideo(String videoURL) {
+        boolean isExternalLink = !(videoURL.startsWith(ApiConstants.BASE_URL));
+
+        if (isExternalLink) {
+            String VIDEO_ID = null;
+            if (videoURL.contains("youtube")) {
+                String[] split = videoURL.split("v=");
+                if (split.length > 1) {
+                    VIDEO_ID = split[1];
+                }
+            }
+            if ((VIDEO_ID != null && !VIDEO_ID.isEmpty())) {
+                Intent intent = YouTubeStandalonePlayer.createVideoIntent(activity, ApiConstants.YOUTUBE_API_KEY, VIDEO_ID);
+                activity.startActivity(intent);
+            } else {
+                Snackbar.make(feed_imgDisplay_play, "Oops! Something went wrong", Snackbar.LENGTH_LONG).show();
+            }
+        } else {
+            Intent intent = new Intent(activity, FullScreenPlayVideoActivity.class);
+            intent.putExtra(FullScreenPlayVideoActivity.VIDEO_URL, videoURL);
+            activity.startActivity(intent);
+        }
     }
 
     private void shareImage(File file) {

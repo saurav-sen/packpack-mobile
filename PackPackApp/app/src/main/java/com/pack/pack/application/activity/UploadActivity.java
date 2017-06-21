@@ -148,16 +148,17 @@ public class UploadActivity extends AbstractActivity {
             public void onClick(View view) {
                 title = upload_title.getText() + "";
                 description = upload_description.getText() + "";
+                int descNoOfWords = description.split(" ").length;
                 if(title.length() < 5) {
                     Toast.makeText(UploadActivity.this, "Title should be of minimum 5 characters long.",
                             Toast.LENGTH_LONG).show();
                     return;
                 } else if(description.length() < ApiConstants.MIN_ATTACHMENT_DESC_FIELD_LENGTH) {
-                    Toast.makeText(UploadActivity.this, "Description should be of minimum" + ApiConstants.MIN_ATTACHMENT_DESC_FIELD_LENGTH + "characters long.",
+                    Toast.makeText(UploadActivity.this, "Description should be of minimum " + ApiConstants.MIN_ATTACHMENT_DESC_FIELD_LENGTH + " characters long.",
                             Toast.LENGTH_LONG).show();
                     return;
-                } else if(description.length() > ApiConstants.MAX_ATTACHMENT_DESC_FIELD_LENGTH) {
-                    Toast.makeText(UploadActivity.this, "Description is too long, max allowed " + ApiConstants.MAX_ATTACHMENT_DESC_FIELD_LENGTH,
+                } else if(descNoOfWords > ApiConstants.MAX_ATTACHMENT_DESC_FIELD_LENGTH) {
+                    Toast.makeText(UploadActivity.this, "Description is too long, max words " + ApiConstants.MAX_ATTACHMENT_DESC_FIELD_LENGTH,
                             Toast.LENGTH_LONG).show();
                     return;
                 }

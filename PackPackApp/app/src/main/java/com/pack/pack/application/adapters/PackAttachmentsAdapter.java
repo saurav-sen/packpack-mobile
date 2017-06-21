@@ -551,6 +551,9 @@ public class PackAttachmentsAdapter extends ArrayAdapter<JPackAttachment> {
                 continue;
             }
             AttachmentUnderUploadDetails attachmentUnderUploadDetails = attachmentIdVsAttachmentDetails.get(oldAttachmentId);
+            if(attachmentUnderUploadDetails == null) {
+                continue;
+            }
             attachmentUnderUploadDetails.setUploadSuccess(true);
             replace(attachmentUnderUploadDetails.getAttachment(), newAttachment);
             attachmentUnderUploadDetails.getAttachment().setUploadProgress(false);

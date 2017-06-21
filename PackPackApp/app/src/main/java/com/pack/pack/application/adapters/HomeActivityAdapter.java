@@ -106,7 +106,10 @@ public class HomeActivityAdapter extends ArrayAdapter<JRssFeed> {
                 home_rss_feed_video_play.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        playVideo(videoUrl);
+                        //playVideo(videoUrl);
+                        Intent intent = new Intent(getContext(), FullScreenRssFeedViewActivity.class);
+                        intent.putParcelableArrayListExtra(FullScreenRssFeedViewActivity.PARCELLABLE_FEEDS, prepareParcel(feed));
+                        getContext().startActivity(intent);
                     }
                 });
             } else {

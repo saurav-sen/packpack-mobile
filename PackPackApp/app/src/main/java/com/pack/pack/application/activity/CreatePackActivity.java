@@ -102,6 +102,7 @@ public class CreatePackActivity extends AbstractAppCompatActivity implements IAs
     private void doCreatePack(PackCreateInfo info) {
         String title = info.title + "";
         String story = info.story + "";
+        int storyNoOfWords = story.split(" ").length;
         if(title.length() < 5) {
             Toast.makeText(CreatePackActivity.this, "Title should be of minimum 5 characters long.",
                     Toast.LENGTH_LONG).show();
@@ -110,8 +111,8 @@ public class CreatePackActivity extends AbstractAppCompatActivity implements IAs
             Toast.makeText(CreatePackActivity.this, "Story should be of minimum " + ApiConstants.MIN_GALLERY_DESC_FIELD_LENGTH + " characters long.",
                     Toast.LENGTH_LONG).show();
             return;
-        } else if(story.length() > ApiConstants.MAX_GALLERY_DESC_FIELD_LENGTH) {
-            Toast.makeText(CreatePackActivity.this, "Story is too long, max allowed " + ApiConstants.MAX_GALLERY_DESC_FIELD_LENGTH,
+        } else if(storyNoOfWords > ApiConstants.MAX_GALLERY_DESC_FIELD_LENGTH) {
+            Toast.makeText(CreatePackActivity.this, "Story is too long, max words " + ApiConstants.MAX_GALLERY_DESC_FIELD_LENGTH,
                     Toast.LENGTH_LONG).show();
             return;
         }

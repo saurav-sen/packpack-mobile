@@ -228,6 +228,7 @@ public class TopicCreateActivity extends AbstractAppCompatActivity implements IA
         String locality = topic_create_localityAddr.getText().toString();
         String city = topic_create_city.getText().toString();
         String country = topic_create_country.getText().toString();
+        int descNoOfWords = topicDescription.split(" ").length;
         if(topicName.length() < 5) {
             Toast.makeText(TopicCreateActivity.this, "Name should be of minimum 5 characters long.",
                     Toast.LENGTH_LONG).show();
@@ -236,8 +237,8 @@ public class TopicCreateActivity extends AbstractAppCompatActivity implements IA
             Toast.makeText(TopicCreateActivity.this, "Description should be of minimum " + ApiConstants.MIN_VISION_DESC_FIELD_LENGTH + " characters long.",
                     Toast.LENGTH_LONG).show();
             return;
-        } else if(topicDescription.length() > ApiConstants.MAX_VISION_DESC_FIELD_LENGTH) {
-            Toast.makeText(TopicCreateActivity.this, "Description is too long, max allowed " + ApiConstants.MAX_VISION_DESC_FIELD_LENGTH,
+        } else if(descNoOfWords > ApiConstants.MAX_VISION_DESC_FIELD_LENGTH) {
+            Toast.makeText(TopicCreateActivity.this, "Description is too long, max words " + ApiConstants.MAX_VISION_DESC_FIELD_LENGTH,
                     Toast.LENGTH_LONG).show();
             return;
         } else if(!validateTopicCategory(topicCategory)) {

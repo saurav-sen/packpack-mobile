@@ -30,7 +30,7 @@ public interface ApiConstants {
     public static final int MAX_GALLERY_DESC_FIELD_LENGTH = 600;
 
     public static final int MIN_ATTACHMENT_DESC_FIELD_LENGTH = 5;
-    public static final int MAX_ATTACHMENT_DESC_FIELD_LENGTH = 500;
+    public static final int MAX_ATTACHMENT_DESC_FIELD_LENGTH = 600;
 
     public static final String YOUTUBE_API_KEY = "AIzaSyCEBFeUbTeBMtL4mNfpgANER7Da0Z_Gq5Q";
 

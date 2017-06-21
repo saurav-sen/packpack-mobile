@@ -14,6 +14,8 @@ import android.widget.ListView;
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
 import com.pack.pack.application.adapters.HomeActivityAdapter;
+import com.pack.pack.application.data.cache.RssFeedCache;
+import com.pack.pack.application.data.util.AbstractNetworkTask;
 import com.pack.pack.application.data.util.ApiConstants;
 import com.pack.pack.client.api.API;
 import com.pack.pack.client.api.APIBuilder;
@@ -23,8 +25,10 @@ import com.pack.pack.model.web.JRssFeed;
 import com.pack.pack.model.web.Pagination;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -100,14 +104,61 @@ public class HomeViewFragment extends Fragment {
         }
     }
 
-    private class RSSFeedTask extends AsyncTask<String, Integer, Pagination<JRssFeed>> {
+    private class RSSFeedTask extends AbstractNetworkTask<String, Integer, Pagination<JRssFeed>> {
 
         private String pageLink;
 
+        private String errorMsg;
+
         public RSSFeedTask() {
+            super(false, false, getActivity(), false);
         }
 
         @Override
+        protected String getFailureMessage() {
+            return errorMsg;
+        }
+
+        @Override
+        protected Pagination<JRssFeed> executeApi(API api) throws Exception {
+            if(pageLink == null) {
+                pageLink = "FIRST_PAGE";
+            }
+            Pagination<JRssFeed> page = RssFeedCache.INSTANCE.readFromCache(pageLink);
+            if(page != null && page.getResult() != null && !page.getResult().isEmpty()) {
+                return page;
+            }
+            try {
+                page = (Pagination<JRssFeed>)api.execute();
+                RssFeedCache.INSTANCE.storeInCache(pageLink, page);
+            } catch (Exception e) {
+                Log.d(LOG_TAG, e.getMessage());
+                errorMsg = "Oops! Something went wrong";
+            }
+            return page;
+        }
+
+        @Override
+        protected String getContainerIdForObjectStore() {
+            return null;
+        }
+
+        @Override
+        protected COMMAND command() {
+            return COMMAND.GET_ALL_PROMOTIONAL_FEEDS;
+        }
+
+        @Override
+        protected Map<String, Object> prepareApiParams(String inputObject) {
+            Map<String, Object> apiParams = new HashMap<String, Object>();
+            pageLink = inputObject;
+            String userId = AppController.getInstance().getUserId();
+            apiParams.put(APIConstants.User.ID, userId);
+            apiParams.put(APIConstants.PageInfo.PAGE_LINK, pageLink);
+            return apiParams;
+        }
+
+       /* @Override
         protected Pagination<JRssFeed> doInBackground(String... pageLinks) {
             if(pageLinks == null || pageLinks.length == 0)
                 return null;
@@ -127,7 +178,7 @@ public class HomeViewFragment extends Fragment {
                 Log.d(LOG_TAG, e.getMessage());
             }
             return page;
-        }
+        }*/
 
         @Override
         protected void onPostExecute(Pagination<JRssFeed> page) {

@@ -127,7 +127,7 @@ public class AppController extends Application {
     }
 
     public String getUserId() {
-        return user != null ? user.getId() : null;
+        return user != null ? user.getId() : "";
     }
 
     private static AppController mInstance;

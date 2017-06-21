@@ -84,6 +84,7 @@ public class MainActivity extends AbstractAppCompatActivity {
 
         pager = (ViewPager)findViewById(R.id.pager);
         pager.setAdapter(new MainActivityAdapter(getSupportFragmentManager(), types.toArray(new TabType[types.size()])));
+        pager.setOffscreenPageLimit(4);
         int itemIndex = getIntent().getIntExtra(PAGE_CURRENT_INDEX, -1);
         if(itemIndex >= 0 && itemIndex < list.size()) {
             pageCurrentItemIndex = itemIndex;
