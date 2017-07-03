@@ -216,7 +216,7 @@ public class PackDetailActivity extends AbstractAppCompatActivity {
                             feed_display.setTag(selectedFeedForUpload.getOgUrl());
                         }
                         if(selectedFeedForUpload != null) {
-                            new DownloadImageTask(feed_image, 200, 200, PackDetailActivity.this).execute(selectedFeedForUpload.getOgImage());
+                            new DownloadImageTask(feed_image, 200, 200, PackDetailActivity.this, null, false, true, true).execute(selectedFeedForUpload.getOgImage());
                             feed_title.setText(selectedFeedForUpload.getOgTitle());
                             //feed_description.setText(selectedFeedForUpload.getOgDescription());
                         }

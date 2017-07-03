@@ -12,17 +12,21 @@ import java.util.List;
  */
 public enum TabType {
     //Tabs which are enabled
-    HOME("home", "Home", R.drawable.home, HomeViewFragment.class, true, new String[] {"home"}),
-    ART(ApiConstants.ART, "Art", R.drawable.art, ArtViewFragment.class, true, new String[]{ApiConstants.ART, ApiConstants.MUSIC}),
-    PHOTOGRAPHY(ApiConstants.PHOTOGRAPHY, "Photo", R.drawable.photography, PhotographyViewFragment.class, true, new String[]{ApiConstants.PHOTOGRAPHY, ApiConstants.LIFESTYLE}),
-    EDUCATION(ApiConstants.EDUCATION, "Writer", R.drawable.education, EducationViewFragment.class, true, new String[]{ApiConstants.EDUCATION, ApiConstants.SPIRITUAL, ApiConstants.FUN}),
-    OTHERS(ApiConstants.OTHERS, "Misc", R.drawable.others, MiscViewFragment.class, true, new String[]{ApiConstants.OTHERS, ApiConstants.LIFESTYLE}),
+    //SQUILL("squill", "SQUILL TEAM", R.drawable.home, SquillTeamViewFragment.class, true, new String[] {"squill"}, true),
+    NEWS("news", "NEWS", R.drawable.news, NewsViewFragment.class, true, new String[] {"news"}, true),
+    CUSTOM("custom", "USER", R.drawable.forum, UserBroadcastMessageViewFragment.class, false, new String[] {"custom"}, true),
+
+    HOME("home", "Home", R.drawable.home, HomeViewFragment.class, true, new String[] {"home"}, false),
+    ART(ApiConstants.ART, "Artist", R.drawable.art, ArtViewFragment.class, true, new String[]{ApiConstants.ART, ApiConstants.MUSIC}, false),
+    PHOTOGRAPHY(ApiConstants.PHOTOGRAPHY, "Photography", R.drawable.photography, PhotographyViewFragment.class, true, new String[]{ApiConstants.PHOTOGRAPHY, ApiConstants.LIFESTYLE}, false),
+    EDUCATION(ApiConstants.EDUCATION, "Writer", R.drawable.education, EducationViewFragment.class, true, new String[]{ApiConstants.EDUCATION, ApiConstants.SPIRITUAL, ApiConstants.FUN}, false),
+    OTHERS(ApiConstants.OTHERS, "Misc", R.drawable.others, MiscViewFragment.class, true, new String[]{ApiConstants.OTHERS, ApiConstants.LIFESTYLE}, false),
 
     //Tabs which are disabled
-    LIFE_STYLE(ApiConstants.LIFESTYLE, "Lifestyle", R.drawable.lifestyle, LifestyleViewFragment.class, false, new String[]{ApiConstants.LIFESTYLE}),
-    MUSIC(ApiConstants.MUSIC, "Music", R.drawable.music, MusicViewFragment.class, false, new String[]{ApiConstants.MUSIC}),
-    ENTERTAINMENT_FUN(ApiConstants.FUN, "Fun", R.drawable.fun, FunViewFragment.class, false, new String[]{ApiConstants.FUN}),
-    SPIRITUAL(ApiConstants.SPIRITUAL, "Spiritual", R.drawable.spiritual, SpiritualViewFragment.class, false, new String[]{ApiConstants.SPIRITUAL});
+    LIFE_STYLE(ApiConstants.LIFESTYLE, "Lifestyle", R.drawable.lifestyle, LifestyleViewFragment.class, false, new String[]{ApiConstants.LIFESTYLE}, false),
+    MUSIC(ApiConstants.MUSIC, "Music", R.drawable.music, MusicViewFragment.class, false, new String[]{ApiConstants.MUSIC}, false),
+    ENTERTAINMENT_FUN(ApiConstants.FUN, "Fun", R.drawable.fun, FunViewFragment.class, false, new String[]{ApiConstants.FUN}, false),
+    SPIRITUAL(ApiConstants.SPIRITUAL, "Spiritual", R.drawable.spiritual, SpiritualViewFragment.class, false, new String[]{ApiConstants.SPIRITUAL}, false);
 
     private String type;
 
@@ -37,6 +41,12 @@ public enum TabType {
     private boolean isEnabled;
 
     private String[] similarCategories;
+
+    public boolean isBroadcastTab() {
+        return isBroadcastTab;
+    }
+
+    private boolean isBroadcastTab;
 
     public void setRecreate(boolean recreate) {
         this.recreate = recreate;
@@ -66,13 +76,14 @@ public enum TabType {
 
     private Fragment fragment;
 
-    TabType(String type, String displayName, int icon, Class<?> fragmentClass, boolean isEnabled, String[] similarCategories) {
+    TabType(String type, String displayName, int icon, Class<?> fragmentClass, boolean isEnabled, String[] similarCategories, boolean isBroadcastTab) {
         this.displayName = displayName;
         this.type = type;
         this.icon = icon;
         this.fragmentClass = fragmentClass;
         this.isEnabled = isEnabled;
         this.similarCategories = similarCategories;
+        this.isBroadcastTab = isBroadcastTab;
     }
 
     public String getDisplayName() {

@@ -21,4 +21,5 @@
     <dimen name="intro_slide_title">30dp</dimen>
     <dimen name="intro_slide_desc">16dp</dimen>
     <dimen name="intro_desc_padding">40dp</dimen>
+    <dimen name="appbar_padding_top">8dp</dimen>
 </resources>

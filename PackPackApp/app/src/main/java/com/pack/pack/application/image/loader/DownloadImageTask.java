@@ -52,6 +52,8 @@ public class DownloadImageTask extends AbstractNetworkTask<String, Void, Bitmap>
 
     private boolean blindResize;
 
+    private boolean noCaching;
+
     private static final String LOG_TAG = "DownloadImageTask";
 
     public DownloadImageTask(ImageView imageView, Context context) {
@@ -77,6 +79,10 @@ public class DownloadImageTask extends AbstractNetworkTask<String, Void, Bitmap>
     }
 
     public DownloadImageTask(ImageView imageView, int imageWidth, int imageHeight, Context context, ProgressBar progressBar, boolean includeOauthToken, boolean blindResize) {
+        this(imageView, imageWidth, imageHeight, context, progressBar, includeOauthToken, blindResize, false);
+    }
+
+    public DownloadImageTask(ImageView imageView, int imageWidth, int imageHeight, Context context, ProgressBar progressBar, boolean includeOauthToken, boolean blindResize, boolean noCaching) {
         super(false, false, context, false);
         this.imageView = imageView;
         this.imageWidth = imageWidth;
@@ -84,6 +90,7 @@ public class DownloadImageTask extends AbstractNetworkTask<String, Void, Bitmap>
         this.progressBar = progressBar;
         this.includeOauthToken = includeOauthToken;
         this.blindResize = blindResize;
+        this.noCaching = noCaching;
     }
 
     @Override

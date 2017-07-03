@@ -162,7 +162,7 @@ public class FollowCategoryActivity extends AbstractActivity {
     }
 
     private void startMainActivity() {
-        Intent intent = new Intent(this, MainActivity.class);
+        Intent intent = new Intent(this, LandingPageActivity.class);
         startActivity(intent);
     }
 

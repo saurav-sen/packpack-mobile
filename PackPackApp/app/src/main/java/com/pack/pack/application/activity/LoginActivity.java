@@ -192,7 +192,7 @@ public class LoginActivity extends AbstractAppCompatActivity implements IAsyncTa
     }
 
     private void startMainActivity() {
-        Intent intent = new Intent(this, MainActivity.class);
+        Intent intent = new Intent(this, LandingPageActivity.class);
         startActivity(intent);
     }
 }

@@ -64,6 +64,11 @@ public class LoginTask extends AbstractNetworkTask<UserInfo, Integer, AccessToke
     }
 
     @Override
+    protected boolean forceStoreInDb() {
+        return true;
+    }
+
+    @Override
     protected String getContainerIdForObjectStore() {
         return null;
     }

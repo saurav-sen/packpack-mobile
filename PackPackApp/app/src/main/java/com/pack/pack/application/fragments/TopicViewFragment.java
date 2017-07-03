@@ -34,7 +34,7 @@ import java.util.Map;
 /**
  * Created by Saurav on 08-04-2016.
  */
-public abstract class TopicViewFragment extends Fragment {
+public abstract class TopicViewFragment extends Fragment implements JTopicClickHandler {
 
     // private ProgressDialog progressDialog;
 

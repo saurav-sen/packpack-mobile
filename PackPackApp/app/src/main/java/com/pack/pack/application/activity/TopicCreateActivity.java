@@ -78,8 +78,15 @@ public class TopicCreateActivity extends AbstractAppCompatActivity implements IA
 
     public static final String RESULT_KEY = "topic";
 
+    public static final String INTENDED_CATEGORY = "INTENDED_CATEGORY";
+
     private List<String> getCategoryNames() {
         List<String> result = new ArrayList<String>();
+        String intendedCategory = getIntent().getStringExtra(INTENDED_CATEGORY);
+        if(intendedCategory != null) {
+            result.add(intendedCategory);
+            return result;
+        }
         JCategories jCategories = AppController.getInstance().getSupportedCategories();
         if(jCategories != null && jCategories.getCategories() != null && !jCategories.getCategories().isEmpty()) {
             List<JCategory> categories = jCategories.getCategories();
@@ -195,7 +202,7 @@ public class TopicCreateActivity extends AbstractAppCompatActivity implements IA
 
     @Override
     public void onSuccess(String taskID, Object data) {
-        Toast.makeText(this, "Successfully created new topic",
+        Toast.makeText(this, "Successfully created new vision",
                 Toast.LENGTH_LONG).show();
         JTopic jTopic = (JTopic) data;
         ParcelableTopic pTopic = new ParcelableTopic(jTopic);

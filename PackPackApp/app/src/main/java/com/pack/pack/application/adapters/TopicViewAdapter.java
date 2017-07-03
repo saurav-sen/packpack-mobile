@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.android.volley.toolbox.NetworkImageView;
 import com.pack.pack.application.R;
+import com.pack.pack.application.fragments.JTopicClickHandler;
 import com.pack.pack.application.fragments.TopicViewFragment;
 import com.pack.pack.application.image.loader.DownloadImageTask;
 import com.pack.pack.application.view.util.ViewUtil;
@@ -40,14 +41,14 @@ public class TopicViewAdapter extends ArrayAdapter<JTopic> {
 
     private String categoryType;
 
-    private TopicViewFragment fragment;
+    private JTopicClickHandler topicClickHandler;
 
-    public TopicViewAdapter(Activity activity, TopicViewFragment fragment, List<JTopic> topics, String categoryType) {
+    public TopicViewAdapter(Activity activity, JTopicClickHandler topicClickHandler, List<JTopic> topics, String categoryType) {
         super(activity, ViewUtil.getListViewLayoutId(categoryType), topics);
         this.activity = activity;
         this.topics = topics;
         this.categoryType = categoryType;
-        this.fragment = fragment;
+        this.topicClickHandler = topicClickHandler;
     }
 
     @Override
@@ -77,7 +78,7 @@ public class TopicViewAdapter extends ArrayAdapter<JTopic> {
             @Override
             public void onClick(View v) {
                 JTopic topic = getItem((int)v.getTag());
-                fragment.doHandleItemClick(topic);
+                topicClickHandler.doHandleItemClick(topic);
             }
         });
        // TextView followersTextView = (TextView) convertView.findViewById(R.id.topic_followers);
@@ -87,7 +88,7 @@ public class TopicViewAdapter extends ArrayAdapter<JTopic> {
             @Override
             public void onClick(View v) {
                 JTopic topic = getItem((int)v.getTag());
-                fragment.doHandleItemClick(topic);
+                topicClickHandler.doHandleItemClick(topic);
             }
         });
         ProgressBar loadingProgres = (ProgressBar) convertView.findViewById(ViewUtil.getViewId(categoryType, "loading_progress"));

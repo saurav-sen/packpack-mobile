@@ -24,6 +24,7 @@ import com.pack.pack.application.R;
 import com.pack.pack.application.adapters.TopicDetailAdapter;
 import com.pack.pack.application.data.cache.InMemory;
 import com.pack.pack.application.data.util.AbstractNetworkTask;
+import com.pack.pack.application.data.util.LoadPackTask;
 import com.pack.pack.application.db.DBUtil;
 import com.pack.pack.application.db.PaginationInfo;
 import com.pack.pack.application.topic.activity.model.ParcelablePack;
@@ -54,8 +55,6 @@ import static com.pack.pack.application.AppController.UPLOAD_ENTITY_TYPE_KEY;
 public class InsideTopicActivity extends AbstractAppCompatActivity {
 
     private Pagination<JPack> page;
-
-    private ProgressDialog progressDialog;
 
     private TopicDetailAdapter adapter;
 
@@ -113,7 +112,7 @@ public class InsideTopicActivity extends AbstractAppCompatActivity {
                 int count = listView.getCount();
                 if (scrollState == SCROLL_STATE_IDLE) {
                     if (listView.getLastVisiblePosition() > count - 1) {
-                        new LoadPackTask().execute();
+                        new LoadPackTask(InsideTopicActivity.this, adapter).execute();
                     }
                 }
             }
@@ -124,7 +123,7 @@ public class InsideTopicActivity extends AbstractAppCompatActivity {
             }
         });
 
-        new LoadPackTask().execute(topic);
+        new LoadPackTask(InsideTopicActivity.this, adapter).execute(topic);
     }
 
     @Override
@@ -213,110 +212,5 @@ public class InsideTopicActivity extends AbstractAppCompatActivity {
                 startActivity(getIntent());
             }
         }*/
-    }
-
-    private class LoadPackTask extends AbstractNetworkTask<ParcelableTopic, Integer, Pagination<JPack>> {
-
-        public LoadPackTask() {
-            super(true, true, InsideTopicActivity.this, false);
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            showProgressDialog();
-        }
-
-        @Override
-        protected Map<String, Object> prepareApiParams(ParcelableTopic inputObject) {
-            Map<String, Object> apiParams = new HashMap<String, Object>();
-            String userId = AppController.getInstance().getUserId();
-            apiParams.put(APIConstants.User.ID, userId);
-            apiParams.put(APIConstants.Topic.ID, inputObject.getTopicId());
-            apiParams.put(APIConstants.Topic.CATEGORY, inputObject.getTopicCategory());
-            return apiParams;
-        }
-
-        @Override
-        protected Pagination<JPack> executeApi(API api) throws Exception {
-            return (Pagination<JPack>) api.execute();
-        }
-
-        @Override
-        protected COMMAND command() {
-            return COMMAND.GET_ALL_PACKS_IN_TOPIC;
-        }
-
-        @Override
-        protected String getFailureMessage() {
-            return "Failed to load details";
-        }
-
-        @Override
-        protected String getContainerIdForObjectStore() {
-            return getInputObject().getTopicId();
-        }
-
-        @Override
-        protected String getPaginationContainerId() {
-            return getInputObject().getTopicId() + "::Packs";
-        }
-
-        @Override
-        protected String getPaginationContainerClassName() {
-            return JTopic.class.getName();
-        }
-
-        @Override
-        protected Pagination<JPack> doRetrieveFromDB(SQLiteDatabase readable, ParcelableTopic inputObject) {
-            Pagination<JPack> page = null;
-            List<JPack> packs = DBUtil.loadAllJsonModelByContainerId(readable, inputObject.getTopicId(), JPack.class);
-            if(packs != null && !packs.isEmpty()) {
-                PaginationInfo paginationInfo = DBUtil.loadPaginationInfo(readable, inputObject.getTopicId());
-                page = new Pagination<JPack>();
-                page.setResult(packs);
-                if(paginationInfo != null) {
-                    page.setNextLink(paginationInfo.getNextLink());
-                    page.setPreviousLink(paginationInfo.getPreviousLink());
-                }
-            }
-            return page;
-        }
-
-        @Override
-        protected void onPostExecute(Pagination<JPack> jPackPagination) {
-            super.onPostExecute(jPackPagination);
-            if(jPackPagination != null) {
-                List<JPack> packs = jPackPagination.getResult();
-                if(packs != null && !packs.isEmpty()) {
-                    adapter.setPacks(packs);
-                    adapter.notifyDataSetChanged();
-                }
-            }
-            hideProgressDialog();
-        }
-
-        private void showProgressDialog() {
-            InsideTopicActivity.this.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    progressDialog = new ProgressDialog(InsideTopicActivity.this);
-                    progressDialog.setMessage("Loading...");
-                    progressDialog.show();
-                }
-            });
-        }
-
-        private void hideProgressDialog() {
-            InsideTopicActivity.this.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    if (progressDialog != null) {
-                        progressDialog.dismiss();
-                        progressDialog = null;
-                    }
-                }
-            });
-        }
     }
 }

@@ -35,7 +35,7 @@ import java.util.Map;
  * @author Saurav
  *
  */
-public class HomeViewFragment extends Fragment {
+public abstract class HomeViewFragment extends Fragment {
 
     private TabType tabType;
 
@@ -52,7 +52,9 @@ public class HomeViewFragment extends Fragment {
 
     public void setTabType(TabType tabType) {
        this.tabType = tabType;
-   }
+    }
+
+    protected abstract String getFeedApiType();
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {

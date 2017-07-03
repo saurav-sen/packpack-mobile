@@ -41,6 +41,14 @@
             android:name=".activity.TopicDetailActivity"
             android:label="Squill"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".activity.MyFamilyTopicDetailActivity"
+            android:label="Squill"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".activity.MySocietyTopicDetailActivity"
+            android:label="Squill"
+            android:theme="@style/AppTheme.NoActionBar" />
 
         <intent-filter>
             <data
@@ -161,7 +169,23 @@
         <service
             android:name=".service.NotificationReaderService"
             android:enabled="true"
-            android:exported="true"></service>
+            android:exported="true" />
+
+        <activity android:name=".activity.TopicEditActivity" />
+        <activity android:name=".activity.LandingPageActivity" />
+        <activity android:name=".activity.BroadcastActivity" />
+        <activity
+            android:name=".activity.MyFamilyActivity"
+            android:label="@string/title_activity_my_family"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".activity.GenericTopicListActivity"
+            android:label="@string/title_activity_generic_topic_list"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".activity.MySocietyActivity"
+            android:label="@string/title_activity_my_society"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

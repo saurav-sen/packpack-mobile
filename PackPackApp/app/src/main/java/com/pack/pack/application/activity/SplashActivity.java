@@ -180,7 +180,7 @@ public class SplashActivity extends AbstractActivity implements IAsyncTaskStatus
     }
 
     private void startMainActivity() {
-        Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+        Intent intent = new Intent(SplashActivity.this, LandingPageActivity.class);
         finish();
         startActivity(intent);
     }

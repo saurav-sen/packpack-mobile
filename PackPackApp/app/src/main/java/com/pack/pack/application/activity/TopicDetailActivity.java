@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.net.Uri;
 import android.os.Environment;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -25,11 +26,15 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextSwitcher;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -65,6 +70,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import static com.pack.pack.application.AppController.EDIT_TOPIC_REQUSET_CODE;
+
 import io.branch.invite.SimpleInviteBuilder;
 import io.branch.referral.Branch;
 
@@ -87,6 +94,10 @@ public class TopicDetailActivity extends AbstractAppCompatActivity implements On
 
     private static final String LOG_TAG = "TopicDetailActivity";
 
+    private TextView topic_name_text;
+
+    private TextView topic_description_text;
+
    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         /*Toolbar toolbar = (Toolbar) findViewById(R.id.topic_detail_toolbar);
@@ -102,10 +113,10 @@ public class TopicDetailActivity extends AbstractAppCompatActivity implements On
        if(item0 != null) {
            item0.setVisible(true);
        }
-       MenuItem item1 = menu.findItem(R.id.enter_forum);
+       /*MenuItem item1 = menu.findItem(R.id.enter_forum);
        if(item1 != null) {
            item1.setVisible(true);
-       }
+       }*/
        invalidateOptionsMenu();
        return true;
     }
@@ -116,12 +127,12 @@ public class TopicDetailActivity extends AbstractAppCompatActivity implements On
             case android.R.id.home:
                 onBackPressed();
                 break;
-            case R.id.enter_forum:
+            /*case R.id.enter_forum:
                 Intent intent = new Intent(TopicDetailActivity.this, DiscussionViewActivity.class);
                 intent.putExtra(Constants.DISCUSSION_ENTITY_ID, topic.getTopicId());
                 intent.putExtra(Constants.DISCUSSION_ENTITY_TYPE, EntityType.TOPIC.name());
                 startActivity(intent);
-                break;
+                break;*/
             case R.id.app_settings:
                 Intent intent_0 = new Intent(TopicDetailActivity.this, SettingsActivity.class);
                 startActivity(intent_0);
@@ -154,7 +165,23 @@ public class TopicDetailActivity extends AbstractAppCompatActivity implements On
 
         topic = (ParcelableTopic) getIntent().getParcelableExtra(AppController.TOPIC_PARCELABLE_KEY);
 
-        TextView topic_name_text = (TextView) findViewById(R.id.topic_name_text);
+        FloatingActionButton topic_edit_fab = (FloatingActionButton) findViewById(R.id.topic_edit_fab);
+        String userId = AppController.getInstance().getUserId();
+        if(userId.equals(topic.getOwnerId())) {
+            topic_edit_fab.setVisibility(View.VISIBLE);
+            topic_edit_fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(TopicDetailActivity.this, TopicEditActivity.class);
+                    intent.putExtra(TopicEditActivity.TOPIC_INPUT, topic);
+                    startActivityForResult(intent, EDIT_TOPIC_REQUSET_CODE);
+                }
+            });
+        } else {
+            topic_edit_fab.setVisibility(View.GONE);
+        }
+
+        topic_name_text = (TextView) findViewById(R.id.topic_name_text);
         topic_name_text.setText((topic.getTopicName() + "").trim());
 
         String longStory = topic.getDescription() + "";
@@ -162,7 +189,7 @@ public class TopicDetailActivity extends AbstractAppCompatActivity implements On
         String[] split = longStory.split("[\n|\r]");
         int longStoryLineCount = split.length;
 
-        TextView topic_description_text = (TextView) findViewById(R.id.topic_description_text);
+        topic_description_text = (TextView) findViewById(R.id.topic_description_text);
         topic_description_text.setMinLines(longStoryLineCount);
 
         if(longStoryLineCount > 3) {
@@ -195,9 +222,7 @@ public class TopicDetailActivity extends AbstractAppCompatActivity implements On
         enterTopic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(TopicDetailActivity.this, InsideTopicActivity.class);
-                intent.putExtra(AppController.TOPIC_PARCELABLE_KEY, topic);
-                startActivity(intent);
+                openTopic(topic);
             }
         });
 
@@ -208,7 +233,6 @@ public class TopicDetailActivity extends AbstractAppCompatActivity implements On
             followTopic.setImageResource(R.drawable.neglect_topic);
         }
 
-        String userId = AppController.getInstance().getUserId();
         String topicOwnerId = topic.getOwnerId();
 
         if(userId.equals(topicOwnerId)) {
@@ -246,8 +270,7 @@ public class TopicDetailActivity extends AbstractAppCompatActivity implements On
         shareTopic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                File file = createScreenCast(view);
-                shareImage(file);
+                shareTopic(view);
             }
         });
 
@@ -266,6 +289,17 @@ public class TopicDetailActivity extends AbstractAppCompatActivity implements On
         }
     }
 
+    protected void openTopic(ParcelableTopic topic) {
+        Intent intent = new Intent(TopicDetailActivity.this, InsideTopicActivity.class);
+        intent.putExtra(AppController.TOPIC_PARCELABLE_KEY, topic);
+        startActivity(intent);
+    }
+
+    protected void shareTopic(View view) {
+        File file = createScreenCast(view);
+        shareImage(file);
+    }
+
     private void shareImage(File file) {
         if(file == null || !file.exists()) {
             return;
@@ -281,6 +315,28 @@ public class TopicDetailActivity extends AbstractAppCompatActivity implements On
         intent.putExtra(Intent.EXTRA_STREAM, uri);
 
         startActivity(Intent.createChooser(intent, "Share My Vision"));
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == EDIT_TOPIC_REQUSET_CODE) {
+            if(resultCode == RESULT_OK && data != null) {
+                ParcelableTopic pTopic = (ParcelableTopic) data.getParcelableExtra(TopicEditActivity.RESULT_KEY);
+                topic = pTopic;
+                topic_name_text.setText(topic.getTopicName());
+                topic_description_text.setText(topic.getDescription());
+            } else if(resultCode == RESULT_CANCELED) {
+                String msg = "Failed to update";
+                if(data != null) {
+                    String str = data.getStringExtra(TopicEditActivity.RESULT_KEY);
+                    if(str != null) {
+                        msg = str;
+                    }
+                }
+                Toast.makeText(TopicDetailActivity.this, msg, Toast.LENGTH_LONG).show();
+            }
+        }
     }
 
     private File createScreenCast(View view) {

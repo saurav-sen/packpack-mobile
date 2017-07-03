@@ -65,6 +65,8 @@ public class AppController extends Application {
 
     public static final int GALLERY_SELECT_VIDEO_REQUEST_CODE = 422;
 
+    public static final int EDIT_TOPIC_REQUSET_CODE = 501;
+
     public static final String UPLOAD_FILE_BITMAP = "upload_file_bitmap";
 
     public static final String UPLOAD_FILE_PATH = "upload_file_path";

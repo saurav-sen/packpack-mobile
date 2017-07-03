@@ -283,7 +283,7 @@ public abstract class AbstractNetworkTask<X, Y, Z> extends AsyncTask<X, Y, Z> {
     }
 
     private void storeResultsInDb_0(DbObject __dbObject) {
-        if(loadedFromDB)
+        if(loadedFromDB && !forceStoreInDb())
             return;
         /*if(checkExistence_0(__dbObject)) {
             boolean success = deleteExisting_0(__dbObject);
@@ -299,6 +299,10 @@ public abstract class AbstractNetworkTask<X, Y, Z> extends AsyncTask<X, Y, Z> {
             String ENTITY_ID = entityIdColumnName(__dbObject);
             long newRowID = wDB.update(table_name, values, ENTITY_ID + "='" + __dbObject.getEntityId() + "'", null);
         }
+    }
+
+    protected boolean forceStoreInDb() {
+        return false;
     }
 
     private static String entityIdColumnName(DbObject __dbObject) {

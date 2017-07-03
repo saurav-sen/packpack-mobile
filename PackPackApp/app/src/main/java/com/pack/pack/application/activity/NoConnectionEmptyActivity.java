@@ -151,7 +151,7 @@ public class NoConnectionEmptyActivity extends AbstractActivity implements IAsyn
     }
 
     private void startMainActivity() {
-        Intent intent = new Intent(NoConnectionEmptyActivity.this, MainActivity.class);
+        Intent intent = new Intent(NoConnectionEmptyActivity.this, LandingPageActivity.class);
         finish();
         startActivity(intent);
     }

@@ -202,6 +202,7 @@ public class NotificationReaderService extends Service {
                     new NotificationCompat.Builder(NotificationReaderService.this)
                             .setSmallIcon(R.drawable.logo)
                             .setContentTitle(feedMsg.getTitle())
+                            .setPriority(NotificationCompat.PRIORITY_MAX)
                             .setContentText(message);
             Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
             notificationBuilder.setSound(alarmSound);

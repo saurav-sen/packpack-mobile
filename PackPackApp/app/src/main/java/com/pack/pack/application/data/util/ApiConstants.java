@@ -23,6 +23,9 @@ public interface ApiConstants {
     public static final String SPIRITUAL = "spiritual";
     public static final String OTHERS = "others";
 
+    public static final String FAMILY = "family";
+    public static final String SOCIETY = "society";
+
     public static final int MIN_VISION_DESC_FIELD_LENGTH = 50;
     public static final int MAX_VISION_DESC_FIELD_LENGTH = 1000;
 
