@@ -15,6 +15,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -40,6 +41,8 @@ import static com.pack.pack.application.AppController.CREATE_TOPIC_REQUSET_CODE;
  */
 public class MainActivity extends AbstractAppCompatActivity {
 
+    //private Toolbar toolbar;
+
     private ViewPager pager;
 
     private int pageCurrentItemIndex;
@@ -51,6 +54,9 @@ public class MainActivity extends AbstractAppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        /*toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);*/
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
@@ -144,10 +150,10 @@ public class MainActivity extends AbstractAppCompatActivity {
         if(item0 != null) {
             item0.setVisible(true);
         }
-        MenuItem item1 = menu.findItem(R.id.enter_forum);
+        /*MenuItem item1 = menu.findItem(R.id.enter_forum);
         if(item1 != null) {
             item1.setVisible(false);
-        }
+        }*/
         invalidateOptionsMenu();
         return true;
     }

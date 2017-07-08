@@ -22,7 +22,7 @@
 
         <activity
             android:name=".activity.SplashActivity"
-            android:label="Squill"
+            android:label="SQUILL"
             android:theme="@style/splashScreenTheme">
 
             <!--
@@ -35,19 +35,19 @@
         </activity>
         <activity
             android:name=".activity.LoginActivity"
-            android:label="Squill"
+            android:label="SQUILL"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activity.TopicDetailActivity"
-            android:label="Squill"
+            android:label="SQUILL"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activity.MyFamilyTopicDetailActivity"
-            android:label="Squill"
+            android:label="SQUILL"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activity.MySocietyTopicDetailActivity"
-            android:label="Squill"
+            android:label="SQUILL"
             android:theme="@style/AppTheme.NoActionBar" />
 
         <intent-filter>
@@ -63,27 +63,27 @@
 
         <activity
             android:name=".activity.PackDetailActivity"
-            android:label="Squill"
+            android:label="SQUILL"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activity.InsideTopicActivity"
-            android:label="Squill"
+            android:label="SQUILL"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".activity.PackAttachmentCommentsActivity" />
         <activity android:name=".activity.ImageVideoCaptureActivity" />
         <activity
             android:name=".activity.UploadActivity"
-            android:label="Squill"
+            android:label="SQUILL"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activity.FullscreenAttachmentViewActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label="Squill"
+            android:label="SQUILL"
             android:theme="@style/FullscreenTheme" />
         <activity
             android:name=".activity.FullScreenPlayVideoActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label="Squill"
+            android:label="SQUILL"
             android:theme="@style/FullscreenTheme" />
         <activity android:name=".activity.MainActivity" />
         <activity android:name=".activity.SignupActivity" />
@@ -97,7 +97,7 @@
 
         <activity
             android:name=".activity.TopicCreateActivity"
-            android:label="Squill" />
+            android:label="SQUILL" />
         <activity
             android:name=".activity.DiscussionStartActivity"
             android:label="@string/title_activity_discussion"
@@ -149,7 +149,7 @@
         <activity android:name=".activity.AttachmentStoryReaderActivity" />
         <activity
             android:name=".activity.IntroMainActivity"
-            android:label="Squill"
+            android:label="SQUILL"
             android:theme="@style/introMainScreenTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -159,7 +159,7 @@
         </activity>
         <activity
             android:name=".activity.WelcomeActivity"
-            android:label="Squill"
+            android:label="SQUILL"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".activity.PasswordResetActivity" />
         <activity android:name=".data.util.PasswordResetVerifierActivity" />

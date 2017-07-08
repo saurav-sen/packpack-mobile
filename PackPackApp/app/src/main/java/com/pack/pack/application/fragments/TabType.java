@@ -12,11 +12,11 @@ import java.util.List;
  */
 public enum TabType {
     //Tabs which are enabled
-    //SQUILL("squill", "SQUILL TEAM", R.drawable.home, SquillTeamViewFragment.class, true, new String[] {"squill"}, true),
+    SQUILL("squill", "SQUILL TEAM", R.drawable.home, SquillTeamViewFragment.class, true, new String[] {"squill"}, true),
     NEWS("news", "NEWS", R.drawable.news, NewsViewFragment.class, true, new String[] {"news"}, true),
     CUSTOM("custom", "USER", R.drawable.forum, UserBroadcastMessageViewFragment.class, false, new String[] {"custom"}, true),
 
-    HOME("home", "Home", R.drawable.home, HomeViewFragment.class, true, new String[] {"home"}, false),
+    //HOME("home", "Home", R.drawable.home, HomeViewFragment.class, true, new String[] {"home"}, false),
     ART(ApiConstants.ART, "Artist", R.drawable.art, ArtViewFragment.class, true, new String[]{ApiConstants.ART, ApiConstants.MUSIC}, false),
     PHOTOGRAPHY(ApiConstants.PHOTOGRAPHY, "Photography", R.drawable.photography, PhotographyViewFragment.class, true, new String[]{ApiConstants.PHOTOGRAPHY, ApiConstants.LIFESTYLE}, false),
     EDUCATION(ApiConstants.EDUCATION, "Writer", R.drawable.education, EducationViewFragment.class, true, new String[]{ApiConstants.EDUCATION, ApiConstants.SPIRITUAL, ApiConstants.FUN}, false),

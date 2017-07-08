@@ -407,10 +407,10 @@ public class PackDetailActivity extends AbstractAppCompatActivity {
         if(item0 != null) {
             item0.setVisible(true);
         }
-        MenuItem item1 = menu.findItem(R.id.enter_forum);
+        /*MenuItem item1 = menu.findItem(R.id.enter_forum);
         if(item1 != null) {
             item1.setVisible(false);
-        }
+        }*/
         invalidateOptionsMenu();
         return true;
     }

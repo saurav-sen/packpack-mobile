@@ -133,10 +133,10 @@ public class InsideTopicActivity extends AbstractAppCompatActivity {
         if(item0 != null) {
             item0.setVisible(true);
         }
-        MenuItem item1 = menu.findItem(R.id.enter_forum);
+        /*MenuItem item1 = menu.findItem(R.id.enter_forum);
         if(item1 != null) {
             item1.setVisible(true);
-        }
+        }*/
         invalidateOptionsMenu();
         return true;
     }
@@ -147,12 +147,12 @@ public class InsideTopicActivity extends AbstractAppCompatActivity {
             case android.R.id.home:
                 onBackPressed();
                 break;
-            case R.id.enter_forum:
+            /*case R.id.enter_forum:
                 Intent intent = new Intent(InsideTopicActivity.this, DiscussionViewActivity.class);
                 intent.putExtra(Constants.DISCUSSION_ENTITY_ID, topic.getTopicId());
                 intent.putExtra(Constants.DISCUSSION_ENTITY_TYPE, EntityType.TOPIC.name());
                 startActivity(intent);
-                break;
+                break;*/
             default:
                 break;
         }

@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -55,6 +56,9 @@ public class GenericTopicListActivity extends AppCompatActivity implements JTopi
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+
         categoryType = getIntent().getStringExtra(CATEGORY_TYPE);
 
         generic_topic_list = (ListView) findViewById(R.id.generic_topic_list);
@@ -68,7 +72,7 @@ public class GenericTopicListActivity extends AppCompatActivity implements JTopi
                 int count = generic_topic_list.getCount();
                 if (scrollState == SCROLL_STATE_IDLE) {
                     if (generic_topic_list.getLastVisiblePosition() > count - 1) {
-                        new LoadTopicTask().execute();
+                        new LoadTopicTask().execute(AppController.getInstance().getUserId());
                     }
                 }
             }
@@ -96,18 +100,22 @@ public class GenericTopicListActivity extends AppCompatActivity implements JTopi
                 startActivityForResult(intent, CREATE_TOPIC_REQUSET_CODE);
             }
         });
+
+        new LoadTopicTask().execute(AppController.getInstance().getUserId());
     }
 
     @Override
     public void doHandleItemClick(JTopic topic) {
         if(ApiConstants.FAMILY.equals(categoryType)) {
             ParcelableTopic parcel = new ParcelableTopic(topic);
-            Intent intent = new Intent(this, MyFamilyTopicDetailActivity.class);
+            //Intent intent = new Intent(this, MyFamilyTopicDetailActivity.class);
+            Intent intent = new Intent(this, MyFamilyActivity.class);
             intent.putExtra(AppController.TOPIC_PARCELABLE_KEY, parcel);
             startActivity(intent);
         } if(ApiConstants.SOCIETY.equals(categoryType)) {
             ParcelableTopic parcel = new ParcelableTopic(topic);
-            Intent intent = new Intent(this, MySocietyTopicDetailActivity.class);
+            //Intent intent = new Intent(this, MySocietyTopicDetailActivity.class);
+            Intent intent = new Intent(this, MySocietyActivity.class);
             intent.putExtra(AppController.TOPIC_PARCELABLE_KEY, parcel);
             startActivity(intent);
         }
@@ -118,7 +126,7 @@ public class GenericTopicListActivity extends AppCompatActivity implements JTopi
         private String errorMsg;
 
         public LoadTopicTask() {
-            super(true, true, GenericTopicListActivity.this, false);
+            super(false, false, GenericTopicListActivity.this, false);
         }
 
         /*@Override

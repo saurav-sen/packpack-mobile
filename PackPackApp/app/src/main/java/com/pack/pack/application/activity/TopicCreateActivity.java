@@ -80,9 +80,11 @@ public class TopicCreateActivity extends AbstractAppCompatActivity implements IA
 
     public static final String INTENDED_CATEGORY = "INTENDED_CATEGORY";
 
+    private String intendedCategory;
+
     private List<String> getCategoryNames() {
         List<String> result = new ArrayList<String>();
-        String intendedCategory = getIntent().getStringExtra(INTENDED_CATEGORY);
+        //intendedCategory = getIntent().getStringExtra(INTENDED_CATEGORY);
         if(intendedCategory != null) {
             result.add(intendedCategory);
             return result;
@@ -114,22 +116,28 @@ public class TopicCreateActivity extends AbstractAppCompatActivity implements IA
         topic_create_wallpaper = (ImageView) findViewById(R.id.topic_create_wallpaper);
         wallpaper_select = (Button) findViewById(R.id.wallpaper_select);
 
-        topic_create_category.setThreshold(1);
-        List<String>  followedCategories = getCategoryNames();
-        ArrayAdapter<String> categoryAdapter = new ArrayAdapter<String>(this,
-                android.support.v7.appcompat.R.layout.select_dialog_item_material,
-                followedCategories);
-        topic_create_category.setAdapter(categoryAdapter);
-        String displayText = "Valid categories for you: [";
-        int len = followedCategories.size()-1;
-        for(int i=0; i<len; i++) {
-            displayText = displayText + followedCategories.get(i);
-            displayText = displayText + ", ";
-        }
-        displayText = displayText + followedCategories.get(len);
-        displayText = displayText + "]";
+        intendedCategory = getIntent().getStringExtra(INTENDED_CATEGORY);
+        if(intendedCategory != null && intendedCategory.equalsIgnoreCase("family")) {
+            topic_create_category.setVisibility(View.GONE);
+            topic_create_category_notes.setVisibility(View.GONE);
+        } else {
+            topic_create_category.setThreshold(1);
+            List<String>  followedCategories = getCategoryNames();
+            ArrayAdapter<String> categoryAdapter = new ArrayAdapter<String>(this,
+                    android.support.v7.appcompat.R.layout.select_dialog_item_material,
+                    followedCategories);
+            topic_create_category.setAdapter(categoryAdapter);
+            String displayText = "Valid categories for you: [";
+            int len = followedCategories.size()-1;
+            for(int i=0; i<len; i++) {
+                displayText = displayText + followedCategories.get(i);
+                displayText = displayText + ", ";
+            }
+            displayText = displayText + followedCategories.get(len);
+            displayText = displayText + "]";
 
-        topic_create_category_notes.setText(displayText);
+            topic_create_category_notes.setText(displayText);
+        }
 
         /*SpannableString spannableString = new SpannableString("Select an image, as wallpaper of your topic");
         spannableString.setSpan(new UnderlineSpan(), 0, spannableString.length(), 0);
@@ -202,7 +210,11 @@ public class TopicCreateActivity extends AbstractAppCompatActivity implements IA
 
     @Override
     public void onSuccess(String taskID, Object data) {
-        Toast.makeText(this, "Successfully created new vision",
+        String msg = "Successfully created new vision";
+        if(intendedCategory != null) {
+            msg = "Successfully registered new " + intendedCategory;
+        }
+        Toast.makeText(this, msg,
                 Toast.LENGTH_LONG).show();
         JTopic jTopic = (JTopic) data;
         ParcelableTopic pTopic = new ParcelableTopic(jTopic);
@@ -231,7 +243,7 @@ public class TopicCreateActivity extends AbstractAppCompatActivity implements IA
         JTopic jTopic = null;
         String topicName = topic_create_name.getText().toString();
         String topicDescription = topic_create_description.getText().toString();
-        String topicCategory = topic_create_category.getText().toString();
+        String topicCategory = intendedCategory != null ? intendedCategory : topic_create_category.getText().toString();
         String locality = topic_create_localityAddr.getText().toString();
         String city = topic_create_city.getText().toString();
         String country = topic_create_country.getText().toString();
@@ -278,6 +290,9 @@ public class TopicCreateActivity extends AbstractAppCompatActivity implements IA
     private boolean validateTopicCategory(String topicCategory) {
         if(topicCategory == null || topicCategory.trim().isEmpty())
             return false;
+        if(intendedCategory != null && intendedCategory.equalsIgnoreCase("family")) {
+            return true;
+        }
         List<JCategory> categories = AppController.getInstance().getSupportedCategories().getCategories();
         for(JCategory category : categories) {
             if(category.getLabel().equalsIgnoreCase(topicCategory)) {
@@ -333,7 +348,14 @@ public class TopicCreateActivity extends AbstractAppCompatActivity implements IA
                 jTopic = (JTopic) api.execute(listener);
             } catch (Exception e) {
                 errorMsg = "Failed creating new Vision";
-                Log.i(LOG_TAG, "Failed creating new Vision :: " + e.getMessage());
+                if(intendedCategory != null) {
+                    errorMsg = "Failed creating new " + intendedCategory;
+                }
+                String msg = "Failed creating new Vision :: " + e.getMessage();
+                if(intendedCategory != null) {
+                    msg = "Failed creating new " + intendedCategory + " :: " + e.getMessage();
+                }
+                Log.i(LOG_TAG, msg);
             }
             return jTopic;
         }

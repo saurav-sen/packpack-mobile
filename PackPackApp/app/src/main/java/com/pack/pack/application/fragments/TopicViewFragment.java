@@ -74,7 +74,7 @@ public abstract class TopicViewFragment extends Fragment implements JTopicClickH
                 int count = listView.getCount();
                 if (scrollState == SCROLL_STATE_IDLE) {
                     if (listView.getLastVisiblePosition() > count - 1) {
-                        new LoadTopicTask().execute();
+                        new LoadTopicTask().execute(AppController.getInstance().getUserId());
                     }
                 }
             }
