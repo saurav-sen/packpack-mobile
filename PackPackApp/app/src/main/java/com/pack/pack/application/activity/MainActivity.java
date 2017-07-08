@@ -146,10 +146,10 @@ public class MainActivity extends AbstractAppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.app_menu, menu);
-        MenuItem item0 = menu.findItem(R.id.app_settings);
+        /*MenuItem item0 = menu.findItem(R.id.app_settings);
         if(item0 != null) {
             item0.setVisible(true);
-        }
+        }*/
         /*MenuItem item1 = menu.findItem(R.id.enter_forum);
         if(item1 != null) {
             item1.setVisible(false);
@@ -161,11 +161,12 @@ public class MainActivity extends AbstractAppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                break;
             case R.id.app_settings:
                 Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
                 startActivity(intent);
-                break;
-            default:
                 break;
         }
         return true;

@@ -1,6 +1,7 @@
 package com.pack.pack.application.activity;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
@@ -15,6 +16,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -24,6 +26,7 @@ import com.pack.pack.application.R;
 import com.pack.pack.application.adapters.TopicDetailAdapter;
 import com.pack.pack.application.data.cache.InMemory;
 import com.pack.pack.application.data.util.AbstractNetworkTask;
+import com.pack.pack.application.data.util.IAsyncTaskStatusListener;
 import com.pack.pack.application.data.util.LoadPackTask;
 import com.pack.pack.application.db.DBUtil;
 import com.pack.pack.application.db.PaginationInfo;
@@ -36,6 +39,7 @@ import com.pack.pack.model.web.EntityType;
 import com.pack.pack.model.web.JPack;
 import com.pack.pack.model.web.JPackAttachment;
 import com.pack.pack.model.web.JTopic;
+import com.pack.pack.model.web.JUser;
 import com.pack.pack.model.web.Pagination;
 
 import java.util.ArrayList;
@@ -128,10 +132,26 @@ public class InsideTopicActivity extends AbstractAppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.app_menu, menu);
-        MenuItem item0 = menu.findItem(R.id.app_settings);
-        if(item0 != null) {
-            item0.setVisible(true);
+        getMenuInflater().inflate(R.menu.inside_topic_menu, menu);
+        MenuItem topic_follow = menu.findItem(R.id.topic_follow);
+        if(topic_follow != null) {
+            if(!topic.isFollowing()) {
+                topic_follow.setVisible(true);
+            } else {
+                topic_follow.setVisible(false);
+            }
+        }
+        MenuItem topic_neglect = menu.findItem(R.id.topic_neglect);
+        if(topic_neglect != null) {
+            if(!topic.isFollowing()) {
+                topic_neglect.setVisible(false);
+            } else {
+                topic_neglect.setVisible(true);
+            }
+        }
+        MenuItem topic_details = menu.findItem(R.id.topic_details);
+        if(topic_details != null) {
+            topic_details.setVisible(true);
         }
         /*MenuItem item1 = menu.findItem(R.id.enter_forum);
         if(item1 != null) {
@@ -153,7 +173,20 @@ public class InsideTopicActivity extends AbstractAppCompatActivity {
                 intent.putExtra(Constants.DISCUSSION_ENTITY_TYPE, EntityType.TOPIC.name());
                 startActivity(intent);
                 break;*/
-            default:
+            case R.id.topic_follow:
+                FollowTopicTask task0 = new FollowTopicTask(InsideTopicActivity.this, topic, COMMAND.FOLLOW_TOPIC);
+                task0.addListener(new FollowTopicTaskListener(task0.getTaskID(), true));
+                task0.execute(topic.getTopicId());
+                break;
+            case R.id.topic_neglect:
+                FollowTopicTask task1 = new FollowTopicTask(InsideTopicActivity.this, topic, COMMAND.NEGLECT_TOPIC);
+                task1.addListener(new FollowTopicTaskListener(task1.getTaskID(), false));
+                task1.execute(topic.getTopicId());
+                break;
+            case R.id.topic_details:
+                Intent intent_0 = new Intent(InsideTopicActivity.this, TopicDetailActivity.class);
+                intent_0.putExtra(AppController.TOPIC_PARCELABLE_KEY, topic);
+                startActivity(intent_0);
                 break;
         }
         return true;
@@ -212,5 +245,100 @@ public class InsideTopicActivity extends AbstractAppCompatActivity {
                 startActivity(getIntent());
             }
         }*/
+    }
+
+    private class FollowTopicTask extends AbstractNetworkTask<String, Integer, Void> {
+
+        private ParcelableTopic topic;
+
+        private COMMAND command;
+
+        public FollowTopicTask(Context context, ParcelableTopic topic, COMMAND command) {
+            super(false, false, false, context, true, true);
+            this.topic = topic;
+        }
+
+        @Override
+        protected String getContainerIdForObjectStore() {
+            return null;
+        }
+
+        @Override
+        protected Void executeApi(API api) throws Exception {
+            api.execute();
+            return null;
+        }
+
+        @Override
+        protected COMMAND command() {
+            /*if(!topic.isFollowing()) {
+                return COMMAND.FOLLOW_TOPIC;
+            }
+            return COMMAND.NEGLECT_TOPIC;*/
+            return command;
+        }
+
+        @Override
+        protected void fireOnSuccess(Object data) {
+            topic.setIsFollowing(!topic.isFollowing());
+            super.fireOnSuccess(data);
+        }
+
+        @Override
+        protected Map<String, Object> prepareApiParams(String inputObject) {
+            JUser user = AppController.getInstance().getUser();
+            Map<String, Object> apiParams = new HashMap<String, Object>();
+            apiParams.put(APIConstants.User.ID, user.getId());
+            apiParams.put(APIConstants.Topic.ID, inputObject);
+            return apiParams;
+        }
+
+        @Override
+        protected String getFailureMessage() {
+            return "Failed following topic command";
+        }
+    }
+
+    private class FollowTopicTaskListener implements IAsyncTaskStatusListener {
+
+        private String taskID;
+
+        private boolean isFollow;
+
+        FollowTopicTaskListener(String taskID, boolean isFollow) {
+            this.taskID = taskID;
+            this.isFollow = isFollow;
+        }
+
+        @Override
+        public void onPreStart(String taskID) {
+
+        }
+
+        @Override
+        public void onSuccess(String taskID, Object data) {
+            InsideTopicActivity.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    topic.setIsFollowing(isFollow);
+                    if (isFollow) {
+                        //InsideTopicActivity.this.getMe
+                        //imageButton.setImageResource(R.drawable.follow_topic);
+                    } else {
+                        //imageButton.setImageResource(R.drawable.neglect_topic);
+                    }
+                }
+            });
+        }
+
+        @Override
+        public void onFailure(String taskID, String errorMsg) {
+
+        }
+
+        @Override
+        public void onPostComplete(String taskID) {
+
+        }
     }
 }

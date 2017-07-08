@@ -132,24 +132,37 @@ public class MyFamilyActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_my_family, menu);
+        getMenuInflater().inflate(R.menu.app_menu, menu);
+        /*MenuItem item0 = menu.findItem(R.id.app_settings);
+        if(item0 != null) {
+            item0.setVisible(true);
+        }*/
+        /*MenuItem item1 = menu.findItem(R.id.enter_forum);
+        if(item1 != null) {
+            item1.setVisible(true);
+        }*/
+        invalidateOptionsMenu();
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                break;
+            /*case R.id.enter_forum:
+                Intent intent = new Intent(InsideTopicActivity.this, DiscussionViewActivity.class);
+                intent.putExtra(Constants.DISCUSSION_ENTITY_ID, topic.getTopicId());
+                intent.putExtra(Constants.DISCUSSION_ENTITY_TYPE, EntityType.TOPIC.name());
+                startActivity(intent);
+                break;*/
+            case R.id.app_settings:
+                Intent intent_0 = new Intent(MyFamilyActivity.this, SettingsActivity.class);
+                startActivity(intent_0);
+                break;
         }
-
-        return super.onOptionsItemSelected(item);
+        return true;
     }
 
     /**

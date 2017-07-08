@@ -8,6 +8,8 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
@@ -102,6 +104,35 @@ public class GenericTopicListActivity extends AppCompatActivity implements JTopi
         });
 
         new LoadTopicTask().execute(AppController.getInstance().getUserId());
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.app_menu, menu);
+        /*MenuItem item0 = menu.findItem(R.id.app_settings);
+        if(item0 != null) {
+            item0.setVisible(true);
+        }*/
+        /*MenuItem item1 = menu.findItem(R.id.enter_forum);
+        if(item1 != null) {
+            item1.setVisible(false);
+        }*/
+        invalidateOptionsMenu();
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                break;
+            case R.id.app_settings:
+                Intent intent = new Intent(GenericTopicListActivity.this, SettingsActivity.class);
+                startActivity(intent);
+                break;
+        }
+        return true;
     }
 
     @Override

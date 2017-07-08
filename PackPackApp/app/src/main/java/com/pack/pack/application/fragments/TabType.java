@@ -20,13 +20,13 @@ public enum TabType {
     ART(ApiConstants.ART, "Artist", R.drawable.art, ArtViewFragment.class, true, new String[]{ApiConstants.ART, ApiConstants.MUSIC}, false),
     PHOTOGRAPHY(ApiConstants.PHOTOGRAPHY, "Photography", R.drawable.photography, PhotographyViewFragment.class, true, new String[]{ApiConstants.PHOTOGRAPHY, ApiConstants.LIFESTYLE}, false),
     EDUCATION(ApiConstants.EDUCATION, "Writer", R.drawable.education, EducationViewFragment.class, true, new String[]{ApiConstants.EDUCATION, ApiConstants.SPIRITUAL, ApiConstants.FUN}, false),
-    OTHERS(ApiConstants.OTHERS, "Misc", R.drawable.others, MiscViewFragment.class, true, new String[]{ApiConstants.OTHERS, ApiConstants.LIFESTYLE}, false),
+    OTHERS(ApiConstants.OTHERS, "Misc", R.drawable.others, MiscViewFragment.class, true, new String[]{ApiConstants.OTHERS, ApiConstants.LIFESTYLE}, false);
 
     //Tabs which are disabled
-    LIFE_STYLE(ApiConstants.LIFESTYLE, "Lifestyle", R.drawable.lifestyle, LifestyleViewFragment.class, false, new String[]{ApiConstants.LIFESTYLE}, false),
+    /*LIFE_STYLE(ApiConstants.LIFESTYLE, "Lifestyle", R.drawable.lifestyle, LifestyleViewFragment.class, false, new String[]{ApiConstants.LIFESTYLE}, false),
     MUSIC(ApiConstants.MUSIC, "Music", R.drawable.music, MusicViewFragment.class, false, new String[]{ApiConstants.MUSIC}, false),
     ENTERTAINMENT_FUN(ApiConstants.FUN, "Fun", R.drawable.fun, FunViewFragment.class, false, new String[]{ApiConstants.FUN}, false),
-    SPIRITUAL(ApiConstants.SPIRITUAL, "Spiritual", R.drawable.spiritual, SpiritualViewFragment.class, false, new String[]{ApiConstants.SPIRITUAL}, false);
+    SPIRITUAL(ApiConstants.SPIRITUAL, "Spiritual", R.drawable.spiritual, SpiritualViewFragment.class, false, new String[]{ApiConstants.SPIRITUAL}, false);*/
 
     private String type;
 
