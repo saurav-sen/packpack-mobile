@@ -6,8 +6,12 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
+
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.pack.pack.application.Constants;
 import com.pack.pack.application.R;
 import com.pack.pack.application.adapters.LandingPageGridAdapter;
+import com.pack.pack.application.data.cache.PreferenceManager;
 import com.pack.pack.application.data.util.ApiConstants;
 
 public class LandingPageActivity extends AppCompatActivity {
@@ -31,6 +35,11 @@ public class LandingPageActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_landing_page);
+
+        PreferenceManager preferenceManager = new PreferenceManager(getApplicationContext());
+        if(!preferenceManager.isFirstTimeLogin()) {
+            FirebaseMessaging.getInstance().subscribeToTopic(Constants.GLOBAL_NOTIFICATION_TOPIC);
+        }
 
         landing_page_grid = (GridView) findViewById(R.id.landing_page_grid);
         LandingPageGridAdapter adapter = new LandingPageGridAdapter(this, texts, imageIds);

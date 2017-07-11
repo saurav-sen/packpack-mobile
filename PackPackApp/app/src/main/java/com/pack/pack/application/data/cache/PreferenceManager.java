@@ -20,6 +20,8 @@ public class PreferenceManager {
 
     private static final String IS_FIRST_TIME_LAUNCH = "IsFirstTimeLaunch";
 
+    private static final String IS_FIRST_TIME_LOGIN = "IsFirstTimeLogin";
+
     public PreferenceManager(Context context) {
         this._context = context;
         pref = _context.getSharedPreferences(PREF_NAME, PRIVATE_MODE);
@@ -34,5 +36,14 @@ public class PreferenceManager {
     public boolean isFirstTimeLaunch() {
         //return true;
         return pref.getBoolean(IS_FIRST_TIME_LAUNCH, true);
+    }
+
+    public void setFirstTimeLogin(boolean isFirstTimeLogin) {
+        editor.putBoolean(IS_FIRST_TIME_LOGIN, isFirstTimeLogin);
+        editor.commit();
+    }
+
+    public boolean isFirstTimeLogin() {
+        return pref.getBoolean(IS_FIRST_TIME_LOGIN, false);
     }
 }
