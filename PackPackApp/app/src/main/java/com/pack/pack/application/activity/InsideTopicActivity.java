@@ -20,6 +20,7 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.Constants;
 import com.pack.pack.application.R;
@@ -322,9 +323,11 @@ public class InsideTopicActivity extends AbstractAppCompatActivity {
                 public void run() {
                     topic.setIsFollowing(isFollow);
                     if (isFollow) {
+                        FirebaseMessaging.getInstance().subscribeToTopic(topic.getTopicId());
                         //InsideTopicActivity.this.getMe
                         //imageButton.setImageResource(R.drawable.follow_topic);
                     } else {
+                        FirebaseMessaging.getInstance().unsubscribeFromTopic(topic.getTopicId());
                         //imageButton.setImageResource(R.drawable.neglect_topic);
                     }
                 }

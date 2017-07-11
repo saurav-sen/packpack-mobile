@@ -1,6 +1,7 @@
 package com.pack.pack.application.activity;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -22,6 +23,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.appinvite.AppInviteInvitation;
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.Constants;
 import com.pack.pack.application.R;
@@ -127,12 +129,18 @@ public class MyFamilyActivity extends AppCompatActivity {
                 }
                 Toast.makeText(this, errorMsg, Toast.LENGTH_LONG).show();
             }
+        } else if(requestCode == Constants.INVITE_OTHERS_TO_JOIN_FAMILY) {
+            if(resultCode == RESULT_OK) {
+                Toast.makeText(this, "Invite sent successfully", Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(this, "Failed sending invite", Toast.LENGTH_LONG).show();
+            }
         }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.app_menu, menu);
+        getMenuInflater().inflate(R.menu.inside_family_menu, menu);
         /*MenuItem item0 = menu.findItem(R.id.app_settings);
         if(item0 != null) {
             item0.setVisible(true);
@@ -157,9 +165,14 @@ public class MyFamilyActivity extends AppCompatActivity {
                 intent.putExtra(Constants.DISCUSSION_ENTITY_TYPE, EntityType.TOPIC.name());
                 startActivity(intent);
                 break;*/
-            case R.id.app_settings:
-                Intent intent_0 = new Intent(MyFamilyActivity.this, SettingsActivity.class);
-                startActivity(intent_0);
+            case R.id.invite_others:
+                Intent intent = new AppInviteInvitation.IntentBuilder(topic.getTopicName())
+                        .setMessage(topic.getDescription())
+                        .setDeepLink(Uri.parse(getString(R.string.invite_others_to_family_deeplink_base_url) + topic.getTopicId()))
+                        .setCustomImage(Uri.parse(topic.getWallpaperUrl()))
+                        .setCallToActionText("Join My Family")
+                        .build();
+                startActivityForResult(intent, Constants.INVITE_OTHERS_TO_JOIN_FAMILY);
                 break;
         }
         return true;

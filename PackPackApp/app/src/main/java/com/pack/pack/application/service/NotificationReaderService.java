@@ -38,7 +38,8 @@ import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class NotificationReaderService extends Service {
+public class NotificationReaderService {}
+/*public class NotificationReaderService extends Service {
 
     private static final String LOG_TAG = "NotificationService";
 
@@ -46,23 +47,12 @@ public class NotificationReaderService extends Service {
 
     private AmqpConnection amqpConnection;
 
-    //private ExecutorService executorService;
-
     public NotificationReaderService() {
         amqpConnection = new AmqpConnection();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        //new MessageSubscriber().execute(amqpConnection);
-        /*if(executorService == null) {
-            executorService = Executors.newSingleThreadExecutor();
-        }*/
-        /*if(timer != null) {
-            timer.cancel();
-        } else {
-            timer = new Timer();
-        }*/
         if(timer == null) {
             timer = new Timer();
         }
@@ -168,8 +158,6 @@ public class NotificationReaderService extends Service {
 
                 channel.queueBind(QUEUE_NAME, exchange_name, "");
                 channel.basicConsume(QUEUE_NAME, true, new MessageHandler(channel));
-                //channel.close();
-                //connection.close();
                 Thread.sleep(3000);
                 channel.close();
                 connection.close();
@@ -211,27 +199,6 @@ public class NotificationReaderService extends Service {
             notificationBuilder.setLargeIcon(largeIcon);
 
             notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());
-            /*new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    notificationBuilder.setProgress(100, 10, true);
-                    notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());
-                    while(!status.isComplete()) {
-                        try {
-                            Thread.sleep(1000);
-                        } catch (InterruptedException e) {
-                            Log.d(LOG_TAG, e.getMessage(), e);
-                        }
-                    }
-                    if(status.isSuccess()) {
-                        notificationBuilder.setContentText("Upload Photo Completed Successfully");
-                    } else {
-                        notificationBuilder.setContentText("Upload Photo Failed");
-                    }
-                    notificationBuilder.setProgress(100, 100, false);
-                    notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());
-                }
-            }).start();*/
         }
 
         @Override
@@ -246,4 +213,4 @@ public class NotificationReaderService extends Service {
             }
         }
     }
-}
+}*/

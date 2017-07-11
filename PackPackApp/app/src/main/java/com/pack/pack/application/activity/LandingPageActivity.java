@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
-
 import com.pack.pack.application.R;
 import com.pack.pack.application.adapters.LandingPageGridAdapter;
 import com.pack.pack.application.data.util.ApiConstants;
@@ -39,17 +38,17 @@ public class LandingPageActivity extends AppCompatActivity {
         landing_page_grid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if(position == 0) { // Open broadcast
+                if (position == 0) { // Open broadcast
                     Intent intent = new Intent(LandingPageActivity.this, BroadcastActivity.class);
                     startActivity(intent);
-                } else if(position == 1) { // Open visions of artists
+                } else if (position == 1) { // Open visions of artists
                     Intent intent = new Intent(LandingPageActivity.this, MainActivity.class);
                     startActivity(intent);
-                } else if(position == 2) { // Open My Family
+                } else if (position == 2) { // Open My Family
                     Intent intent = new Intent(LandingPageActivity.this, GenericTopicListActivity.class);
                     intent.putExtra(GenericTopicListActivity.CATEGORY_TYPE, ApiConstants.FAMILY);
                     startActivity(intent);
-                } else if(position == 3) { // Open My Society
+                } else if (position == 3) { // Open My Society
                     Intent intent = new Intent(LandingPageActivity.this, GenericTopicListActivity.class);
                     intent.putExtra(GenericTopicListActivity.CATEGORY_TYPE, ApiConstants.SOCIETY);
                     startActivity(intent);

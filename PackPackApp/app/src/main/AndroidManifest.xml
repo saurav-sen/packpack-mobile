@@ -156,6 +156,13 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:host="squill.co.in" android:scheme="http"/>
+                <data android:host="squill.co.in" android:scheme="https"/>
+            </intent-filter>
         </activity>
         <activity
             android:name=".activity.WelcomeActivity"
@@ -167,12 +174,25 @@
         <activity android:name=".activity.FullScreenRssFeedViewActivity" />
 
         <service
-            android:name=".service.NotificationReaderService"
+            android:name=".service.SquillNotificationService"
             android:enabled="true"
-            android:exported="true" />
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+            </intent-filter>
+        </service>
+
+        <service
+            android:name=".service.FirebaseIDService"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
+            </intent-filter>
+        </service>
 
         <activity android:name=".activity.TopicEditActivity" />
-        <activity android:name=".activity.LandingPageActivity" />
+        <activity android:name=".activity.LandingPageActivity"/>
         <activity android:name=".activity.BroadcastActivity" />
         <activity
             android:name=".activity.MyFamilyActivity"

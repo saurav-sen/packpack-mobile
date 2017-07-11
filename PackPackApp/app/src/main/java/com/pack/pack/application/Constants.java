@@ -18,10 +18,15 @@ public interface Constants {
     public static final int IMAGE_VIDEO_CAPTURE_REQUEST_CODE = 132;
     public static final int ATTACHMENT_LONG_STORY_EDIT_REQUEST_CODE = 140;
 
+    public static final int INVITE_OTHERS_TO_JOIN_FAMILY = 241;
+
     public static final String PARCELLABLE_DISCUSSION_KEY = "parcellableDiscussion";
 
     public static final String ERROR_MSG = "errorMsg";
 
     public static final String ATTACHMENT_ID = "attachmentId";
     public static final String ATTACHMENT_STORY_ID = "attachmentStoryId";
+
+    public static final String PUSH_NOTIFICATION_MSG = "PUSH_NOTIFICATION_MSG";
+    public static final String PUSH_DATA_MSG = "PUSH_DATA_MSG";
 }

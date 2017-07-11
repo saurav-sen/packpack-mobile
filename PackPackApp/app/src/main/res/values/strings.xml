@@ -51,4 +51,6 @@
     <string name="section_format">Hello World from section: %1$d</string>
     <string name="title_activity_generic_topic_list">SQUILL</string>
     <string name="title_activity_my_society">SQUILL</string>
+
+    <string name="invite_others_to_family_deeplink_base_url">http://squill.co.in/invitation/myfamily_</string>
 </resources>
