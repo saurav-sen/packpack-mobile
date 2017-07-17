@@ -7,7 +7,8 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
 
-import com.google.firebase.messaging.FirebaseMessaging;
+//import com.google.firebase.messaging.FirebaseMessaging;
+//import com.google.firebase.messaging.FirebaseMessaging;
 import com.pack.pack.application.Constants;
 import com.pack.pack.application.R;
 import com.pack.pack.application.adapters.LandingPageGridAdapter;
@@ -38,7 +39,7 @@ public class LandingPageActivity extends AppCompatActivity {
 
         PreferenceManager preferenceManager = new PreferenceManager(getApplicationContext());
         if(!preferenceManager.isFirstTimeLogin()) {
-            FirebaseMessaging.getInstance().subscribeToTopic(Constants.GLOBAL_NOTIFICATION_TOPIC);
+            //FirebaseMessaging.getInstance().subscribeToTopic(Constants.GLOBAL_NOTIFICATION_TOPIC);
         }
 
         landing_page_grid = (GridView) findViewById(R.id.landing_page_grid);

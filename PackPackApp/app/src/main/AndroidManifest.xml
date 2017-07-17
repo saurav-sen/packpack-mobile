@@ -18,7 +18,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <uses-library android:name="com.google.android.maps" />
+        <!--uses-library android:name="com.google.android.maps" /-->
 
         <activity
             android:name=".activity.SplashActivity"
@@ -150,7 +150,8 @@
         <activity
             android:name=".activity.IntroMainActivity"
             android:label="SQUILL"
-            android:theme="@style/introMainScreenTheme">
+            android:theme="@style/AppTheme.NoActionBar">
+           <!-- android:theme="@style/introMainScreenTheme"-->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -174,6 +175,12 @@
         <activity android:name=".activity.FullScreenRssFeedViewActivity" />
 
         <service
+            android:name=".service.NotificationReaderService"
+            android:enabled="true"
+            android:exported="true">
+        </service>
+
+        <!--service
             android:name=".service.SquillNotificationService"
             android:enabled="true"
             android:exported="true">
@@ -189,7 +196,7 @@
             <intent-filter>
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
             </intent-filter>
-        </service>
+        </service-->
 
         <activity android:name=".activity.TopicEditActivity" />
         <activity android:name=".activity.LandingPageActivity"/>

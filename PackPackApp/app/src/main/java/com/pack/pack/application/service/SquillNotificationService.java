@@ -11,8 +11,8 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
-import com.google.firebase.messaging.FirebaseMessagingService;
-import com.google.firebase.messaging.RemoteMessage;
+/*import com.google.firebase.messaging.FirebaseMessagingService;
+import com.google.firebase.messaging.RemoteMessage;*/
 import com.pack.pack.application.Constants;
 import com.pack.pack.application.R;
 import com.pack.pack.common.util.JSONUtil;
@@ -26,7 +26,8 @@ import java.util.Random;
 /**
  * Created by Saurav on 10-07-2017.
  */
-public class SquillNotificationService extends FirebaseMessagingService {
+public class SquillNotificationService {}
+/*public class SquillNotificationService extends FirebaseMessagingService {
 
     private static final String LOG_TAG = "FCM Service";
 
@@ -48,9 +49,9 @@ public class SquillNotificationService extends FirebaseMessagingService {
                     Log.d(LOG_TAG, e.getMessage(), e);
                 }
             }
-            /*String json = new String(msgBody);
+            *//*String json = new String(msgBody);
             FeedMsg msg = JSONUtil.deserialize(json, FeedMsg.class, true);
-            showNotification(msg);*/
+            showNotification(msg);*//*
         } catch (Exception e) {
             Log.d(LOG_TAG, e.getMessage(), e);
         }
@@ -81,7 +82,7 @@ public class SquillNotificationService extends FirebaseMessagingService {
         }
     }
 
-    /*private void showNotification(FeedMsg feedMsg) {
+    *//*private void showNotification(FeedMsg feedMsg) {
         String message =  feedMsg.getTitle();
         if(message == null) {
             return;
@@ -106,5 +107,5 @@ public class SquillNotificationService extends FirebaseMessagingService {
         notificationBuilder.setLargeIcon(largeIcon);
 
         notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());
-    }*/
-}
+    }*//*
+}*/

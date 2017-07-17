@@ -1,5 +1,6 @@
 package com.pack.pack.application.activity;
 
+import android.content.Context;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -12,20 +13,27 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import com.google.android.gms.appinvite.AppInvite;
+/*import com.google.android.gms.appinvite.AppInvite;
 import com.google.android.gms.appinvite.AppInviteInvitationResult;
 import com.google.android.gms.appinvite.AppInviteReferral;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.appinvite.FirebaseAppInvite;
-import com.google.firebase.dynamiclinks.FirebaseDynamicLinks;
-import com.google.firebase.dynamiclinks.PendingDynamicLinkData;
+import com.google.android.gms.common.api.ResultCallback;*/
+import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
 import com.pack.pack.application.data.cache.PreferenceManager;
+import com.pack.pack.application.data.util.AbstractNetworkTask;
+import com.pack.pack.application.data.util.IAsyncTaskStatusListener;
+import com.pack.pack.client.api.API;
+import com.pack.pack.client.api.APIConstants;
+import com.pack.pack.client.api.COMMAND;
+import com.pack.pack.model.web.JStatus;
+import com.pack.pack.model.web.JTopic;
 
-public class IntroMainActivity extends AbstractAppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
+import java.util.HashMap;
+import java.util.Map;
+
+public class IntroMainActivity extends AbstractActivity /*implements GoogleApiClient.OnConnectionFailedListener*/ {
 
     private static final String LOG_TAG = "IntroMainActivity";
 
@@ -36,7 +44,7 @@ public class IntroMainActivity extends AbstractAppCompatActivity implements Goog
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_intro_main);
 
-        FirebaseDynamicLinks.getInstance().getDynamicLink(getIntent())
+        /*FirebaseDynamicLinks.getInstance().getDynamicLink(getIntent())
                 .addOnSuccessListener(this, new OnSuccessListener<PendingDynamicLinkData>() {
                     @Override
                     public void onSuccess(PendingDynamicLinkData pendingDynamicLinkData) {
@@ -53,13 +61,18 @@ public class IntroMainActivity extends AbstractAppCompatActivity implements Goog
 
                         Uri deepLinkUri = pendingDynamicLinkData.getLink();
                         if(deepLinkUri != null) {
-                            Log.d(LOG_TAG, "getInvitation: deepLinkUri=" + deepLinkUri.toString());
-                            handleDeepLinkBasedRouting(deepLinkUri.toString());
+                            String linkUrl = deepLinkUri.toString();
+                            handleDeepLinkBasedRouting(linkUrl);
                         }
                     }
-                });
+                }).addOnCompleteListener(this, new OnCompleteListener<PendingDynamicLinkData>() {
+            @Override
+            public void onComplete(@NonNull Task<PendingDynamicLinkData> task) {
+                forward();
+            }
+        });*/
 
-       /* mGoogleApiClient = new GoogleApiClient.Builder(this)
+      /* mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .enableAutoManage(this, this)
                 .addApi(AppInvite.API)
                 .build();
@@ -71,24 +84,41 @@ public class IntroMainActivity extends AbstractAppCompatActivity implements Goog
                             @Override
                             public void onResult(@NonNull AppInviteInvitationResult result) {
                                 if (result.getStatus().isSuccess()) {
-                                    // Extract deep link from Intent
                                     Intent intent = result.getInvitationIntent();
                                     String deepLink = AppInviteReferral.getDeepLink(intent);
 
-                                    // Handle the deep link. For example, open the linked
-                                    // content, or apply promotional credit to the user's
-                                    // account.
-
-                                    // [START_EXCLUDE]
-                                    // Display deep link in the UI
-                                    //((TextView) findViewById(R.id.link_view_receive)).setText(deepLink);
-                                    // [END_EXCLUDE]
+                                    handleDeepLinkBasedRouting(deepLink);
                                 } else {
                                     Log.d(LOG_TAG, "getInvitation: no deep link found.");
                                 }
                             }
                         });*/
 
+
+    }
+
+    /*@Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Log.w(LOG_TAG, "onConnectionFailed:" + connectionResult);
+        Toast.makeText(this, "Google Play Services Error: " + connectionResult.getErrorCode(),
+                Toast.LENGTH_SHORT).show();
+    }*/
+
+    private void handleDeepLinkBasedRouting(String deepLink) {
+        String linkUrlPrefix0 = getString(R.string.invite_others_to_family_deeplink_base_url);
+        String linkUrlPrefix1 = getString(R.string.invite_others_to_society_deeplink_base_url);
+        if(deepLink.indexOf(linkUrlPrefix0) >= 0) {
+            String topicID = deepLink.substring(linkUrlPrefix0.length());
+            Log.d(LOG_TAG, "getInvitation: deepLinkUri=" + deepLink);
+            new AcceptFamilyInviteTask(this).addListener(new AcceptFamilyInviteTaskListener()).execute(topicID);
+        } else if(deepLink.indexOf(linkUrlPrefix1) >= 0) {
+            String topicID = deepLink.substring(linkUrlPrefix1.length());
+            Log.d(LOG_TAG, "getInvitation: deepLinkUri=" + deepLink);
+            new AcceptFamilyInviteTask(this).addListener(new AcceptFamilyInviteTaskListener()).execute(topicID);
+        }
+    }
+
+    private void forward() {
         PreferenceManager prefManager = new PreferenceManager(getApplicationContext());
         if(prefManager.isFirstTimeLaunch()) {
             //prefManager.setFirstTimeLaunch(false);
@@ -100,14 +130,71 @@ public class IntroMainActivity extends AbstractAppCompatActivity implements Goog
         }
     }
 
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        Log.w(LOG_TAG, "onConnectionFailed:" + connectionResult);
-        Toast.makeText(this, "Google Play Services Error: " + connectionResult.getErrorCode(),
-                Toast.LENGTH_SHORT).show();
-    }
+   private class AcceptFamilyInviteTaskListener implements IAsyncTaskStatusListener {
+       @Override
+       public void onSuccess(String taskID, Object data) {
+            forward();
+       }
 
-    private void handleDeepLinkBasedRouting(String deepLink) {
+       @Override
+       public void onFailure(String taskID, String errorMsg) {
 
+       }
+
+       @Override
+       public void onPostComplete(String taskID) {
+
+       }
+
+       @Override
+       public void onPreStart(String taskID) {
+
+       }
+   }
+
+    private class AcceptFamilyInviteTask extends AbstractNetworkTask<String, Integer, JStatus> {
+
+        private String errorMsg;
+
+        AcceptFamilyInviteTask(Context context) {
+            super(false, false, context, false);
+        }
+
+        @Override
+        protected COMMAND command() {
+            return COMMAND.FOLLOW_TOPIC;
+        }
+
+        @Override
+        protected String getFailureMessage() {
+            return errorMsg;
+        }
+
+        @Override
+        protected String getContainerIdForObjectStore() {
+            return null;
+        }
+
+        @Override
+        protected Map<String, Object> prepareApiParams(String inputObject) {
+            if(inputObject == null)
+                return null;
+            Map<String, Object> apiParams = new HashMap<String, Object>();
+            apiParams.put(APIConstants.User.ID, AppController.getInstance().getUserId());
+            apiParams.put(APIConstants.Topic.ID, inputObject);
+            return apiParams;
+        }
+
+        @Override
+        protected JStatus executeApi(API api) throws Exception {
+            JStatus status = null;
+            try {
+                status = (JStatus) api.execute();
+            } catch (Exception e) {
+                Log.d(LOG_TAG, e.getMessage());
+                errorMsg = "Failed accepting the invite";
+            }
+            return status;
+        }
     }
 }

@@ -23,7 +23,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.appinvite.AppInviteInvitation;
+//import com.google.android.gms.appinvite.AppInviteInvitation;
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.Constants;
 import com.pack.pack.application.R;
@@ -166,13 +166,13 @@ public class MyFamilyActivity extends AppCompatActivity {
                 startActivity(intent);
                 break;*/
             case R.id.invite_others:
-                Intent intent = new AppInviteInvitation.IntentBuilder(topic.getTopicName())
+                /*Intent intent = new AppInviteInvitation.IntentBuilder(topic.getTopicName())
                         .setMessage(topic.getDescription())
                         .setDeepLink(Uri.parse(getString(R.string.invite_others_to_family_deeplink_base_url) + topic.getTopicId()))
                         .setCustomImage(Uri.parse(topic.getWallpaperUrl()))
                         .setCallToActionText("Join My Family")
                         .build();
-                startActivityForResult(intent, Constants.INVITE_OTHERS_TO_JOIN_FAMILY);
+                startActivityForResult(intent, Constants.INVITE_OTHERS_TO_JOIN_FAMILY);*/
                 break;
         }
         return true;

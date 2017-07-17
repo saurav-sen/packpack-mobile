@@ -9,7 +9,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="end"
         android:id="@+id/discussion_open"
-        android:src="@drawable/common_full_open_on_phone"/>
+        android:src="@drawable/edit_story"/>
 
     <TextView
         android:layout_width="match_parent"

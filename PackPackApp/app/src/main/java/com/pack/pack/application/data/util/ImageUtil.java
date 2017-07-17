@@ -18,7 +18,7 @@ import android.util.Log;
 import com.github.hiteshsondhi88.libffmpeg.FFmpegExecuteResponseHandler;
 import com.github.hiteshsondhi88.libffmpeg.FFmpegLoadBinaryResponseHandler;
 import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegNotSupportedException;*/
-import com.google.android.gms.maps.model.Circle;
+//import com.google.android.gms.maps.model.Circle;
 import com.pack.pack.application.AppController;
 
 import java.io.File;

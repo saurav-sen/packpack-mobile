@@ -36,7 +36,7 @@ import android.widget.TextSwitcher;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
+/*import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.maps.CameraUpdate;
@@ -46,7 +46,7 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.MarkerOptions;*/
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.Constants;
 import com.pack.pack.application.R;
@@ -77,7 +77,7 @@ import static com.pack.pack.application.AppController.EDIT_TOPIC_REQUSET_CODE;
  * @author Saurav
  *
  */
-public class TopicDetailActivity extends AbstractAppCompatActivity implements OnMapReadyCallback {
+public class TopicDetailActivity extends AbstractAppCompatActivity /*implements OnMapReadyCallback*/ {
 
     private ParcelableTopic topic;
 
@@ -85,7 +85,7 @@ public class TopicDetailActivity extends AbstractAppCompatActivity implements On
 
     private boolean gMapAvailable = false;
 
-    private GoogleMap gMap;
+    //private GoogleMap gMap;
 
     //private ImageButton invitePeople;
 
@@ -280,10 +280,10 @@ public class TopicDetailActivity extends AbstractAppCompatActivity implements On
             fragmentTransaction.commit();
         }
         mapFragment.getMapAsync(this);*/
-        gMapAvailable = isMapAvailable();
+        /*gMapAvailable = isMapAvailable();
         if(gMapAvailable) {
             initializeGMap();
-        }
+        }*/
     }
 
     protected void openTopic(ParcelableTopic topic) {
@@ -390,23 +390,23 @@ public class TopicDetailActivity extends AbstractAppCompatActivity implements On
     }
 
     private void initializeGMap() {
-        if(gMap != null)
+        /*if(gMap != null)
             return;
         MapFragment fragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
-        fragment.getMapAsync(this);
+        fragment.getMapAsync(this);*/
     }
 
-    private boolean isMapAvailable() {
-        GoogleApiAvailability googleApiAvailability = GoogleApiAvailability.getInstance();
+    /*private boolean isMapAvailable() {
+       GoogleApiAvailability googleApiAvailability = GoogleApiAvailability.getInstance();
         int code = googleApiAvailability.isGooglePlayServicesAvailable(this);
         boolean bool = (code == ConnectionResult.SUCCESS);
         if(!bool && googleApiAvailability.isUserResolvableError(code)) {
             googleApiAvailability.getErrorDialog(this, code, 1010).show();
         }
         return bool;
-    }
+    }*/
 
-    @Override
+   /* @Override
     public void onMapReady(GoogleMap map) {
         if(gMap != null)
             return;
@@ -419,7 +419,7 @@ public class TopicDetailActivity extends AbstractAppCompatActivity implements On
         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 8);
         gMap.moveCamera(cameraUpdate);
         gMap.addMarker(new MarkerOptions().position(latLng).anchor(0.5f, 0.5f)).setTitle(topic.getAddress());
-    }
+    }*/
 
     private class FollowTopicTask extends AbstractNetworkTask<String, Integer, Void> {
 

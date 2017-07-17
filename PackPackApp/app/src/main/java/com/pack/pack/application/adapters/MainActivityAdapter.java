@@ -6,11 +6,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 
 import com.pack.pack.application.fragments.ArtViewFragment;
 import com.pack.pack.application.fragments.EducationViewFragment;
-import com.pack.pack.application.fragments.FunViewFragment;
-import com.pack.pack.application.fragments.LifestyleViewFragment;
 import com.pack.pack.application.fragments.MiscViewFragment;
-import com.pack.pack.application.fragments.MusicViewFragment;
-import com.pack.pack.application.fragments.SpiritualViewFragment;
 import com.pack.pack.application.fragments.TabType;
 import com.pack.pack.application.fragments.HomeViewFragment;
 import com.pack.pack.application.fragments.TopicViewFragment;
