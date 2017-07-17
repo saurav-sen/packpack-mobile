@@ -50,7 +50,7 @@ public class NotificationReaderService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         //new MessageSubscriber().execute(amqpConnection);
         if(timer != null) {
-            timer.cancel();
+            //timer.cancel();
         } else {
             timer = new Timer();
         }

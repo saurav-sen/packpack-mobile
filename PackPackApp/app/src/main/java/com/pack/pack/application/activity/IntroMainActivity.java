@@ -44,6 +44,8 @@ public class IntroMainActivity extends AbstractActivity /*implements GoogleApiCl
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_intro_main);
 
+        forward();
+
         /*FirebaseDynamicLinks.getInstance().getDynamicLink(getIntent())
                 .addOnSuccessListener(this, new OnSuccessListener<PendingDynamicLinkData>() {
                     @Override
