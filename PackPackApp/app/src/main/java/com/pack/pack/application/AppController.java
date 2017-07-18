@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-import io.branch.referral.Branch;
+//import io.branch.referral.Branch;
 
 public class AppController extends Application {
 
@@ -204,7 +204,7 @@ public class AppController extends Application {
     }
 
     public void initializeBranchIO() {
-        Branch.getAutoInstance(this);
+        //Branch.getAutoInstance(this);
     }
 
     public static synchronized AppController getInstance() {

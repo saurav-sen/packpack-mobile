@@ -1,27 +1,27 @@
 {
   "project_info": {
-    "project_number": "115157947179",
-    "firebase_url": "https://squill-dd32c.firebaseio.com",
-    "project_id": "squill-dd32c",
-    "storage_bucket": "squill-dd32c.appspot.com"
+    "project_number": "708777082258",
+    "firebase_url": "https://squill-b5f4e.firebaseio.com",
+    "project_id": "squill-b5f4e",
+    "storage_bucket": "squill-b5f4e.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:115157947179:android:50116b385991f4cc",
+        "mobilesdk_app_id": "1:708777082258:android:50116b385991f4cc",
         "android_client_info": {
           "package_name": "com.pack.pack.application"
         }
       },
       "oauth_client": [
         {
-          "client_id": "115157947179-uc5lncanv0aoleqn8r0pdtk1sqol51gm.apps.googleusercontent.com",
+          "client_id": "708777082258-2hkit20p681libcur33me8t61kran4sj.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyAB1xvBSmAu_OPTYPErtzENSVkE0NPNSow"
+          "current_key": "AIzaSyAkEuyDeUDDSaB1QWVj-AOkAfdifexJ1xI"
         }
       ],
       "services": {
