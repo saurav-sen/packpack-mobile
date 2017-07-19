@@ -21,7 +21,7 @@ public class LandingPageActivity extends AppCompatActivity {
     private GridView landing_page_grid;
 
     private static String[] texts = new String[] {
-            "Broadcast",
+            "Refreshments",
             "My Favourite",
             "My Family",
             "My Society"

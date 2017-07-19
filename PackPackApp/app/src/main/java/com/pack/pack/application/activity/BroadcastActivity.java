@@ -120,13 +120,13 @@ public class BroadcastActivity extends AbstractAppCompatActivity {
 
         }
 
-        startNotificationReader();
+        //startNotificationReader();
     }
 
-    private void startNotificationReader() {
+    /*private void startNotificationReader() {
         Intent intent = new Intent(this, NotificationReaderService.class);
         startService(intent);
-    }
+    }*/
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {

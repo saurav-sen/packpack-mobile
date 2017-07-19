@@ -10,12 +10,12 @@
     tools:context="com.pack.pack.application.activity.LandingPageActivity">
 
     <GridView
-        android:numColumns="auto_fit"
+        android:numColumns="2"
         android:gravity="center"
         android:columnWidth="100dp"
         android:stretchMode="columnWidth"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:id="@+id/landing_page_grid" />
 

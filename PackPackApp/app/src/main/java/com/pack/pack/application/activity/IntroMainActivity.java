@@ -15,10 +15,16 @@ import android.widget.Toast;
 
 /*import com.google.android.gms.appinvite.AppInvite;
 import com.google.android.gms.appinvite.AppInviteInvitationResult;
-import com.google.android.gms.appinvite.AppInviteReferral;
+import com.google.android.gms.appinvite.AppInviteReferral;*/
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;*/
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.appinvite.FirebaseAppInvite;
+import com.google.firebase.dynamiclinks.FirebaseDynamicLinks;
+import com.google.firebase.dynamiclinks.PendingDynamicLinkData;
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
 import com.pack.pack.application.data.cache.PreferenceManager;
@@ -33,20 +39,22 @@ import com.pack.pack.model.web.JTopic;
 import java.util.HashMap;
 import java.util.Map;
 
-public class IntroMainActivity extends AbstractActivity /*implements GoogleApiClient.OnConnectionFailedListener*/ {
+public class IntroMainActivity extends AbstractActivity implements GoogleApiClient.OnConnectionFailedListener {
 
     private static final String LOG_TAG = "IntroMainActivity";
 
     //private GoogleApiClient mGoogleApiClient;
+
+    private boolean deepLinkFound = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_intro_main);
 
-        forward();
+        //forward();
 
-        /*FirebaseDynamicLinks.getInstance().getDynamicLink(getIntent())
+        FirebaseDynamicLinks.getInstance().getDynamicLink(getIntent())
                 .addOnSuccessListener(this, new OnSuccessListener<PendingDynamicLinkData>() {
                     @Override
                     public void onSuccess(PendingDynamicLinkData pendingDynamicLinkData) {
@@ -56,23 +64,26 @@ public class IntroMainActivity extends AbstractActivity /*implements GoogleApiCl
                         }
 
                         FirebaseAppInvite appInvite = FirebaseAppInvite.getInvitation(pendingDynamicLinkData);
-                        if(appInvite != null) {
+                        if (appInvite != null) {
                             String appInviteId = appInvite.getInvitationId();
                             Log.d(LOG_TAG, "getInvitation: appInviteID=" + appInviteId);
                         }
 
                         Uri deepLinkUri = pendingDynamicLinkData.getLink();
-                        if(deepLinkUri != null) {
+                        if (deepLinkUri != null) {
                             String linkUrl = deepLinkUri.toString();
+                            deepLinkFound = true;
                             handleDeepLinkBasedRouting(linkUrl);
                         }
                     }
                 }).addOnCompleteListener(this, new OnCompleteListener<PendingDynamicLinkData>() {
             @Override
             public void onComplete(@NonNull Task<PendingDynamicLinkData> task) {
-                forward();
+                if (!deepLinkFound) {
+                    forward();
+                }
             }
-        });*/
+        });
 
       /* mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .enableAutoManage(this, this)
@@ -99,12 +110,12 @@ public class IntroMainActivity extends AbstractActivity /*implements GoogleApiCl
 
     }
 
-    /*@Override
+    @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         Log.w(LOG_TAG, "onConnectionFailed:" + connectionResult);
         Toast.makeText(this, "Google Play Services Error: " + connectionResult.getErrorCode(),
                 Toast.LENGTH_SHORT).show();
-    }*/
+    }
 
     private void handleDeepLinkBasedRouting(String deepLink) {
         String linkUrlPrefix0 = getString(R.string.invite_others_to_family_deeplink_base_url);
@@ -112,11 +123,11 @@ public class IntroMainActivity extends AbstractActivity /*implements GoogleApiCl
         if(deepLink.indexOf(linkUrlPrefix0) >= 0) {
             String topicID = deepLink.substring(linkUrlPrefix0.length());
             Log.d(LOG_TAG, "getInvitation: deepLinkUri=" + deepLink);
-            new AcceptFamilyInviteTask(this).addListener(new AcceptFamilyInviteTaskListener()).execute(topicID);
+            new AcceptTopicInviteTask(this).addListener(new AcceptTopicInviteTaskListener()).execute(topicID);
         } else if(deepLink.indexOf(linkUrlPrefix1) >= 0) {
             String topicID = deepLink.substring(linkUrlPrefix1.length());
             Log.d(LOG_TAG, "getInvitation: deepLinkUri=" + deepLink);
-            new AcceptFamilyInviteTask(this).addListener(new AcceptFamilyInviteTaskListener()).execute(topicID);
+            new AcceptTopicInviteTask(this).addListener(new AcceptTopicInviteTaskListener()).execute(topicID);
         }
     }
 
@@ -132,15 +143,15 @@ public class IntroMainActivity extends AbstractActivity /*implements GoogleApiCl
         }
     }
 
-   private class AcceptFamilyInviteTaskListener implements IAsyncTaskStatusListener {
+   private class AcceptTopicInviteTaskListener implements IAsyncTaskStatusListener {
        @Override
        public void onSuccess(String taskID, Object data) {
-            forward();
+           forward();
        }
 
        @Override
        public void onFailure(String taskID, String errorMsg) {
-
+           forward();
        }
 
        @Override
@@ -154,11 +165,11 @@ public class IntroMainActivity extends AbstractActivity /*implements GoogleApiCl
        }
    }
 
-    private class AcceptFamilyInviteTask extends AbstractNetworkTask<String, Integer, JStatus> {
+    private class AcceptTopicInviteTask extends AbstractNetworkTask<String, Integer, JStatus> {
 
         private String errorMsg;
 
-        AcceptFamilyInviteTask(Context context) {
+        AcceptTopicInviteTask(Context context) {
             super(false, false, context, false);
         }
 
