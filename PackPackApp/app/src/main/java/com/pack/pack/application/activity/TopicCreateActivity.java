@@ -117,7 +117,8 @@ public class TopicCreateActivity extends AbstractAppCompatActivity implements IA
         wallpaper_select = (Button) findViewById(R.id.wallpaper_select);
 
         intendedCategory = getIntent().getStringExtra(INTENDED_CATEGORY);
-        if(intendedCategory != null && intendedCategory.equalsIgnoreCase("family")) {
+        if((intendedCategory != null && intendedCategory.equalsIgnoreCase("family"))
+                || (intendedCategory != null && intendedCategory.equalsIgnoreCase("society"))) {
             topic_create_category.setVisibility(View.GONE);
             topic_create_category_notes.setVisibility(View.GONE);
         } else {
@@ -290,7 +291,10 @@ public class TopicCreateActivity extends AbstractAppCompatActivity implements IA
     private boolean validateTopicCategory(String topicCategory) {
         if(topicCategory == null || topicCategory.trim().isEmpty())
             return false;
-        if(intendedCategory != null && intendedCategory.equalsIgnoreCase("family")) {
+        if (intendedCategory != null && intendedCategory.equalsIgnoreCase("family")) {
+            return true;
+        }
+        if(intendedCategory != null && intendedCategory.equalsIgnoreCase("society")) {
             return true;
         }
         List<JCategory> categories = AppController.getInstance().getSupportedCategories().getCategories();

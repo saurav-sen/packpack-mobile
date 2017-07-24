@@ -26,8 +26,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:tabTextAppearance="@style/CustomTabTextAppearance"
-            android:theme="@style/CustomTabLayout"
-            app:tabMode="scrollable" />
+            app:tabGravity="fill"
+            app:tabMode="fixed" />
 
     </android.support.design.widget.AppBarLayout>
 

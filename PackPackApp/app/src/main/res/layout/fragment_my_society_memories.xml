@@ -5,6 +5,7 @@
     android:layout_marginTop="@dimen/activity_vertical_margin"
     android:layout_marginBottom="@dimen/activity_vertical_margin"
     android:orientation="vertical"
+    android:background="@color/white"
     android:id="@+id/mysociety_memories">
 
     <!--TextView

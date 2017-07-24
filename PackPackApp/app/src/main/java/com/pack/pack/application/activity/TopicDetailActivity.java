@@ -47,6 +47,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;*/
+import com.google.android.gms.appinvite.AppInviteInvitation;
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.Constants;
 import com.pack.pack.application.R;
@@ -97,24 +98,7 @@ public class TopicDetailActivity extends AbstractAppCompatActivity /*implements 
 
    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        /*Toolbar toolbar = (Toolbar) findViewById(R.id.topic_detail_toolbar);
-        toolbar.inflateMenu(R.menu.inside_topic);
-        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                return onOptionsItemSelected(item);
-            }
-        });*/
        getMenuInflater().inflate(R.menu.app_menu, menu);
-       MenuItem item0 = menu.findItem(R.id.app_settings);
-       if(item0 != null) {
-           item0.setVisible(true);
-       }
-       /*MenuItem item1 = menu.findItem(R.id.enter_forum);
-       if(item1 != null) {
-           item1.setVisible(true);
-       }*/
-       invalidateOptionsMenu();
        return true;
     }
 
@@ -130,9 +114,27 @@ public class TopicDetailActivity extends AbstractAppCompatActivity /*implements 
                 intent.putExtra(Constants.DISCUSSION_ENTITY_TYPE, EntityType.TOPIC.name());
                 startActivity(intent);
                 break;*/
-            case R.id.app_settings:
+            /*case R.id.app_settings:
                 Intent intent_0 = new Intent(TopicDetailActivity.this, SettingsActivity.class);
                 startActivity(intent_0);
+                break;*/
+            case R.id.invite_others:
+                Intent intent = new AppInviteInvitation.IntentBuilder(topic.getTopicName())
+                        .setMessage(topic.getDescription())
+                        .setDeepLink(Uri.parse(getString(R.string.invite_others_to_society_deeplink_base_url) + topic.getTopicId()))
+                        .setCustomImage(Uri.parse(topic.getWallpaperUrl()))
+                        .setCallToActionText("Be a part of " + topic.getTopicName() + " @ SQUILL")
+                        .build();
+                startActivityForResult(intent, Constants.INVITE_OTHERS_TO_JOIN_TOPIC);
+                break;
+            case R.id.invite_others_alt:
+                Intent intent1 = new AppInviteInvitation.IntentBuilder(topic.getTopicName())
+                        .setMessage(topic.getDescription())
+                        .setDeepLink(Uri.parse(getString(R.string.invite_others_to_society_deeplink_base_url) + topic.getTopicId()))
+                        .setCustomImage(Uri.parse(topic.getWallpaperUrl()))
+                        .setCallToActionText("Be a part of " + topic.getTopicName() + " @ SQUILL")
+                        .build();
+                startActivityForResult(intent1, Constants.INVITE_OTHERS_TO_JOIN_TOPIC);
                 break;
         }
         return true;

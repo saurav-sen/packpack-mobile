@@ -5,8 +5,13 @@
     <item
         android:id="@+id/invite_others"
         android:orderInCategory="100"
-        android:title="Invite"
+        android:title="Invite Others"
         android:icon="@drawable/invite_others"
         app:showAsAction="always|withText"/>
+
+    <item
+        android:id="@+id/invite_others_alt"
+        android:orderInCategory="100"
+        android:title="Invite Others"/>
 
 </menu>

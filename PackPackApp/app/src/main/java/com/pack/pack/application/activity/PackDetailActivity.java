@@ -2,7 +2,6 @@ package com.pack.pack.application.activity;
 
 import android.Manifest;
 import android.animation.ObjectAnimator;
-import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
@@ -11,24 +10,16 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Color;
-import android.graphics.Typeface;
-import android.os.AsyncTask;
+import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.SpannableString;
-import android.text.style.ForegroundColorSpan;
-import android.text.style.StyleSpan;
 import android.util.Log;
-import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -36,7 +27,6 @@ import android.view.ViewTreeObserver;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AbsListView;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -46,6 +36,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.appinvite.AppInviteInvitation;
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.Constants;
 import com.pack.pack.application.R;
@@ -55,7 +46,6 @@ import com.pack.pack.application.data.cache.PackAttachmentsCache;
 import com.pack.pack.application.data.util.AbstractNetworkTask;
 import com.pack.pack.application.data.util.IAsyncTaskStatusListener;
 import com.pack.pack.application.db.DBUtil;
-import com.pack.pack.application.db.DbObject;
 import com.pack.pack.application.db.PaginationInfo;
 import com.pack.pack.application.image.loader.DownloadImageTask;
 import com.pack.pack.application.service.UploadImageAttachmentService;
@@ -64,11 +54,9 @@ import com.pack.pack.application.service.UploadVideoAttachmentService;
 import com.pack.pack.application.topic.activity.model.ParcelablePack;
 import com.pack.pack.application.topic.activity.model.ParcelableTopic;
 import com.pack.pack.client.api.API;
-import com.pack.pack.client.api.APIBuilder;
 import com.pack.pack.client.api.APIConstants;
 import com.pack.pack.client.api.COMMAND;
 import com.pack.pack.common.util.JSONUtil;
-import com.pack.pack.model.web.EntityType;
 import com.pack.pack.model.web.JPack;
 import com.pack.pack.model.web.JPackAttachment;
 import com.pack.pack.model.web.JRssFeed;
@@ -403,27 +391,46 @@ public class PackDetailActivity extends AbstractAppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.app_menu, menu);
-        MenuItem item0 = menu.findItem(R.id.app_settings);
+        /*MenuItem item0 = menu.findItem(R.id.app_settings);
         if(item0 != null) {
             item0.setVisible(true);
-        }
+        }*/
         /*MenuItem item1 = menu.findItem(R.id.enter_forum);
         if(item1 != null) {
             item1.setVisible(false);
         }*/
-        invalidateOptionsMenu();
+        //invalidateOptionsMenu();
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        ParcelableTopic topic = InMemory.INSTANCE.get(pack.getParentTopicId());
         switch (item.getItemId()) {
             case android.R.id.home:
                 onBackPressed();
                 break;
-            case R.id.app_settings:
+            /*case R.id.app_settings:
                 Intent intent = new Intent(PackDetailActivity.this, SettingsActivity.class);
                 startActivity(intent);
+                break;*/
+            case R.id.invite_others:
+                Intent intent = new AppInviteInvitation.IntentBuilder(topic.getTopicName())
+                        .setMessage(topic.getDescription())
+                        .setDeepLink(Uri.parse(getString(R.string.invite_others_to_society_deeplink_base_url) + topic.getTopicId()))
+                        .setCustomImage(Uri.parse(topic.getWallpaperUrl()))
+                        .setCallToActionText("Be a part of " + topic.getTopicName() + " @ SQUILL")
+                        .build();
+                startActivityForResult(intent, Constants.INVITE_OTHERS_TO_JOIN_TOPIC);
+                break;
+            case R.id.invite_others_alt:
+                Intent intent1 = new AppInviteInvitation.IntentBuilder(topic.getTopicName())
+                        .setMessage(topic.getDescription())
+                        .setDeepLink(Uri.parse(getString(R.string.invite_others_to_society_deeplink_base_url) + topic.getTopicId()))
+                        .setCustomImage(Uri.parse(topic.getWallpaperUrl()))
+                        .setCallToActionText("Be a part of " + topic.getTopicName() + " @ SQUILL")
+                        .build();
+                startActivityForResult(intent1, Constants.INVITE_OTHERS_TO_JOIN_TOPIC);
                 break;
             default:
                 break;
@@ -509,6 +516,12 @@ public class PackDetailActivity extends AbstractAppCompatActivity {
                 }
             } else if(resultCode == RESULT_CANCELED) {
                 Toast.makeText(this, "You have cancelled upload", Toast.LENGTH_LONG).show();
+            }
+        } else if(requestCode == Constants.INVITE_OTHERS_TO_JOIN_TOPIC) {
+            if(resultCode == RESULT_OK) {
+                Toast.makeText(this, "Invite sent successfully", Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(this, "Failed sending invite", Toast.LENGTH_LONG).show();
             }
         }
     }

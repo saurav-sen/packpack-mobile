@@ -143,9 +143,9 @@ public class MainActivity extends AbstractAppCompatActivity {
         startService(intent);
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.app_menu, menu);
+   // @Override
+   // public boolean onCreateOptionsMenu(Menu menu) {
+        /*getMenuInflater().inflate(R.menu.app_menu, menu);*/
         /*MenuItem item0 = menu.findItem(R.id.app_settings);
         if(item0 != null) {
             item0.setVisible(true);
@@ -154,11 +154,11 @@ public class MainActivity extends AbstractAppCompatActivity {
         if(item1 != null) {
             item1.setVisible(false);
         }*/
-        invalidateOptionsMenu();
-        return true;
-    }
+        /*invalidateOptionsMenu();
+        return true;*/
+   // }
 
-    @Override
+   /* @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
@@ -170,7 +170,7 @@ public class MainActivity extends AbstractAppCompatActivity {
                 break;
         }
         return true;
-    }
+    }*/
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {

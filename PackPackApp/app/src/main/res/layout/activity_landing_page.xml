@@ -12,11 +12,12 @@
     <GridView
         android:numColumns="2"
         android:gravity="center"
-        android:columnWidth="100dp"
+        android:columnWidth="60dp"
         android:stretchMode="columnWidth"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:id="@+id/landing_page_grid" />
+        android:layout_gravity="center_horizontal|center_vertical"
+        android:id="@+id/landing_page_grid"
+        android:drawSelectorOnTop="true" />
 
 </LinearLayout>

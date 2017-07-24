@@ -15,6 +15,7 @@ import com.pack.pack.application.R;
 import com.pack.pack.application.adapters.DiscussionAdapter;
 import com.pack.pack.application.adapters.IDiscussionAdapter;
 import com.pack.pack.application.adapters.TopicDetailAdapter;
+import com.pack.pack.application.data.cache.InMemory;
 import com.pack.pack.application.data.util.FetchDiscussionTask;
 import com.pack.pack.application.data.util.IAsyncTaskStatusListener;
 import com.pack.pack.application.data.util.LoadPackTask;
@@ -51,6 +52,9 @@ public class MySocietyDiscussionsFragment extends Fragment implements IAsyncTask
     @Override
     public void setArguments(Bundle args) {
         topic = (ParcelableTopic) args.getParcelable(TOPIC);
+        if(topic != null) {
+            InMemory.INSTANCE.add(topic);
+        }
         super.setArguments(args);
     }
 

@@ -11,6 +11,7 @@ import android.widget.ListView;
 
 import com.pack.pack.application.R;
 import com.pack.pack.application.adapters.TopicDetailAdapter;
+import com.pack.pack.application.data.cache.InMemory;
 import com.pack.pack.application.data.util.LoadPackTask;
 import com.pack.pack.application.topic.activity.model.ParcelableTopic;
 import com.pack.pack.model.web.JPack;
@@ -38,6 +39,10 @@ public class MySocietyMemoriesFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_my_society_memories, container, false);
+
+        if(topic != null) {
+            InMemory.INSTANCE.add(topic);
+        }
 
         adapter = new TopicDetailAdapter(this.getActivity(), new ArrayList<JPack>());
         final ListView listView = (ListView) rootView.findViewById(R.id.mysociety_memories_list);

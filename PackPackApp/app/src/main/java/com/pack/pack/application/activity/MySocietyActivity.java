@@ -1,10 +1,11 @@
 package com.pack.pack.application.activity;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.ActionBar;
+import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -13,13 +14,10 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 
-import android.widget.TextView;
 import android.widget.Toast;
 
 //import com.google.android.gms.appinvite.AppInviteInvitation;
@@ -27,7 +25,6 @@ import com.google.android.gms.appinvite.AppInviteInvitation;
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.Constants;
 import com.pack.pack.application.R;
-import com.pack.pack.application.fragments.MyFamilyMemoriesFragment;
 import com.pack.pack.application.fragments.MySocietyDiscussionsFragment;
 import com.pack.pack.application.fragments.MySocietyMemoriesFragment;
 import com.pack.pack.application.topic.activity.model.ParcelableTopic;
@@ -56,6 +53,8 @@ public class MySocietyActivity extends AppCompatActivity {
 
     private FloatingActionButton mysociety_fab;
 
+    private static final String[] TAB_NAMES = new String[] {"Memories", "Forum"};
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,8 +65,8 @@ public class MySocietyActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
+        /*ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);*/
 
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
@@ -76,6 +75,18 @@ public class MySocietyActivity extends AppCompatActivity {
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.mysociety_container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
+        mViewPager.setOffscreenPageLimit(2);
+
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.mysociety_tabs);
+        tabLayout.setSelectedTabIndicatorColor(Color.WHITE);
+        tabLayout.setupWithViewPager(mViewPager);
+
+
+        for(int i=0; i<2; i++) {
+            //tabLayout.getTabAt(i).setIcon(value.getIcon());
+            tabLayout.getTabAt(i).setText(TAB_NAMES[i]);
+            i++;
+        }
 
 
         mysociety_fab = (FloatingActionButton) findViewById(R.id.mysociety_fab);
@@ -125,6 +136,7 @@ public class MySocietyActivity extends AppCompatActivity {
                     recreate();
                 } else {
                     finish();
+                    getIntent().putExtra(AppController.TOPIC_PARCELABLE_KEY, topic);
                     startActivity(getIntent());
                 }
             } else if(resultCode == RESULT_CANCELED) {
@@ -140,6 +152,7 @@ public class MySocietyActivity extends AppCompatActivity {
                     recreate();
                 } else {
                     finish();
+                    getIntent().putExtra(AppController.TOPIC_PARCELABLE_KEY, topic);
                     startActivity(getIntent());
                 }
             } else if(resultCode == RESULT_CANCELED) {
@@ -148,6 +161,12 @@ public class MySocietyActivity extends AppCompatActivity {
                     errorMsg = "You have cancelled to start new discussion";
                 }
                 Toast.makeText(this, errorMsg, Toast.LENGTH_LONG).show();
+            }
+        } else if(requestCode == Constants.INVITE_OTHERS_TO_JOIN_TOPIC) {
+            if(resultCode == RESULT_OK) {
+                Toast.makeText(this, "Invite sent successfully", Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(this, "Failed sending invite", Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -174,11 +193,20 @@ public class MySocietyActivity extends AppCompatActivity {
             case R.id.invite_others:
                 Intent intent = new AppInviteInvitation.IntentBuilder(topic.getTopicName())
                         .setMessage(topic.getDescription())
-                        .setDeepLink(Uri.parse(getString(R.string.invite_others_to_family_deeplink_base_url) + topic.getTopicId()))
+                        .setDeepLink(Uri.parse(getString(R.string.invite_others_to_society_deeplink_base_url) + topic.getTopicId()))
                         .setCustomImage(Uri.parse(topic.getWallpaperUrl()))
                         .setCallToActionText("Join My Family")
                         .build();
-                startActivityForResult(intent, Constants.INVITE_OTHERS_TO_JOIN_FAMILY);
+                startActivityForResult(intent, Constants.INVITE_OTHERS_TO_JOIN_TOPIC);
+                break;
+            case R.id.invite_others_alt:
+                Intent intent1 = new AppInviteInvitation.IntentBuilder(topic.getTopicName())
+                        .setMessage(topic.getDescription())
+                        .setDeepLink(Uri.parse(getString(R.string.invite_others_to_society_deeplink_base_url) + topic.getTopicId()))
+                        .setCustomImage(Uri.parse(topic.getWallpaperUrl()))
+                        .setCallToActionText("Join My Family")
+                        .build();
+                startActivityForResult(intent1, Constants.INVITE_OTHERS_TO_JOIN_TOPIC);
                 break;
         }
         return true;
@@ -198,21 +226,24 @@ public class MySocietyActivity extends AppCompatActivity {
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
+            Fragment fragment = null;
             switch (position) {
                 case 0:
                     MySocietyMemoriesFragment fragment0 = new MySocietyMemoriesFragment();
                     Bundle bundle0 = new Bundle();
                     bundle0.putParcelable(MySocietyMemoriesFragment.TOPIC, topic);
                     fragment0.setArguments(bundle0);
-                    return fragment0;
+                    fragment = fragment0;
+                    break;
                 case 1:
                     MySocietyDiscussionsFragment fragment1 = new MySocietyDiscussionsFragment();
                     Bundle bundle1 = new Bundle();
                     bundle1.putParcelable(MySocietyDiscussionsFragment.TOPIC, topic);
                     fragment1.setArguments(bundle1);
-                    return fragment1;
+                    fragment = fragment1;
+                    break;
             }
-            return null;
+            return fragment;
         }
 
         @Override
@@ -223,15 +254,18 @@ public class MySocietyActivity extends AppCompatActivity {
 
         @Override
         public CharSequence getPageTitle(int position) {
+            String title = null;
             switch (position) {
                 case 0:
-                    return "Memories";
+                    title = TAB_NAMES[0];
+                    break;
                 case 1:
-                    return "Forum";
+                    title = TAB_NAMES[1];
+                    break;
                 /*case 2:
                     return "Helpdesk";*/
             }
-            return null;
+            return title;
         }
     }
 }

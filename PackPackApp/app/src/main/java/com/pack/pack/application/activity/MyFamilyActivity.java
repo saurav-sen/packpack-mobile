@@ -4,8 +4,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.ActionBar;
+import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -14,13 +13,10 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 
-import android.widget.TextView;
 import android.widget.Toast;
 
 //import com.google.android.gms.appinvite.AppInviteInvitation;
@@ -54,6 +50,8 @@ public class MyFamilyActivity extends AppCompatActivity {
 
     private FloatingActionButton myfamily_fab;
 
+    //private static final String[] TAB_NAMES = new String[] {"Memories"};
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,8 +62,8 @@ public class MyFamilyActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
+        /*ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);*/
 
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
@@ -74,7 +72,8 @@ public class MyFamilyActivity extends AppCompatActivity {
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.myfamily_container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
-        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+        mViewPager.setOffscreenPageLimit(2);
+        /*mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
@@ -89,7 +88,19 @@ public class MyFamilyActivity extends AppCompatActivity {
             public void onPageScrollStateChanged(int state) {
 
             }
-        });
+        });*/
+
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.myfamily_tabs);
+        //tabLayout.setSelectedTabIndicatorColor(Color.WHITE);
+        tabLayout.setupWithViewPager(mViewPager);
+
+
+        for(int i=0; i<2; i++) {
+            //tabLayout.getTabAt(i).setIcon(value.getIcon());
+            //tabLayout.getTabAt(i).setText(TAB_NAMES[i]);
+            tabLayout.getTabAt(i).setText(topic.getTopicName());
+            i++;
+        }
 
 
         myfamily_fab = (FloatingActionButton) findViewById(R.id.myfamily_fab);
@@ -130,7 +141,7 @@ public class MyFamilyActivity extends AppCompatActivity {
                 }
                 Toast.makeText(this, errorMsg, Toast.LENGTH_LONG).show();
             }
-        } else if(requestCode == Constants.INVITE_OTHERS_TO_JOIN_FAMILY) {
+        } else if(requestCode == Constants.INVITE_OTHERS_TO_JOIN_TOPIC) {
             if(resultCode == RESULT_OK) {
                 Toast.makeText(this, "Invite sent successfully", Toast.LENGTH_LONG).show();
             } else {
@@ -173,7 +184,16 @@ public class MyFamilyActivity extends AppCompatActivity {
                         .setCustomImage(Uri.parse(topic.getWallpaperUrl()))
                         .setCallToActionText("Join My Family")
                         .build();
-                startActivityForResult(intent, Constants.INVITE_OTHERS_TO_JOIN_FAMILY);
+                startActivityForResult(intent, Constants.INVITE_OTHERS_TO_JOIN_TOPIC);
+                break;
+            case R.id.invite_others_alt:
+                Intent intent1 = new AppInviteInvitation.IntentBuilder(topic.getTopicName())
+                        .setMessage(topic.getDescription())
+                        .setDeepLink(Uri.parse(getString(R.string.invite_others_to_family_deeplink_base_url) + topic.getTopicId()))
+                        .setCustomImage(Uri.parse(topic.getWallpaperUrl()))
+                        .setCallToActionText("Join My Family")
+                        .build();
+                startActivityForResult(intent1, Constants.INVITE_OTHERS_TO_JOIN_TOPIC);
                 break;
         }
         return true;
@@ -193,15 +213,17 @@ public class MyFamilyActivity extends AppCompatActivity {
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
+            Fragment fragment = null;
             switch (position) {
                 case 0:
                     MyFamilyMemoriesFragment fragment0 = new MyFamilyMemoriesFragment();
                     Bundle bundle0 = new Bundle();
                     bundle0.putParcelable(MyFamilyMemoriesFragment.TOPIC, topic);
                     fragment0.setArguments(bundle0);
-                    return fragment0;
+                    fragment = fragment0;
+                    break;
             }
-            return null;
+            return fragment;
         }
 
         @Override
@@ -211,11 +233,14 @@ public class MyFamilyActivity extends AppCompatActivity {
 
         @Override
         public CharSequence getPageTitle(int position) {
+            String title = null;
             switch (position) {
                 case 0:
-                    return "Memories";
+                    //title = TAB_NAMES[0];
+                    title = topic.getTopicName();
+                    break;
             }
-            return null;
+            return title;
         }
     }
 }

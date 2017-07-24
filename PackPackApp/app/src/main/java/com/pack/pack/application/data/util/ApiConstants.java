@@ -10,7 +10,7 @@ public interface ApiConstants {
     //public static final String BASE_URL = "http://api.squill.co.in/packpack/"; //PRODUCTION Environment
     //public static final String PUBLIC_ENDPOINT_BASE_URL = "http://api.squill.co.in/RSS/";//PRODUCTION Environment
 
-    public static final boolean IS_PRODUCTION_ENV = true;
+    public static final boolean IS_PRODUCTION_ENV = false;//true;
 
     public static final String APP_NAME = "Squill";
 

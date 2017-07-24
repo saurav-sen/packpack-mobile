@@ -2,6 +2,7 @@ package com.pack.pack.application.activity;
 
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -14,8 +15,11 @@ import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
+import com.google.android.gms.appinvite.AppInviteInvitation;
 import com.pack.pack.application.AppController;
+import com.pack.pack.application.Constants;
 import com.pack.pack.application.R;
 import com.pack.pack.application.adapters.TopicViewAdapter;
 import com.pack.pack.application.data.util.AbstractNetworkTask;
@@ -117,7 +121,7 @@ public class GenericTopicListActivity extends AppCompatActivity implements JTopi
         if(item1 != null) {
             item1.setVisible(false);
         }*/
-        invalidateOptionsMenu();
+        //invalidateOptionsMenu();
         return true;
     }
 
@@ -127,12 +131,42 @@ public class GenericTopicListActivity extends AppCompatActivity implements JTopi
             case android.R.id.home:
                 onBackPressed();
                 break;
-            case R.id.app_settings:
+            /*case R.id.app_settings:
                 Intent intent = new Intent(GenericTopicListActivity.this, SettingsActivity.class);
                 startActivity(intent);
+                break;*/
+            case R.id.invite_others:
+                Intent intent = new AppInviteInvitation.IntentBuilder("Install SQUILL")
+                        .setMessage("Hi! I am using SQUILL. It's really nice thought you ma be interested")
+                        .setDeepLink(Uri.parse(getString(R.string.invite_others_to_society_deeplink_base_url)))
+                        /*.setCustomImage(Uri.parse(topic.getWallpaperUrl()))*/
+                        .setCallToActionText("Check SQUILL App")
+                        .build();
+                startActivityForResult(intent, Constants.INVITE_OTHERS_TO_JOIN_TOPIC);
+                break;
+            case R.id.invite_others_alt:
+                Intent intent1 = new AppInviteInvitation.IntentBuilder("Install SQUILL")
+                        .setMessage("Hi! I am using SQUILL. It's really nice thought you ma be interested")
+                        .setDeepLink(Uri.parse(getString(R.string.invite_others_to_society_deeplink_base_url)))
+                        /*.setCustomImage(Uri.parse(topic.getWallpaperUrl()))*/
+                        .setCallToActionText("Check SQUILL App")
+                        .build();
+                startActivityForResult(intent1, Constants.INVITE_OTHERS_TO_JOIN_TOPIC);
                 break;
         }
         return true;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == Constants.INVITE_OTHERS_TO_JOIN_TOPIC) {
+            if(resultCode == RESULT_OK) {
+                Toast.makeText(this, "Invite sent successfully", Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(this, "Failed sending invite", Toast.LENGTH_LONG).show();
+            }
+        }
     }
 
     @Override

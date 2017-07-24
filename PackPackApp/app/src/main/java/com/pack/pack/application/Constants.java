@@ -18,7 +18,7 @@ public interface Constants {
     public static final int IMAGE_VIDEO_CAPTURE_REQUEST_CODE = 132;
     public static final int ATTACHMENT_LONG_STORY_EDIT_REQUEST_CODE = 140;
 
-    public static final int INVITE_OTHERS_TO_JOIN_FAMILY = 241;
+    public static final int INVITE_OTHERS_TO_JOIN_TOPIC = 241;
 
     public static final String PARCELLABLE_DISCUSSION_KEY = "parcellableDiscussion";
 

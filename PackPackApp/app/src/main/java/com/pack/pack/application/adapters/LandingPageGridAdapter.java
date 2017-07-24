@@ -1,7 +1,9 @@
 package com.pack.pack.application.adapters;
 
 import android.content.Context;
+import android.util.FloatMath;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -54,6 +56,19 @@ public class LandingPageGridAdapter extends BaseAdapter {
             ImageView landing_grid_image = (ImageView)grid.findViewById(R.id.landing_grid_image);
             landing_grid_text.setText(web[position]);
             landing_grid_image.setImageResource(Imageid[position]);
+
+            /*landing_grid_image.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    if((event.getAction() & MotionEvent.ACTION_MASK) == MotionEvent.ACTION_MOVE) {
+                        float X = event.getX(0) - event.getX(1);
+                        float Y = event.getY(0) - event.getY(1);
+
+                        float newDistance = (float) Math.sqrt(X*X + Y*Y);
+                    }
+                    return false;
+                }
+            });*/
         } else {
             grid = (View) convertView;
         }

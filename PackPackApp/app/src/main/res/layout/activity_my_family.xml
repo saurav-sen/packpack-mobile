@@ -12,10 +12,9 @@
         android:id="@+id/appbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="@dimen/appbar_padding_top"
         android:theme="@style/AppTheme.AppBarOverlay">
 
-        <android.support.v7.widget.Toolbar
+       <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
@@ -24,6 +23,14 @@
             app:popupTheme="@style/AppTheme.PopupOverlay">
 
         </android.support.v7.widget.Toolbar>
+
+        <android.support.design.widget.TabLayout
+            android:id="@+id/myfamily_tabs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:tabTextAppearance="@style/CustomTabTextAppearance"
+            app:tabGravity="fill"
+            app:tabMode="fixed" />
 
     </android.support.design.widget.AppBarLayout>
 

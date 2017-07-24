@@ -22,15 +22,17 @@ public class LandingPageActivity extends AppCompatActivity {
 
     private static String[] texts = new String[] {
             "Refreshments",
-            "My Favourite",
+            "Visionaries",
             "My Family",
-            "My Society"
+            "My Society",
+            "Settings"
     };
     private static int[] imageIds = new int[] {
             R.drawable.broadcast,
             R.drawable.art_culture,
             R.drawable.my_family,
-            R.drawable.smart_society
+            R.drawable.smart_society,
+            R.drawable.app_settings
     };
 
     @Override
@@ -62,6 +64,9 @@ public class LandingPageActivity extends AppCompatActivity {
                 } else if (position == 3) { // Open My Society
                     Intent intent = new Intent(LandingPageActivity.this, GenericTopicListActivity.class);
                     intent.putExtra(GenericTopicListActivity.CATEGORY_TYPE, ApiConstants.SOCIETY);
+                    startActivity(intent);
+                } else if (position == 4) { // Open App Settings
+                    Intent intent = new Intent(LandingPageActivity.this, SettingsActivity.class);
                     startActivity(intent);
                 }
             }

@@ -52,6 +52,6 @@
     <string name="title_activity_generic_topic_list">SQUILL</string>
     <string name="title_activity_my_society">SQUILL</string>
 
-    <string name="invite_others_to_family_deeplink_base_url">http://squill.co.in/invitation/myfamily_</string>
-    <string name="invite_others_to_society_deeplink_base_url">http://squill.co.in/invitation/mysociety_</string>
+    <string name="invite_others_to_family_deeplink_base_url">http://www.squill.co.in/invitation/myfamily_</string>
+    <string name="invite_others_to_society_deeplink_base_url">http://www.squill.co.in/invitation/mysociety_</string>
 </resources>
