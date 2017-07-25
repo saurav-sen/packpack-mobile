@@ -3,6 +3,7 @@ package com.pack.pack.application.activity;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -160,7 +161,21 @@ public class GenericTopicListActivity extends AppCompatActivity implements JTopi
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == Constants.INVITE_OTHERS_TO_JOIN_TOPIC) {
+        if(requestCode == CREATE_TOPIC_REQUSET_CODE) {
+            if(resultCode == RESULT_OK && data != null) {
+                ParcelableTopic pTopic = (ParcelableTopic) data.getParcelableExtra(TopicCreateActivity.RESULT_KEY);
+                if(Build.VERSION.SDK_INT >= 11) {
+                    recreate();
+                } else {
+                    finish();
+                    startActivity(getIntent());
+                }
+            }
+            else {
+                Toast.makeText(GenericTopicListActivity.this, "Sorry!! Failed creating",
+                        Toast.LENGTH_LONG).show();;
+            }
+        } else if(requestCode == Constants.INVITE_OTHERS_TO_JOIN_TOPIC) {
             if(resultCode == RESULT_OK) {
                 Toast.makeText(this, "Invite sent successfully", Toast.LENGTH_LONG).show();
             } else {
@@ -181,6 +196,18 @@ public class GenericTopicListActivity extends AppCompatActivity implements JTopi
             ParcelableTopic parcel = new ParcelableTopic(topic);
             //Intent intent = new Intent(this, MySocietyTopicDetailActivity.class);
             Intent intent = new Intent(this, MySocietyActivity.class);
+            intent.putExtra(AppController.TOPIC_PARCELABLE_KEY, parcel);
+            startActivity(intent);
+        } else if(ApiConstants.OTHERS.equals(categoryType)) {
+            /*ParcelableTopic parcel = new ParcelableTopic(topic);
+            Intent intent = new Intent(this, MySocietyActivity.class);
+            intent.putExtra(AppController.TOPIC_PARCELABLE_KEY, parcel);
+            startActivity(intent);*/
+
+            //openDetailActivity(AppController.TOPIC_PARCELABLE_KEY, parcel, InsideTopicActivity.class);
+
+            ParcelableTopic parcel = new ParcelableTopic(topic);
+            Intent intent = new Intent(this, InsideTopicActivity.class);
             intent.putExtra(AppController.TOPIC_PARCELABLE_KEY, parcel);
             startActivity(intent);
         }

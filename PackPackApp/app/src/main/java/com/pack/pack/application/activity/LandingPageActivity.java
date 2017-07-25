@@ -55,7 +55,10 @@ public class LandingPageActivity extends AppCompatActivity {
                     Intent intent = new Intent(LandingPageActivity.this, BroadcastActivity.class);
                     startActivity(intent);
                 } else if (position == 1) { // Open visions of artists
-                    Intent intent = new Intent(LandingPageActivity.this, MainActivity.class);
+                    /*Intent intent = new Intent(LandingPageActivity.this, MainActivity.class);
+                    startActivity(intent);*/
+                    Intent intent = new Intent(LandingPageActivity.this, GenericTopicListActivity.class);
+                    intent.putExtra(GenericTopicListActivity.CATEGORY_TYPE, ApiConstants.OTHERS);
                     startActivity(intent);
                 } else if (position == 2) { // Open My Family
                     Intent intent = new Intent(LandingPageActivity.this, GenericTopicListActivity.class);

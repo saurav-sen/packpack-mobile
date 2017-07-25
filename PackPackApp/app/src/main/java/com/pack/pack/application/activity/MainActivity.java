@@ -135,13 +135,13 @@ public class MainActivity extends AbstractAppCompatActivity {
 
         }
 
-        startNotificationReader();
+        //startNotificationReader();
     }
 
-    private void startNotificationReader() {
+    /*private void startNotificationReader() {
         Intent intent = new Intent(this, NotificationReaderService.class);
         startService(intent);
-    }
+    }*/
 
    // @Override
    // public boolean onCreateOptionsMenu(Menu menu) {
