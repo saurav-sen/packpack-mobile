@@ -52,9 +52,9 @@ public class LandingPageGridAdapter extends BaseAdapter {
 
             grid = new View(mContext);
             grid = inflater.inflate(R.layout.landing_page_grid, null);
-            TextView landing_grid_text = (TextView) grid.findViewById(R.id.landing_grid_text);
+            //TextView landing_grid_text = (TextView) grid.findViewById(R.id.landing_grid_text);
             ImageView landing_grid_image = (ImageView)grid.findViewById(R.id.landing_grid_image);
-            landing_grid_text.setText(web[position]);
+            //landing_grid_text.setText(web[position]);
             landing_grid_image.setImageResource(Imageid[position]);
 
             /*landing_grid_image.setOnTouchListener(new View.OnTouchListener() {

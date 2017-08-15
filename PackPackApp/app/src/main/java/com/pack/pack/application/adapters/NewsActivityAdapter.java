@@ -3,20 +3,17 @@ package com.pack.pack.application.adapters;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.support.design.widget.Snackbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.android.volley.toolbox.ImageLoader;
-import com.android.volley.toolbox.NetworkImageView;
 import com.google.android.youtube.player.YouTubeStandalonePlayer;
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
@@ -24,44 +21,36 @@ import com.pack.pack.application.activity.FullScreenPlayVideoActivity;
 import com.pack.pack.application.activity.FullScreenRssFeedViewActivity;
 import com.pack.pack.application.data.util.ApiConstants;
 import com.pack.pack.application.data.util.DownloadFeedImageTask;
-import com.pack.pack.application.image.loader.DownloadImageTask;
 import com.pack.pack.application.topic.activity.model.ParcellableRssFeed;
 import com.pack.pack.application.view.util.ViewUtil;
-import com.pack.pack.client.api.APIConstants;
-import com.pack.pack.client.api.COMMAND;
-import com.pack.pack.model.web.JPackAttachment;
 import com.pack.pack.model.web.JRssFeed;
 import com.pack.pack.model.web.JRssSubFeed;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
- *
- * Created by Saurav on 08-04-2016.
- *
+ * Created by Saurav on 13-08-2017.
  */
-public class HomeActivityAdapter extends ArrayAdapter<JRssFeed> {
+public class NewsActivityAdapter extends ArrayAdapter<JRssFeed> {
 
     private Activity activity;
     private LayoutInflater inflater;
     private ImageLoader imageLoader = AppController.getInstance().getImageLoader();
 
-    private TextView home_rss_feed__name;
-    private ImageView home_rss_feed_image;
-    private ImageView home_rss_feed_video_play;
-    private TextView home_rss_feed_description;
+    private TextView news_rss_feed__name;
+    private ImageView news_rss_feed_image;
+    private ImageView news_rss_feed_video_play;
+    private TextView news_rss_feed_description;
 
     private ProgressBar loading_progress;
 
-    private Button home_rss_share;
+    private Button news_rss_share;
 
     private List<JRssFeed> feeds;
 
-    public HomeActivityAdapter(Activity activity, List<JRssFeed> feeds) {
-        super(activity, R.layout.home_event_item, feeds.toArray(new JRssFeed[feeds.size()]));
+    public NewsActivityAdapter(Activity activity, List<JRssFeed> feeds) {
+        super(activity, R.layout.news_list_items, feeds.toArray(new JRssFeed[feeds.size()]));
         this.activity = activity;
         this.feeds = feeds;
     }
@@ -90,25 +79,25 @@ public class HomeActivityAdapter extends ArrayAdapter<JRssFeed> {
             inflater = activity.getLayoutInflater();
         }
         if(convertView == null) {
-            convertView = inflater.inflate(ViewUtil.getListViewLayoutId("home"), null);
+            convertView = inflater.inflate(R.layout.news_list_items, null);
         }
-        home_rss_feed__name = (TextView) convertView.findViewById(R.id.home_rss_feed__name);
-        home_rss_feed_image = (ImageView) convertView.findViewById(R.id.home_rss_feed_image);
-        home_rss_feed_video_play = (ImageView) convertView.findViewById(R.id.home_rss_feed_video_play);
-        home_rss_feed_description = (TextView) convertView.findViewById(R.id.home_rss_feed_description);
+        news_rss_feed__name = (TextView) convertView.findViewById(R.id.news_rss_feed__name);
+        news_rss_feed_image = (ImageView) convertView.findViewById(R.id.news_rss_feed_image);
+        news_rss_feed_video_play = (ImageView) convertView.findViewById(R.id.news_rss_feed_video_play);
+        news_rss_feed_description = (TextView) convertView.findViewById(R.id.news_rss_feed_description);
         loading_progress = (ProgressBar) convertView.findViewById(R.id.loading_progress);
         loading_progress.setVisibility(View.VISIBLE);
-        home_rss_share = (Button) convertView.findViewById(R.id.home_rss_share);
+        news_rss_share = (Button) convertView.findViewById(R.id.news_rss_share);
 
         final JRssFeed feed = getItem(position);
         if(feed != null) {
-            home_rss_feed__name.setText(feed.getOgTitle());
-            home_rss_feed_description.setText(feed.getOgDescription());
+            news_rss_feed__name.setText(feed.getOgTitle());
+            news_rss_feed_description.setText(feed.getOgDescription());
             final String imageUrl = feed.getOgImage();
             final String videoUrl = feed.getVideoUrl();
             if(videoUrl != null && !videoUrl.trim().isEmpty()) {
-                home_rss_feed_video_play.setVisibility(View.VISIBLE);
-                home_rss_feed_video_play.setOnClickListener(new View.OnClickListener() {
+                news_rss_feed_video_play.setVisibility(View.VISIBLE);
+                news_rss_feed_video_play.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         //playVideo(videoUrl);
@@ -118,12 +107,12 @@ public class HomeActivityAdapter extends ArrayAdapter<JRssFeed> {
                     }
                 });
             } else {
-                home_rss_feed_video_play.setVisibility(View.GONE);
+                news_rss_feed_video_play.setVisibility(View.GONE);
             }
             if(imageUrl != null && !imageUrl.trim().isEmpty()) {
-                new DownloadFeedImageTask(home_rss_feed_image, 850, 600, HomeActivityAdapter.this.activity, loading_progress)
+                new DownloadFeedImageTask(news_rss_feed_image, 850, 600, NewsActivityAdapter.this.activity, loading_progress)
                         .execute(imageUrl);
-                home_rss_feed_image.setOnClickListener(new View.OnClickListener() {
+                news_rss_feed_image.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                        /*Intent intent = new Intent(Intent.ACTION_VIEW);
@@ -135,7 +124,7 @@ public class HomeActivityAdapter extends ArrayAdapter<JRssFeed> {
                         getContext().startActivity(intent);
                     }
                 });
-                home_rss_feed_description.setOnClickListener(new View.OnClickListener() {
+                news_rss_feed_description.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         Intent intent = new Intent(getContext(), FullScreenRssFeedViewActivity.class);
@@ -145,7 +134,7 @@ public class HomeActivityAdapter extends ArrayAdapter<JRssFeed> {
                 });
             }
 
-            home_rss_share.setOnClickListener(new View.OnClickListener() {
+            news_rss_share.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     String publicUrl = imageUrl;
@@ -210,7 +199,7 @@ public class HomeActivityAdapter extends ArrayAdapter<JRssFeed> {
                 Intent intent = YouTubeStandalonePlayer.createVideoIntent(activity, ApiConstants.YOUTUBE_API_KEY, VIDEO_ID);
                 activity.startActivity(intent);
             } else {
-                Snackbar.make(home_rss_feed_video_play, "Oops! Something went wrong", Snackbar.LENGTH_LONG).show();
+                Snackbar.make(news_rss_feed_video_play, "Oops! Something went wrong", Snackbar.LENGTH_LONG).show();
             }
         } else {
             Intent intent = new Intent(activity, FullScreenPlayVideoActivity.class);

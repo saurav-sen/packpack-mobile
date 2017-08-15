@@ -48,6 +48,7 @@
     <string name="intro_slide_3_title">Stay Updated</string>
     <string name="intro_slide_3_desc">With SQUILL stay updated with latest happening and know-how in the world of art and culture</string>
     <string name="title_activity_my_family">SQUILL</string>
+    <string name="title_activity_refreshments">SQUILL</string>
     <string name="section_format">Hello World from section: %1$d</string>
     <string name="title_activity_generic_topic_list">SQUILL</string>
     <string name="title_activity_my_society">SQUILL</string>

@@ -1,32 +1,43 @@
 package com.pack.pack.application.activity;
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Build;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
+import android.support.v7.widget.Toolbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AbsListView;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
+import com.pack.pack.application.adapters.HomeActivityAdapter;
 import com.pack.pack.application.adapters.MainActivityAdapter;
+import com.pack.pack.application.data.util.IAsyncTaskStatusListener;
+import com.pack.pack.application.data.util.RSSFeedTask;
 import com.pack.pack.application.fragments.TabType;
 import com.pack.pack.application.service.NotificationReaderService;
 import com.pack.pack.application.topic.activity.model.ParcelableTopic;
+import com.pack.pack.model.web.JRssFeed;
+import com.pack.pack.model.web.Pagination;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -34,32 +45,71 @@ import static com.pack.pack.application.AppController.CREATE_TOPIC_REQUSET_CODE;
 
 public class BroadcastActivity extends AbstractAppCompatActivity {
 
-    private ViewPager pager;
+    //private ViewPager pager;
 
-    private int pageCurrentItemIndex;
+    //private Toolbar toolbar;
 
-    public static final String PAGE_CURRENT_INDEX = "pageCurrentItemIndex";
-    public static final String RECREATE = "RECREATE";
+    private HomeActivityAdapter adapter;
+
+    private ListView squill_feeds;
+
+    private String nextLink;
+
+    private String prevLink;
+
+    private ProgressDialog progressDialog;
+
+    //private int pageCurrentItemIndex;
+
+    //public static final String PAGE_CURRENT_INDEX = "pageCurrentItemIndex";
+    //public static final String RECREATE = "RECREATE";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_broadcast);
 
+        /*toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);*/
+
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        FloatingActionButton FAB = (FloatingActionButton) findViewById(R.id.broadcast_create);
+        squill_feeds = (ListView) findViewById(R.id.squill_feeds);
+        List<JRssFeed> feeds = new LinkedList<JRssFeed>();
+        adapter = new HomeActivityAdapter(this, feeds);
+        squill_feeds.setAdapter(adapter);
+        squill_feeds.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView absListView, int scrollState) {
+                int count = squill_feeds.getCount();
+                if (scrollState == SCROLL_STATE_IDLE) {
+                    if (squill_feeds.getLastVisiblePosition() > count - 1 && !"END_OF_PAGE".equals(nextLink)) {
+                        loadRssFeeds(nextLink);
+                    }
+                }
+            }
+
+            @Override
+            public void onScroll(AbsListView absListView, int i, int i1, int i2) {
+
+            }
+        });
+
+        loadRssFeeds(!"END_OF_PAGE".equals(nextLink) ? nextLink : prevLink);
+        //new RSSFeedTask(BroadcastActivity.this).execute(!"END_OF_PAGE".equals(nextLink) ? nextLink : prevLink);
+
+        /*FloatingActionButton FAB = (FloatingActionButton) findViewById(R.id.broadcast_create);
         FAB.setVisibility(View.GONE);
         FAB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-               /* Intent intent = new Intent(BroadcastActivity.this, TopicCreateActivity.class);
-                startActivityForResult(intent, CREATE_TOPIC_REQUSET_CODE);*/
+               *//* Intent intent = new Intent(BroadcastActivity.this, TopicCreateActivity.class);
+                startActivityForResult(intent, CREATE_TOPIC_REQUSET_CODE);*//*
             }
-        });
+        });*/
 
-        List<String> list = AppController.getInstance().getFollowedCategories();
+        /*List<String> list = AppController.getInstance().getFollowedCategories();
         TabType[] values = TabType.values();
         Object __OBJECT = new Object();
         Map<String, Object> map = new HashMap<String, Object>();
@@ -70,10 +120,7 @@ public class BroadcastActivity extends AbstractAppCompatActivity {
         boolean recreate = getIntent().getBooleanExtra(RECREATE, false);
 
         List<TabType> types = new ArrayList<TabType>();
-        //types.add(TabType.HOME);
         for(TabType value : values) {
-            /*if(map.get(value.getType()) == null)
-                continue;*/
             if(!value.isEnabled()) {
                 continue;
             }
@@ -102,9 +149,9 @@ public class BroadcastActivity extends AbstractAppCompatActivity {
             tabLayout.getTabAt(i).setIcon(value.getIcon());
             tabLayout.getTabAt(i).setText(value.getDisplayName());
             i++;
-        }
+        }*/
 
-        if(ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+        /*if(ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.CAMERA},
@@ -122,7 +169,7 @@ public class BroadcastActivity extends AbstractAppCompatActivity {
                     AppController.APP_EXTERNAL_STORAGE_READ_REQUEST_CODE);
         } else {
 
-        }
+        }*/
 
         //startNotificationReader();
     }
@@ -132,7 +179,7 @@ public class BroadcastActivity extends AbstractAppCompatActivity {
         startService(intent);
     }*/
 
-    @Override
+    /*@Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         pageCurrentItemIndex = pager.getCurrentItem();
@@ -143,21 +190,21 @@ public class BroadcastActivity extends AbstractAppCompatActivity {
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         pageCurrentItemIndex = savedInstanceState.getInt(PAGE_CURRENT_INDEX);
-    }
+    }*/
 
-    @Override
+    /*@Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
             case AppController.CAMERA_ACCESS_REQUEST_CODE:
                 if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     AppController.getInstance().cameraPermissionGranted();
-                    /*if(Build.VERSION.SDK_INT >= 11) {
+                    *//*if(Build.VERSION.SDK_INT >= 11) {
                         recreate();
                     } else {
                         finish();
                         startActivity(getIntent());
-                    }*/
+                    }*//*
                 } else {
                     AppController.getInstance().cameraPermisionDenied();
                 }
@@ -165,20 +212,20 @@ public class BroadcastActivity extends AbstractAppCompatActivity {
             case AppController.APP_EXTERNAL_STORAGE_READ_REQUEST_CODE:
                 if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     AppController.getInstance().externalReadGranted();
-                    /*if(Build.VERSION.SDK_INT >= 11) {
+                    *//*if(Build.VERSION.SDK_INT >= 11) {
                         recreate();
                     } else {
                         finish();
                         startActivity(getIntent());
-                    }*/
+                    }*//*
                 } else {
                     AppController.getInstance().externalReadDenied();
                 }
                 break;
         }
-    }
+    }*/
 
-    @Override
+    /*@Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == CREATE_TOPIC_REQUSET_CODE) {
@@ -198,6 +245,76 @@ public class BroadcastActivity extends AbstractAppCompatActivity {
             else {
                 Toast.makeText(BroadcastActivity.this, "Sorry!! Failed creating new vision",
                         Toast.LENGTH_LONG).show();;
+            }
+        }
+    }*/
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        hideProgressDialog();
+    }
+
+    private void showProgressDialog() {
+        if(progressDialog == null) {
+            progressDialog = new ProgressDialog(BroadcastActivity.this);
+            progressDialog.setMessage("Loading...");
+            progressDialog.show();
+        }
+    }
+
+    private void hideProgressDialog() {
+        if(progressDialog != null) {
+            progressDialog.dismiss();
+            progressDialog = null;
+        }
+    }
+
+    private void loadRssFeeds(String pageLink) {
+        RSSFeedTask task = new RSSFeedTask(BroadcastActivity.this);
+        RssFeedTaskStatusListener listener = new RssFeedTaskStatusListener(task.getTaskID());
+        task.addListener(listener);
+        task.execute(pageLink);
+    }
+
+    private class RssFeedTaskStatusListener implements IAsyncTaskStatusListener {
+
+        private String taskID;
+
+        RssFeedTaskStatusListener(String taskID) {
+            this.taskID = taskID;
+        }
+
+        @Override
+        public void onPreStart(String taskID) {
+            if(this.taskID.equals(taskID)) {
+                showProgressDialog();
+            }
+        }
+
+        @Override
+        public void onFailure(String taskID, String errorMsg) {
+            if(this.taskID.equals(taskID)) {
+                Snackbar.make(squill_feeds, errorMsg, Snackbar.LENGTH_LONG).show();
+            }
+        }
+
+        @Override
+        public void onSuccess(String taskID, Object data) {
+            if(this.taskID.equals(taskID) && data != null) {
+                Pagination<JRssFeed> page = (Pagination<JRssFeed>) data;
+                nextLink = page.getNextLink();
+                prevLink = page.getPreviousLink();
+                List<JRssFeed> list = page.getResult();
+                adapter.getFeeds().addAll(list);
+                adapter.notifyDataSetChanged();
+            }
+        }
+
+        @Override
+        public void onPostComplete(String taskID) {
+            if(this.taskID.equals(taskID)) {
+                hideProgressDialog();
             }
         }
     }

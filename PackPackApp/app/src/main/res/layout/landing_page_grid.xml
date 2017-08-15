@@ -7,17 +7,17 @@
 
     <ImageView
         android:id="@+id/landing_grid_image"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
     </ImageView>
 
-    <TextView
+    <!--<TextView
         android:id="@+id/landing_grid_text"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:paddingLeft="10dp"
         android:layout_gravity="center"
         android:textSize="15sp" >
-    </TextView>
+    </TextView>-->
 
 </RelativeLayout>

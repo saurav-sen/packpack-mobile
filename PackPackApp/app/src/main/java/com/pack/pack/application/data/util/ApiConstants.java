@@ -5,8 +5,12 @@ package com.pack.pack.application.data.util;
  */
 public interface ApiConstants {
 
+    //public static final String BASE_URL = "http://192.168.35.12:8080/packpack/"; //DEV Local Environment
+    //public static final String PUBLIC_ENDPOINT_BASE_URL = "http://192.168.35.12:8080/RSS/";//DEV Local Environment
+
     public static final String BASE_URL = "http://13.126.116.95:8080/packpack/"; //DEV Environment
     public static final String PUBLIC_ENDPOINT_BASE_URL = "http://13.126.116.95:8080/RSS/";//DEV Environment
+
     //public static final String BASE_URL = "http://api.squill.co.in/packpack/"; //PRODUCTION Environment
     //public static final String PUBLIC_ENDPOINT_BASE_URL = "http://api.squill.co.in/RSS/";//PRODUCTION Environment
 

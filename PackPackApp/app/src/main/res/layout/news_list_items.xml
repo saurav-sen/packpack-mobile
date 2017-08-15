@@ -31,7 +31,7 @@
                 android:paddingLeft="@dimen/feed_item_profile_info_padd" >
 
                 <TextView
-                    android:id="@+id/home_rss_feed__name"
+                    android:id="@+id/news_rss_feed__name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textSize="@dimen/feed_item_profile_name"
@@ -44,7 +44,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <!--<ImageView android:id="@+id/home_rss_feed_image"
+            <!--<ImageView android:id="@+id/news_rss_feed_image"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
@@ -55,7 +55,7 @@
                 android:paddingLeft="@dimen/feed_item_status_pad_left_right"
                 android:paddingRight="@dimen/feed_item_status_pad_left_right"
                 android:paddingTop="@dimen/feed_item_status_pad_top"/>-->
-            <ImageView android:id="@+id/home_rss_feed_image"
+            <ImageView android:id="@+id/news_rss_feed_image"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -72,7 +72,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:layout_gravity="center_horizontal|bottom"
-                android:id="@+id/home_rss_feed_video_play"
+                android:id="@+id/news_rss_feed_video_play"
                 android:background="@drawable/video_play"
                 android:visibility="gone"/>
 
@@ -85,7 +85,7 @@
             android:indeterminate="true"/>
 
         <TextView
-            android:id="@+id/home_rss_feed_description"
+            android:id="@+id/news_rss_feed_description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="@color/timestamp"
@@ -102,7 +102,7 @@
             android:layout_marginLeft="3dp"
             android:layout_marginRight="3dp"
             android:background="@drawable/bg_parent_rounded_corner"
-            android:id="@+id/home_rss_share"/>
+            android:id="@+id/news_rss_share"/>
     </LinearLayout>
 
 </LinearLayout>

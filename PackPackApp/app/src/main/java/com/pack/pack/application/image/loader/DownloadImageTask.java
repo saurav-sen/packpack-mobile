@@ -15,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 
 import com.pack.pack.application.AppController;
+import com.pack.pack.application.R;
 import com.pack.pack.application.data.util.AbstractNetworkTask;
 import com.pack.pack.application.data.util.ApiConstants;
 import com.pack.pack.application.db.DbObject;
@@ -233,6 +234,9 @@ public class DownloadImageTask extends AbstractNetworkTask<String, Void, Bitmap>
                         ImageDimension dimension = calculateResizeDimensions(bitmap);
                         bitmap = Bitmap.createScaledBitmap(bitmap, dimension.newWidth, dimension.newHeight, true);
                     }
+                }
+                if(bitmap == null) {
+                    bitmap = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.noimage);
                 }
                 AppController.getInstance().getLruBitmapCache().putBitmap(lookupURL(url), bitmap);
             }
