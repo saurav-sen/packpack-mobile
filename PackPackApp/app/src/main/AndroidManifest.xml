@@ -242,7 +242,10 @@
             android:name=".activity.MySocietyActivity"
             android:label="@string/title_activity_my_society"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".activity.NewsActivity"></activity>
+        <activity android:name=".activity.NewsActivity" />
+        <activity android:name=".activity.FullScreenNewsViewActivity"
+            android:label="@string/title_activity_generic_topic_list"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

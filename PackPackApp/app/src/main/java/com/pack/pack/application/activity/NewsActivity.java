@@ -49,8 +49,9 @@ public class NewsActivity extends AppCompatActivity {
             public void onScrollStateChanged(AbsListView absListView, int scrollState) {
                 int count = news_feeds.getCount();
                 if (scrollState == SCROLL_STATE_IDLE) {
-                    if (news_feeds.getLastVisiblePosition() > count - 1 && !"END_OF_PAGE".equals(nextLink)) {
-                        loadNewsFeeds(nextLink);
+                    int c = count - 3;
+                    if (news_feeds.getLastVisiblePosition() >= c && c > 0 && !"END_OF_PAGE".equals(nextLink)) {
+                        loadNewsFeeds(nextLink, false);
                     }
                 }
             }
@@ -61,7 +62,7 @@ public class NewsActivity extends AppCompatActivity {
             }
         });
 
-        loadNewsFeeds(!"END_OF_PAGE".equals(nextLink) ? nextLink : prevLink);
+        loadNewsFeeds(!"END_OF_PAGE".equals(nextLink) ? nextLink : prevLink, true);
     }
 
     @Override
@@ -85,9 +86,9 @@ public class NewsActivity extends AppCompatActivity {
         }
     }
 
-    private void loadNewsFeeds(String pageLink) {
+    private void loadNewsFeeds(String pageLink, boolean showLoadingProgress) {
         NewsFeedTask task = new NewsFeedTask(NewsActivity.this);
-        NewsFeedTaskStatusListener listener = new NewsFeedTaskStatusListener(task.getTaskID());
+        NewsFeedTaskStatusListener listener = new NewsFeedTaskStatusListener(task.getTaskID(), showLoadingProgress);
         task.addListener(listener);
         task.execute(pageLink);
     }
@@ -96,13 +97,16 @@ public class NewsActivity extends AppCompatActivity {
 
         private String taskID;
 
-        NewsFeedTaskStatusListener(String taskID) {
+        private boolean showLoadingProgress;
+
+        NewsFeedTaskStatusListener(String taskID, boolean showLoadingProgress) {
             this.taskID = taskID;
+            this.showLoadingProgress = showLoadingProgress;
         }
 
         @Override
         public void onPreStart(String taskID) {
-            if(this.taskID.equals(taskID)) {
+            if(this.taskID.equals(taskID) && showLoadingProgress) {
                 showProgressDialog();
             }
         }
@@ -128,7 +132,7 @@ public class NewsActivity extends AppCompatActivity {
 
         @Override
         public void onPostComplete(String taskID) {
-            if(this.taskID.equals(taskID)) {
+            if(this.taskID.equals(taskID) && showLoadingProgress) {
                 hideProgressDialog();
             }
         }

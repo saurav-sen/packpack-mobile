@@ -17,6 +17,7 @@ import com.android.volley.toolbox.ImageLoader;
 import com.google.android.youtube.player.YouTubeStandalonePlayer;
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
+import com.pack.pack.application.activity.FullScreenNewsViewActivity;
 import com.pack.pack.application.activity.FullScreenPlayVideoActivity;
 import com.pack.pack.application.activity.FullScreenRssFeedViewActivity;
 import com.pack.pack.application.data.util.ApiConstants;
@@ -95,14 +96,16 @@ public class NewsActivityAdapter extends ArrayAdapter<JRssFeed> {
             news_rss_feed_description.setText(feed.getOgDescription());
             final String imageUrl = feed.getOgImage();
             final String videoUrl = feed.getVideoUrl();
+            final String newsUrl = feed.getHrefSource();
             if(videoUrl != null && !videoUrl.trim().isEmpty()) {
                 news_rss_feed_video_play.setVisibility(View.VISIBLE);
                 news_rss_feed_video_play.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         //playVideo(videoUrl);
-                        Intent intent = new Intent(getContext(), FullScreenRssFeedViewActivity.class);
-                        intent.putParcelableArrayListExtra(FullScreenRssFeedViewActivity.PARCELLABLE_FEEDS, prepareParcel(feed));
+                        Intent intent = new Intent(getContext(), FullScreenNewsViewActivity.class);
+                        intent.putExtra(FullScreenNewsViewActivity.NEWS_LINK, feed.getHrefSource());
+                        //intent.putParcelableArrayListExtra(FullScreenRssFeedViewActivity.PARCELLABLE_FEEDS, prepareParcel(feed));
                         getContext().startActivity(intent);
                     }
                 });
@@ -119,16 +122,22 @@ public class NewsActivityAdapter extends ArrayAdapter<JRssFeed> {
                         intent.setData(Uri.parse(feed.getOgUrl()));
                         getContext().startActivity(intent);*/
 
-                        Intent intent = new Intent(getContext(), FullScreenRssFeedViewActivity.class);
+                        /*Intent intent = new Intent(getContext(), FullScreenRssFeedViewActivity.class);
                         intent.putParcelableArrayListExtra(FullScreenRssFeedViewActivity.PARCELLABLE_FEEDS, prepareParcel(feed));
+                        getContext().startActivity(intent);*/
+                        Intent intent = new Intent(getContext(), FullScreenNewsViewActivity.class);
+                        intent.putExtra(FullScreenNewsViewActivity.NEWS_LINK, feed.getHrefSource());
                         getContext().startActivity(intent);
                     }
                 });
                 news_rss_feed_description.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent intent = new Intent(getContext(), FullScreenRssFeedViewActivity.class);
+                        /*Intent intent = new Intent(getContext(), FullScreenRssFeedViewActivity.class);
                         intent.putParcelableArrayListExtra(FullScreenRssFeedViewActivity.PARCELLABLE_FEEDS, prepareParcel(feed));
+                        getContext().startActivity(intent);*/
+                        Intent intent = new Intent(getContext(), FullScreenNewsViewActivity.class);
+                        intent.putExtra(FullScreenNewsViewActivity.NEWS_LINK, feed.getHrefSource());
                         getContext().startActivity(intent);
                     }
                 });
@@ -137,11 +146,12 @@ public class NewsActivityAdapter extends ArrayAdapter<JRssFeed> {
             news_rss_share.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    String publicUrl = imageUrl;
+                    /*String publicUrl = imageUrl;
                     if(videoUrl != null) {
                         publicUrl = videoUrl;
-                    }
+                    }*/
 
+                    String publicUrl = newsUrl;
                     if(publicUrl != null && !publicUrl.isEmpty()) {
                         shareUrl(publicUrl);
                     }
