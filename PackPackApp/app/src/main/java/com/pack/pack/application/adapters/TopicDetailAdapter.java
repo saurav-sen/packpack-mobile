@@ -17,6 +17,7 @@ import android.widget.GridView;
 import android.widget.TextView;
 
 import com.pack.pack.application.AppController;
+import com.pack.pack.application.Constants;
 import com.pack.pack.application.R;
 import com.pack.pack.application.activity.PackDetailActivity;
 import com.pack.pack.application.data.cache.InMemory;
@@ -55,6 +56,8 @@ public class TopicDetailAdapter extends ArrayAdapter<JPack> {
 
     private List<JPack> packs;
 
+    private String topicType;
+
     private View.OnClickListener onClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
@@ -65,14 +68,16 @@ public class TopicDetailAdapter extends ArrayAdapter<JPack> {
             ParcelablePack parcel = new ParcelablePack(pack);
             Intent intent = new Intent(getContext(), PackDetailActivity.class);
             intent.putExtra(AppController.PACK_PARCELABLE_KEY, parcel);
+            intent.putExtra(Constants.TOPIC_TYPE, topicType);
             getContext().startActivity(intent);
         }
     };
 
-    public TopicDetailAdapter(Activity activity, List<JPack> packs) {
+    public TopicDetailAdapter(Activity activity, List<JPack> packs, String topicType) {
         super(activity, R.layout.inside_topic_detail_item);
         this.activity = activity;
         this.packs = packs;
+        this.topicType = topicType;
     }
 
     @Override

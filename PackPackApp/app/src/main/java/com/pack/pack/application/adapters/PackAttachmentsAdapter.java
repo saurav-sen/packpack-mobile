@@ -28,7 +28,9 @@ import com.pack.pack.application.Constants;
 import com.pack.pack.application.R;
 import com.pack.pack.application.activity.AttachmentStoryEditActivity;
 import com.pack.pack.application.activity.AttachmentStoryReaderActivity;
+import com.pack.pack.application.activity.FullScreenNewsViewActivity;
 import com.pack.pack.application.activity.FullScreenPlayVideoActivity;
+import com.pack.pack.application.activity.FullScreenWebViewActivity;
 import com.pack.pack.application.activity.FullscreenAttachmentViewActivity;
 import com.pack.pack.application.activity.PackAttachmentCommentsActivity;
 import com.pack.pack.application.data.cache.InMemory;
@@ -216,9 +218,15 @@ public class PackAttachmentsAdapter extends ArrayAdapter<JPackAttachment> {
             public void onClick(View view) {
                 JPackAttachment attachment = getItem(position);
                 if(PackAttachmentType.IMAGE.name().equalsIgnoreCase(attachment.getAttachmentType())) {
-                    Intent intent = new Intent(getContext(), FullscreenAttachmentViewActivity.class);
-                    intent.putExtra("index", position);
-                    getContext().startActivity(intent);
+                    if(attachment.isExternalLink()) {
+                        Intent intent = new Intent(getContext(), FullScreenWebViewActivity.class);
+                        intent.putExtra(FullScreenWebViewActivity.WEB_LINK, attachment.getAttachmentUrl());
+                        getContext().startActivity(intent);
+                    } else {
+                        Intent intent = new Intent(getContext(), FullscreenAttachmentViewActivity.class);
+                        intent.putExtra("index", position);
+                        getContext().startActivity(intent);
+                    }
                 } else {
                     playVideo(attachment);
                 }

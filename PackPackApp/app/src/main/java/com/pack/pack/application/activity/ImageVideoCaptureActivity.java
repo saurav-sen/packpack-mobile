@@ -183,28 +183,7 @@ public class ImageVideoCaptureActivity extends AbstractActivity {
     }*/
 
     private boolean checkUploadSize(Uri mediaFileUri) {
-        /*Cursor cursor = getContentResolver().query(mediaFileUri, null, null, null, null);
-        int sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE);
-        long sizeInMb = cursor.getLong(sizeIndex)/ (1024*1024);
-        if(sizeInMb > ApiConstants.UPLOAD_SIZE_LIMIT_IN_MB) {
-            return false;
-        }*/
-        /*try {
-            File file = new File(mediaFileUri.getPath());
-            if(!file.exists()) {
-                Log.e(LOG_TAG, "Error calculating file size. File handle not resolved correctly.");
-                return true;
-            }
-            long sizeInMb = file.length()/(1024*1024);
-            if(sizeInMb > ApiConstants.UPLOAD_SIZE_LIMIT_IN_MB) {
-                return false;
-            }
-            return true;
-        } catch (Throwable e) {
-            Log.e(LOG_TAG, "Error calculating file size. " + e.getMessage(), e);
-            return true;
-        }*/
-        return true;
+        return FileUtil.checkUploadSize(this, mediaFileUri);
     }
 
     @Override

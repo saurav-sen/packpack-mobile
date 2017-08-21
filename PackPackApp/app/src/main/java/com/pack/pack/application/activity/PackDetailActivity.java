@@ -119,6 +119,8 @@ public class PackDetailActivity extends AbstractAppCompatActivity {
 
     private JRssFeed selectedFeedForUpload;
 
+    private String topicType;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -130,6 +132,10 @@ public class PackDetailActivity extends AbstractAppCompatActivity {
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         pack = (ParcelablePack) getIntent().getParcelableExtra(AppController.PACK_PARCELABLE_KEY);
+        topicType = getIntent().getStringExtra(Constants.TOPIC_TYPE);
+        if(topicType == null) {
+            topicType = Constants.TOPIC_TYPE_GENERAL;
+        }
         ParcelableTopic topic = InMemory.INSTANCE.get(pack.getParentTopicId());
 
         fab_open = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_open);
@@ -415,18 +421,31 @@ public class PackDetailActivity extends AbstractAppCompatActivity {
                 startActivity(intent);
                 break;*/
             case R.id.invite_others:
+                String deepLinkBaseUri = getString(R.string.invite_others_to_topic_deeplink_base_url);
+                if(Constants.TOPIC_TYPE_FAMILY.equals(topicType)) {
+                    deepLinkBaseUri = getString(R.string.invite_others_to_family_deeplink_base_url);
+                } else if(Constants.TOPIC_TYPE_SOCIETY.equals(topicType)) {
+                    deepLinkBaseUri = getString(R.string.invite_others_to_society_deeplink_base_url);
+                }
                 Intent intent = new AppInviteInvitation.IntentBuilder(topic.getTopicName())
                         .setMessage(topic.getDescription())
-                        .setDeepLink(Uri.parse(getString(R.string.invite_others_to_society_deeplink_base_url) + topic.getTopicId()))
+                        .setDeepLink(Uri.parse(deepLinkBaseUri + topic.getTopicId()))
                         .setCustomImage(Uri.parse(topic.getWallpaperUrl()))
                         .setCallToActionText("Be a part of " + topic.getTopicName() + " @ SQUILL")
                         .build();
                 startActivityForResult(intent, Constants.INVITE_OTHERS_TO_JOIN_TOPIC);
                 break;
             case R.id.invite_others_alt:
+                String deepLinkBaseUri1 = getString(R.string.invite_others_to_topic_deeplink_base_url);
+                if(Constants.TOPIC_TYPE_FAMILY.equals(topicType)) {
+                    deepLinkBaseUri1 = getString(R.string.invite_others_to_family_deeplink_base_url);
+                } else if(Constants.TOPIC_TYPE_SOCIETY.equals(topicType)) {
+                    deepLinkBaseUri1 = getString(R.string.invite_others_to_society_deeplink_base_url);
+                }
+
                 Intent intent1 = new AppInviteInvitation.IntentBuilder(topic.getTopicName())
                         .setMessage(topic.getDescription())
-                        .setDeepLink(Uri.parse(getString(R.string.invite_others_to_society_deeplink_base_url) + topic.getTopicId()))
+                        .setDeepLink(Uri.parse(deepLinkBaseUri1 + topic.getTopicId()))
                         .setCustomImage(Uri.parse(topic.getWallpaperUrl()))
                         .setCallToActionText("Be a part of " + topic.getTopicName() + " @ SQUILL")
                         .build();
@@ -470,7 +489,7 @@ public class PackDetailActivity extends AbstractAppCompatActivity {
                 //currentScrollableObject.nextLink = "FIRST_PAGE"; // TODO -- This is to get going for demo purpose
                 //new LoadPackDetailTask().execute(currentScrollableObject);
                 try {
-                    String json = data.getStringExtra(UploadActivity.ATTACHMENT_UNDER_UPLOAD);
+                    String json = data.getStringExtra(Constants.ATTACHMENT_UNDER_UPLOAD);
 
                     if(json != null && !json.trim().isEmpty()) {
                         JPackAttachment attachment = JSONUtil.deserialize(json, JPackAttachment.class, true);

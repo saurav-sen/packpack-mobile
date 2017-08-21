@@ -9,10 +9,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 
 import com.pack.pack.application.AppController;
+import com.pack.pack.application.Constants;
 import com.pack.pack.application.R;
 import com.pack.pack.application.data.LoggedInUserInfo;
 import com.pack.pack.application.data.util.ImageUtil;
@@ -42,6 +44,9 @@ public class SplashActivity extends AbstractActivity implements IAsyncTaskStatus
 
     private int ntpJobId = 1;
 
+    private String action;
+    private String actionContentType;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,20 +57,23 @@ public class SplashActivity extends AbstractActivity implements IAsyncTaskStatus
             return;
         }
 
-        startNetworkChecker();
-        startNTPService();
+        JUser user = AppController.getInstance().getUser();
+        if(user == null) {
+            startNetworkChecker();
+            startNTPService();
 
-        /*splash_image = (ImageView) findViewById(R.id.splash_image);
-        Snackbar.make(splash_image, "Zxuluk from DryDock", Snackbar.LENGTH_LONG);*/
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
 
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
+                }
+            }, 5000);
 
-            }
-        }, 5000);
+            ImageUtil.loadFFMpeg(this);
+        }
 
-        ImageUtil.loadFFMpeg(this);
+        action = getIntent().getAction();
+        actionContentType = getIntent().getType();
         verify();
     }
 
@@ -101,7 +109,7 @@ public class SplashActivity extends AbstractActivity implements IAsyncTaskStatus
         String oAuthToken = AppController.getInstance().getoAuthToken();
         if(oAuthToken != null) {
             finish();
-            startMainActivity();
+            routeToTargetActivity();
         } else {
             UserInfo userInfo = DBUtil.loadLastLoggedInUserInfo(new SquillDbHelper(this).getReadableDatabase());
             if(userInfo != null) {
@@ -137,7 +145,7 @@ public class SplashActivity extends AbstractActivity implements IAsyncTaskStatus
         }
         getIntent().putExtra("loginStatus", true);
         finish();
-        startMainActivity();
+        routeToTargetActivity();
     }
 
     @Override
@@ -177,6 +185,24 @@ public class SplashActivity extends AbstractActivity implements IAsyncTaskStatus
         Intent intent = new Intent(SplashActivity.this, LoginActivity.class);
         finish();
         startActivity(intent);
+    }
+
+    private void routeToTargetActivity() {
+        if(Intent.ACTION_SEND.equals(action) && actionContentType != null){
+            if("image/*".equals(actionContentType)) {
+                Uri imageUri = (Uri) getIntent().getParcelableExtra(Intent.EXTRA_STREAM);
+                Intent intent = new Intent(SplashActivity.this, ImageVideoShareReceiveActivity.class);
+                intent.putExtra(Constants.SHARED_IMAGE_URI_KEY, imageUri);
+                finish();
+                startActivity(intent);
+            } else if("text/plain".equals(actionContentType)) {
+                finish();
+            } else {
+                startMainActivity();
+            }
+        } else {
+            startMainActivity();
+        }
     }
 
     private void startMainActivity() {

@@ -55,6 +55,8 @@ public class GenericTopicListActivity extends AppCompatActivity implements JTopi
 
     private Pagination<JTopic> page;
 
+    private String topicType;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,6 +69,7 @@ public class GenericTopicListActivity extends AppCompatActivity implements JTopi
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         categoryType = getIntent().getStringExtra(CATEGORY_TYPE);
+        topicType = getIntent().getStringExtra(Constants.TOPIC_TYPE);
 
         generic_topic_list = (ListView) findViewById(R.id.generic_topic_list);
 
@@ -78,7 +81,7 @@ public class GenericTopicListActivity extends AppCompatActivity implements JTopi
             public void onScrollStateChanged(AbsListView absListView, int scrollState) {
                 int count = generic_topic_list.getCount();
                 if (scrollState == SCROLL_STATE_IDLE) {
-                    if (generic_topic_list.getLastVisiblePosition() > count - 1) {
+                    if (generic_topic_list.getLastVisiblePosition() > count - 3) {
                         new LoadTopicTask().execute(AppController.getInstance().getUserId());
                     }
                 }
@@ -209,6 +212,7 @@ public class GenericTopicListActivity extends AppCompatActivity implements JTopi
             ParcelableTopic parcel = new ParcelableTopic(topic);
             Intent intent = new Intent(this, InsideTopicActivity.class);
             intent.putExtra(AppController.TOPIC_PARCELABLE_KEY, parcel);
+            intent.putExtra(Constants.TOPIC_TYPE, topicType);
             startActivity(intent);
         }
     }

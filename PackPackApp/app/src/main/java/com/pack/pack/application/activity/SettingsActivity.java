@@ -228,15 +228,15 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             ParcelableTopic topic = getArguments().getParcelable(PARCELABLE_TOPIC_KEY);
             setPreferenceScreen(createPreferenceScreen(topic));
 
-            Preference allow_followers_to_promote = findPreference(topic.getTopicId() + ".allow_followers_to_promote");
+            Preference allow_followers_to_promote = findPreference(topic.getTopicId() + ".allow_followers_to_edit");
             allow_followers_to_promote.getExtras().putParcelable(PARCELABLE_TOPIC_KEY, topic);
             bindPreferenceSummaryToValue(allow_followers_to_promote);
 
-            Preference number_of_promotions = findPreference(topic.getTopicId() + ".number_of_promotions");
+            /*Preference number_of_promotions = findPreference(topic.getTopicId() + ".number_of_promotions");
             number_of_promotions.getExtras().putParcelable(PARCELABLE_TOPIC_KEY, topic);
-            bindPreferenceSummaryToValue(number_of_promotions);
+            bindPreferenceSummaryToValue(number_of_promotions);*/
 
-            Preference enable_live_streaming_service = findPreference(topic.getTopicId() + ".enable_live_streaming_service");
+            Preference enable_live_streaming_service = findPreference(topic.getTopicId() + ".activate");
             enable_live_streaming_service.getExtras().putParcelable(PARCELABLE_TOPIC_KEY, topic);
             bindPreferenceSummaryToValue(enable_live_streaming_service);
 
@@ -250,25 +250,25 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             PreferenceScreen preferenceScreen = getPreferenceManager().createPreferenceScreen(context);
 
             SwitchPreference allow_followers_to_promote = new SwitchPreference(context);
-            allow_followers_to_promote.setKey(topic.getTopicId() + ".allow_followers_to_promote");
-            allow_followers_to_promote.setTitle("Allow Topic Followers To Promote");
+            allow_followers_to_promote.setKey(topic.getTopicId() + ".allow_followers_to_edit");
+            allow_followers_to_promote.setTitle("Allow Topic Followers To Edit");
             allow_followers_to_promote.setDefaultValue(false);
             allow_followers_to_promote.setSwitchTextOff("Disabled");
             allow_followers_to_promote.setSwitchTextOn("Enabled");
             allow_followers_to_promote.getExtras().putParcelable(PARCELABLE_TOPIC_KEY, topic);
             preferenceScreen.addPreference(allow_followers_to_promote);
 
-            EditTextPreference number_of_promotions = new EditTextPreference(context);
+            /*EditTextPreference number_of_promotions = new EditTextPreference(context);
             number_of_promotions.setKey(topic.getTopicId() + ".number_of_promotions");
             number_of_promotions.setTitle("Number of promotions");
             number_of_promotions.setDefaultValue("500");
             number_of_promotions.getEditText().setInputType(InputType.TYPE_NUMBER_VARIATION_NORMAL);
             number_of_promotions.getExtras().putParcelable(PARCELABLE_TOPIC_KEY, topic);
-            preferenceScreen.addPreference(number_of_promotions);
+            preferenceScreen.addPreference(number_of_promotions);*/
 
             SwitchPreference enable_live_streaming_service = new SwitchPreference(context);
-            enable_live_streaming_service.setKey(topic.getTopicId() + ".enable_live_streaming_service");
-            enable_live_streaming_service.setTitle("Enable Live Streaming Service");
+            enable_live_streaming_service.setKey(topic.getTopicId() + ".activate");
+            enable_live_streaming_service.setTitle("Activation Status");
             enable_live_streaming_service.setDefaultValue(false);
             enable_live_streaming_service.getExtras().putParcelable(PARCELABLE_TOPIC_KEY, topic);
             preferenceScreen.addPreference(enable_live_streaming_service);

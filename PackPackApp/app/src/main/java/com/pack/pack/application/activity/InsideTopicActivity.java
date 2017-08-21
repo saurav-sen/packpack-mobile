@@ -69,6 +69,8 @@ public class InsideTopicActivity extends AbstractAppCompatActivity {
 
     private String topicId;
 
+    private String topicType;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,6 +80,8 @@ public class InsideTopicActivity extends AbstractAppCompatActivity {
 
         topic = (ParcelableTopic) getIntent().getParcelableExtra(AppController.TOPIC_PARCELABLE_KEY);
         this.topicId = topic.getTopicId();
+
+        topicType = getIntent().getStringExtra(Constants.TOPIC_TYPE);
 
         InMemory.INSTANCE.add(topic);
 
@@ -107,7 +111,7 @@ public class InsideTopicActivity extends AbstractAppCompatActivity {
             fab.setVisibility(View.GONE);
         }
 
-        adapter = new TopicDetailAdapter(this, new ArrayList<JPack>());
+        adapter = new TopicDetailAdapter(this, new ArrayList<JPack>(), topicType);
         final ListView listView = (ListView) findViewById(R.id.topic_detail_list);
         listView.setAdapter(adapter);
 

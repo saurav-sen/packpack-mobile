@@ -23,6 +23,7 @@ import android.widget.Toast;
 import android.widget.VideoView;
 
 import com.pack.pack.application.AppController;
+import com.pack.pack.application.Constants;
 import com.pack.pack.application.R;
 import com.pack.pack.application.data.cache.PackAttachmentsCache;
 import com.pack.pack.application.data.util.ApiConstants;
@@ -71,9 +72,6 @@ import static com.pack.pack.application.AppController.UPLOAD_ATTACHMENT_DESCRIPT
  *
  */
 public class UploadActivity extends AbstractActivity {
-
-    public static final String ATTACHMENT_UNDER_UPLOAD = "ATTACHMENT_UNDER_UPLOAD";
-    public static final String ATTACHMENT_UNDER_UPLOAD_IS_PHOTO = "ATTACHMENT_UNDER_UPLOAD_IS_PHOTO";
 
     private String topicId;
 
@@ -247,8 +245,8 @@ public class UploadActivity extends AbstractActivity {
                 attachment.setAttachmentType(attachmentType);
                 attachment.setMimeType(attachmentType);
                 String json = JSONUtil.serialize(attachment);
-                getIntent().putExtra(ATTACHMENT_UNDER_UPLOAD_IS_PHOTO, isPhotoUpload);
-                getIntent().putExtra(ATTACHMENT_UNDER_UPLOAD, json);
+                getIntent().putExtra(Constants.ATTACHMENT_UNDER_UPLOAD_IS_PHOTO, isPhotoUpload);
+                getIntent().putExtra(Constants.ATTACHMENT_UNDER_UPLOAD, json);
             } catch (PackPackException e) {
                 Log.d(LOG_TAG, e.getMessage(), e);
             }
