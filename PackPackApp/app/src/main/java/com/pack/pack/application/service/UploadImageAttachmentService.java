@@ -43,6 +43,7 @@ public class UploadImageAttachmentService extends Service {
     public static final String ATTACHMENT_TITLE = "ATTACHMENT_TITLE";
     public static final String ATTACHMENT_DESCRIPTION = "ATTACHMENT_DESCRIPTION";
     public static final String ATTACHMENT_ID = "ATTACHMENT_ID";
+    public static final String ATTACHMENT_IS_TOPIC_SHARED_FEED = "ATTACHMENT_IS_TOPIC_SHARED_FEED";
 
     private static final String LOG_TAG = "UploadImageService";
 
@@ -56,6 +57,7 @@ public class UploadImageAttachmentService extends Service {
         String topicId = intent.getStringExtra(TOPIC_ID);
         String attachmentTitle = intent.getStringExtra(ATTACHMENT_TITLE);
         String attachmentDescription = intent.getStringExtra(ATTACHMENT_DESCRIPTION);
+        boolean isTopicSharedFeed = intent.getBooleanExtra(ATTACHMENT_IS_TOPIC_SHARED_FEED, false);
 
         //String selectedInputVideoFilePath = intent.getStringExtra(SELECTED_INPUT_VIDEO_FILE);
 
@@ -69,7 +71,7 @@ public class UploadImageAttachmentService extends Service {
 
         PackAttachmentsCache.open(this).addUploadInProgressAttachment(attachment, packId);
 
-        upload(attachmentId, packId, topicId, attachmentTitle, attachmentDescription);
+        upload(attachmentId, packId, topicId, attachmentTitle, attachmentDescription, isTopicSharedFeed);
 
         return START_STICKY;
         //return START_REDELIVER_INTENT;
@@ -128,8 +130,8 @@ public class UploadImageAttachmentService extends Service {
         LocalBroadcastManager.getInstance(UploadImageAttachmentService.this).sendBroadcast(broadcast);
     }
 
-    private void upload(String attachmentId, String packId, String topicId, String attachmentTitle, String attachmentDescription) {
-        ExecutorsPool.INSTANCE.submit(new ExecutorTask(attachmentId, packId, topicId, attachmentTitle, attachmentDescription, new ExecutorStatus()));
+    private void upload(String attachmentId, String packId, String topicId, String attachmentTitle, String attachmentDescription, boolean isTopicSharedFeed) {
+        ExecutorsPool.INSTANCE.submit(new ExecutorTask(attachmentId, packId, topicId, attachmentTitle, attachmentDescription, isTopicSharedFeed, new ExecutorStatus()));
     }
 
     @Nullable
@@ -151,15 +153,18 @@ public class UploadImageAttachmentService extends Service {
         private String attachmentTitle;
         private String attachmentDescription;
 
+        private boolean isTopicSharedFeed;
+
         private ExecutorStatus status;
 
         ExecutorTask(String attachmentId, String packId, String topicId, String attachmentTitle,
-                     String attachmentDescription, ExecutorStatus status) {
+                     String attachmentDescription, boolean isTopicSharedFeed, ExecutorStatus status) {
             this.attachmentId = attachmentId;
             this.packId = packId;
             this.topicId = topicId;
             this.attachmentTitle = attachmentTitle;
             this.attachmentDescription = attachmentDescription;
+            this.isTopicSharedFeed = isTopicSharedFeed;
             this.status = status;
         }
 
@@ -183,16 +188,7 @@ public class UploadImageAttachmentService extends Service {
                     showNotification(status, null);
                     started = true;
 
-                    COMMAND command = COMMAND.ADD_IMAGE_TO_PACK;
-                    API api = APIBuilder.create(ApiConstants.BASE_URL).setAction(command)
-                            .setOauthToken(AppController.getInstance().getoAuthToken())
-                            .addApiParam(APIConstants.User.ID, AppController.getInstance().getUserId())
-                            .addApiParam(APIConstants.Pack.ID, packId)
-                            .addApiParam(APIConstants.Topic.ID, topicId)
-                            .addApiParam(APIConstants.Attachment.FILE_ATTACHMENT, byteBody)
-                            .addApiParam(APIConstants.Attachment.TITLE, attachmentTitle)
-                            .addApiParam(APIConstants.Attachment.DESCRIPTION, attachmentDescription)
-                            .build();
+                    API api = createApi(byteBody);
                     JPackAttachment result = (JPackAttachment)api.execute(null);
                     if(result == null) {
                         success = false;
@@ -219,6 +215,33 @@ public class UploadImageAttachmentService extends Service {
                 status.setSuccess(success);
                 status.setComplete(true);
                 broadcastStatus(packId, attachmentId, newAttachmentId, success);
+            }
+        }
+
+        private API createApi(ByteBody byteBody) {
+            if(isTopicSharedFeed) {
+                COMMAND command = COMMAND.ADD_SHARED_IMAGE_TO_TOPIC;
+                API api = APIBuilder.create(ApiConstants.BASE_URL).setAction(command)
+                        .setOauthToken(AppController.getInstance().getoAuthToken())
+                        .addApiParam(APIConstants.User.ID, AppController.getInstance().getUserId())
+                        .addApiParam(APIConstants.Pack.ID, packId)
+                        .addApiParam(APIConstants.Topic.ID, topicId)
+                        .addApiParam(APIConstants.Attachment.FILE_ATTACHMENT, byteBody)
+                        .addApiParam(APIConstants.Attachment.TITLE, attachmentTitle)
+                        .addApiParam(APIConstants.Attachment.DESCRIPTION, attachmentDescription)
+                        .build();
+                return api;
+            } else {
+                COMMAND command = COMMAND.ADD_IMAGE_TO_PACK;
+                API api = APIBuilder.create(ApiConstants.BASE_URL).setAction(command)
+                        .setOauthToken(AppController.getInstance().getoAuthToken())
+                        .addApiParam(APIConstants.User.ID, AppController.getInstance().getUserId())
+                        .addApiParam(APIConstants.Topic.ID, topicId)
+                        .addApiParam(APIConstants.Attachment.FILE_ATTACHMENT, byteBody)
+                        .addApiParam(APIConstants.Attachment.TITLE, attachmentTitle)
+                        .addApiParam(APIConstants.Attachment.DESCRIPTION, attachmentDescription)
+                        .build();
+                return api;
             }
         }
     }

@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.ListView;
 
+import com.pack.pack.application.Constants;
 import com.pack.pack.application.R;
 import com.pack.pack.application.adapters.TopicDetailAdapter;
 import com.pack.pack.application.data.cache.InMemory;
@@ -44,7 +45,7 @@ public class MySocietyMemoriesFragment extends Fragment {
             InMemory.INSTANCE.add(topic);
         }
 
-        adapter = new TopicDetailAdapter(this.getActivity(), new ArrayList<JPack>());
+        adapter = new TopicDetailAdapter(this.getActivity(), new ArrayList<JPack>(), Constants.TOPIC_TYPE_SOCIETY);
         final ListView listView = (ListView) rootView.findViewById(R.id.mysociety_memories_list);
         listView.setAdapter(adapter);
 

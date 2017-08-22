@@ -1,5 +1,7 @@
 package com.pack.pack.application.activity;
 
+import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
@@ -18,6 +20,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 //import com.google.android.gms.appinvite.AppInviteInvitation;
@@ -25,10 +32,24 @@ import com.google.android.gms.appinvite.AppInviteInvitation;
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.Constants;
 import com.pack.pack.application.R;
+import com.pack.pack.application.data.util.AbstractNetworkTask;
+import com.pack.pack.application.data.util.IAsyncTaskStatusListener;
 import com.pack.pack.application.fragments.MySocietyDiscussionsFragment;
 import com.pack.pack.application.fragments.MySocietyMemoriesFragment;
+import com.pack.pack.application.fragments.TopicSharedFeedsFragment;
+import com.pack.pack.application.image.loader.DownloadImageTask;
 import com.pack.pack.application.topic.activity.model.ParcelableTopic;
+import com.pack.pack.client.api.API;
+import com.pack.pack.client.api.APIConstants;
+import com.pack.pack.client.api.COMMAND;
 import com.pack.pack.model.web.EntityType;
+import com.pack.pack.model.web.JPackAttachment;
+import com.pack.pack.model.web.JRssFeed;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static com.pack.pack.application.AppController.TOPIC_ID_KEY;
 
@@ -53,7 +74,11 @@ public class MySocietyActivity extends AppCompatActivity {
 
     private FloatingActionButton mysociety_fab;
 
-    private static final String[] TAB_NAMES = new String[] {"Memories", "Forum"};
+    private static final String[] TAB_NAMES = new String[] {"Shared", "Discussions", "Memories"};
+
+    private JRssFeed selectedFeedForUpload;
+
+    private TopicSharedFeedsFragment topicSharedFeedsFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,15 +120,124 @@ public class MySocietyActivity extends AppCompatActivity {
             public void onClick(View view) {
                 int index = mViewPager.getCurrentItem();
                 if(index == 0) {
-                    Intent intent = new Intent(MySocietyActivity.this, CreatePackActivity.class);
-                    intent.putExtra(TOPIC_ID_KEY, topic.getTopicId());
-                    startActivityForResult(intent, Constants.PACK_CREATE_REQUEST_CODE);
+                    selectedFeedForUpload = null;
+                    final Dialog copyLinkDialog = new Dialog(MySocietyActivity.this);
+                    copyLinkDialog.setContentView(R.layout.copy_link);
+                    copyLinkDialog.setTitle("Share External Link");
+
+                    final EditText copy_link_url = (EditText) copyLinkDialog.findViewById(R.id.copy_link_url);
+                    Button copy_link_ok = (Button) copyLinkDialog.findViewById(R.id.copy_link_ok);
+
+                    final RelativeLayout feed_display = (RelativeLayout) copyLinkDialog.findViewById(R.id.feed_display);
+                    final ImageView feed_image = (ImageView) copyLinkDialog.findViewById(R.id.feed_image);
+                    final TextView feed_title = (TextView) copyLinkDialog.findViewById(R.id.feed_title);
+                    //final TextView feed_description = (TextView) copyLinkDialog.findViewById(R.id.feed_description);
+
+                    final Button copy_link_done = (Button) copyLinkDialog.findViewById(R.id.copy_link_done);
+
+                    final IAsyncTaskStatusListener testLinkListener = new IAsyncTaskStatusListener() {
+                        @Override
+                        public void onPreStart(String taskID) {
+                        }
+
+                        @Override
+                        public void onSuccess(String taskID, Object data) {
+                            if(data != null) {
+                                feed_display.setVisibility(View.VISIBLE);
+                                copy_link_done.setVisibility(View.VISIBLE);
+                                selectedFeedForUpload = (JRssFeed) data;
+                                feed_display.setTag(selectedFeedForUpload.getOgUrl());
+                            }
+                            if(selectedFeedForUpload != null) {
+                                new DownloadImageTask(feed_image, 200, 200, MySocietyActivity.this, null, false, true, true).execute(selectedFeedForUpload.getOgImage());
+                                feed_title.setText(selectedFeedForUpload.getOgTitle());
+                                //feed_description.setText(selectedFeedForUpload.getOgDescription());
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(String taskID, String errorMsg) {
+                            feed_display.setVisibility(View.GONE);
+                            copy_link_done.setVisibility(View.GONE);
+                            feed_display.setTag(null);
+                        }
+
+                        @Override
+                        public void onPostComplete(String taskID) {
+
+                        }
+                    };
+
+                    copy_link_ok.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            String url = copy_link_url.getText() != null ? copy_link_url.getText().toString() : null;
+                            if(url != null && !url.trim().isEmpty()) {
+                                new ReadCopiedLink(MySocietyActivity.this, testLinkListener).execute(url);
+                            }
+                        }
+                    });
+
+                    final IAsyncTaskStatusListener uploadLinkListener = new IAsyncTaskStatusListener() {
+                        @Override
+                        public void onPreStart(String taskID) {
+
+                        }
+
+                        @Override
+                        public void onSuccess(String taskID, Object data) {
+                            copyLinkDialog.dismiss();
+                            if(data != null && (data instanceof JPackAttachment)) {
+                                JPackAttachment attachment = (JPackAttachment) data;
+                                List<JPackAttachment> attachments = new ArrayList<JPackAttachment>(2);
+                                attachments.add(attachment);
+                                topicSharedFeedsFragment.handleSuccess(attachments);
+                            } else {
+                                topicSharedFeedsFragment.handleFailure("Failed to upload link");
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(String taskID, String errorMsg) {
+                            copyLinkDialog.dismiss();
+                            topicSharedFeedsFragment.handleFailure("Failed to upload link");
+                        }
+
+                        @Override
+                        public void onPostComplete(String taskID) {
+
+                        }
+                    };
+
+                    copy_link_done.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            if(selectedFeedForUpload != null) {
+                                ExternalLinkAttchmentData uploadData = new ExternalLinkAttchmentData();
+                                uploadData.setTopicId(topic.getTopicId());
+                                uploadData.setUserId(AppController.getInstance().getUserId());
+                                uploadData.setTitle(selectedFeedForUpload.getOgTitle());
+                                uploadData.setDescription(selectedFeedForUpload.getOgDescription());
+                                uploadData.setAttachmentUrl(selectedFeedForUpload.getOgUrl());
+                                uploadData.setAttachmentThumbnailUrl(selectedFeedForUpload.getOgImage());
+
+                                new UploadExternalLink(MySocietyActivity.this, uploadLinkListener).execute(uploadData);
+                            }
+                            selectedFeedForUpload = null;
+                        }
+                    });
+
+                    copyLinkDialog.show();
                 } else if(index == 1) {
                     Intent intent = new Intent(MySocietyActivity.this, DiscussionStartActivity.class);
                     intent.putExtra(Constants.DISCUSSION_IS_REPLY, false);
                     intent.putExtra(Constants.DISCUSSION_ENTITY_ID, topic.getTopicId());
                     intent.putExtra(Constants.DISCUSSION_ENTITY_TYPE, EntityType.TOPIC.name());
                     startActivityForResult(intent, Constants.DISCUSSION_CREATE_REQUEST_CODE);
+                } else if(index == 2) {
+                    Intent intent = new Intent(MySocietyActivity.this, CreatePackActivity.class);
+                    intent.putExtra(TOPIC_ID_KEY, topic.getTopicId());
+                    startActivityForResult(intent, Constants.PACK_CREATE_REQUEST_CODE);
                 }
             }
         });
@@ -229,11 +363,12 @@ public class MySocietyActivity extends AppCompatActivity {
             Fragment fragment = null;
             switch (position) {
                 case 0:
-                    MySocietyMemoriesFragment fragment0 = new MySocietyMemoriesFragment();
+                    TopicSharedFeedsFragment fragment0 = new TopicSharedFeedsFragment();
                     Bundle bundle0 = new Bundle();
-                    bundle0.putParcelable(MySocietyMemoriesFragment.TOPIC, topic);
+                    bundle0.putParcelable(TopicSharedFeedsFragment.TOPIC, topic);
                     fragment0.setArguments(bundle0);
                     fragment = fragment0;
+                    topicSharedFeedsFragment = fragment0;
                     break;
                 case 1:
                     MySocietyDiscussionsFragment fragment1 = new MySocietyDiscussionsFragment();
@@ -242,6 +377,13 @@ public class MySocietyActivity extends AppCompatActivity {
                     fragment1.setArguments(bundle1);
                     fragment = fragment1;
                     break;
+                case 2:
+                    MySocietyMemoriesFragment fragment2 = new MySocietyMemoriesFragment();
+                    Bundle bundle2 = new Bundle();
+                    bundle2.putParcelable(MySocietyMemoriesFragment.TOPIC, topic);
+                    fragment2.setArguments(bundle2);
+                    fragment = fragment2;
+                    break;
             }
             return fragment;
         }
@@ -249,7 +391,7 @@ public class MySocietyActivity extends AppCompatActivity {
         @Override
         public int getCount() {
             // Show 3 total pages.
-            return 2;
+            return 3;
         }
 
         @Override
@@ -262,10 +404,168 @@ public class MySocietyActivity extends AppCompatActivity {
                 case 1:
                     title = TAB_NAMES[1];
                     break;
+                case 2:
+                    title = TAB_NAMES[2];
+                    break;
                 /*case 2:
                     return "Helpdesk";*/
             }
             return title;
+        }
+    }
+
+    private class ReadCopiedLink extends AbstractNetworkTask<String, Integer, JRssFeed> {
+
+        private String errorMsg;
+
+        ReadCopiedLink(Context context, IAsyncTaskStatusListener listener) {
+            super(false, false, false,context, false, true);
+            addListener(listener);
+        }
+
+        @Override
+        protected COMMAND command() {
+            return COMMAND.CRAWL_FEED;
+        }
+
+        @Override
+        protected String getFailureMessage() {
+            return errorMsg;
+        }
+
+        @Override
+        protected JRssFeed executeApi(API api) throws Exception {
+            JRssFeed feed = null;
+            try {
+                feed = (JRssFeed) api.execute();
+            } catch (Exception e) {
+                errorMsg = "Failed reading from external link";
+            }
+            return feed;
+        }
+
+        @Override
+        protected String getContainerIdForObjectStore() {
+            return null;
+        }
+
+        @Override
+        protected Map<String, Object> prepareApiParams(String inputObject) {
+            Map<String, Object> apiParams = new HashMap<String, Object>();
+            apiParams.put(APIConstants.ExternalResource.RESOURCE_URL, inputObject);
+            return apiParams;
+        }
+    }
+
+    private class UploadExternalLink extends AbstractNetworkTask<ExternalLinkAttchmentData, Integer, JPackAttachment> {
+
+        private String errorMsg;
+
+        UploadExternalLink(Context context, IAsyncTaskStatusListener listener) {
+            super(false, false, false,context, true, true);
+            addListener(listener);
+        }
+
+        @Override
+        protected COMMAND command() {
+            return COMMAND.ADD_VIDEO_TO_PACK_EXTERNAL_LINK;
+        }
+
+        @Override
+        protected String getFailureMessage() {
+            return errorMsg;
+        }
+
+        @Override
+        protected JPackAttachment executeApi(API api) throws Exception {
+            JPackAttachment attachment = null;
+            try {
+                attachment = (JPackAttachment) api.execute();
+            } catch (Exception e) {
+                errorMsg = "Failed reading to upload new attachment";
+            }
+            return attachment;
+        }
+
+        @Override
+        protected String getContainerIdForObjectStore() {
+            return null;
+        }
+
+        @Override
+        protected Map<String, Object> prepareApiParams(ExternalLinkAttchmentData inputObject) {
+            Map<String, Object> apiParams = new HashMap<String, Object>();
+            apiParams.put(APIConstants.Topic.ID, inputObject.getTopicId());
+            //apiParams.put(APIConstants.Pack.ID, inputObject.getPackId());
+            apiParams.put(APIConstants.User.ID, inputObject.getUserId());
+            apiParams.put(APIConstants.Attachment.TITLE, inputObject.getTitle());
+            apiParams.put(APIConstants.Attachment.DESCRIPTION, inputObject.getDescription());
+            apiParams.put(APIConstants.Attachment.ATTACHMENT_URL, inputObject.getAttachmentUrl());
+            apiParams.put(APIConstants.Attachment.ATTACHMENT_THUMBNAIL_URL, inputObject.getAttachmentThumbnailUrl());
+            return apiParams;
+        }
+    }
+
+    private class ExternalLinkAttchmentData {
+
+        private String topicId;
+
+        private String userId;
+
+        private String title;
+
+        private String description;
+
+        private String attachmentUrl;
+
+        private String attachmentThumbnailUrl;
+
+        public String getTopicId() {
+            return topicId;
+        }
+
+        public void setTopicId(String topicId) {
+            this.topicId = topicId;
+        }
+
+        public String getUserId() {
+            return userId;
+        }
+
+        public void setUserId(String userId) {
+            this.userId = userId;
+        }
+
+        public String getTitle() {
+            return title;
+        }
+
+        public void setTitle(String title) {
+            this.title = title;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public void setDescription(String description) {
+            this.description = description;
+        }
+
+        public String getAttachmentUrl() {
+            return attachmentUrl;
+        }
+
+        public void setAttachmentUrl(String attachmentUrl) {
+            this.attachmentUrl = attachmentUrl;
+        }
+
+        public String getAttachmentThumbnailUrl() {
+            return attachmentThumbnailUrl;
+        }
+
+        public void setAttachmentThumbnailUrl(String attachmentThumbnailUrl) {
+            this.attachmentThumbnailUrl = attachmentThumbnailUrl;
         }
     }
 }

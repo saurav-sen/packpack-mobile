@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -25,12 +26,18 @@ import com.pack.pack.application.data.util.FileUtil;
 import com.pack.pack.application.db.DBUtil;
 import com.pack.pack.application.db.PaginationInfo;
 import com.pack.pack.application.db.UserInfo;
+import com.pack.pack.application.service.UploadImageAttachmentService;
+import com.pack.pack.application.service.UploadVideoAttachmentService;
 import com.pack.pack.application.topic.activity.model.UploadAttachmentData;
 import com.pack.pack.client.api.API;
 import com.pack.pack.client.api.APIConstants;
 import com.pack.pack.client.api.COMMAND;
+import com.pack.pack.common.util.JSONUtil;
+import com.pack.pack.model.web.JPackAttachment;
 import com.pack.pack.model.web.JTopic;
+import com.pack.pack.model.web.PackAttachmentType;
 import com.pack.pack.model.web.Pagination;
+import com.pack.pack.services.exception.PackPackException;
 
 import java.io.File;
 import java.io.IOException;
@@ -146,9 +153,53 @@ public class ImageVideoShareReceiveActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
             case Constants.SHARED_IMAGE_UPLOAD_REQUEST_CODE:
-                setResult(RESULT_OK, data);
+                JPackAttachment attachment = null;
+                try {
+                    String json = data.getStringExtra(Constants.ATTACHMENT_UNDER_UPLOAD);
+
+                    if(json != null && !json.trim().isEmpty()) {
+                        attachment = JSONUtil.deserialize(json, JPackAttachment.class, true);
+                    }
+                    if(attachment != null) {
+                        String topicId = data.getStringExtra(UploadImageAttachmentService.TOPIC_ID);
+                        new UploadTask(attachment, topicId).execute();
+                    }
+                } catch (PackPackException e) {
+                    Log.e(LOG_TAG, e.getMessage(), e);
+                }
+                //setResult(RESULT_OK, data);
                 finish();
                 break;
+        }
+    }
+
+    private class UploadTask extends AsyncTask<Void, Void, Void> {
+
+        private JPackAttachment attachment;
+
+        private String topicId;
+
+        UploadTask(JPackAttachment attachment, String topicId) {
+            this.attachment = attachment;
+            this.topicId = topicId;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            invokeUploadService(topicId, attachment);
+            return null;
+        }
+
+        private void invokeUploadService(String topicId, JPackAttachment attachment) {
+            if(PackAttachmentType.IMAGE.name().equals(attachment.getMimeType())) {
+                Intent service = new Intent(ImageVideoShareReceiveActivity.this, UploadImageAttachmentService.class);
+                service.putExtra(UploadImageAttachmentService.ATTACHMENT_TITLE, attachment.getTitle());
+                service.putExtra(UploadImageAttachmentService.ATTACHMENT_DESCRIPTION, attachment.getDescription());
+                service.putExtra(UploadImageAttachmentService.TOPIC_ID, topicId);
+                service.putExtra(UploadImageAttachmentService.ATTACHMENT_ID, attachment.getId());
+                service.putExtra(UploadImageAttachmentService.ATTACHMENT_IS_TOPIC_SHARED_FEED, true);
+                ImageVideoShareReceiveActivity.this.startService(service);
+            }
         }
     }
 
