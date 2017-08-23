@@ -31,6 +31,8 @@ import com.pack.pack.application.service.SquillNTPService;
 import com.pack.pack.model.web.JUser;
 import com.pack.pack.oauth1.client.AccessToken;
 
+import java.util.regex.Pattern;
+
 /**
  *
  * @author Saurav
@@ -189,7 +191,7 @@ public class SplashActivity extends AbstractActivity implements IAsyncTaskStatus
 
     private void routeToTargetActivity() {
         if(Intent.ACTION_SEND.equals(action) && actionContentType != null){
-            if("image/*".equals(actionContentType)) {
+            if(Pattern.compile("image/.*").matcher(actionContentType).matches()) {
                 Uri imageUri = (Uri) getIntent().getParcelableExtra(Intent.EXTRA_STREAM);
                 Intent intent = new Intent(SplashActivity.this, ImageVideoShareReceiveActivity.class);
                 intent.putExtra(Constants.SHARED_IMAGE_URI_KEY, imageUri);

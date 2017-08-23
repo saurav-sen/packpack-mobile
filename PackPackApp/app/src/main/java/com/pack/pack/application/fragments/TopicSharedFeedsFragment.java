@@ -15,6 +15,8 @@ import com.pack.pack.application.data.cache.InMemory;
 import com.pack.pack.application.data.util.IAsyncTaskStatusListener;
 import com.pack.pack.application.data.util.LoadTopicFeedsTask;
 import com.pack.pack.application.topic.activity.model.ParcelableTopic;
+import com.pack.pack.client.api.APIConstants;
+import com.pack.pack.common.util.CommonConstants;
 import com.pack.pack.model.web.JPackAttachment;
 import com.pack.pack.model.web.Pagination;
 
@@ -48,7 +50,7 @@ public class TopicSharedFeedsFragment extends Fragment implements IAsyncTaskStat
         ListView shared_feeds = (ListView) rootView.findViewById(R.id.shared_feeds);
         adapter = new TopicSharedFeedsAdapter(this.getActivity(), new ArrayList<JPackAttachment>(0), topic);
         shared_feeds.setAdapter(adapter);
-        new LoadTopicFeedsTask(this.getActivity(), topic.getTopicId()).addListener(this).execute();
+        new LoadTopicFeedsTask(this.getActivity(), topic.getTopicId()).addListener(this).execute(CommonConstants.NULL_PAGE_LINK);
         return rootView;
     }
 

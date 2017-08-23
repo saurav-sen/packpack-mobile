@@ -293,12 +293,12 @@ public class TopicSharedFeedsAdapter  extends ArrayAdapter<JPackAttachment> {
             pack_attachment_title.setText(attachment.getTitle() + "");
             pack_attachment_description.setText(attachment.getDescription() + "");
             String url = null;
-            if(PackAttachmentType.VIDEO.name().equals(attachment.getMimeType())) {
+            if(PackAttachmentType.VIDEO.name().equals(attachment.getMimeType()) || PackAttachmentType.VIDEO.name().equals(attachment.getAttachmentType())) {
                 url = attachment.getAttachmentThumbnailUrl();
                 pack_attachment_img.setVisibility(View.GONE);
                 pack_loading_progress.setVisibility(View.GONE);
                 pack_attachment_video_play.setVisibility(View.VISIBLE);
-            } else if(PackAttachmentType.IMAGE.name().equals(attachment.getMimeType())) {
+            } else if(PackAttachmentType.IMAGE.name().equals(attachment.getMimeType()) || PackAttachmentType.IMAGE.name().equals(attachment.getAttachmentType())) {
                 url = attachment.getAttachmentUrl();
                 pack_attachment_video_play.setVisibility(View.GONE);
                 pack_loading_progress.setVisibility(View.GONE);

@@ -34,7 +34,8 @@
         <activity
             android:name=".activity.SplashActivity"
             android:label="SQUILL"
-            android:theme="@style/splashScreenTheme">
+            android:theme="@style/splashScreenTheme"
+            android:launchMode="singleInstance">
 
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
@@ -46,6 +47,8 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="text/plain" />
             </intent-filter>
+
+
 
             <!--
             intent-filter>
@@ -259,7 +262,9 @@
             android:label="@string/title_activity_generic_topic_list"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".activity.FullScreenWebViewActivity" />
-        <activity android:name=".activity.ImageVideoShareReceiveActivity" />
+        <activity android:name=".activity.ImageVideoShareReceiveActivity"
+            android:launchMode="singleInstance">
+        </activity>
         <activity android:name=".activity.UploadActivity2"></activity>
     </application>
 

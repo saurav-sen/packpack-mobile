@@ -46,6 +46,16 @@ public class TopicThumbnailViewAdapter extends ArrayAdapter<JTopic>  {
     }
 
     @Override
+    public int getCount() {
+        return topics != null ? topics.size() : 0;
+    }
+
+    @Override
+    public JTopic getItem(int position) {
+        return position < topics.size() ? topics.get(position) : null;
+    }
+
+    @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         if(inflator == null) {
             inflator = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
