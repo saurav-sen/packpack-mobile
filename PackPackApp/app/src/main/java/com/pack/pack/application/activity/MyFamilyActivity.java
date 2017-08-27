@@ -3,10 +3,10 @@ package com.pack.pack.application.activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -35,13 +35,13 @@ import com.pack.pack.application.R;
 import com.pack.pack.application.data.util.AbstractNetworkTask;
 import com.pack.pack.application.data.util.IAsyncTaskStatusListener;
 import com.pack.pack.application.fragments.MyFamilyMemoriesFragment;
-import com.pack.pack.application.fragments.TopicSharedFeedsFragment;
+import com.pack.pack.application.fragments.MyFamilyTopicSharedFeedsFragment;
+import com.pack.pack.application.fragments.MySocietyTopicSharedFeedsFragment;
 import com.pack.pack.application.image.loader.DownloadImageTask;
 import com.pack.pack.application.topic.activity.model.ParcelableTopic;
 import com.pack.pack.client.api.API;
 import com.pack.pack.client.api.APIConstants;
 import com.pack.pack.client.api.COMMAND;
-import com.pack.pack.model.web.EntityType;
 import com.pack.pack.model.web.JPackAttachment;
 import com.pack.pack.model.web.JRssFeed;
 
@@ -77,7 +77,7 @@ public class MyFamilyActivity extends AppCompatActivity {
 
     private static final String[] TAB_NAMES = new String[] {"Shared", "Memories"};
 
-    private TopicSharedFeedsFragment topicSharedFeedsFragment;
+    private MyFamilyTopicSharedFeedsFragment topicSharedFeedsFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -118,7 +118,7 @@ public class MyFamilyActivity extends AppCompatActivity {
         });*/
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.myfamily_tabs);
-        //tabLayout.setSelectedTabIndicatorColor(Color.WHITE);
+        tabLayout.setSelectedTabIndicatorColor(Color.WHITE);
         tabLayout.setupWithViewPager(mViewPager);
 
 
@@ -347,9 +347,9 @@ public class MyFamilyActivity extends AppCompatActivity {
             Fragment fragment = null;
             switch (position) {
                 case 0:
-                    TopicSharedFeedsFragment fragment1 = new TopicSharedFeedsFragment();
+                    MyFamilyTopicSharedFeedsFragment fragment1 = new MyFamilyTopicSharedFeedsFragment();
                     Bundle bundle1 = new Bundle();
-                    bundle1.putParcelable(TopicSharedFeedsFragment.TOPIC, topic);
+                    bundle1.putParcelable(MyFamilyTopicSharedFeedsFragment.TOPIC, topic);
                     fragment1.setArguments(bundle1);
                     fragment = fragment1;
                     topicSharedFeedsFragment = fragment1;

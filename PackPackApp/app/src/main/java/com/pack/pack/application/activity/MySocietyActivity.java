@@ -36,7 +36,7 @@ import com.pack.pack.application.data.util.AbstractNetworkTask;
 import com.pack.pack.application.data.util.IAsyncTaskStatusListener;
 import com.pack.pack.application.fragments.MySocietyDiscussionsFragment;
 import com.pack.pack.application.fragments.MySocietyMemoriesFragment;
-import com.pack.pack.application.fragments.TopicSharedFeedsFragment;
+import com.pack.pack.application.fragments.MySocietyTopicSharedFeedsFragment;
 import com.pack.pack.application.image.loader.DownloadImageTask;
 import com.pack.pack.application.topic.activity.model.ParcelableTopic;
 import com.pack.pack.client.api.API;
@@ -78,7 +78,7 @@ public class MySocietyActivity extends AppCompatActivity {
 
     private JRssFeed selectedFeedForUpload;
 
-    private TopicSharedFeedsFragment topicSharedFeedsFragment;
+    private MySocietyTopicSharedFeedsFragment mySocietyTopicSharedFeedsFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -191,16 +191,16 @@ public class MySocietyActivity extends AppCompatActivity {
                                 JPackAttachment attachment = (JPackAttachment) data;
                                 List<JPackAttachment> attachments = new ArrayList<JPackAttachment>(2);
                                 attachments.add(attachment);
-                                topicSharedFeedsFragment.handleSuccess(attachments);
+                                mySocietyTopicSharedFeedsFragment.handleSuccess(attachments);
                             } else {
-                                topicSharedFeedsFragment.handleFailure("Failed to upload link");
+                                mySocietyTopicSharedFeedsFragment.handleFailure("Failed to upload link");
                             }
                         }
 
                         @Override
                         public void onFailure(String taskID, String errorMsg) {
                             copyLinkDialog.dismiss();
-                            topicSharedFeedsFragment.handleFailure("Failed to upload link");
+                            mySocietyTopicSharedFeedsFragment.handleFailure("Failed to upload link");
                         }
 
                         @Override
@@ -363,12 +363,12 @@ public class MySocietyActivity extends AppCompatActivity {
             Fragment fragment = null;
             switch (position) {
                 case 0:
-                    TopicSharedFeedsFragment fragment0 = new TopicSharedFeedsFragment();
+                    MySocietyTopicSharedFeedsFragment fragment0 = new MySocietyTopicSharedFeedsFragment();
                     Bundle bundle0 = new Bundle();
-                    bundle0.putParcelable(TopicSharedFeedsFragment.TOPIC, topic);
+                    bundle0.putParcelable(MySocietyTopicSharedFeedsFragment.TOPIC, topic);
                     fragment0.setArguments(bundle0);
                     fragment = fragment0;
-                    topicSharedFeedsFragment = fragment0;
+                    mySocietyTopicSharedFeedsFragment = fragment0;
                     break;
                 case 1:
                     MySocietyDiscussionsFragment fragment1 = new MySocietyDiscussionsFragment();

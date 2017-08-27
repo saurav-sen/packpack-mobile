@@ -15,7 +15,6 @@ import com.pack.pack.application.data.cache.InMemory;
 import com.pack.pack.application.data.util.IAsyncTaskStatusListener;
 import com.pack.pack.application.data.util.LoadTopicFeedsTask;
 import com.pack.pack.application.topic.activity.model.ParcelableTopic;
-import com.pack.pack.client.api.APIConstants;
 import com.pack.pack.common.util.CommonConstants;
 import com.pack.pack.model.web.JPackAttachment;
 import com.pack.pack.model.web.Pagination;
@@ -24,9 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Saurav on 23-08-2017.
+ * Created by Saurav on 27-08-2017.
  */
-public class TopicSharedFeedsFragment extends Fragment implements IAsyncTaskStatusListener {
+public class MyFamilyTopicSharedFeedsFragment extends Fragment implements IAsyncTaskStatusListener {
 
     private ParcelableTopic topic;
 
@@ -43,8 +42,8 @@ public class TopicSharedFeedsFragment extends Fragment implements IAsyncTaskStat
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_topic_shared_feeds, container, false);
-        if(topic != null) {
+        View rootView = inflater.inflate(R.layout.myfamily_fragment_topic_shared_feeds, container, false);
+        if (topic != null) {
             InMemory.INSTANCE.add(topic);
         }
         ListView shared_feeds = (ListView) rootView.findViewById(R.id.shared_feeds);
@@ -56,7 +55,7 @@ public class TopicSharedFeedsFragment extends Fragment implements IAsyncTaskStat
 
     @Override
     public void onSuccess(String taskID, Object data) {
-        if(data != null) {
+        if (data != null) {
             Pagination<JPackAttachment> page = (Pagination<JPackAttachment>) data;
             handleSuccess(page.getResult());
         }
@@ -78,7 +77,7 @@ public class TopicSharedFeedsFragment extends Fragment implements IAsyncTaskStat
     }
 
     public void handleSuccess(List<JPackAttachment> attachments) {
-        if(attachments == null)
+        if (attachments == null)
             return;
         adapter.getAttachments().addAll(attachments);
         adapter.notifyDataSetChanged();
