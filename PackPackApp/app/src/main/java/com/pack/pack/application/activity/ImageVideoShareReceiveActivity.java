@@ -1,5 +1,6 @@
 package com.pack.pack.application.activity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
@@ -19,21 +20,26 @@ import com.pack.pack.application.AppController;
 import com.pack.pack.application.Constants;
 import com.pack.pack.application.R;
 import com.pack.pack.application.adapters.TopicThumbnailViewAdapter;
+import com.pack.pack.application.data.cache.ImageVideoShareDataHolder;
 import com.pack.pack.application.data.cache.PackAttachmentsCache;
 import com.pack.pack.application.data.util.AbstractNetworkTask;
 import com.pack.pack.application.data.util.ApiConstants;
 import com.pack.pack.application.data.util.FileUtil;
+import com.pack.pack.application.data.util.IAsyncTaskStatusListener;
+import com.pack.pack.application.data.util.ReadCopiedLink;
 import com.pack.pack.application.db.DBUtil;
 import com.pack.pack.application.db.PaginationInfo;
 import com.pack.pack.application.db.UserInfo;
 import com.pack.pack.application.service.UploadImageAttachmentService;
 import com.pack.pack.application.service.UploadVideoAttachmentService;
+import com.pack.pack.application.topic.activity.model.ParcelableTopic;
 import com.pack.pack.application.topic.activity.model.UploadAttachmentData;
 import com.pack.pack.client.api.API;
 import com.pack.pack.client.api.APIConstants;
 import com.pack.pack.client.api.COMMAND;
 import com.pack.pack.common.util.JSONUtil;
 import com.pack.pack.model.web.JPackAttachment;
+import com.pack.pack.model.web.JRssFeed;
 import com.pack.pack.model.web.JTopic;
 import com.pack.pack.model.web.PackAttachmentType;
 import com.pack.pack.model.web.Pagination;
@@ -63,6 +69,8 @@ public class ImageVideoShareReceiveActivity extends AppCompatActivity {
 
     private Uri imageUri;
 
+    private String sharedText;
+
     private static final String LOG_TAG = "SharedImageUpload";
 
     @Override
@@ -71,6 +79,7 @@ public class ImageVideoShareReceiveActivity extends AppCompatActivity {
         setContentView(R.layout.activity_image_video_share_receive);
 
         imageUri = (Uri) getIntent().getParcelableExtra(Constants.SHARED_IMAGE_URI_KEY);
+        sharedText = getIntent().getStringExtra(Constants.SHARED_TEXT_OR_URL_KEY);
 
         share_receive_list = (ListView) findViewById(R.id.share_receive_list);
         adapter = new TopicThumbnailViewAdapter(this, new ArrayList<JTopic>());
@@ -95,7 +104,16 @@ public class ImageVideoShareReceiveActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 JTopic topic = adapter.getTopics().get(position);
-                uploadSharedImage(topic);
+                if(imageUri != null) {
+                    uploadSharedImage(topic);
+                } else if(sharedText != null) {
+                    uploadSharedText(topic);
+                } else {
+                    Toast.makeText(ImageVideoShareReceiveActivity.this, "Unable to share...", Toast.LENGTH_LONG).show();
+                    Intent intent = new Intent(ImageVideoShareReceiveActivity.this, LandingPageActivity.class);
+                    finish();
+                    startActivity(intent);
+                }
             }
         });
 
@@ -108,6 +126,98 @@ public class ImageVideoShareReceiveActivity extends AppCompatActivity {
 
     private void hideProgressDialog() {
 
+    }
+
+    private void uploadSharedText(final JTopic topic) {
+        sharedText = sharedText.trim();
+        if(sharedText.startsWith("http://") || sharedText.startsWith("https://")) {
+            IAsyncTaskStatusListener listener = new IAsyncTaskStatusListener() {
+                @Override
+                public void onPreStart(String taskID) {
+                }
+
+                @Override
+                public void onSuccess(String taskID, Object data) {
+                    if(data != null) {
+                        JRssFeed sharedFeedForUpload = (JRssFeed) data;
+                        uploadSharedFeed(topic, sharedFeedForUpload);
+                    } else {
+                        handleFailure();
+                    }
+                }
+
+                private void handleFailure() {
+                    Toast.makeText(ImageVideoShareReceiveActivity.this, "Failed to share...", Toast.LENGTH_LONG).show();
+                    Intent intent = new Intent(ImageVideoShareReceiveActivity.this, LandingPageActivity.class);
+                    ImageVideoShareReceiveActivity.this.finish();
+                    startActivity(intent);
+                }
+
+                @Override
+                public void onFailure(String taskID, String errorMsg) {
+                    handleFailure();
+                }
+
+                @Override
+                public void onPostComplete(String taskID) {
+                }
+            };
+            new ReadCopiedLink(ImageVideoShareReceiveActivity.this, listener).execute(sharedText);
+        }
+    }
+
+    private void uploadSharedFeed(final JTopic topic, JRssFeed sharedFeedForUpload) {
+        ExternalLinkAttchmentData uploadData = new ExternalLinkAttchmentData();
+        uploadData.setTopicId(topic.getId());
+        uploadData.setUserId(AppController.getInstance().getUserId());
+        uploadData.setTitle(sharedFeedForUpload.getOgTitle());
+        uploadData.setDescription(sharedFeedForUpload.getOgDescription());
+        uploadData.setAttachmentUrl(sharedFeedForUpload.getOgUrl());
+        uploadData.setAttachmentThumbnailUrl(sharedFeedForUpload.getOgImage());
+
+        IAsyncTaskStatusListener uploadLinkListener = new IAsyncTaskStatusListener() {
+            @Override
+            public void onPreStart(String taskID) {
+            }
+
+            private void handleFailure() {
+                Toast.makeText(ImageVideoShareReceiveActivity.this, "Failed to share...", Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(ImageVideoShareReceiveActivity.this, LandingPageActivity.class);
+                ImageVideoShareReceiveActivity.this.finish();
+                startActivity(intent);
+            }
+
+            @Override
+            public void onSuccess(String taskID, Object data) {
+                if(data != null && (data instanceof JPackAttachment)) {
+                    ParcelableTopic parcel = new ParcelableTopic(topic);
+                    if(ApiConstants.FAMILY.equalsIgnoreCase(topic.getCategory())) {
+                        Intent intent = new Intent(ImageVideoShareReceiveActivity.this, MyFamilyActivity.class);
+                        intent.putExtra(AppController.TOPIC_PARCELABLE_KEY, parcel);
+                        ImageVideoShareReceiveActivity.this.finish();
+                        startActivity(intent);
+                    } else if(ApiConstants.SOCIETY.equalsIgnoreCase(topic.getCategory())) {
+                        Intent intent = new Intent(ImageVideoShareReceiveActivity.this, MySocietyActivity.class);
+                        intent.putExtra(AppController.TOPIC_PARCELABLE_KEY, parcel);
+                        ImageVideoShareReceiveActivity.this.finish();
+                        startActivity(intent);
+                    }
+                } else {
+                    handleFailure();
+                }
+            }
+
+            @Override
+            public void onFailure(String taskID, String errorMsg) {
+
+            }
+
+            @Override
+            public void onPostComplete(String taskID) {
+            }
+        };
+
+        new UploadExternalLink(ImageVideoShareReceiveActivity.this, uploadLinkListener).execute(uploadData);
     }
 
     private void uploadSharedImage(JTopic topic) {
@@ -145,6 +255,7 @@ public class ImageVideoShareReceiveActivity extends AppCompatActivity {
         intent.putExtra(UploadActivity2.SHARED_IMAGE_ID, sharedImageId);
         intent.putExtra(TOPIC_ID_KEY, topic.getId());
 
+        ImageVideoShareDataHolder.getInstance().addTopic(topic);
         startActivityForResult(intent, Constants.SHARED_IMAGE_UPLOAD_REQUEST_CODE);
     }
 
@@ -199,6 +310,25 @@ public class ImageVideoShareReceiveActivity extends AppCompatActivity {
                 service.putExtra(UploadImageAttachmentService.ATTACHMENT_ID, attachment.getId());
                 service.putExtra(UploadImageAttachmentService.ATTACHMENT_IS_TOPIC_SHARED_FEED, true);
                 ImageVideoShareReceiveActivity.this.startService(service);
+
+                JTopic topic = ImageVideoShareDataHolder.getInstance().getTopic(topicId);
+                if(topic != null) {
+                    ParcelableTopic parcel = new ParcelableTopic(topic);
+                    ImageVideoShareDataHolder.getInstance().clear(topicId);
+                    if(ApiConstants.FAMILY.equalsIgnoreCase(topic.getCategory())) {
+                        Intent intent = new Intent(ImageVideoShareReceiveActivity.this, MyFamilyActivity.class);
+                        intent.putExtra(AppController.TOPIC_PARCELABLE_KEY, parcel);
+                        startActivity(intent);
+                    } else if(ApiConstants.SOCIETY.equalsIgnoreCase(topic.getCategory())) {
+                        Intent intent = new Intent(ImageVideoShareReceiveActivity.this, MySocietyActivity.class);
+                        intent.putExtra(AppController.TOPIC_PARCELABLE_KEY, parcel);
+                        startActivity(intent);
+                    }
+                } else {
+                    Intent intent = new Intent(ImageVideoShareReceiveActivity.this, LandingPageActivity.class);
+                    startActivity(intent);
+                }
+                ImageVideoShareReceiveActivity.this.finish();
             }
         }
     }
@@ -311,6 +441,119 @@ public class ImageVideoShareReceiveActivity extends AppCompatActivity {
             apiParams.put(APIConstants.PageInfo.PAGE_LINK, nextLink);
             apiParams.put(APIConstants.Topic.CATEGORY, categoryName);
             return apiParams;
+        }
+    }
+
+    private class UploadExternalLink extends AbstractNetworkTask<ExternalLinkAttchmentData, Integer, JPackAttachment> {
+
+        private String errorMsg;
+
+        UploadExternalLink(Context context, IAsyncTaskStatusListener listener) {
+            super(false, false, false,context, true, true);
+            addListener(listener);
+        }
+
+        @Override
+        protected COMMAND command() {
+            return COMMAND.ADD_SHARED_EXTERNAL_LINK_TO_TOPIC;
+        }
+
+        @Override
+        protected String getFailureMessage() {
+            return errorMsg;
+        }
+
+        @Override
+        protected JPackAttachment executeApi(API api) throws Exception {
+            JPackAttachment attachment = null;
+            try {
+                attachment = (JPackAttachment) api.execute();
+            } catch (Exception e) {
+                errorMsg = "Failed reading to upload new attachment";
+            }
+            return attachment;
+        }
+
+        @Override
+        protected String getContainerIdForObjectStore() {
+            return null;
+        }
+
+        @Override
+        protected Map<String, Object> prepareApiParams(ExternalLinkAttchmentData inputObject) {
+            Map<String, Object> apiParams = new HashMap<String, Object>();
+            apiParams.put(APIConstants.Topic.ID, inputObject.getTopicId());
+            apiParams.put(APIConstants.User.ID, inputObject.getUserId());
+            apiParams.put(APIConstants.Attachment.TITLE, inputObject.getTitle());
+            apiParams.put(APIConstants.Attachment.DESCRIPTION, inputObject.getDescription());
+            apiParams.put(APIConstants.Attachment.ATTACHMENT_URL, inputObject.getAttachmentUrl());
+            apiParams.put(APIConstants.Attachment.ATTACHMENT_THUMBNAIL_URL, inputObject.getAttachmentThumbnailUrl());
+            return apiParams;
+        }
+    }
+
+    private class ExternalLinkAttchmentData {
+
+        private String topicId;
+
+        private String packId;
+
+        private String userId;
+
+        private String title;
+
+        private String description;
+
+        private String attachmentUrl;
+
+        private String attachmentThumbnailUrl;
+
+        public String getTopicId() {
+            return topicId;
+        }
+
+        public void setTopicId(String topicId) {
+            this.topicId = topicId;
+        }
+
+        public String getUserId() {
+            return userId;
+        }
+
+        public void setUserId(String userId) {
+            this.userId = userId;
+        }
+
+        public String getTitle() {
+            return title;
+        }
+
+        public void setTitle(String title) {
+            this.title = title;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public void setDescription(String description) {
+            this.description = description;
+        }
+
+        public String getAttachmentUrl() {
+            return attachmentUrl;
+        }
+
+        public void setAttachmentUrl(String attachmentUrl) {
+            this.attachmentUrl = attachmentUrl;
+        }
+
+        public String getAttachmentThumbnailUrl() {
+            return attachmentThumbnailUrl;
+        }
+
+        public void setAttachmentThumbnailUrl(String attachmentThumbnailUrl) {
+            this.attachmentThumbnailUrl = attachmentThumbnailUrl;
         }
     }
 }

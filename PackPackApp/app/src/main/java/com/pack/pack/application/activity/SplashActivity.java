@@ -198,7 +198,11 @@ public class SplashActivity extends AbstractActivity implements IAsyncTaskStatus
                 finish();
                 startActivity(intent);
             } else if("text/plain".equals(actionContentType)) {
+                String sharedText = getIntent().getStringExtra(Intent.EXTRA_TEXT);
+                Intent intent = new Intent(SplashActivity.this, ImageVideoShareReceiveActivity.class);
+                intent.putExtra(Constants.SHARED_TEXT_OR_URL_KEY, sharedText);
                 finish();
+                startActivity(intent);
             } else {
                 startMainActivity();
             }

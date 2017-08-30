@@ -69,7 +69,9 @@ public class UploadImageAttachmentService extends Service {
         attachment.setTitle(attachmentTitle);
         attachment.setDescription(attachmentDescription);
 
-        PackAttachmentsCache.open(this).addUploadInProgressAttachment(attachment, packId);
+        if(packId != null) {
+            PackAttachmentsCache.open(this).addUploadInProgressAttachment(attachment, packId);
+        }
 
         upload(attachmentId, packId, topicId, attachmentTitle, attachmentDescription, isTopicSharedFeed);
 
@@ -131,6 +133,9 @@ public class UploadImageAttachmentService extends Service {
     }
 
     private void upload(String attachmentId, String packId, String topicId, String attachmentTitle, String attachmentDescription, boolean isTopicSharedFeed) {
+        if(isTopicSharedFeed) {
+
+        }
         ExecutorsPool.INSTANCE.submit(new ExecutorTask(attachmentId, packId, topicId, attachmentTitle, attachmentDescription, isTopicSharedFeed, new ExecutorStatus()));
     }
 

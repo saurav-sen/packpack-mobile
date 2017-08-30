@@ -45,6 +45,7 @@ import com.pack.pack.application.data.cache.InMemory;
 import com.pack.pack.application.data.cache.PackAttachmentsCache;
 import com.pack.pack.application.data.util.AbstractNetworkTask;
 import com.pack.pack.application.data.util.IAsyncTaskStatusListener;
+import com.pack.pack.application.data.util.ReadCopiedLink;
 import com.pack.pack.application.db.DBUtil;
 import com.pack.pack.application.db.PaginationInfo;
 import com.pack.pack.application.image.loader.DownloadImageTask;
@@ -739,49 +740,6 @@ public class PackDetailActivity extends AbstractAppCompatActivity {
             }
         }
     };
-
-    private class ReadCopiedLink extends AbstractNetworkTask<String, Integer, JRssFeed> {
-
-        private String errorMsg;
-
-        ReadCopiedLink(Context context, IAsyncTaskStatusListener listener) {
-            super(false, false, false,context, false, true);
-            addListener(listener);
-        }
-
-        @Override
-        protected COMMAND command() {
-            return COMMAND.CRAWL_FEED;
-        }
-
-        @Override
-        protected String getFailureMessage() {
-            return errorMsg;
-        }
-
-        @Override
-        protected JRssFeed executeApi(API api) throws Exception {
-            JRssFeed feed = null;
-            try {
-                feed = (JRssFeed) api.execute();
-            } catch (Exception e) {
-                errorMsg = "Failed reading from external link";
-            }
-            return feed;
-        }
-
-        @Override
-        protected String getContainerIdForObjectStore() {
-            return null;
-        }
-
-        @Override
-        protected Map<String, Object> prepareApiParams(String inputObject) {
-            Map<String, Object> apiParams = new HashMap<String, Object>();
-            apiParams.put(APIConstants.ExternalResource.RESOURCE_URL, inputObject);
-            return apiParams;
-        }
-    }
 
     private class UploadExternalLink extends AbstractNetworkTask<ExternalLinkAttchmentData, Integer, JPackAttachment> {
 

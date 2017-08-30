@@ -43,4 +43,5 @@ public interface Constants {
     public static final String ATTACHMENT_UNDER_UPLOAD_IS_PHOTO = "ATTACHMENT_UNDER_UPLOAD_IS_PHOTO";
 
     public static final String SHARED_IMAGE_URI_KEY = "SHARED_IMAGE_URI_KEY";
+    public static final String SHARED_TEXT_OR_URL_KEY = "SHARED_TEXT_OR_URL_KEY";
 }
