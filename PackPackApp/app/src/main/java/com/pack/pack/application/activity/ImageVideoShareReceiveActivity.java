@@ -31,9 +31,7 @@ import com.pack.pack.application.db.DBUtil;
 import com.pack.pack.application.db.PaginationInfo;
 import com.pack.pack.application.db.UserInfo;
 import com.pack.pack.application.service.UploadImageAttachmentService;
-import com.pack.pack.application.service.UploadVideoAttachmentService;
 import com.pack.pack.application.topic.activity.model.ParcelableTopic;
-import com.pack.pack.application.topic.activity.model.UploadAttachmentData;
 import com.pack.pack.client.api.API;
 import com.pack.pack.client.api.APIConstants;
 import com.pack.pack.client.api.COMMAND;
@@ -45,7 +43,6 @@ import com.pack.pack.model.web.PackAttachmentType;
 import com.pack.pack.model.web.Pagination;
 import com.pack.pack.services.exception.PackPackException;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -53,11 +50,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static com.pack.pack.application.AppController.CAMERA_CAPTURE_PHOTO_REQUEST_CODE;
 import static com.pack.pack.application.AppController.TOPIC_ID_KEY;
-import static com.pack.pack.application.AppController.UPLOAD_ENTITY_ID_KEY;
-import static com.pack.pack.application.AppController.UPLOAD_ENTITY_TYPE_KEY;
-import static com.pack.pack.application.AppController.UPLOAD_FILE_IS_PHOTO;
 
 public class ImageVideoShareReceiveActivity extends AppCompatActivity {
 
@@ -128,42 +121,94 @@ public class ImageVideoShareReceiveActivity extends AppCompatActivity {
 
     }
 
-    private void uploadSharedText(final JTopic topic) {
+    private void uploadSharedText(JTopic topic) {
         sharedText = sharedText.trim();
         if(sharedText.startsWith("http://") || sharedText.startsWith("https://")) {
-            IAsyncTaskStatusListener listener = new IAsyncTaskStatusListener() {
-                @Override
-                public void onPreStart(String taskID) {
-                }
+            uploadExternalLink(topic);
+        } else {
+            uploadSharedTextMsg(topic);
+        }
+    }
 
-                @Override
-                public void onSuccess(String taskID, Object data) {
-                    if(data != null) {
-                        JRssFeed sharedFeedForUpload = (JRssFeed) data;
-                        uploadSharedFeed(topic, sharedFeedForUpload);
-                    } else {
-                        handleFailure();
+    private void uploadSharedTextMsg(final JTopic topic) {
+        IAsyncTaskStatusListener uploadTextMsgListener = new IAsyncTaskStatusListener() {
+            @Override
+            public void onPreStart(String taskID) {
+            }
+
+            private void handleFailure() {
+                Toast.makeText(ImageVideoShareReceiveActivity.this, "Failed to share...", Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(ImageVideoShareReceiveActivity.this, LandingPageActivity.class);
+                ImageVideoShareReceiveActivity.this.finish();
+                startActivity(intent);
+            }
+
+            @Override
+            public void onSuccess(String taskID, Object data) {
+                if(data != null && (data instanceof JPackAttachment)) {
+                    ParcelableTopic parcel = new ParcelableTopic(topic);
+                    if(ApiConstants.FAMILY.equalsIgnoreCase(topic.getCategory())) {
+                        Intent intent = new Intent(ImageVideoShareReceiveActivity.this, MyFamilyActivity.class);
+                        intent.putExtra(AppController.TOPIC_PARCELABLE_KEY, parcel);
+                        ImageVideoShareReceiveActivity.this.finish();
+                        startActivity(intent);
+                    } else if(ApiConstants.SOCIETY.equalsIgnoreCase(topic.getCategory())) {
+                        Intent intent = new Intent(ImageVideoShareReceiveActivity.this, MySocietyActivity.class);
+                        intent.putExtra(AppController.TOPIC_PARCELABLE_KEY, parcel);
+                        ImageVideoShareReceiveActivity.this.finish();
+                        startActivity(intent);
                     }
-                }
-
-                private void handleFailure() {
-                    Toast.makeText(ImageVideoShareReceiveActivity.this, "Failed to share...", Toast.LENGTH_LONG).show();
-                    Intent intent = new Intent(ImageVideoShareReceiveActivity.this, LandingPageActivity.class);
-                    ImageVideoShareReceiveActivity.this.finish();
-                    startActivity(intent);
-                }
-
-                @Override
-                public void onFailure(String taskID, String errorMsg) {
+                } else {
                     handleFailure();
                 }
+            }
 
-                @Override
-                public void onPostComplete(String taskID) {
+            @Override
+            public void onFailure(String taskID, String errorMsg) {
+
+            }
+
+            @Override
+            public void onPostComplete(String taskID) {
+            }
+        };
+
+        new UploadTextMessageTask(ImageVideoShareReceiveActivity.this, topic, uploadTextMsgListener).execute(sharedText);
+    }
+
+    private void uploadExternalLink(final JTopic topic) {
+        IAsyncTaskStatusListener listener = new IAsyncTaskStatusListener() {
+            @Override
+            public void onPreStart(String taskID) {
+            }
+
+            @Override
+            public void onSuccess(String taskID, Object data) {
+                if(data != null) {
+                    JRssFeed sharedFeedForUpload = (JRssFeed) data;
+                    uploadSharedFeed(topic, sharedFeedForUpload);
+                } else {
+                    handleFailure();
                 }
-            };
-            new ReadCopiedLink(ImageVideoShareReceiveActivity.this, listener).execute(sharedText);
-        }
+            }
+
+            private void handleFailure() {
+                Toast.makeText(ImageVideoShareReceiveActivity.this, "Failed to share...", Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(ImageVideoShareReceiveActivity.this, LandingPageActivity.class);
+                ImageVideoShareReceiveActivity.this.finish();
+                startActivity(intent);
+            }
+
+            @Override
+            public void onFailure(String taskID, String errorMsg) {
+                handleFailure();
+            }
+
+            @Override
+            public void onPostComplete(String taskID) {
+            }
+        };
+        new ReadCopiedLink(ImageVideoShareReceiveActivity.this, listener).execute(sharedText);
     }
 
     private void uploadSharedFeed(final JTopic topic, JRssFeed sharedFeedForUpload) {
@@ -444,12 +489,61 @@ public class ImageVideoShareReceiveActivity extends AppCompatActivity {
         }
     }
 
+    private class UploadTextMessageTask extends AbstractNetworkTask<String, Integer, JPackAttachment> {
+
+        private String errorMsg;
+
+        private JTopic topic;
+
+        UploadTextMessageTask(Context context, JTopic topic, IAsyncTaskStatusListener listener) {
+            super(false, false, false,context, false, false);
+            this.topic = topic;
+            addListener(listener);
+        }
+
+        @Override
+        protected COMMAND command() {
+            return COMMAND.ADD_SHARED_TEXT_MSG_TO_TOPIC;
+        }
+
+        @Override
+        protected String getFailureMessage() {
+            return errorMsg;
+        }
+
+        @Override
+        protected JPackAttachment executeApi(API api) throws Exception {
+            JPackAttachment attachment = null;
+            try {
+                attachment = (JPackAttachment) api.execute();
+            } catch (Exception e) {
+                errorMsg = "Failed to upload new attachment (Shared Text Message)";
+            }
+            return attachment;
+        }
+
+        @Override
+        protected String getContainerIdForObjectStore() {
+            return null;
+        }
+
+        @Override
+        protected Map<String, Object> prepareApiParams(String inputObject) {
+            Map<String, Object> apiParams = new HashMap<String, Object>();
+            apiParams.put(APIConstants.Topic.ID, topic.getId());
+            apiParams.put(APIConstants.User.ID, AppController.getInstance().getUserId());
+            apiParams.put(APIConstants.Attachment.TITLE, " ");
+            apiParams.put(APIConstants.Attachment.DESCRIPTION, inputObject);
+            return apiParams;
+        }
+    }
+
     private class UploadExternalLink extends AbstractNetworkTask<ExternalLinkAttchmentData, Integer, JPackAttachment> {
 
         private String errorMsg;
 
         UploadExternalLink(Context context, IAsyncTaskStatusListener listener) {
-            super(false, false, false,context, true, true);
+            super(false, false, false,context, false, false);
             addListener(listener);
         }
 
@@ -469,7 +563,7 @@ public class ImageVideoShareReceiveActivity extends AppCompatActivity {
             try {
                 attachment = (JPackAttachment) api.execute();
             } catch (Exception e) {
-                errorMsg = "Failed reading to upload new attachment";
+                errorMsg = "Failed to upload new attachment (Shared External Link)";
             }
             return attachment;
         }

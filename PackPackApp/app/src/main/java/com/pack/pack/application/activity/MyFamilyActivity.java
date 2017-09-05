@@ -44,6 +44,7 @@ import com.pack.pack.client.api.APIConstants;
 import com.pack.pack.client.api.COMMAND;
 import com.pack.pack.model.web.JPackAttachment;
 import com.pack.pack.model.web.JRssFeed;
+import com.pack.pack.model.web.Pagination;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -207,7 +208,8 @@ public class MyFamilyActivity extends AppCompatActivity {
                                 JPackAttachment attachment = (JPackAttachment) data;
                                 List<JPackAttachment> attachments = new ArrayList<JPackAttachment>(2);
                                 attachments.add(attachment);
-                                topicSharedFeedsFragment.handleSuccess(attachments);
+                                Pagination<JPackAttachment> page = new Pagination<JPackAttachment>(null, null, attachments);
+                                topicSharedFeedsFragment.handleSuccess(page);
                             } else {
                                 topicSharedFeedsFragment.handleFailure("Failed to upload link");
                             }
