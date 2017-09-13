@@ -46,4 +46,13 @@ public class PreferenceManager {
     public boolean isFirstTimeLogin() {
         return pref.getBoolean(IS_FIRST_TIME_LOGIN, false);
     }
+
+    public String getNotificationCount(int notificationID) {
+        return pref.getString(String.valueOf(notificationID), null);
+    }
+
+    public void setNotificationCount(int notificationID, String count) {
+        editor.putString(String.valueOf(notificationID), count);
+        editor.commit();
+    }
 }

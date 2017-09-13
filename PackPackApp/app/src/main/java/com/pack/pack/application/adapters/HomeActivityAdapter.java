@@ -26,6 +26,7 @@ import com.pack.pack.application.data.util.ApiConstants;
 import com.pack.pack.application.data.util.DownloadFeedImageTask;
 import com.pack.pack.application.image.loader.DownloadImageTask;
 import com.pack.pack.application.topic.activity.model.ParcellableRssFeed;
+import com.pack.pack.application.view.util.ExternalLinkShareUtil;
 import com.pack.pack.application.view.util.ViewUtil;
 import com.pack.pack.client.api.APIConstants;
 import com.pack.pack.client.api.COMMAND;
@@ -153,8 +154,10 @@ public class HomeActivityAdapter extends ArrayAdapter<JRssFeed> {
                         publicUrl = videoUrl;
                     }
 
-                    if(publicUrl != null && !publicUrl.isEmpty()) {
-                        shareUrl(publicUrl);
+                    if(publicUrl != null && !publicUrl.isEmpty() && publicUrl.contains("youtube.com")) {
+                        shareUrl(feed, publicUrl);
+                    } else {
+                        shareUrl(feed, null);
                     }
                 }
             });
@@ -162,17 +165,8 @@ public class HomeActivityAdapter extends ArrayAdapter<JRssFeed> {
         return convertView;
     }
 
-    private void shareUrl(String url) {
-        Intent share = new Intent(Intent.ACTION_SEND);
-        share.setType("text/plain");
-        share.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-
-        share.putExtra(Intent.EXTRA_SUBJECT, "Title Of The Post (Shared @ SQUILL)");
-        share.putExtra(Intent.EXTRA_TEXT, url);
-
-        //getContext().startActivity(share);
-
-        getContext().startActivity(Intent.createChooser(share, "Shared @ SQUILL"));
+    private void shareUrl(JRssFeed feed, String url) {
+        ExternalLinkShareUtil.shareUrl(getContext(), feed, url);
     }
 
     private ArrayList<ParcellableRssFeed> prepareParcel(JRssFeed feed) {

@@ -17,6 +17,8 @@ import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 
 import com.pack.pack.application.R;
+import com.pack.pack.application.view.util.ExternalLinkShareUtil;
+import com.pack.pack.application.view.util.ViewUtil;
 
 public class FullScreenNewsViewActivity extends AppCompatActivity {
 
@@ -60,16 +62,7 @@ public class FullScreenNewsViewActivity extends AppCompatActivity {
     }
 
     private void shareUrl(String url) {
-        Intent share = new Intent(Intent.ACTION_SEND);
-        share.setType("text/plain");
-        share.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-
-        share.putExtra(Intent.EXTRA_SUBJECT, "Title Of The Post (Shared @ SQUILL)");
-        share.putExtra(Intent.EXTRA_TEXT, url);
-
-        //getContext().startActivity(share);
-
-        FullScreenNewsViewActivity.this.startActivity(Intent.createChooser(share, "Shared @ SQUILL"));
+        ExternalLinkShareUtil.shareDirectLink(FullScreenNewsViewActivity.this, url, "");
     }
 
     @Override

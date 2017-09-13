@@ -23,6 +23,7 @@ import com.pack.pack.application.activity.FullScreenRssFeedViewActivity;
 import com.pack.pack.application.data.util.ApiConstants;
 import com.pack.pack.application.data.util.DownloadFeedImageTask;
 import com.pack.pack.application.topic.activity.model.ParcellableRssFeed;
+import com.pack.pack.application.view.util.ExternalLinkShareUtil;
 import com.pack.pack.application.view.util.ViewUtil;
 import com.pack.pack.model.web.JRssFeed;
 import com.pack.pack.model.web.JRssSubFeed;
@@ -96,7 +97,7 @@ public class NewsActivityAdapter extends ArrayAdapter<JRssFeed> {
             news_rss_feed_description.setText(feed.getOgDescription());
             final String imageUrl = feed.getOgImage();
             final String videoUrl = feed.getVideoUrl();
-            final String newsUrl = feed.getHrefSource();
+            //final String newsUrl = feed.getHrefSource();
             if(videoUrl != null && !videoUrl.trim().isEmpty()) {
                 news_rss_feed_video_play.setVisibility(View.VISIBLE);
                 news_rss_feed_video_play.setOnClickListener(new View.OnClickListener() {
@@ -104,7 +105,8 @@ public class NewsActivityAdapter extends ArrayAdapter<JRssFeed> {
                     public void onClick(View v) {
                         //playVideo(videoUrl);
                         Intent intent = new Intent(getContext(), FullScreenNewsViewActivity.class);
-                        intent.putExtra(FullScreenNewsViewActivity.NEWS_LINK, feed.getHrefSource());
+                        String url = feed.getShareableUrl() != null ? feed.getShareableUrl() : feed.getHrefSource();
+                        intent.putExtra(FullScreenNewsViewActivity.NEWS_LINK, url);
                         //intent.putParcelableArrayListExtra(FullScreenRssFeedViewActivity.PARCELLABLE_FEEDS, prepareParcel(feed));
                         getContext().startActivity(intent);
                     }
@@ -126,7 +128,8 @@ public class NewsActivityAdapter extends ArrayAdapter<JRssFeed> {
                         intent.putParcelableArrayListExtra(FullScreenRssFeedViewActivity.PARCELLABLE_FEEDS, prepareParcel(feed));
                         getContext().startActivity(intent);*/
                         Intent intent = new Intent(getContext(), FullScreenNewsViewActivity.class);
-                        intent.putExtra(FullScreenNewsViewActivity.NEWS_LINK, feed.getHrefSource());
+                        String url = feed.getShareableUrl() != null ? feed.getShareableUrl() : feed.getHrefSource();
+                        intent.putExtra(FullScreenNewsViewActivity.NEWS_LINK, url);
                         getContext().startActivity(intent);
                     }
                 });
@@ -137,7 +140,8 @@ public class NewsActivityAdapter extends ArrayAdapter<JRssFeed> {
                         intent.putParcelableArrayListExtra(FullScreenRssFeedViewActivity.PARCELLABLE_FEEDS, prepareParcel(feed));
                         getContext().startActivity(intent);*/
                         Intent intent = new Intent(getContext(), FullScreenNewsViewActivity.class);
-                        intent.putExtra(FullScreenNewsViewActivity.NEWS_LINK, feed.getHrefSource());
+                        String url = feed.getShareableUrl() != null ? feed.getShareableUrl() : feed.getHrefSource();
+                        intent.putExtra(FullScreenNewsViewActivity.NEWS_LINK, url);
                         getContext().startActivity(intent);
                     }
                 });
@@ -151,27 +155,20 @@ public class NewsActivityAdapter extends ArrayAdapter<JRssFeed> {
                         publicUrl = videoUrl;
                     }*/
 
-                    String publicUrl = newsUrl;
+                    /*String publicUrl = newsUrl;
                     if(publicUrl != null && !publicUrl.isEmpty()) {
                         shareUrl(publicUrl);
-                    }
+                    }*/
+
+                    shareUrl(feed);
                 }
             });
         }
         return convertView;
     }
 
-    private void shareUrl(String url) {
-        Intent share = new Intent(Intent.ACTION_SEND);
-        share.setType("text/plain");
-        share.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-
-        share.putExtra(Intent.EXTRA_SUBJECT, "Title Of The Post (Shared @ SQUILL)");
-        share.putExtra(Intent.EXTRA_TEXT, url);
-
-        //getContext().startActivity(share);
-
-        getContext().startActivity(Intent.createChooser(share, "Shared @ SQUILL"));
+    private void shareUrl(JRssFeed feed) {
+        ExternalLinkShareUtil.shareUrl(getContext(), feed);
     }
 
     private ArrayList<ParcellableRssFeed> prepareParcel(JRssFeed feed) {
