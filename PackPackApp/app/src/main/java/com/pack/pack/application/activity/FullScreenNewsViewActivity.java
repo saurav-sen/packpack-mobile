@@ -26,6 +26,7 @@ public class FullScreenNewsViewActivity extends AppCompatActivity {
 
     private FloatingActionButton fab;
 
+    public static final String WEB_SHARE_LINK = "WEB_SHARE_LINK";
     public static final String NEWS_LINK = "NEWS_LINK";
 
     @Override
@@ -40,6 +41,7 @@ public class FullScreenNewsViewActivity extends AppCompatActivity {
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         final String newsLink = getIntent().getStringExtra(NEWS_LINK);
+        final String webShareLink = getIntent().getStringExtra(WEB_SHARE_LINK);
         new_detail_fullscreen_view = (WebView) findViewById(R.id.new_detail_fullscreen_view);
         new_detail_fullscreen_view.getSettings().setJavaScriptEnabled(true);
         //new_detail_fullscreen_view.getSettings().setUserAgentString();
@@ -55,7 +57,7 @@ public class FullScreenNewsViewActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                shareUrl(newsLink);
+                shareUrl(webShareLink);
             }
         });
         new_detail_fullscreen_view.loadUrl(newsLink);

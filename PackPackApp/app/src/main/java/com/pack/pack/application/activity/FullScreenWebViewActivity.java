@@ -25,7 +25,10 @@ public class FullScreenWebViewActivity extends AppCompatActivity {
 
     private FloatingActionButton fab;
 
+    public static final String SHARE_WEB_LINK = "SHARE_WEB_LINK";
     public static final String WEB_LINK = "WEB_LINK";
+
+    private String shareWebLink;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +42,10 @@ public class FullScreenWebViewActivity extends AppCompatActivity {
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         final String webLink = getIntent().getStringExtra(WEB_LINK);
+        shareWebLink = getIntent().getStringExtra(SHARE_WEB_LINK);
+        if(shareWebLink == null) {
+            shareWebLink = webLink;
+        }
         web_detail_fullscreen_view = (WebView) findViewById(R.id.web_detail_fullscreen_view);
         web_detail_fullscreen_view.getSettings().setJavaScriptEnabled(true);
         //new_detail_fullscreen_view.getSettings().setUserAgentString();
@@ -54,7 +61,7 @@ public class FullScreenWebViewActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                shareUrl(webLink);
+                shareUrl(shareWebLink);
             }
         });
         web_detail_fullscreen_view.loadUrl(webLink);

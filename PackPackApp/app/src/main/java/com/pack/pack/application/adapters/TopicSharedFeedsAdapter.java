@@ -214,6 +214,7 @@ public class TopicSharedFeedsAdapter  extends ArrayAdapter<JPackAttachment> {
                     if(attachment.isExternalLink()) {
                         Intent intent = new Intent(getContext(), FullScreenWebViewActivity.class);
                         intent.putExtra(FullScreenWebViewActivity.WEB_LINK, attachment.getAttachmentUrl());
+                        intent.putExtra(FullScreenWebViewActivity.SHARE_WEB_LINK, attachment.getAttachmentUrl());
                         getContext().startActivity(intent);
                     } else {
                         Intent intent = new Intent(getContext(), FullscreenAttachmentViewActivity.class);
