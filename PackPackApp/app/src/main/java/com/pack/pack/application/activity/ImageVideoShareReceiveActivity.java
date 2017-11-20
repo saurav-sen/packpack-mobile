@@ -186,6 +186,7 @@ public class ImageVideoShareReceiveActivity extends AppCompatActivity {
             public void onSuccess(String taskID, Object data) {
                 if(data != null) {
                     JRssFeed sharedFeedForUpload = (JRssFeed) data;
+                    sharedFeedForUpload.setOgUrl(sharedText);
                     uploadSharedFeed(topic, sharedFeedForUpload);
                 } else {
                     handleFailure();

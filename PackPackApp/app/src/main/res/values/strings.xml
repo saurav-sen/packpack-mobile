@@ -40,13 +40,26 @@
     <string name="start">GOT IT</string>
 
     <string name="intro_slide_1_title">Explore</string>
-    <string name="intro_slide_1_desc">Explore the Network Of Artists, Painters, Musician, Philosopher and many more..</string>
+    <string name="intro_slide_1_desc">Explore the Network Of visionaries including Artists, Musician, blogger/writers ..</string>
 
     <string name="intro_slide_2_title">Vision</string>
     <string name="intro_slide_2_desc">Launch your own vision of work of art and drag followers</string>
 
-    <string name="intro_slide_3_title">Stay Updated</string>
-    <string name="intro_slide_3_desc">With SQUILL stay updated with latest happening and know-how in the world of art and culture</string>
+    <string name="intro_slide_3_title">SQUILL Refreshment</string>
+    <string name="intro_slide_3_desc">SQUILL team does bring to you everyday amazing video to re-vitalize your mind</string>
+
+    <string name="intro_slide_4_title">News</string>
+    <string name="intro_slide_4_desc">Read latest news and happening around the globe to stay ahead</string>
+
+    <string name="intro_slide_5_title">My Family</string>
+    <string name="intro_slide_5_desc">Share and store memories with your near and dear one</string>
+
+    <string name="intro_slide_6_title">Friends Group</string>
+    <string name="intro_slide_6_desc">Share and store memories with your friends and special one</string>
+
+    <string name="intro_slide_7_title">Smart Society</string>
+    <string name="intro_slide_7_desc">Stay attached to neighbour.Tackle all affairs of society at one place</string>
+
     <string name="title_activity_my_family">SQUILL</string>
     <string name="title_activity_refreshments">SQUILL</string>
     <string name="section_format">Hello World from section: %1$d</string>
