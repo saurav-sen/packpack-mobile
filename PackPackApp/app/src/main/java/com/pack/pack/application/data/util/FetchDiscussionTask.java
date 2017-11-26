@@ -39,14 +39,15 @@ public class FetchDiscussionTask extends AbstractNetworkTask<ScrollableDiscussio
 
     @Override
     protected COMMAND command() {
+        COMMAND cmd = null;
         if(EntityType.TOPIC.name().equalsIgnoreCase(getInputObject().entityType)) {
-            return COMMAND.GET_ALL_DISCUSSIONS_FOR_TOPIC;
+            cmd = COMMAND.GET_ALL_DISCUSSIONS_FOR_TOPIC;
         } else if(EntityType.PACK.name().equalsIgnoreCase(getInputObject().entityType)) {
-            return  COMMAND.GET_ALL_DISCUSSIONS_FOR_PACK;
+            cmd =  COMMAND.GET_ALL_DISCUSSIONS_FOR_PACK;
         } else if(EntityType.DISCUSSION.name().equalsIgnoreCase(getInputObject().entityType)) {
-            return COMMAND.GET_ALL_REPLIES_FOR_DISCUSSION;
+            cmd = COMMAND.GET_ALL_REPLIES_FOR_DISCUSSION;
         }
-        return null;
+        return cmd;
     }
 
     @Override

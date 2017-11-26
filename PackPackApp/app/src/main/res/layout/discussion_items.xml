@@ -2,21 +2,16 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:paddingTop="5dp"
+    android:paddingLeft="3dp"
+    android:paddingRight="3dp"
     android:id="@+id/mainLayout">
-
-    <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:id="@+id/discussion_open"
-        android:src="@drawable/edit_story"/>
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="start"
-        android:id="@+id/discussion_title"
-        android:paddingTop="4dp">
+        android:paddingLeft="5dp"
+        android:id="@+id/discussion_title">
     </TextView>
 
     <TextView
@@ -24,10 +19,18 @@
         android:layout_height="wrap_content"
         android:id="@+id/discussion_description"
         android:layout_marginBottom="5dp"
-        android:paddingTop="5dp"
+        android:paddingTop="3dp"
+        android:paddingLeft="5dp"
         android:minLines="3"
         android:maxLines="7">
     </TextView>
+
+    <!--ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:id="@+id/discussion_open"
+        android:src="@drawable/edit_story"/-->
 
     <View
         android:layout_width="match_parent"

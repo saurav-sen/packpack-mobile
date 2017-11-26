@@ -39,7 +39,7 @@ public class DiscussionAdapter extends ArrayAdapter<JDiscussion> implements IDis
 
     private LayoutInflater layoutInflater;
 
-    private ImageButton discussion_open;
+    //private ImageButton discussion_open;
 
     private TextView discussion_title;
 
@@ -84,10 +84,12 @@ public class DiscussionAdapter extends ArrayAdapter<JDiscussion> implements IDis
             convertView = layoutInflater.inflate(R.layout.discussion_items, null);
         }
 
-        discussion_open = (ImageButton) convertView.findViewById(R.id.discussion_open);
-        discussion_open.setTag(position);
+       // discussion_open = (ImageButton) convertView.findViewById(R.id.discussion_open);
+       // discussion_open.setTag(position);
         discussion_title = (TextView) convertView.findViewById(R.id.discussion_title);
+        discussion_title.setTag(position);
         discussion_description = (TextView) convertView.findViewById(R.id.discussion_description);
+        discussion_description.setTag(position);
 
         JDiscussion discussion = getItem(position);
         if(discussion != null) {
@@ -109,21 +111,34 @@ public class DiscussionAdapter extends ArrayAdapter<JDiscussion> implements IDis
             discussion_description.setText(content);
         }
 
-        discussion_open.setOnClickListener(new View.OnClickListener() {
+        discussion_title.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 int position = (int) view.getTag();
-                if(position < 0 || discussions == null || position >= discussions.size())
-                    return;
-                JDiscussion discussion = discussions.get(position);
-                if(discussion == null)
-                    return;
-                Intent intent = new Intent(getContext(), DiscussionDetailViewActivity.class);
-                intent.putExtra(Constants.DISCUSSION_ENTITY_ID, discussion.getId());
-                intent.putExtra(Constants.DISCUSSION_ENTITY_TYPE, EntityType.DISCUSSION.name());
-                getContext().startActivity(intent);
+                openDiscussion(position);
             }
         });
+
+        discussion_description.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int position = (int) view.getTag();
+                openDiscussion(position);
+            }
+        });
+
         return convertView;
+    }
+
+    private void openDiscussion(int position) {
+        if(position < 0 || discussions == null || position >= discussions.size())
+            return;
+        JDiscussion discussion = discussions.get(position);
+        if(discussion == null)
+            return;
+        Intent intent = new Intent(getContext(), DiscussionDetailViewActivity.class);
+        intent.putExtra(Constants.DISCUSSION_ENTITY_ID, discussion.getId());
+        intent.putExtra(Constants.DISCUSSION_ENTITY_TYPE, EntityType.DISCUSSION.name());
+        getContext().startActivity(intent);
     }
 }

@@ -68,7 +68,7 @@ public class MySocietyDiscussionsFragment extends Fragment implements IAsyncTask
         currentScrollableDiscussion.entityType = EntityType.TOPIC.name();
 
         mysociety_discussions_list = (ListView) rootView.findViewById(R.id.mysociety_discussions_list);
-        new DiscussionAdapter(this.getActivity(), discussions);
+        adapter = new DiscussionAdapter(this.getActivity(), discussions);
         mysociety_discussions_list.setAdapter(adapter);
         mysociety_discussions_list.setOnScrollListener(new AbsListView.OnScrollListener() {
 
@@ -87,6 +87,9 @@ public class MySocietyDiscussionsFragment extends Fragment implements IAsyncTask
 
             }
         });
+
+        new FetchDiscussionTask(MySocietyDiscussionsFragment.this.getActivity(), MySocietyDiscussionsFragment.this).execute(currentScrollableDiscussion);
+
         return rootView;
     }
 
