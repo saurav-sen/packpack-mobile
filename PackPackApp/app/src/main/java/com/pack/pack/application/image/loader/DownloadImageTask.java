@@ -118,7 +118,7 @@ public class DownloadImageTask extends AbstractNetworkTask<String, Void, Bitmap>
     }
 
     protected String lookupURL(String url) {
-        //if(ApiConstants.IS_PRODUCTION_ENV) {
+        //if(!ApiConstants.IS_AWS_S3_LINK_FOR_IMAGE) {
             url = url != null ? url.trim() : url;
             url = url + "?w=" + imageWidth + "&h=" + imageHeight;
         //}

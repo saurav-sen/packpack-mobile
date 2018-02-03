@@ -2,6 +2,7 @@ package com.pack.pack.application.activity;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.net.Uri;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -9,6 +10,7 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.URLUtil;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
@@ -46,13 +48,7 @@ public class FullScreenNewsViewActivity extends AppCompatActivity {
         new_detail_fullscreen_view.getSettings().setJavaScriptEnabled(true);
         //new_detail_fullscreen_view.getSettings().setUserAgentString();
         new_detail_fullscreen_view.setWebChromeClient(new WebChromeClient());
-        new_detail_fullscreen_view.setWebViewClient(new SquillWebViewClient() {
-            @Override
-            public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                view.loadUrl(url);
-                return true;
-            }
-        });
+        new_detail_fullscreen_view.setWebViewClient(new SquillWebViewClient());
         fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -89,7 +85,12 @@ public class FullScreenNewsViewActivity extends AppCompatActivity {
 
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
-            view.loadUrl(url);
+            if(URLUtil.isNetworkUrl(url)) {
+                //view.loadUrl(url);
+                return false;
+            }
+                /*Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                startActivity(intent);*/
             return true;
         }
 
