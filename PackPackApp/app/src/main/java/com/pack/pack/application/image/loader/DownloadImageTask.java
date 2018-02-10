@@ -62,6 +62,18 @@ public class DownloadImageTask extends AbstractNetworkTask<String, Void, Bitmap>
 
     private static final String LOG_TAG = "DownloadImageTask";
 
+    public static class SamplingOption {
+        public boolean considerSuppliedDimensionDuringSampling = true;
+        public int minimumInSampleSize = 2;
+    }
+
+    private SamplingOption samplingOption = new SamplingOption();
+
+    public DownloadImageTask setSamplingOption(SamplingOption samplingOption) {
+        this.samplingOption = samplingOption;
+        return this;
+    }
+
     public DownloadImageTask(ImageView imageView, Context context) {
         this(imageView, context, null);
         //this(imageView, 900, 700, context);
@@ -250,7 +262,7 @@ public class DownloadImageTask extends AbstractNetworkTask<String, Void, Bitmap>
                 options.inJustDecodeBounds = true;
                 BitmapFactory.decodeStream(new FileInputStream(file), null, options);
 
-                if(imageHeight > 0 && imageWidth > 0) {
+                if(imageHeight > 0 && imageWidth > 0 && samplingOption != null && samplingOption.considerSuppliedDimensionDuringSampling) {
                     options.inSampleSize = calculateInSampleSize(options, imageWidth, imageHeight);
                 } else {
                     ImageDimension dimension = calculateResizeDimensions(options.outHeight, options.outWidth);
@@ -261,6 +273,15 @@ public class DownloadImageTask extends AbstractNetworkTask<String, Void, Bitmap>
                 if(options.inSampleSize < 2) {
                     options.inSampleSize = 2;
                 }
+
+                if(options.inSampleSize < samplingOption.minimumInSampleSize) {
+                    options.inSampleSize = samplingOption.minimumInSampleSize;
+                }
+
+                // This may destroy image quality
+               /* if(options.inSampleSize > 4) {
+                    options.inSampleSize = 4;
+                }*/
 
                 options.inJustDecodeBounds = false;
                 bitmap = BitmapFactory.decodeStream(new FileInputStream(file), null, options);
