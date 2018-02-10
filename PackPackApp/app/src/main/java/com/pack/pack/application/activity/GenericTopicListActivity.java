@@ -82,7 +82,7 @@ public class GenericTopicListActivity extends AppCompatActivity implements JTopi
                 int count = generic_topic_list.getCount();
                 if (scrollState == SCROLL_STATE_IDLE) {
                     if (generic_topic_list.getLastVisiblePosition() > count - 3) {
-                        new LoadTopicTask().execute(AppController.getInstance().getUserId());
+                        //new LoadTopicTask().execute(AppController.getInstance().getUserId());
                     }
                 }
             }

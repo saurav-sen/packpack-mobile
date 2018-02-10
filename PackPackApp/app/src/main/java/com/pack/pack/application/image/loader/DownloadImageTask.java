@@ -27,8 +27,13 @@ import com.pack.pack.client.api.COMMAND;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URLEncoder;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
@@ -137,6 +142,12 @@ public class DownloadImageTask extends AbstractNetworkTask<String, Void, Bitmap>
     }
 
     private ImageDimension calculateResizeDimensions(Bitmap bitmap) {
+        int height = bitmap.getHeight();
+        int width = bitmap.getWidth();
+        return calculateResizeDimensions(height, width);
+    }
+
+    private ImageDimension calculateResizeDimensions(int bitmapHeight, int bitmapWidth) {
         //int shortSideMax = 900;
         //int longSideMax = 1440;
 
@@ -147,8 +158,8 @@ public class DownloadImageTask extends AbstractNetworkTask<String, Void, Bitmap>
         int shortSideMax = size.x;
         int longSideMax = size.x+200;//(int)(size.y * 0.6f);
 
-        int height = bitmap.getHeight();
-        int width = bitmap.getWidth();
+        int height = bitmapHeight;
+        int width = bitmapWidth;
 
         float aspectRatio = (float)width / (float)height;
         if(aspectRatio >= 1.2f) {
@@ -194,6 +205,103 @@ public class DownloadImageTask extends AbstractNetworkTask<String, Void, Bitmap>
         return new ImageDimension(height, width);
     }
 
+    private int copyStream(InputStream is, OutputStream os) {
+        int total = 0;
+        final int buffer_size = 1024;
+        try {
+            byte[] bytes = new byte[buffer_size];
+            int count = is.read(bytes);
+            while (count != -1) {
+                total = total + count;
+                os.write(bytes, 0, count);
+                count = is.read(bytes);
+            }
+            return total;
+        } catch (Exception e) {
+            Log.e(LOG_TAG, e.getMessage(), e);
+            return -1;
+        }
+    }
+
+    private Bitmap decodeSampledBitmapFromStream(InputStream stream) {
+        File file = null;
+        Bitmap bitmap = null;
+        try {
+            file = File.createTempFile("img", ".tmp", getContext().getCacheDir());
+            file.deleteOnExit();
+        } catch (Exception e) {
+            Log.e(LOG_TAG, e.getMessage(), e);
+            file = null;
+        }
+        if(file == null) {
+            bitmap = decodeDefaultSampledBitmapFromStream(stream);
+        } else {
+            try {
+                OutputStream fileOutputStream = new FileOutputStream(file);
+                int count = copyStream(stream, fileOutputStream);
+                if(count == -1) {
+                    Log.e(LOG_TAG, "Failed copying stream");
+                    return null;
+                }
+                fileOutputStream.flush();
+                fileOutputStream.close();
+
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inJustDecodeBounds = true;
+                BitmapFactory.decodeStream(new FileInputStream(file), null, options);
+
+                if(imageHeight > 0 && imageWidth > 0) {
+                    options.inSampleSize = calculateInSampleSize(options, imageWidth, imageHeight);
+                } else {
+                    ImageDimension dimension = calculateResizeDimensions(options.outHeight, options.outWidth);
+                    options.inSampleSize = calculateInSampleSize(options, dimension.newWidth, dimension.newHeight);
+                }
+
+                // Lets make it half atleast to reduce memory usage
+                if(options.inSampleSize < 2) {
+                    options.inSampleSize = 2;
+                }
+
+                options.inJustDecodeBounds = false;
+                bitmap = BitmapFactory.decodeStream(new FileInputStream(file), null, options);
+            } catch (FileNotFoundException e) {
+                bitmap = decodeDefaultSampledBitmapFromStream(stream);
+            } catch (Exception e) {
+                bitmap = null;
+            }
+        }
+        return bitmap;
+    }
+
+    private Bitmap decodeDefaultSampledBitmapFromStream(InputStream stream) {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inSampleSize = 2;
+        return BitmapFactory.decodeStream(stream, null, options);
+    }
+
+    private int calculateInSampleSize(
+            BitmapFactory.Options options, int reqWidth, int reqHeight) {
+        // Raw height and width of image
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        int inSampleSize = 1;
+
+        if (height > reqHeight || width > reqWidth) {
+
+            final int halfHeight = height / 2;
+            final int halfWidth = width / 2;
+
+            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+            // height and width larger than the requested height and width.
+            while ((halfHeight / inSampleSize) >= reqHeight
+                    && (halfWidth / inSampleSize) >= reqWidth) {
+                inSampleSize *= 2;
+            }
+        }
+
+        return inSampleSize;
+    }
+
     @Override
     protected Bitmap executeApi(API api) throws Exception {
         InputStream stream = null;
@@ -221,7 +329,13 @@ public class DownloadImageTask extends AbstractNetworkTask<String, Void, Bitmap>
             }
             stream = (InputStream) api.execute();
             if(stream != null) {
-                bitmap = BitmapFactory.decodeStream(stream);
+
+                /*===============================================*/
+                //bitmap = BitmapFactory.decodeStream(stream);
+                /*===============================================*/
+
+                bitmap = decodeSampledBitmapFromStream(stream);
+
                 if(bitmap != null) {
                     /*if (imageWidth > 0 && imageHeight > 0) {
                         bitmap = Bitmap.createScaledBitmap(bitmap, imageWidth, imageHeight, true);
