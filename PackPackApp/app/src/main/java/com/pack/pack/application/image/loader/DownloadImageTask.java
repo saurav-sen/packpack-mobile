@@ -65,12 +65,15 @@ public class DownloadImageTask extends AbstractNetworkTask<String, Void, Bitmap>
     public static class SamplingOption {
         public boolean considerSuppliedDimensionDuringSampling = true;
         public int minimumInSampleSize = 2;
+        public boolean blindResize = false;
     }
 
     private SamplingOption samplingOption = new SamplingOption();
 
     public DownloadImageTask setSamplingOption(SamplingOption samplingOption) {
-        this.samplingOption = samplingOption;
+        if(samplingOption != null) {
+            this.samplingOption = samplingOption;
+        }
         return this;
     }
 
@@ -363,7 +366,7 @@ public class DownloadImageTask extends AbstractNetworkTask<String, Void, Bitmap>
                     } else {
                         bitmap = Bitmap.createScaledBitmap(bitmap, 900, 700, true);
                     }*/
-                    if(blindResize && imageWidth > 0 && imageHeight > 0) {
+                    if((blindResize || samplingOption.blindResize) && imageWidth > 0 && imageHeight > 0) {
                         bitmap = Bitmap.createScaledBitmap(bitmap, imageWidth, imageHeight, true);
                     } else {
                         ImageDimension dimension = calculateResizeDimensions(bitmap);
@@ -471,9 +474,13 @@ public class DownloadImageTask extends AbstractNetworkTask<String, Void, Bitmap>
             progressBar.setVisibility(View.GONE);
         }
         if(imageView != null) {
-            imageView.setImageBitmap(bitmap);
-            imageView.setVisibility(View.VISIBLE);
+            setImageBitmapToImageView(bitmap);
         }
         super.onPostExecute(bitmap);
+    }
+
+    protected void setImageBitmapToImageView(Bitmap bitmap) {
+        imageView.setImageBitmap(bitmap);
+        imageView.setVisibility(View.VISIBLE);
     }
 }

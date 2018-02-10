@@ -1,6 +1,7 @@
 package com.pack.pack.application.adapters;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -60,9 +61,25 @@ public class ImageGridAdapter extends BaseAdapter {
             String imageUrl = imageUrls.get(i);
             DownloadImageTask.SamplingOption samplingOption = new DownloadImageTask.SamplingOption();
             samplingOption.considerSuppliedDimensionDuringSampling = false;
-            samplingOption.minimumInSampleSize = 15;
-            new DownloadImageTask(imageView, 90, 100, mContext).setSamplingOption(samplingOption).execute(imageUrl.trim());
+            samplingOption.minimumInSampleSize = 3;
+            new ThumbnailImageDownloadTask(imageView, mContext).setSamplingOption(samplingOption).execute(imageUrl.trim());
         }
         return imageView;
+    }
+
+    private class ThumbnailImageDownloadTask extends DownloadImageTask {
+
+        private static final int IMAGE_WIDTH = 90;
+        private static final int IMAGE_HEIGHT = 100;
+
+        public ThumbnailImageDownloadTask(ImageView imageView, Context context) {
+            super(imageView, IMAGE_WIDTH, IMAGE_HEIGHT, context);
+        }
+
+        @Override
+        protected void setImageBitmapToImageView(Bitmap bitmap) {
+            Bitmap scaledBitmap = Bitmap.createScaledBitmap(bitmap, IMAGE_WIDTH, IMAGE_HEIGHT, true);
+            super.setImageBitmapToImageView(scaledBitmap);
+        }
     }
 }
