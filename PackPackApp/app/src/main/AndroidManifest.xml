@@ -62,18 +62,6 @@
             android:name=".activity.LoginActivity"
             android:label="SQUILL"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".activity.TopicDetailActivity"
-            android:label="SQUILL"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".activity.MyFamilyTopicDetailActivity"
-            android:label="SQUILL"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".activity.MySocietyTopicDetailActivity"
-            android:label="SQUILL"
-            android:theme="@style/AppTheme.NoActionBar" />
 
         <intent-filter>
             <data
@@ -101,16 +89,10 @@
             android:label="SQUILL"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".activity.FullscreenAttachmentViewActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label="SQUILL"
-            android:theme="@style/FullscreenTheme" />
-        <activity
             android:name=".activity.FullScreenPlayVideoActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="SQUILL"
             android:theme="@style/FullscreenTheme" />
-        <activity android:name=".activity.MainActivity" />
         <activity android:name=".activity.SignupActivity" />
         <activity android:name=".activity.ResetPasswordActivity" />
 
@@ -119,24 +101,6 @@
             android:exported="false" />
         <service android:name=".service.UploadVideoAttachmentService" />
         <service android:name=".service.UploadImageAttachmentService" />
-
-        <activity
-            android:name=".activity.TopicCreateActivity"
-            android:label="SQUILL" />
-        <activity
-            android:name=".activity.DiscussionStartActivity"
-            android:label="@string/title_activity_discussion"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".activity.DiscussionCreateActivity"
-            android:label="@string/title_activity_discussion"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".activity.DiscussionViewActivity" />
-        <activity android:name=".activity.DiscussionDetailViewActivity" />
-        <activity
-            android:name=".activity.CreatePackActivity"
-            android:label="@string/title_activity_create_pack"
-            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activity.FollowCategoryActivity"
             android:label="FollowCategoryActivity" />
@@ -247,10 +211,6 @@
         <activity
             android:name=".activity.MyFamilyActivity"
             android:label="@string/title_activity_my_family"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".activity.GenericTopicListActivity"
-            android:label="@string/title_activity_generic_topic_list"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activity.MySocietyActivity"
