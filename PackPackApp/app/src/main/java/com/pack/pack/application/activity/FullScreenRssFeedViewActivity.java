@@ -17,13 +17,11 @@ import android.widget.TextView;
 
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
-import com.pack.pack.application.adapters.FullScreenAttachmentViewAdapter;
 import com.pack.pack.application.adapters.FullScreenRssFeedViewAdapter;
 import com.pack.pack.application.data.util.DownloadFeedImageTask;
 import com.pack.pack.application.image.loader.DownloadImageTask;
 import com.pack.pack.application.topic.activity.model.ParcellableRssFeed;
 import com.pack.pack.application.view.AttachmentViewPager;
-import com.pack.pack.model.web.JPackAttachment;
 import com.pack.pack.model.web.JRssFeed;
 
 import java.io.File;

@@ -11,7 +11,6 @@ import android.widget.EditText;
 
 import com.pack.pack.application.R;
 import com.pack.pack.application.activity.LoginActivity;
-import com.pack.pack.application.activity.MainActivity;
 import com.pack.pack.client.api.API;
 import com.pack.pack.client.api.APIConstants;
 import com.pack.pack.client.api.COMMAND;

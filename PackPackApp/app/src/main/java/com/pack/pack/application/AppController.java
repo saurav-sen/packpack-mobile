@@ -13,9 +13,6 @@ import com.pack.pack.application.data.cache.HttpCache;
 import com.pack.pack.application.data.cache.HttpCacheFactory;
 import com.pack.pack.application.topic.activity.model.UploadAttachmentData;
 import com.pack.pack.client.api.APIConstants;
-import com.pack.pack.model.web.JCategories;
-import com.pack.pack.model.web.JPackAttachment;
-import com.pack.pack.model.web.JTopic;
 import com.pack.pack.model.web.JUser;
 
 import org.apache.http.entity.mime.content.ContentBody;
@@ -105,12 +102,6 @@ public class AppController extends Application {
 
     private String apkUrl;
 
-    public List<JTopic> getUserOwnedTopics() {
-        return userOwnedTopics;
-    }
-
-    private List<JTopic> userOwnedTopics = new ArrayList<JTopic>();
-
     public JUser getUser() {
         return user;
     }
@@ -170,12 +161,8 @@ public class AppController extends Application {
         this.externalReadGranted = false;
     }
 
-    private Map<String, JPackAttachment> packAttachmentCache = new WeakHashMap<String, JPackAttachment>();
-
     public static final int MEDIA_TYPE_IMAGE = 1;
     public static final int MEDIA_TYPE_VIDEO = 2;
-
-    private List<JPackAttachment> packAttachments;
 
     private boolean signInProgress;
 
@@ -276,26 +263,6 @@ public class AppController extends Application {
         cameraPermissionGranted = false;
     }
 
-    public void cachePackAttachments(List<JPackAttachment> attachments) {
-        packAttachmentCache.clear();
-        if(attachments == null || attachments.isEmpty())
-            return;
-        for(JPackAttachment attachment : attachments) {
-            packAttachmentCache.put(attachment.getId(), attachment);
-        }
-    }
-
-    public JPackAttachment getPackAttachmentFromCache(String id) {
-        return packAttachmentCache.get(id);
-    }
-
-    public List<JPackAttachment> getPackAttachments() {
-        if(packAttachments == null) {
-            packAttachments = new ArrayList<JPackAttachment>();
-        }
-        return packAttachments;
-    }
-
     private Bitmap selectedBitmapPhoto;
 
     public Bitmap getSelectedBitmapPhoto() {
@@ -304,16 +271,6 @@ public class AppController extends Application {
 
     public void setSelectedBitmapPhoto(Bitmap selectedBitmapPhoto) {
         this.selectedBitmapPhoto = selectedBitmapPhoto;
-    }
-
-    private JCategories supportedCategories;
-
-    public JCategories getSupportedCategories() {
-        return supportedCategories;
-    }
-
-    public void setSupportedCategories(JCategories supportedCategories) {
-        this.supportedCategories = supportedCategories;
     }
 
     private UploadAttachmentData uploadAttachmentData;

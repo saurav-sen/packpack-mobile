@@ -27,20 +27,20 @@ public class SquillDbHelper extends SQLiteOpenHelper {
                         + " TEXT, " + UserInfo.ACCESS_TOKEN_SECRET + " TEXT, "
                         + UserInfo.FOLLWED_CATEGORIES + " TEXT)";
 
-        public static final String USER_OWNED_TOPIC_INFO =
+       /* public static final String USER_OWNED_TOPIC_INFO =
                 "CREATE TABLE " + UserOwnedTopicInfo.TABLE_NAME + " (" + UserOwnedTopicInfo._ID
                         + " INTEGER PRIMARY KEY, " + UserOwnedTopicInfo.ENTITY_ID + " TEXT, "
                         + UserOwnedTopicInfo.TOPIC_NAME + " TEXT, " + UserOwnedTopicInfo.TOPIC_DESCRIPTION
                         + " TEXT, " + UserOwnedTopicInfo.OWNER_ID + " TEXT, "
                         + UserOwnedTopicInfo.TOPIC_CATEGORY + " TEXT, "
-                        + UserOwnedTopicInfo.TOPIC_WALLPAPER_URL + " TEXT)";
+                        + UserOwnedTopicInfo.TOPIC_WALLPAPER_URL + " TEXT)";*/
 
-        public static final String ATTACHMENT_INFO =
+        /*public static final String ATTACHMENT_INFO =
                 "CREATE TABLE " + AttachmentInfo.TABLE_NAME + "(" + AttachmentInfo._ID
                         + " INTEGER PRIMARY KEY, " + AttachmentInfo.ENTITY_ID + " TEXT, "
                         + AttachmentInfo.URL + " TEXT, " + AttachmentInfo.TYPE + " TEXT, "
                         + AttachmentInfo.CONTAINER_ID + " TEXT, " + AttachmentInfo.JSON_BODY
-                        + " TEXT)";
+                        + " TEXT)";*/
 
         public static final String PAGINATION_INFO =
                 "CREATE TABLE " + PaginationInfo.TABLE_NAME + "(" + PaginationInfo._ID
@@ -53,12 +53,12 @@ public class SquillDbHelper extends SQLiteOpenHelper {
                         + " INTEGER PRIMARY KEY, " + ResourceURL.URL + " TEXT, "
                         + ResourceURL.BLOB_CONTENT + " BLOB)";
 
-        public static final String DISCUSSION_INFO = "CREATE TABLE " + DiscussionInfo.TABLE_NAME
+        /*public static final String DISCUSSION_INFO = "CREATE TABLE " + DiscussionInfo.TABLE_NAME
                 + "(" + DiscussionInfo._ID + " INTEGER PRIMARY KEY, " + DiscussionInfo.ENTITY_ID
                 + " TEXT, " + DiscussionInfo.CONTAINER_TYPE + " TEXT, " + DiscussionInfo.CONTAINER_ID
                 + " TEXT, " + DiscussionInfo.CONTENT + " TEXT, " + DiscussionInfo.FROM_USERNAME
                 + " TEXT, " + DiscussionInfo.FROM_USER_FULL_NAME + " TEXT, " + DiscussionInfo.DATE_TIME
-                + " TEXT)";
+                + " TEXT)";*/
     }
 
     public interface DeleteQueries {
@@ -69,11 +69,11 @@ public class SquillDbHelper extends SQLiteOpenHelper {
         public static final String USER_INFO =
                 "DROP TABLE IF EXISTS " + UserInfo.TABLE_NAME;
 
-        public static final String USER_OWNED_TOPIC_INFO =
-                "DROP TABLE IF EXISTS " + UserOwnedTopicInfo.TABLE_NAME;
+        /*public static final String USER_OWNED_TOPIC_INFO =
+                "DROP TABLE IF EXISTS " + UserOwnedTopicInfo.TABLE_NAME;*/
 
-        public static final String ATTACHMENT_INFO =
-                "DROP TABLE IF EXISTS " + AttachmentInfo.TABLE_NAME;
+        /*public static final String ATTACHMENT_INFO =
+                "DROP TABLE IF EXISTS " + AttachmentInfo.TABLE_NAME;*/
 
         public static final String PAGINATION_INFO =
                 "DROP TABLE IF EXISTS " + PaginationInfo.TABLE_NAME;
@@ -81,8 +81,8 @@ public class SquillDbHelper extends SQLiteOpenHelper {
         public static final String RESOURCE_URL =
                 "DROP TABLE IF EXISTS " + ResourceURL.TABLE_NAME;
 
-        public static final String DISCUSSION_INFO =
-                "DROP TABLE IF EXISTS " + DiscussionInfo.TABLE_NAME;
+        /*public static final String DISCUSSION_INFO =
+                "DROP TABLE IF EXISTS " + DiscussionInfo.TABLE_NAME;*/
     }
 
     public interface InsertQueries {
@@ -101,22 +101,22 @@ public class SquillDbHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CreateQueries.JSON_MODEL);
         db.execSQL(CreateQueries.USER_INFO);
-        db.execSQL(CreateQueries.USER_OWNED_TOPIC_INFO);
-        db.execSQL(CreateQueries.ATTACHMENT_INFO);
+        //db.execSQL(CreateQueries.USER_OWNED_TOPIC_INFO);
+        //db.execSQL(CreateQueries.ATTACHMENT_INFO);
         db.execSQL(CreateQueries.PAGINATION_INFO);
         db.execSQL(CreateQueries.RESOURCE_URL);
-        db.execSQL(CreateQueries.DISCUSSION_INFO);
+        //db.execSQL(CreateQueries.DISCUSSION_INFO);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL(DeleteQueries.JSON_MODEL);
         db.execSQL(DeleteQueries.USER_INFO);
-        db.execSQL(DeleteQueries.USER_OWNED_TOPIC_INFO);
-        db.execSQL(DeleteQueries.ATTACHMENT_INFO);
+        //db.execSQL(DeleteQueries.USER_OWNED_TOPIC_INFO);
+        //db.execSQL(DeleteQueries.ATTACHMENT_INFO);
         db.execSQL(DeleteQueries.PAGINATION_INFO);
         db.execSQL(DeleteQueries.RESOURCE_URL);
-        db.execSQL(DeleteQueries.DISCUSSION_INFO);
+        //db.execSQL(DeleteQueries.DISCUSSION_INFO);
         onCreate(db);
     }
 

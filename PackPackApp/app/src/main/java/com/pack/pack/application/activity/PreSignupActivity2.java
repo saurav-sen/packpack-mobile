@@ -62,7 +62,7 @@ public class PreSignupActivity2 extends AbstractAppCompatActivity implements IAs
             @Override
             public void onClick(View v) {
                 String verifierCode = signup_verifier.getText() != null ? signup_verifier.getText().toString() : null;
-                if(verifierCode == null || verifierCode.trim().isEmpty()) {
+                if (verifierCode == null || verifierCode.trim().isEmpty()) {
                     Snackbar.make(signup_verifier, "Verification Code is mandatory", Snackbar.LENGTH_LONG).show();
                     return;
                 }
@@ -98,8 +98,7 @@ public class PreSignupActivity2 extends AbstractAppCompatActivity implements IAs
         JUser user = userInfo.getUser();
         getIntent().putExtra("loginStatus", true);
         finish();
-        //startMainActivity();
-        startFollowCategoryActivity();
+        startMainActivity();
     }
 
     protected void onSignUpSuccess() {
@@ -123,17 +122,10 @@ public class PreSignupActivity2 extends AbstractAppCompatActivity implements IAs
     @Override
     public void onFailure(String taskID, String errorMsg) {
         hideProgressDialog();
-        /*Intent intent = new Intent(this, LoginActivity.class);
-        intent.putExtra("email", input_email.getText().toString());
-        intent.putExtra("passwd", input_password.getText().toString());
-        intent.putExtra("loginStatus", false);
-        finish();
-        startActivity(intent);*/
     }
 
-    private void startFollowCategoryActivity() {
-        Intent intent = new Intent(this, FollowCategoryActivity.class);
-        finish();
+    private void startMainActivity() {
+        Intent intent = new Intent(this, LandingPageActivity.class);
         startActivity(intent);
     }
 

@@ -26,7 +26,6 @@ import com.pack.pack.application.data.util.DownloadFeedImageTask;
 import com.pack.pack.application.data.util.ImageUtil;
 import com.pack.pack.application.image.loader.DownloadImageTask;
 import com.pack.pack.application.topic.activity.model.ParcellableRssFeed;
-import com.pack.pack.model.web.JPackAttachment;
 import com.pack.pack.model.web.JRssSubFeed;
 
 import java.io.File;

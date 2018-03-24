@@ -85,20 +85,20 @@ public class LandingPageActivity extends AppCompatActivity {
                     Intent intent = new Intent(LandingPageActivity.this, NewsActivity.class);
                     startActivity(intent);
                 } else if (position == 2) { // Open My Society
-                    Intent intent = new Intent(LandingPageActivity.this, GenericTopicListActivity.class);
+                    /*Intent intent = new Intent(LandingPageActivity.this, GenericTopicListActivity.class);
                     intent.putExtra(GenericTopicListActivity.CATEGORY_TYPE, ApiConstants.SOCIETY);
                     intent.putExtra(Constants.TOPIC_TYPE, Constants.TOPIC_TYPE_SOCIETY);
-                    startActivity(intent);
+                    startActivity(intent);*/
                 } else if (position == 3) { // Open My Family
-                    Intent intent = new Intent(LandingPageActivity.this, GenericTopicListActivity.class);
+                    /*Intent intent = new Intent(LandingPageActivity.this, GenericTopicListActivity.class);
                     intent.putExtra(GenericTopicListActivity.CATEGORY_TYPE, ApiConstants.FAMILY);
                     intent.putExtra(Constants.TOPIC_TYPE, Constants.TOPIC_TYPE_FAMILY);
-                    startActivity(intent);
+                    startActivity(intent);*/
                 } else if (position == 4) { // Open visions of artists
-                    Intent intent = new Intent(LandingPageActivity.this, GenericTopicListActivity.class);
+                    /*Intent intent = new Intent(LandingPageActivity.this, GenericTopicListActivity.class);
                     intent.putExtra(GenericTopicListActivity.CATEGORY_TYPE, ApiConstants.OTHERS);
                     intent.putExtra(Constants.TOPIC_TYPE, Constants.TOPIC_TYPE_GENERAL);
-                    startActivity(intent);
+                    startActivity(intent);*/
                 } else if (position == 5) { // Open App Settings
                     Intent intent = new Intent(LandingPageActivity.this, SettingsActivity.class);
                     startActivity(intent);

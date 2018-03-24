@@ -28,29 +28,6 @@ public class UserInfo implements DbObject {
 
     private String accessTokenSecret;
 
-    public List<UserOwnedTopicInfo> getUserOwnedTopicInfos() {
-        if(userOwnedTopicInfos == null) {
-            userOwnedTopicInfos = new ArrayList<UserOwnedTopicInfo>();
-        }
-        return userOwnedTopicInfos;
-    }
-
-    public void setUserOwnedTopicInfos(List<UserOwnedTopicInfo> userOwnedTopicInfos) {
-        this.userOwnedTopicInfos = userOwnedTopicInfos;
-    }
-
-    private List<UserOwnedTopicInfo> userOwnedTopicInfos;
-
-    public String getFollowedCategories() {
-        return followedCategories;
-    }
-
-    public void setFollowedCategories(String followedCategories) {
-        this.followedCategories = followedCategories;
-    }
-
-    private String followedCategories;
-
     public UserInfo() {
     }
 
@@ -72,7 +49,6 @@ public class UserInfo implements DbObject {
         setUserId(id);
         setAccessToken(accessToken);
         setAccessTokenSecret(accessTokenSecret);
-        setFollowedCategories(followedCategories);
     }
 
     public String getAccessToken() {
@@ -139,6 +115,6 @@ public class UserInfo implements DbObject {
 
     @Override
     public List<? extends DbObject> getChildrenObjects() {
-        return getUserOwnedTopicInfos();
+        return Collections.emptyList();
     }
 }

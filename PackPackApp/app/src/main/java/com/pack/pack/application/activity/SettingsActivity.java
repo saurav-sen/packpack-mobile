@@ -24,13 +24,11 @@ import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
 import com.pack.pack.application.data.util.ApiConstants;
 import com.pack.pack.application.data.util.UserUtil;
-import com.pack.pack.application.topic.activity.model.ParcelableTopic;
 import com.pack.pack.application.view.ProfilePicturePreference;
 import com.pack.pack.client.api.API;
 import com.pack.pack.client.api.APIBuilder;
 import com.pack.pack.client.api.APIConstants;
 import com.pack.pack.client.api.COMMAND;
-import com.pack.pack.model.web.JTopic;
 import com.pack.pack.model.web.JUser;
 import com.pack.pack.model.web.dto.UserSettings;
 
@@ -76,13 +74,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             String value = o.toString();
             preference.setDefaultValue(value);
             preference.setTitle(value);
-            ParcelableTopic topic = (ParcelableTopic) preference.getExtras().getParcelable(PARCELABLE_TOPIC_KEY);
-            if(topic != null) {
-                key = key.substring(key.indexOf(".")+1);
-                TopicPreferenceSettings[] topicPreferenceSettingses = new TopicPreferenceSettings[] {
-                        new TopicPreferenceSettings(key, value, topic.getTopicId())};
-                new UpdateTopicSettingsTask().execute(topicPreferenceSettingses);
-            } else if(UserSettings.DISPLAY_NAME.equals(key) || UserSettings.USER_ADDRESS.equals(key)){
+            if(UserSettings.DISPLAY_NAME.equals(key) || UserSettings.USER_ADDRESS.equals(key)){
                 PreferenceObj preferenceObj = new PreferenceObj(key, value);
                 JUser user = AppController.getInstance().getUser();
                 if(UserSettings.DISPLAY_NAME.equals(key)) {
@@ -96,7 +88,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
     @Override
     protected boolean isValidFragment(String fragmentName) {
-        return AccountsFragment.class.getName().equals(fragmentName) || TopicSettingsFragment.class.getName().equals(fragmentName);
+        return AccountsFragment.class.getName().equals(fragmentName);
     }
 
     private static void bindPreferenceSummaryToValue(Preference preference) {
@@ -152,22 +144,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             accountsHeader.title = "Accounts";
             target.add(accountsHeader);
         }
-
-        {
-            List<JTopic> userOwnedTopics = AppController.getInstance().getUserOwnedTopics();
-            if(userOwnedTopics != null && !userOwnedTopics.isEmpty()) {
-                for(JTopic userOwnedTopic : userOwnedTopics) {
-                    Header topicSettingsHeader = new Header();
-                    topicSettingsHeader.fragment = "com.pack.pack.application.activity.SettingsActivity$TopicSettingsFragment";
-                    topicSettingsHeader.iconRes = getResources().getIdentifier("topic_settings_icon", "drawable", this.getPackageName());
-                    topicSettingsHeader.title = userOwnedTopic.getName();
-                    Bundle extras = new Bundle();
-                    extras.putParcelable(PARCELABLE_TOPIC_KEY, new ParcelableTopic(userOwnedTopic));
-                    topicSettingsHeader.fragmentArguments = extras;
-                    target.add(topicSettingsHeader);
-                }
-            }
-        }
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
@@ -218,72 +194,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public static class TopicSettingsFragment extends PreferenceFragment {
-
-        @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            //addPreferencesFromResource(R.xml.pref_topics);
-            ParcelableTopic topic = getArguments().getParcelable(PARCELABLE_TOPIC_KEY);
-            setPreferenceScreen(createPreferenceScreen(topic));
-
-            Preference allow_followers_to_promote = findPreference(topic.getTopicId() + ".allow_followers_to_edit");
-            allow_followers_to_promote.getExtras().putParcelable(PARCELABLE_TOPIC_KEY, topic);
-            bindPreferenceSummaryToValue(allow_followers_to_promote);
-
-            /*Preference number_of_promotions = findPreference(topic.getTopicId() + ".number_of_promotions");
-            number_of_promotions.getExtras().putParcelable(PARCELABLE_TOPIC_KEY, topic);
-            bindPreferenceSummaryToValue(number_of_promotions);*/
-
-            Preference enable_live_streaming_service = findPreference(topic.getTopicId() + ".activate");
-            enable_live_streaming_service.getExtras().putParcelable(PARCELABLE_TOPIC_KEY, topic);
-            bindPreferenceSummaryToValue(enable_live_streaming_service);
-
-            Preference enable_notification_service = findPreference(topic.getTopicId() + ".enable_notification_service");
-            enable_notification_service.getExtras().putParcelable(PARCELABLE_TOPIC_KEY, topic);
-            bindPreferenceSummaryToValue(enable_notification_service);
-        }
-
-        private PreferenceScreen createPreferenceScreen(ParcelableTopic topic) {
-            Context context = this.getActivity();
-            PreferenceScreen preferenceScreen = getPreferenceManager().createPreferenceScreen(context);
-
-            SwitchPreference allow_followers_to_promote = new SwitchPreference(context);
-            allow_followers_to_promote.setKey(topic.getTopicId() + ".allow_followers_to_edit");
-            allow_followers_to_promote.setTitle("Allow Topic Followers To Edit");
-            allow_followers_to_promote.setDefaultValue(false);
-            allow_followers_to_promote.setSwitchTextOff("Disabled");
-            allow_followers_to_promote.setSwitchTextOn("Enabled");
-            allow_followers_to_promote.getExtras().putParcelable(PARCELABLE_TOPIC_KEY, topic);
-            preferenceScreen.addPreference(allow_followers_to_promote);
-
-            /*EditTextPreference number_of_promotions = new EditTextPreference(context);
-            number_of_promotions.setKey(topic.getTopicId() + ".number_of_promotions");
-            number_of_promotions.setTitle("Number of promotions");
-            number_of_promotions.setDefaultValue("500");
-            number_of_promotions.getEditText().setInputType(InputType.TYPE_NUMBER_VARIATION_NORMAL);
-            number_of_promotions.getExtras().putParcelable(PARCELABLE_TOPIC_KEY, topic);
-            preferenceScreen.addPreference(number_of_promotions);*/
-
-            SwitchPreference enable_live_streaming_service = new SwitchPreference(context);
-            enable_live_streaming_service.setKey(topic.getTopicId() + ".activate");
-            enable_live_streaming_service.setTitle("Activation Status");
-            enable_live_streaming_service.setDefaultValue(false);
-            enable_live_streaming_service.getExtras().putParcelable(PARCELABLE_TOPIC_KEY, topic);
-            preferenceScreen.addPreference(enable_live_streaming_service);
-
-            SwitchPreference enable_notification_service = new SwitchPreference(context);
-            enable_notification_service.setKey(topic.getTopicId() + ".enable_notification_service");
-            enable_notification_service.setTitle("Enable Notification Service");
-            enable_notification_service.setDefaultValue(false);
-            enable_notification_service.getExtras().putParcelable(PARCELABLE_TOPIC_KEY, topic);
-            preferenceScreen.addPreference(enable_notification_service);
-
-            return preferenceScreen;
-        }
-    }
-
     private static class PreferenceSettings {
 
         private String key;
@@ -309,50 +219,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
         public void setValue(String value) {
             this.value = value;
-        }
-    }
-
-    private static class TopicPreferenceSettings extends PreferenceSettings {
-
-        private String topicId;
-
-        public TopicPreferenceSettings(String key, String value, String topicId) {
-            super(key, value);
-            this.topicId = topicId;
-        }
-
-        public String getTopicId() {
-            return topicId;
-        }
-
-        public void setTopicId(String topicId) {
-            this.topicId = topicId;
-        }
-    }
-
-    private static class UpdateTopicSettingsTask extends AsyncTask<TopicPreferenceSettings, Void, Void> {
-
-        private static final String LOG_TAG = "UpdateTopicSettingsTask";
-
-        @Override
-        protected Void doInBackground(TopicPreferenceSettings... topicPreferenceSettingses) {
-            if(topicPreferenceSettingses == null || topicPreferenceSettingses.length == 0)
-                return null;
-            TopicPreferenceSettings topicPreferenceSettings = topicPreferenceSettingses[0];
-            try {
-                API api = APIBuilder.create(ApiConstants.BASE_URL)
-                        .setAction(COMMAND.EDIT_TOPIC_SETTINGS)
-                        .setOauthToken(AppController.getInstance().getoAuthToken())
-                        .addApiParam(APIConstants.Topic.ID, topicPreferenceSettings.getTopicId())
-                        .addApiParam(APIConstants.User.ID, AppController.getInstance().getUserId())
-                        .addApiParam(APIConstants.TopicSettings.KEY, topicPreferenceSettings.getKey())
-                        .addApiParam(APIConstants.TopicSettings.VALUE, topicPreferenceSettings.getValue())
-                        .build();
-                api.execute();
-            } catch (Exception e) {
-                Log.i(LOG_TAG, e.getMessage(), e);
-            }
-            return null;
         }
     }
 

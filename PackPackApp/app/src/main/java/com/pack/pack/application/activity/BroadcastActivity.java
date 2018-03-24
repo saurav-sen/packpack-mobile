@@ -26,12 +26,8 @@ import android.widget.Toast;
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
 import com.pack.pack.application.adapters.HomeActivityAdapter;
-import com.pack.pack.application.adapters.MainActivityAdapter;
 import com.pack.pack.application.data.util.IAsyncTaskStatusListener;
 import com.pack.pack.application.data.util.RSSFeedTask;
-import com.pack.pack.application.fragments.TabType;
-import com.pack.pack.application.service.NotificationReaderService;
-import com.pack.pack.application.topic.activity.model.ParcelableTopic;
 import com.pack.pack.model.web.JRssFeed;
 import com.pack.pack.model.web.Pagination;
 

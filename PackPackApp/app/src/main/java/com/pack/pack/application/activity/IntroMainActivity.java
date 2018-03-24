@@ -34,7 +34,6 @@ import com.pack.pack.client.api.API;
 import com.pack.pack.client.api.APIConstants;
 import com.pack.pack.client.api.COMMAND;
 import com.pack.pack.model.web.JStatus;
-import com.pack.pack.model.web.JTopic;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -123,11 +122,11 @@ public class IntroMainActivity extends AbstractActivity implements GoogleApiClie
         if(deepLink.indexOf(linkUrlPrefix0) >= 0) {
             String topicID = deepLink.substring(linkUrlPrefix0.length());
             Log.d(LOG_TAG, "getInvitation: deepLinkUri=" + deepLink);
-            new AcceptTopicInviteTask(this).addListener(new AcceptTopicInviteTaskListener()).execute(topicID);
+            //new AcceptTopicInviteTask(this).addListener(new AcceptTopicInviteTaskListener()).execute(topicID);
         } else if(deepLink.indexOf(linkUrlPrefix1) >= 0) {
             String topicID = deepLink.substring(linkUrlPrefix1.length());
             Log.d(LOG_TAG, "getInvitation: deepLinkUri=" + deepLink);
-            new AcceptTopicInviteTask(this).addListener(new AcceptTopicInviteTaskListener()).execute(topicID);
+            //new AcceptTopicInviteTask(this).addListener(new AcceptTopicInviteTaskListener()).execute(topicID);
         }
     }
 
@@ -164,50 +163,4 @@ public class IntroMainActivity extends AbstractActivity implements GoogleApiClie
 
        }
    }
-
-    private class AcceptTopicInviteTask extends AbstractNetworkTask<String, Integer, JStatus> {
-
-        private String errorMsg;
-
-        AcceptTopicInviteTask(Context context) {
-            super(false, false, context, false);
-        }
-
-        @Override
-        protected COMMAND command() {
-            return COMMAND.FOLLOW_TOPIC;
-        }
-
-        @Override
-        protected String getFailureMessage() {
-            return errorMsg;
-        }
-
-        @Override
-        protected String getContainerIdForObjectStore() {
-            return null;
-        }
-
-        @Override
-        protected Map<String, Object> prepareApiParams(String inputObject) {
-            if(inputObject == null)
-                return null;
-            Map<String, Object> apiParams = new HashMap<String, Object>();
-            apiParams.put(APIConstants.User.ID, AppController.getInstance().getUserId());
-            apiParams.put(APIConstants.Topic.ID, inputObject);
-            return apiParams;
-        }
-
-        @Override
-        protected JStatus executeApi(API api) throws Exception {
-            JStatus status = null;
-            try {
-                status = (JStatus) api.execute();
-            } catch (Exception e) {
-                Log.d(LOG_TAG, e.getMessage());
-                errorMsg = "Failed accepting the invite";
-            }
-            return status;
-        }
-    }
 }

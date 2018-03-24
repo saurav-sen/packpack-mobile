@@ -9,14 +9,10 @@ import com.pack.pack.application.data.LoggedInUserInfo;
 import com.pack.pack.application.db.DBUtil;
 import com.pack.pack.application.db.DbObject;
 import com.pack.pack.application.db.UserInfo;
-import com.pack.pack.application.db.UserOwnedTopicInfo;
 import com.pack.pack.client.api.API;
 import com.pack.pack.client.api.APIBuilder;
 import com.pack.pack.client.api.APIConstants;
 import com.pack.pack.client.api.COMMAND;
-import com.pack.pack.model.web.JCategories;
-import com.pack.pack.model.web.JTopic;
-import com.pack.pack.model.web.JTopics;
 import com.pack.pack.model.web.JUser;
 import com.pack.pack.oauth1.client.AccessToken;
 
@@ -45,8 +41,6 @@ public class LoginTask extends AbstractNetworkTask<UserInfo, Integer, AccessToke
     private String followedCategories;
 
     private boolean refreshToken = false;
-
-    private List<UserOwnedTopicInfo> userOwnedTopicInfos = new ArrayList<UserOwnedTopicInfo>();
 
     public LoginTask(Context context) {
         super(false, true, context, false);
@@ -109,31 +103,6 @@ public class LoginTask extends AbstractNetworkTask<UserInfo, Integer, AccessToke
                 followedCategories = stringBuilder.toString();
             }
 
-            // GET user owned topics
-            api = APIBuilder
-                    .create(ApiConstants.BASE_URL)
-                    .setAction(COMMAND.GET_USER_OWNED_TOPICS)
-                    .setOauthToken(AppController.getInstance().getoAuthToken())
-                    .addApiParam(APIConstants.User.ID, user.getId())
-                    .build();
-            List<JTopic> userOwnedTopics = (List<JTopic>) api.execute();
-            AppController.getInstance().getUserOwnedTopics().clear();
-            AppController.getInstance().getUserOwnedTopics().addAll(userOwnedTopics);
-            if(userOwnedTopics != null && !userOwnedTopics.isEmpty()) {
-                for(JTopic userOwnedTopic : userOwnedTopics) {
-                    UserOwnedTopicInfo userOwnedTopicInfo = new UserOwnedTopicInfo(userOwnedTopic);
-                    userOwnedTopicInfos.add(userOwnedTopicInfo);
-                }
-            }
-
-            // GET list of all system supported categories
-            api = APIBuilder
-                    .create(ApiConstants.BASE_URL)
-                    .setAction(COMMAND.GET_ALL_SYSTEM_SUPPORTED_CATEGORIES)
-                    .build();
-            JCategories supportedCategories = (JCategories)api.execute();
-            AppController.getInstance().setSupportedCategories(supportedCategories);
-
             api = APIBuilder
                     .create(ApiConstants.BASE_URL)
                     .setAction(COMMAND.ANDROID_APK_URL)
@@ -154,12 +123,6 @@ public class LoginTask extends AbstractNetworkTask<UserInfo, Integer, AccessToke
         userInfo.setAccessTokenSecret(successResult.getTokenSecret());
         userInfo.setUserId(user.getId());
         userInfo.setUsername(user.getUsername());
-        userInfo.setFollowedCategories("" + followedCategories);
-        if(userOwnedTopicInfos != null && !userOwnedTopicInfos.isEmpty()) {
-            for(UserOwnedTopicInfo userOwnedTopicInfo : userOwnedTopicInfos) {
-                userInfo.getUserOwnedTopicInfos().add(userOwnedTopicInfo);
-            }
-        }
         return userInfo;
     }
 
@@ -205,12 +168,6 @@ public class LoginTask extends AbstractNetworkTask<UserInfo, Integer, AccessToke
         if(userInfo != null && userInfo.getAccessToken() != null && userInfo.getAccessTokenSecret() != null) {
             AppController.getInstance().setoAuthToken(userInfo.getAccessToken());
             user = DBUtil.convertUserInfo(userInfo);
-            List<JTopic> userOwnedTopics = DBUtil.convertUserOwnedTopicInfo(
-                    userInfo.getUserOwnedTopicInfos());
-            AppController.getInstance().getUserOwnedTopics().clear();
-            if(userOwnedTopics != null) {
-                AppController.getInstance().getUserOwnedTopics().addAll(userOwnedTopics);
-            }
             AppController.getInstance().setUser(user);
             return  new AccessToken() {
                 @Override

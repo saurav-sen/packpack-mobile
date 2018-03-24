@@ -4,16 +4,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import com.pack.pack.application.db.AttachmentInfo;
-import com.pack.pack.application.db.DbObject;
-import com.pack.pack.application.db.JsonModel;
-import com.pack.pack.application.db.PaginationInfo;
-import com.pack.pack.application.db.UserInfo;
 import com.pack.pack.common.util.JSONUtil;
-import com.pack.pack.model.web.JDiscussion;
-import com.pack.pack.model.web.JPack;
-import com.pack.pack.model.web.JPackAttachment;
-import com.pack.pack.model.web.JTopic;
 import com.pack.pack.model.web.JUser;
 import com.pack.pack.services.exception.PackPackException;
 
@@ -29,42 +20,6 @@ public class DBUtil {
     private static final String LOG_TAG = "DBUtil";
 
     private DBUtil() {
-    }
-
-    private static List<UserOwnedTopicInfo> loadUserOwnedTopicInfos(SQLiteDatabase readable) {
-        Cursor cursor = null;
-        List<UserOwnedTopicInfo> userOwnedTopicInfos = new ArrayList<UserOwnedTopicInfo>();
-        try {
-            String[] projection = new String[] {UserOwnedTopicInfo._ID, UserOwnedTopicInfo.ENTITY_ID,
-                    UserOwnedTopicInfo.TABLE_NAME, UserOwnedTopicInfo.TOPIC_DESCRIPTION, UserOwnedTopicInfo.OWNER_ID,
-                    UserOwnedTopicInfo.TOPIC_CATEGORY, UserOwnedTopicInfo.TOPIC_WALLPAPER_URL};
-            try {
-                cursor = readable.query(UserOwnedTopicInfo.TABLE_NAME, projection, null, null,
-                        null, null, null);
-
-                if(cursor.moveToFirst()) {
-                    do {
-                        long id = cursor.getLong(cursor.getColumnIndexOrThrow(UserOwnedTopicInfo._ID));
-                        String topicId = cursor.getString(cursor.getColumnIndexOrThrow(UserOwnedTopicInfo.ENTITY_ID));
-                        String topicName = cursor.getString(cursor.getColumnIndexOrThrow(UserOwnedTopicInfo.TOPIC_NAME));
-                        String topicDescription = cursor.getString(cursor.getColumnIndexOrThrow(UserOwnedTopicInfo.TOPIC_DESCRIPTION));
-                        String ownerId = cursor.getString(cursor.getColumnIndexOrThrow(UserOwnedTopicInfo.OWNER_ID));
-                        String topicCategory = cursor.getString(cursor.getColumnIndexOrThrow(UserOwnedTopicInfo.TOPIC_CATEGORY));
-                        String topicWallpaperUrl = cursor.getString(cursor.getColumnIndexOrThrow(UserOwnedTopicInfo.TOPIC_WALLPAPER_URL));
-                        UserOwnedTopicInfo userOwnedTopicInfo = new UserOwnedTopicInfo(topicId, topicName, topicDescription,
-                                ownerId, topicCategory, topicWallpaperUrl);
-                        userOwnedTopicInfos.add(userOwnedTopicInfo);
-                    } while(cursor.moveToNext());
-                }
-            } finally {
-                if(cursor != null && !cursor.isClosed()) {
-                    cursor.close();
-                }
-            }
-        } catch (Exception e) {
-            Log.d(LOG_TAG, e.getMessage());
-        }
-        return userOwnedTopicInfos;
     }
 
     public static UserInfo loadLastLoggedInUserInfo(SQLiteDatabase readable) {
@@ -84,10 +39,8 @@ public class DBUtil {
                         String userName = cursor.getString(cursor.getColumnIndexOrThrow(UserInfo.USER_NAME));
                         String accessToken = cursor.getString(cursor.getColumnIndexOrThrow(UserInfo.ACCESS_TOKEN));
                         String accessTokenSecret = cursor.getString(cursor.getColumnIndexOrThrow(UserInfo.ACCESS_TOKEN_SECRET));
-                        String followedCategories = cursor.getString(cursor.getColumnIndexOrThrow(UserInfo.FOLLWED_CATEGORIES));
-                        UserInfo userInfo = new UserInfo(userName, userId, accessToken, accessTokenSecret, followedCategories);
-                        List<UserOwnedTopicInfo> userOwnedTopicInfos = loadUserOwnedTopicInfos(readable);
-                        userInfo.setUserOwnedTopicInfos(userOwnedTopicInfos);
+                        //String followedCategories = cursor.getString(cursor.getColumnIndexOrThrow(UserInfo.FOLLWED_CATEGORIES));
+                        UserInfo userInfo = new UserInfo(userName, userId, accessToken, accessTokenSecret);//, followedCategories);
                         return userInfo;
                     } while(cursor.moveToNext());
                 }
@@ -103,7 +56,7 @@ public class DBUtil {
     }
 
     public static DbObject convert(Object object, String containerId) {
-        if(object == null)
+       /* if(object == null)
             return null;
         if(object instanceof JTopic) {
             return convertToJsonModel((JTopic) object, containerId);
@@ -111,11 +64,11 @@ public class DBUtil {
             return convertToJsonModel((JPack)object, containerId);
         } else if(object instanceof JPackAttachment) {
             return convertJPackAttachment((JPackAttachment) object, containerId);
-        }
+        }*/
         return null;
     }
 
-    private static JsonModel convertToJsonModel(JTopic topic, String containerId) {
+   /* private static JsonModel convertToJsonModel(JTopic topic, String containerId) {
         JsonModel jsonModel = new JsonModel();
         try {
             jsonModel.setEntityId(topic.getId());
@@ -126,9 +79,9 @@ public class DBUtil {
             Log.d(LOG_TAG, e.getMessage());
         }
         return jsonModel;
-    }
+    }*/
 
-    private static JsonModel convertToJsonModel(JPack pack, String containerId) {
+    /*private static JsonModel convertToJsonModel(JPack pack, String containerId) {
         JsonModel jsonModel = new JsonModel();
         try {
             jsonModel.setEntityId(pack.getId());
@@ -139,9 +92,9 @@ public class DBUtil {
             Log.d(LOG_TAG, e.getMessage());
         }
         return jsonModel;
-    }
+    }*/
 
-    private static AttachmentInfo convertJPackAttachment(JPackAttachment attachment, String containerId) {
+   /* private static AttachmentInfo convertJPackAttachment(JPackAttachment attachment, String containerId) {
         AttachmentInfo attachmentInfo = null;
         try {
             attachmentInfo = new AttachmentInfo();
@@ -155,7 +108,7 @@ public class DBUtil {
             Log.d(LOG_TAG, e.getMessage());
         }
         return attachmentInfo;
-    }
+    }*/
 
     public static JUser convertUserInfo(UserInfo userInfo) {
         JUser user = new JUser();
@@ -164,7 +117,7 @@ public class DBUtil {
         return user;
     }
 
-    public static List<JTopic> convertUserOwnedTopicInfo(List<UserOwnedTopicInfo> userOwnedTopicInfos) {
+   /* public static List<JTopic> convertUserOwnedTopicInfo(List<UserOwnedTopicInfo> userOwnedTopicInfos) {
         List<JTopic> result = new ArrayList<JTopic>();
         if(userOwnedTopicInfos != null && !userOwnedTopicInfos.isEmpty()) {
             for(UserOwnedTopicInfo userOwnedTopicInfo : userOwnedTopicInfos) {
@@ -182,7 +135,7 @@ public class DBUtil {
         topic.setCategory(userOwnedTopicInfo.getCategory());
         topic.setWallpaperUrl(userOwnedTopicInfo.getWallpaperUrl());
         return topic;
-    }
+    }*/
 
     public static <T> T loadJsonModelByEntityId(SQLiteDatabase writable, String entityId, Class<T> classType) {
         String type = classType.getName();
@@ -247,7 +200,7 @@ public class DBUtil {
         return loadPaginationInfo(readable, entityId, null);
     }
 
-    public static List<JPackAttachment> loadAllAttachmentInfo(SQLiteDatabase readable, String containerId) {
+    /*public static List<JPackAttachment> loadAllAttachmentInfo(SQLiteDatabase readable, String containerId) {
         Cursor cursor = null;
         List<JPackAttachment> attachments = new LinkedList<JPackAttachment>();
         try {
@@ -271,7 +224,7 @@ public class DBUtil {
             }
         }
         return attachments != null && !attachments.isEmpty() ? attachments : null;
-    }
+    }*/
 
     public static PaginationInfo loadPaginationInfo(SQLiteDatabase readable, String entityId, String type) {
         Cursor cursor = null;
@@ -303,7 +256,7 @@ public class DBUtil {
         return paginationInfo;
     }
 
-    public static List<JDiscussion> getDiscussionInfosBasedUponContainerId(SQLiteDatabase readable, String containerId, String containerType) {
+    /*public static List<JDiscussion> getDiscussionInfosBasedUponContainerId(SQLiteDatabase readable, String containerId, String containerType) {
         Cursor cursor = null;
         List<JDiscussion> infos = null;
         try {
@@ -342,5 +295,5 @@ public class DBUtil {
             }
         }
         return infos;
-    }
+    }*/
 }

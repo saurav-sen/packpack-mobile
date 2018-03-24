@@ -11,43 +11,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.Toast;
 
-import com.pack.pack.application.AppController;
 import com.pack.pack.application.Constants;
 import com.pack.pack.application.R;
-import com.pack.pack.application.adapters.TopicThumbnailViewAdapter;
-import com.pack.pack.application.data.cache.ImageVideoShareDataHolder;
-import com.pack.pack.application.data.cache.PackAttachmentsCache;
-import com.pack.pack.application.data.util.AbstractNetworkTask;
-import com.pack.pack.application.data.util.ApiConstants;
-import com.pack.pack.application.data.util.FileUtil;
-import com.pack.pack.application.data.util.IAsyncTaskStatusListener;
-import com.pack.pack.application.data.util.ReadCopiedLink;
-import com.pack.pack.application.db.DBUtil;
-import com.pack.pack.application.db.PaginationInfo;
-import com.pack.pack.application.db.UserInfo;
-import com.pack.pack.application.service.UploadImageAttachmentService;
-import com.pack.pack.application.topic.activity.model.ParcelableTopic;
-import com.pack.pack.client.api.API;
-import com.pack.pack.client.api.APIConstants;
-import com.pack.pack.client.api.COMMAND;
-import com.pack.pack.common.util.JSONUtil;
-import com.pack.pack.model.web.JPackAttachment;
-import com.pack.pack.model.web.JRssFeed;
-import com.pack.pack.model.web.JTopic;
-import com.pack.pack.model.web.PackAttachmentType;
-import com.pack.pack.model.web.Pagination;
-import com.pack.pack.services.exception.PackPackException;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+/*import com.pack.pack.application.data.cache.ImageVideoShareDataHolder;
+import com.pack.pack.application.data.cache.PackAttachmentsCache;*/
 import java.util.UUID;
 
 import static com.pack.pack.application.AppController.TOPIC_ID_KEY;
@@ -56,9 +26,9 @@ public class ImageVideoShareReceiveActivity extends AppCompatActivity {
 
     private ListView share_receive_list;
 
-    private TopicThumbnailViewAdapter adapter;
+    /*private TopicThumbnailViewAdapter adapter;
 
-    private Pagination<JTopic> page;
+    private Pagination<JTopic> page;*/
 
     private Uri imageUri;
 
@@ -75,7 +45,7 @@ public class ImageVideoShareReceiveActivity extends AppCompatActivity {
         sharedText = getIntent().getStringExtra(Constants.SHARED_TEXT_OR_URL_KEY);
 
         share_receive_list = (ListView) findViewById(R.id.share_receive_list);
-        adapter = new TopicThumbnailViewAdapter(this, new ArrayList<JTopic>());
+       /* adapter = new TopicThumbnailViewAdapter(this, new ArrayList<JTopic>());
         share_receive_list.setAdapter(adapter);
         share_receive_list.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
@@ -92,11 +62,11 @@ public class ImageVideoShareReceiveActivity extends AppCompatActivity {
             public void onScroll(AbsListView absListView, int i, int i1, int i2) {
 
             }
-        });
+        });*/
         share_receive_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                JTopic topic = adapter.getTopics().get(position);
+                /*JTopic topic = adapter.getTopics().get(position);
                 if(imageUri != null) {
                     uploadSharedImage(topic);
                 } else if(sharedText != null) {
@@ -106,11 +76,11 @@ public class ImageVideoShareReceiveActivity extends AppCompatActivity {
                     Intent intent = new Intent(ImageVideoShareReceiveActivity.this, LandingPageActivity.class);
                     finish();
                     startActivity(intent);
-                }
+                }*/
             }
         });
 
-        new LoadAllFamilyAndSocietyTask().execute(AppController.getInstance().getUserId());
+        /*new LoadAllFamilyAndSocietyTask().execute(AppController.getInstance().getUserId());*/
     }
 
     private void showProgressDialog() {
@@ -121,7 +91,7 @@ public class ImageVideoShareReceiveActivity extends AppCompatActivity {
 
     }
 
-    private void uploadSharedText(JTopic topic) {
+   /* private void uploadSharedText(JTopic topic) {
         sharedText = sharedText.trim();
         if(sharedText.startsWith("http://") || sharedText.startsWith("https://")) {
             uploadExternalLink(topic);
@@ -210,9 +180,9 @@ public class ImageVideoShareReceiveActivity extends AppCompatActivity {
             }
         };
         new ReadCopiedLink(ImageVideoShareReceiveActivity.this, listener).execute(sharedText);
-    }
+    }*/
 
-    private void uploadSharedFeed(final JTopic topic, JRssFeed sharedFeedForUpload) {
+   /* private void uploadSharedFeed(final JTopic topic, JRssFeed sharedFeedForUpload) {
         ExternalLinkAttchmentData uploadData = new ExternalLinkAttchmentData();
         uploadData.setTopicId(topic.getId());
         uploadData.setUserId(AppController.getInstance().getUserId());
@@ -264,9 +234,9 @@ public class ImageVideoShareReceiveActivity extends AppCompatActivity {
         };
 
         new UploadExternalLink(ImageVideoShareReceiveActivity.this, uploadLinkListener).execute(uploadData);
-    }
+    }*/
 
-    private void uploadSharedImage(JTopic topic) {
+   /* private void uploadSharedImage(JTopic topic) {
         try {
             Uri uri = imageUri;
             if(!FileUtil.checkUploadSize(this, uri)) {
@@ -276,16 +246,7 @@ public class ImageVideoShareReceiveActivity extends AppCompatActivity {
             Bitmap bitmap = MediaStore.Images.Media.getBitmap(
                     getContentResolver(), uri);
             startUploadActivity(bitmap, topic);
-           /* if(!ApiConstants.IS_PRODUCTION_ENV) {
-                Bitmap bitmap = MediaStore.Images.Media.getBitmap(
-                        getContentResolver(), data.getData());
-                startUploadActivity(bitmap);
-            } else {
-                Uri selectedPhotoUri = data.getData();
-                String path = FileUtil.getPath(this, selectedPhotoUri);
-                AppController.getInstance().getUploadAttachmentData().setMediaFileUri(selectedPhotoUri);
-                startUploadActivity(path, true);
-            }*/
+
         } catch (IOException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
             Toast.makeText(getApplicationContext(),
@@ -303,12 +264,12 @@ public class ImageVideoShareReceiveActivity extends AppCompatActivity {
 
         ImageVideoShareDataHolder.getInstance().addTopic(topic);
         startActivityForResult(intent, Constants.SHARED_IMAGE_UPLOAD_REQUEST_CODE);
-    }
+    }*/
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode) {
+        /*switch (requestCode) {
             case Constants.SHARED_IMAGE_UPLOAD_REQUEST_CODE:
                 JPackAttachment attachment = null;
                 try {
@@ -324,13 +285,12 @@ public class ImageVideoShareReceiveActivity extends AppCompatActivity {
                 } catch (PackPackException e) {
                     Log.e(LOG_TAG, e.getMessage(), e);
                 }
-                //setResult(RESULT_OK, data);
                 finish();
                 break;
-        }
+        }*/
     }
 
-    private class UploadTask extends AsyncTask<Void, Void, Void> {
+    /*private class UploadTask extends AsyncTask<Void, Void, Void> {
 
         private JPackAttachment attachment;
 
@@ -387,18 +347,6 @@ public class ImageVideoShareReceiveActivity extends AppCompatActivity {
             super(false, false, ImageVideoShareReceiveActivity.this, false);
         }
 
-        /*@Override
-        protected Pagination<JTopic> doInBackground(Void... inputObjects) {
-            *//*if(xes == null || xes.length == 0)
-                return null;*//*
-            //setInputObject(null);
-            Pagination<JTopic> page = null;
-            page = doRetrieveFromDB(getSquillDbHelper().getReadableDatabase(), getInputObject());
-            if(page == null) {
-                page = doExecuteInBackground(null);
-            }
-            return page;
-        }*/
 
         @Override
         protected String getFailureMessage() {
@@ -650,5 +598,5 @@ public class ImageVideoShareReceiveActivity extends AppCompatActivity {
         public void setAttachmentThumbnailUrl(String attachmentThumbnailUrl) {
             this.attachmentThumbnailUrl = attachmentThumbnailUrl;
         }
-    }
+    }*/
 }
