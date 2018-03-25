@@ -26,11 +26,11 @@ public class LandingPageActivity extends AppCompatActivity {
     private GridView landing_page_grid;
 
     private static String[] texts = new String[] {
-            "Refreshments",
+            "Jsut Like That",
             "News",
-            "My Society",
-            "My Family",
-            "Visionaries",
+            "Sports",
+            "Science & Technology",
+            "Articles",
             "Settings"
     };
     private static int[] imageIds = new int[] {
@@ -84,11 +84,9 @@ public class LandingPageActivity extends AppCompatActivity {
                 } else if (position == 1) { // Open news
                     Intent intent = new Intent(LandingPageActivity.this, NewsActivity.class);
                     startActivity(intent);
-                } else if (position == 2) { // Open My Society
-                    /*Intent intent = new Intent(LandingPageActivity.this, GenericTopicListActivity.class);
-                    intent.putExtra(GenericTopicListActivity.CATEGORY_TYPE, ApiConstants.SOCIETY);
-                    intent.putExtra(Constants.TOPIC_TYPE, Constants.TOPIC_TYPE_SOCIETY);
-                    startActivity(intent);*/
+                } else if (position == 2) { // Open Sports News
+                    Intent intent = new Intent(LandingPageActivity.this, SportsActivity.class);
+                    startActivity(intent);
                 } else if (position == 3) { // Open My Family
                     /*Intent intent = new Intent(LandingPageActivity.this, GenericTopicListActivity.class);
                     intent.putExtra(GenericTopicListActivity.CATEGORY_TYPE, ApiConstants.FAMILY);

@@ -4,11 +4,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:paddingTop="95dp"
-    android:id="@+id/news_broadcast">
+    android:id="@+id/sports_broadcast">
 
     <ListView
-        android:id="@+id/shared_feeds"
+        android:id="@+id/sports_feeds"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:paddingTop="0dp"

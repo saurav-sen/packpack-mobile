@@ -83,30 +83,6 @@ public class IntroMainActivity extends AbstractActivity implements GoogleApiClie
                 }
             }
         });
-
-      /* mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this, this)
-                .addApi(AppInvite.API)
-                .build();
-
-        boolean autoLaunchDeepLink = false;
-        AppInvite.AppInviteApi.getInvitation(mGoogleApiClient, this, autoLaunchDeepLink)
-                .setResultCallback(
-                        new ResultCallback<AppInviteInvitationResult>() {
-                            @Override
-                            public void onResult(@NonNull AppInviteInvitationResult result) {
-                                if (result.getStatus().isSuccess()) {
-                                    Intent intent = result.getInvitationIntent();
-                                    String deepLink = AppInviteReferral.getDeepLink(intent);
-
-                                    handleDeepLinkBasedRouting(deepLink);
-                                } else {
-                                    Log.d(LOG_TAG, "getInvitation: no deep link found.");
-                                }
-                            }
-                        });*/
-
-
     }
 
     @Override

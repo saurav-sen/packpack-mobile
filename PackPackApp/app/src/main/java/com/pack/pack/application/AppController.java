@@ -128,8 +128,6 @@ public class AppController extends Application {
     public static final String ANDROID_APP_CLIENT_KEY = "53e8a1f2-7568-4ac8-ab26-45738ca02599";
     public static final String ANDROID_APP_CLIENT_SECRET = "b1f6d761-dcb7-482b-a695-ab17e4a29b25";
 
-    private static final String USERNAME = "sourabhnits@gmail.com";
-
     public static final int APP_EXTERNAL_STORAGE_READ_REQUEST_CODE = 114;
     public static final int APP_EXTERNAL_STORAGE_WRITE_REQUEST_CODE = 115;
     public static final int CAMERA_ACCESS_REQUEST_CODE = 116;
