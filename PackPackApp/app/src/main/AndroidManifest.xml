@@ -75,20 +75,6 @@
         </intent-filter>
 
         <activity
-            android:name=".activity.PackDetailActivity"
-            android:label="SQUILL"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".activity.InsideTopicActivity"
-            android:label="SQUILL"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".activity.PackAttachmentCommentsActivity" />
-        <activity android:name=".activity.ImageVideoCaptureActivity" />
-        <activity
-            android:name=".activity.UploadActivity"
-            android:label="SQUILL"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
             android:name=".activity.FullScreenPlayVideoActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="SQUILL"
@@ -99,11 +85,6 @@
         <service
             android:name=".service.FetchAddressIntentService"
             android:exported="false" />
-        <service android:name=".service.UploadVideoAttachmentService" />
-        <service android:name=".service.UploadImageAttachmentService" />
-        <activity
-            android:name=".activity.FollowCategoryActivity"
-            android:label="FollowCategoryActivity" />
         <activity
             android:name=".activity.SettingsActivity"
             android:label="Settings" />
@@ -142,8 +123,6 @@
             android:exported="true" />
 
         <activity android:name=".activity.NoConnectionEmptyActivity" />
-        <activity android:name=".activity.AttachmentStoryEditActivity" />
-        <activity android:name=".activity.AttachmentStoryReaderActivity" />
         <activity
             android:name=".activity.IntroMainActivity"
             android:label="SQUILL"
@@ -203,19 +182,10 @@
             </intent-filter>
         </service>
 
-        <activity android:name=".activity.TopicEditActivity" />
         <activity android:name=".activity.LandingPageActivity" />
         <activity
             android:name=".activity.BroadcastActivity"
             android:label="@string/title_activity_refreshments" />
-        <activity
-            android:name=".activity.MyFamilyActivity"
-            android:label="@string/title_activity_my_family"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".activity.MySocietyActivity"
-            android:label="@string/title_activity_my_society"
-            android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".activity.NewsActivity" />
         <activity
             android:name=".activity.FullScreenNewsViewActivity"
@@ -227,7 +197,6 @@
         <activity android:name=".activity.ImageVideoShareReceiveActivity"
             android:launchMode="singleInstance">
         </activity>
-        <activity android:name=".activity.UploadActivity2"></activity>
     </application>
 
 </manifest>
