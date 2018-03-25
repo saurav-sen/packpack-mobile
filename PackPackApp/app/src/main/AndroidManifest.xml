@@ -140,6 +140,7 @@
             android:label="@string/title_activity_refreshments" />
         <activity android:name=".activity.NewsActivity" />
         <activity android:name=".activity.SportsActivity" />
+        <activity android:name=".activity.ScienceNewsActivity" />
         <activity
             android:name=".activity.FullScreenNewsViewActivity"
             android:label="@string/title_activity_generic_topic_list"

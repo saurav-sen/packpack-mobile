@@ -78,20 +78,18 @@ public class LandingPageActivity extends AppCompatActivity {
         landing_page_grid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (position == 0) { // Open broadcast
+                if (position == 0) { // Open broadcast (Just like that)
                     Intent intent = new Intent(LandingPageActivity.this, BroadcastActivity.class);
                     startActivity(intent);
-                } else if (position == 1) { // Open news
+                } else if (position == 1) { // Open news (News)
                     Intent intent = new Intent(LandingPageActivity.this, NewsActivity.class);
                     startActivity(intent);
-                } else if (position == 2) { // Open Sports News
+                } else if (position == 2) { // Open Sports News (Sports)
                     Intent intent = new Intent(LandingPageActivity.this, SportsActivity.class);
                     startActivity(intent);
-                } else if (position == 3) { // Open My Family
-                    /*Intent intent = new Intent(LandingPageActivity.this, GenericTopicListActivity.class);
-                    intent.putExtra(GenericTopicListActivity.CATEGORY_TYPE, ApiConstants.FAMILY);
-                    intent.putExtra(Constants.TOPIC_TYPE, Constants.TOPIC_TYPE_FAMILY);
-                    startActivity(intent);*/
+                } else if (position == 3) { // Open Science & Technology News (Science & Technology)
+                    Intent intent = new Intent(LandingPageActivity.this, ScienceNewsActivity.class);
+                    startActivity(intent);
                 } else if (position == 4) { // Open visions of artists
                     /*Intent intent = new Intent(LandingPageActivity.this, GenericTopicListActivity.class);
                     intent.putExtra(GenericTopicListActivity.CATEGORY_TYPE, ApiConstants.OTHERS);
