@@ -90,11 +90,9 @@ public class LandingPageActivity extends AppCompatActivity {
                 } else if (position == 3) { // Open Science & Technology News (Science & Technology)
                     Intent intent = new Intent(LandingPageActivity.this, ScienceNewsActivity.class);
                     startActivity(intent);
-                } else if (position == 4) { // Open visions of artists
-                    /*Intent intent = new Intent(LandingPageActivity.this, GenericTopicListActivity.class);
-                    intent.putExtra(GenericTopicListActivity.CATEGORY_TYPE, ApiConstants.OTHERS);
-                    intent.putExtra(Constants.TOPIC_TYPE, Constants.TOPIC_TYPE_GENERAL);
-                    startActivity(intent);*/
+                } else if (position == 4) { // Open Articles/Editorials (Articles)
+                    Intent intent = new Intent(LandingPageActivity.this, ArticlesActivity.class);
+                    startActivity(intent);
                 } else if (position == 5) { // Open App Settings
                     Intent intent = new Intent(LandingPageActivity.this, SettingsActivity.class);
                     startActivity(intent);
