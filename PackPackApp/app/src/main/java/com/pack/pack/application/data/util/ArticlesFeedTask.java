@@ -62,7 +62,7 @@ public class ArticlesFeedTask extends AbstractNetworkTask<String, Integer, Pagin
 
     @Override
     protected COMMAND command() {
-        return COMMAND.GET_ALL_SPORTS_NEWS_FEEDS;
+        return COMMAND.GET_ALL_ARTICLES_FEEDS;
     }
 
     @Override
