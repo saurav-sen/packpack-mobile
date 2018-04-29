@@ -8,7 +8,7 @@ import com.pack.pack.application.data.cache.RssFeedCache;
 import com.pack.pack.client.api.API;
 import com.pack.pack.client.api.APIConstants;
 import com.pack.pack.client.api.COMMAND;
-import com.pack.pack.model.web.JRssFeed;
+import com.squill.feed.web.model.JRssFeed;
 import com.pack.pack.model.web.Pagination;
 
 import java.util.HashMap;

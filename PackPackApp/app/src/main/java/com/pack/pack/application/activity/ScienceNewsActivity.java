@@ -12,7 +12,7 @@ import com.pack.pack.application.R;
 import com.pack.pack.application.adapters.ScienceNewsActivityAdapter;
 import com.pack.pack.application.data.util.IAsyncTaskStatusListener;
 import com.pack.pack.application.data.util.ScienceNewsFeedTask;
-import com.pack.pack.model.web.JRssFeed;
+import com.squill.feed.web.model.JRssFeed;
 import com.pack.pack.model.web.Pagination;
 
 import java.util.LinkedList;

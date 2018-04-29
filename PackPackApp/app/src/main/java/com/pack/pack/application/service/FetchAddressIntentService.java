@@ -59,7 +59,7 @@ public class FetchAddressIntentService extends IntentService implements Location
         Location location = null;
         locationManager = (LocationManager) this.getSystemService(LOCATION_SERVICE);
         geocoder = new Geocoder(this, Locale.getDefault());
-        if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             Criteria c = new Criteria();
             String provider = locationManager.getBestProvider(c, false);

@@ -30,8 +30,8 @@ import com.pack.pack.application.view.util.ExternalLinkShareUtil;
 import com.pack.pack.application.view.util.ViewUtil;
 import com.pack.pack.client.api.APIConstants;
 import com.pack.pack.client.api.COMMAND;
-import com.pack.pack.model.web.JRssFeed;
-import com.pack.pack.model.web.JRssSubFeed;
+import com.squill.feed.web.model.JRssFeed;
+import com.squill.feed.web.model.JRssSubFeed;
 
 import java.util.ArrayList;
 import java.util.HashMap;

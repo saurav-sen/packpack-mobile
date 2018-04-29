@@ -14,7 +14,7 @@ import com.pack.pack.application.adapters.NewsActivityAdapter;
 import com.pack.pack.application.data.util.IAsyncTaskStatusListener;
 import com.pack.pack.application.data.util.NewsFeedTask;
 import com.pack.pack.application.data.util.RSSFeedTask;
-import com.pack.pack.model.web.JRssFeed;
+import com.squill.feed.web.model.JRssFeed;
 import com.pack.pack.model.web.Pagination;
 
 import java.util.LinkedList;

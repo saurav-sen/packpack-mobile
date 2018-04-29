@@ -16,7 +16,7 @@ import com.pack.pack.application.R;
 import com.pack.pack.application.activity.FullScreenNewsViewActivity;
 import com.pack.pack.application.data.util.DownloadFeedImageTask;
 import com.pack.pack.application.view.util.ExternalLinkShareUtil;
-import com.pack.pack.model.web.JRssFeed;
+import com.squill.feed.web.model.JRssFeed;
 
 import java.util.List;
 

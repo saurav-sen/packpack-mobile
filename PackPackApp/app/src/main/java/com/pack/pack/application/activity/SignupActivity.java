@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
+import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Handler;
@@ -51,7 +52,7 @@ import java.util.Map;
 import static com.pack.pack.application.AppController.FAILURE_RESULT;
 import static com.pack.pack.application.AppController.LOCATION_PARCELABLE_ADDRESS_KEY;
 import static com.pack.pack.application.AppController.RESULT_RECEIVER;
-import static com.pack.pack.application.AppController.LOCATION_FINE_ACCESS_REQUEST_CODE;
+import static com.pack.pack.application.AppController.LOCATION_COARSE_ACCESS_REQUEST_CODE;
 import static com.pack.pack.application.AppController.SUCCESS_RESULT;
 import static com.pack.pack.application.AppController.PLACE_AUTO_COMPLETE_REQ_CODE;
 
@@ -60,14 +61,12 @@ import static com.pack.pack.application.AppController.PLACE_AUTO_COMPLETE_REQ_CO
  * @author Saurav
  *
  */
-public class SignupActivity extends AbstractAppCompatActivity {
+public class SignupActivity extends AbstractAppCompatActivity implements IAsyncTaskStatusListener {
 
     private EditText input_name;
     private EditText input_email;
     private EditText input_password;
     private EditText input_password_confirm;
-    private EditText input_city;
-    private EditText input_country;
     private AppCompatButton btn_signup;
     private TextView link_login;
 
@@ -78,16 +77,23 @@ public class SignupActivity extends AbstractAppCompatActivity {
     private static final long MIN_DISTANCE_FOR_UPDATE = 10;
     private static final long MIN_TIME_FOR_UPDATE = 1000 * 60 * 2;
 
+    private String email;
+    private String passwd;
+    private String name;
+
+    private double longitude = -1;
+    private double latitude = -1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
 
-        if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    LOCATION_FINE_ACCESS_REQUEST_CODE);
+                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
+                    LOCATION_COARSE_ACCESS_REQUEST_CODE);
         } else {
             startAddressService();
         }
@@ -96,31 +102,8 @@ public class SignupActivity extends AbstractAppCompatActivity {
         input_email = (EditText) findViewById(R.id.input_email);
         input_password = (EditText) findViewById(R.id.input_password);
         input_password_confirm = (EditText) findViewById(R.id.input_password_confirm);
-        input_city = (EditText) findViewById(R.id.input_city);
-        input_country = (EditText) findViewById(R.id.input_country);
         btn_signup = (AppCompatButton) findViewById(R.id.btn_signup);
         link_login = (TextView) findViewById(R.id.link_login);
-
-        final Calendar c = Calendar.getInstance();
-        int year = 1978;//c.get(Calendar.YEAR);
-        int month = c.get(Calendar.MONTH);
-        int day = c.get(Calendar.DAY_OF_MONTH);
-
-        /*input_address.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                try {
-                    Intent intent = new PlaceAutocomplete.IntentBuilder(
-                            PlaceAutocomplete.MODE_FULLSCREEN)
-                            .build(SignupActivity.this);
-                    startActivityForResult(intent, PLACE_AUTO_COMPLETE_REQ_CODE);
-                } catch (GooglePlayServicesRepairableException e) {
-                    e.printStackTrace();
-                } catch (GooglePlayServicesNotAvailableException e) {
-                    e.printStackTrace();
-                }
-            }
-        });*/
 
         btn_signup.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -138,27 +121,19 @@ public class SignupActivity extends AbstractAppCompatActivity {
         });
     }
 
-    /*@Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(requestCode == PLACE_AUTO_COMPLETE_REQ_CODE) {
-            if(resultCode == RESULT_OK) {
-                Place place = PlaceAutocomplete.getPlace(this, data);
-                Log.i(LOG_TAG, "Name:: " + place.getName().toString());
-                Log.i(LOG_TAG, "Address:: " + place.getAddress().toString());
-                input_address.setText(place.getAddress());
-            } else {
-                Log.i(LOG_TAG, "Failed to retrieve location/address");
-            }
-        }
-    }*/
-
     private void startAddressService() {
-        if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    LOCATION_FINE_ACCESS_REQUEST_CODE);
+                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
+                    LOCATION_COARSE_ACCESS_REQUEST_CODE);
             return;
+        }
+        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        if(location != null) {
+            longitude = location.getLongitude();
+            latitude = location.getLatitude();
         }
         /*Intent service = new Intent(this, FetchAddressIntentService.class);
         service.putExtra(RESULT_RECEIVER, new ResultReceiver(null) {
@@ -180,7 +155,7 @@ public class SignupActivity extends AbstractAppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        if(requestCode == LOCATION_FINE_ACCESS_REQUEST_CODE
+        if(requestCode == LOCATION_COARSE_ACCESS_REQUEST_CODE
                 && grantResults != null && grantResults.length > 0
                 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             startAddressService();
@@ -188,12 +163,10 @@ public class SignupActivity extends AbstractAppCompatActivity {
     }
 
     private void goToNextPage() {
-        String email = input_email.getText() != null ? input_email.getText().toString().trim() : null;
-        String passwd = input_password.getText() != null ? input_password.getText().toString().trim() : null;
+        email = input_email.getText() != null ? input_email.getText().toString().trim() : null;
+        passwd = input_password.getText() != null ? input_password.getText().toString().trim() : null;
         String passwd2 = input_password_confirm.getText() != null ? input_password_confirm.getText().toString().trim() : null;
-        String name = input_name.getText() != null ? input_name.getText().toString().trim() : null;
-        String city = input_city.getText() != null ? input_city.getText().toString().trim() : null;
-        String country = input_country.getText() != null ? input_country.getText().toString().trim() : null;
+        name = input_name.getText() != null ? input_name.getText().toString().trim() : null;
 
         boolean valid = true;
         boolean isPasswd = true;
@@ -224,14 +197,6 @@ public class SignupActivity extends AbstractAppCompatActivity {
         }
         if(name == null || name.trim().isEmpty()) {
             Snackbar.make(input_name, "Name is empty", Snackbar.LENGTH_LONG).show();
-            valid = false;
-        }
-        if(city == null || city.trim().isEmpty()) {
-            Snackbar.make(input_city, "City is empty", Snackbar.LENGTH_LONG).show();
-            valid = false;
-        }
-        if(country == null || country.trim().isEmpty()) {
-            Snackbar.make(input_country, "Country is empty", Snackbar.LENGTH_LONG).show();
             valid = false;
         }
 
@@ -290,17 +255,106 @@ public class SignupActivity extends AbstractAppCompatActivity {
             Snackbar.make(input_email, "Sorry something went wrong", Snackbar.LENGTH_LONG).show();
             return;
         }
+
+        IssueVerificationCodeInfo dto = new IssueVerificationCodeInfo(email, name);
+        new IssueSignupVerifier(SignupActivity.this).addListener(SignupActivity.this).execute(dto);
+    }
+
+    private void goToNextPage2() {
         /*LocalAddress addr = null;
         if(address != null) {
             addr = new LocalAddress(null, null, address.getCountryName(), address.getLocality());
         }*/
-        Intent intent = new Intent(SignupActivity.this, PreSignupActivity.class);
-        intent.putExtra(PreSignupActivity.EMAIL, email);
-        intent.putExtra(PreSignupActivity.PASSWD, passwd);
-        intent.putExtra(PreSignupActivity.NAME, name);
-        intent.putExtra(PreSignupActivity.CITY, city);
-        intent.putExtra(PreSignupActivity.COUNTRY, country);
+        Intent intent = new Intent(SignupActivity.this, PreSignupActivity2.class);
+        intent.putExtra(PreSignupActivity2.EMAIL, email);
+        intent.putExtra(PreSignupActivity2.PASSWD, passwd);
+        intent.putExtra(PreSignupActivity2.NAME, name);
+        intent.putExtra(PreSignupActivity2.LONGITUDE, longitude);
+        intent.putExtra(PreSignupActivity2.LATITUDE, latitude);
         finish();
         startActivity(intent);
+    }
+
+    @Override
+    public void onPreStart(String taskID) {
+
+    }
+
+    @Override
+    public void onSuccess(String taskID, Object data) {
+        goToNextPage2();
+    }
+
+    @Override
+    public void onFailure(String taskID, String errorMsg) {
+        Snackbar.make(input_email, errorMsg, Snackbar.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onPostComplete(String taskID) {
+
+    }
+
+    private class IssueVerificationCodeInfo {
+
+        private String email;
+
+        private String nameOfUser;
+
+        IssueVerificationCodeInfo(String email, String nameOfUser) {
+            this.email = email;
+            this.nameOfUser = nameOfUser;
+        }
+
+        public String getEmail() {
+            return email;
+        }
+
+        public String getNameOfUser() {
+            return nameOfUser;
+        }
+    }
+
+    private class IssueSignupVerifier extends AbstractNetworkTask<IssueVerificationCodeInfo, Integer, JStatus> {
+
+        private String errMsg;
+
+        public IssueSignupVerifier(Context context) {
+            super(false, false, false, context, false, true);
+        }
+
+        @Override
+        protected String getFailureMessage() {
+            return errMsg;
+        }
+
+        @Override
+        protected COMMAND command() {
+            return COMMAND.ISSUE_SIGNUP_VERIFIER;
+        }
+
+        @Override
+        protected Map<String, Object> prepareApiParams(IssueVerificationCodeInfo inputObject) {
+            Map<String, Object> apiParams = new HashMap<String, Object>();
+            apiParams.put(APIConstants.User.Register.EMAIL, inputObject.getEmail());
+            apiParams.put(APIConstants.User.Register.NAME, inputObject.getNameOfUser());
+            return apiParams;
+        }
+
+        @Override
+        protected JStatus executeApi(API api) throws Exception {
+            try {
+                return (JStatus) api.execute();
+            } catch (Exception e) {
+                Log.e(LOG_TAG, e.getMessage(), e);
+                errMsg = "Failed Issing Verification Code";
+                return null;
+            }
+        }
+
+        @Override
+        protected String getContainerIdForObjectStore() {
+            return null;
+        }
     }
 }

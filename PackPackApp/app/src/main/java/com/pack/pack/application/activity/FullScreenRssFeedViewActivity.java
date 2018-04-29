@@ -22,7 +22,7 @@ import com.pack.pack.application.data.util.DownloadFeedImageTask;
 import com.pack.pack.application.image.loader.DownloadImageTask;
 import com.pack.pack.application.topic.activity.model.ParcellableRssFeed;
 import com.pack.pack.application.view.AttachmentViewPager;
-import com.pack.pack.model.web.JRssFeed;
+import com.squill.feed.web.model.JRssFeed;
 
 import java.io.File;
 import java.io.FileOutputStream;

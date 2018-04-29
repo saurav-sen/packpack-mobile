@@ -3,7 +3,7 @@ package com.pack.pack.application.topic.activity.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.pack.pack.model.web.JRssFeed;
+import com.squill.feed.web.model.JRssFeed;
 
 /**
  * Created by Saurav on 29-05-2017.

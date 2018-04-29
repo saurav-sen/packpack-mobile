@@ -29,7 +29,12 @@ public class PreSignupActivity2 extends AbstractAppCompatActivity implements IAs
 
     private static final String LOG_TAG = "PreSignupActivity2";
 
-    public static final String DOB = "DOB";
+    public static final String EMAIL = "EMAIL";
+    public static final String PASSWD = "PASSWD";
+    public static final String NAME = "NAME";
+
+    public static final String LONGITUDE = "LONGITUDE";
+    public static final String LATITUDE = "LATITUDE";
 
     private EditText signup_verifier;
 
@@ -38,21 +43,21 @@ public class PreSignupActivity2 extends AbstractAppCompatActivity implements IAs
     private String email;
     private String passwd;
     private String name;
-    private String city;
-    private String country;
-    private String dob;
+
+    private double longitude;
+    private double latitude;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pre_signup2);
 
-        email = getIntent().getStringExtra(PreSignupActivity.EMAIL);
-        passwd = getIntent().getStringExtra(PreSignupActivity.PASSWD);
-        name = getIntent().getStringExtra(PreSignupActivity.NAME);
-        city = getIntent().getStringExtra(PreSignupActivity.CITY);
-        country = getIntent().getStringExtra(PreSignupActivity.COUNTRY);
-        dob = getIntent().getStringExtra(DOB);
+        email = getIntent().getStringExtra(EMAIL);
+        passwd = getIntent().getStringExtra(PASSWD);
+        name = getIntent().getStringExtra(NAME);
+
+        longitude = getIntent().getDoubleExtra(LONGITUDE, -1);
+        latitude = getIntent().getDoubleExtra(LATITUDE, -1);
 
         TextView signup_note = (TextView) findViewById(R.id.signup_note);
         signup_note.setText("Please enter the verification code sent over <" + email + ">");
@@ -135,7 +140,7 @@ public class PreSignupActivity2 extends AbstractAppCompatActivity implements IAs
         if(address != null) {
             addr = new LocalAddress(null, null, address.getCountryName(), address.getLocality());
         }*/
-        UserSignUpInfo userSignUpInfo = new UserSignUpInfo(name, email, passwd, city, country, dob, verifierCode);
+        UserSignUpInfo userSignUpInfo = new UserSignUpInfo(name, email, passwd, verifierCode);
         new SignUpTask().execute(userSignUpInfo);
     }
 
@@ -144,19 +149,13 @@ public class PreSignupActivity2 extends AbstractAppCompatActivity implements IAs
         private String name;
         private String email;
         private String passwd;
-        private String city;
-        private String country;
-        private String dob;
 
         private String verifierCode;
 
-        UserSignUpInfo(String name, String email, String passwd, String city, String country, String dob, String verifierCode) {
+        UserSignUpInfo(String name, String email, String passwd, String verifierCode) {
             this.name = name;
             this.email = email;
             this.passwd = passwd;
-            this.city = city;
-            this.dob = dob;
-            this.country = country;
             this.verifierCode = verifierCode;
         }
 
@@ -172,50 +171,8 @@ public class PreSignupActivity2 extends AbstractAppCompatActivity implements IAs
             return passwd;
         }
 
-        String getCity() {
-            return city;
-        }
-
-        String getCountry() {
-            return country;
-        }
-
-        String getDob() {
-            return dob;
-        }
-
         String getVerifierCode() {
             return verifierCode;
-        }
-    }
-
-    private class LocalAddress {
-        private String city;
-        private String state;
-        private String country;
-        private String locality;
-
-        LocalAddress(String city, String state, String country, String locality) {
-            this.city = city;
-            this.state = state;
-            this.country = country;
-            this.locality = locality;
-        }
-
-        String getCity() {
-            return city;
-        }
-
-        String getState() {
-            return  state;
-        }
-
-        String getCountry() {
-            return country;
-        }
-
-        String getLocality() {
-            return locality;
         }
     }
 
@@ -238,21 +195,13 @@ public class PreSignupActivity2 extends AbstractAppCompatActivity implements IAs
                 String name = userSignUpInfo.getName();
                 String username = userSignUpInfo.getEmail();
                 String passwd = userSignUpInfo.getPasswd();
-                String city = userSignUpInfo.getCity();
-                String country = userSignUpInfo.getCountry();
-                String dob = userSignUpInfo.getDob();
                 String verifier = userSignUpInfo.getVerifierCode();
                 API api = APIBuilder.create(ApiConstants.BASE_URL).setAction(COMMAND.SIGN_UP)
                         .addApiParam(APIConstants.User.Register.NAME, name)
                         .addApiParam(APIConstants.User.Register.EMAIL, username)
                         .addApiParam(APIConstants.User.Register.PASSWORD, passwd)
-                                //.addApiParam(APIConstants.User.Register.LOCALITY, locality)
-                        .addApiParam(APIConstants.User.Register.CITY, city)
-                        .addApiParam(APIConstants.User.Register.COUNTRY, country)
-                                //.addApiParam(APIConstants.User.Register.STATE, state)
-                                //.addApiParam(APIConstants.User.Register.COUNTRY, country)
-                        .addApiParam(APIConstants.User.Register.DOB, dob)
-                                //.addApiParam(APIConstants.User.Register.PROFILE_PICTURE, null)
+                        .addApiParam(APIConstants.User.Register.LONGITUDE, longitude)
+                        .addApiParam(APIConstants.User.Register.LATITUDE, latitude)
                         .addApiParam(APIConstants.User.Register.VERIFIER, verifier)
                         .build();
                 api.execute();
