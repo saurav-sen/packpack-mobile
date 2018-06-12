@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.widget.AbsListView;
 import android.widget.ListView;
 
+import com.pack.pack.application.Constants;
 import com.pack.pack.application.R;
 import com.pack.pack.application.adapters.ScienceNewsActivityAdapter;
 import com.pack.pack.application.data.util.IAsyncTaskStatusListener;
@@ -51,8 +52,8 @@ public class ScienceNewsActivity extends AppCompatActivity {
                 int count = science_feeds.getCount();
                 if (scrollState == SCROLL_STATE_IDLE) {
                     int c = count - 3;
-                    if (science_feeds.getLastVisiblePosition() >= c && c > 0 && !"END_OF_PAGE".equals(nextLink)) {
-                        loadScienceFeeds(nextLink, false);
+                    if (science_feeds.getLastVisiblePosition() >= c && c > 0 && !Constants.END_OF_PAGE.equals(nextLink)) {
+                        loadScienceFeeds(nextLink, false, false);
                     }
                 }
             }
@@ -63,7 +64,7 @@ public class ScienceNewsActivity extends AppCompatActivity {
             }
         });
 
-        loadScienceFeeds(!"END_OF_PAGE".equals(nextLink) ? nextLink : prevLink, true);
+        loadScienceFeeds(!Constants.END_OF_PAGE.equals(nextLink) ? nextLink : prevLink, true, true);
     }
 
     @Override
@@ -87,8 +88,8 @@ public class ScienceNewsActivity extends AppCompatActivity {
         }
     }
 
-    private void loadScienceFeeds(String pageLink, boolean showLoadingProgress) {
-        ScienceNewsFeedTask task = new ScienceNewsFeedTask(ScienceNewsActivity.this);
+    private void loadScienceFeeds(String pageLink, boolean showLoadingProgress, boolean loadOfflineData) {
+        ScienceNewsFeedTask task = new ScienceNewsFeedTask(ScienceNewsActivity.this, loadOfflineData);
         ScienceNewsFeedTaskStatusListener listener = new ScienceNewsFeedTaskStatusListener(task.getTaskID(), showLoadingProgress);
         task.addListener(listener);
         task.execute(pageLink);

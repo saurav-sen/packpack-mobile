@@ -8,12 +8,12 @@ import android.os.Bundle;
 import android.widget.AbsListView;
 import android.widget.ListView;
 
+import com.pack.pack.application.Constants;
 import com.pack.pack.application.R;
 import com.pack.pack.application.adapters.HomeActivityAdapter;
 import com.pack.pack.application.adapters.NewsActivityAdapter;
 import com.pack.pack.application.data.util.IAsyncTaskStatusListener;
 import com.pack.pack.application.data.util.NewsFeedTask;
-import com.pack.pack.application.data.util.RSSFeedTask;
 import com.squill.feed.web.model.JRssFeed;
 import com.pack.pack.model.web.Pagination;
 
@@ -50,8 +50,8 @@ public class NewsActivity extends AppCompatActivity {
                 int count = news_feeds.getCount();
                 if (scrollState == SCROLL_STATE_IDLE) {
                     int c = count - 3;
-                    if (news_feeds.getLastVisiblePosition() >= c && c > 0 && !"END_OF_PAGE".equals(nextLink)) {
-                        loadNewsFeeds(nextLink, false);
+                    if (news_feeds.getLastVisiblePosition() >= c && c > 0 && !Constants.END_OF_PAGE.equals(nextLink)) {
+                        loadNewsFeeds(nextLink, false, false);
                     }
                 }
             }
@@ -62,7 +62,7 @@ public class NewsActivity extends AppCompatActivity {
             }
         });
 
-        loadNewsFeeds(!"END_OF_PAGE".equals(nextLink) ? nextLink : prevLink, true);
+        loadNewsFeeds(!Constants.END_OF_PAGE.equals(nextLink) ? nextLink : prevLink, true, true);
     }
 
     @Override
@@ -86,8 +86,8 @@ public class NewsActivity extends AppCompatActivity {
         }
     }
 
-    private void loadNewsFeeds(String pageLink, boolean showLoadingProgress) {
-        NewsFeedTask task = new NewsFeedTask(NewsActivity.this);
+    private void loadNewsFeeds(String pageLink, boolean showLoadingProgress, boolean loadOfflineData) {
+        NewsFeedTask task = new NewsFeedTask(NewsActivity.this, loadOfflineData);
         NewsFeedTaskStatusListener listener = new NewsFeedTaskStatusListener(task.getTaskID(), showLoadingProgress);
         task.addListener(listener);
         task.execute(pageLink);

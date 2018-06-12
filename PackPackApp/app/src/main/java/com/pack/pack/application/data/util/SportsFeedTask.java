@@ -10,6 +10,7 @@ import com.pack.pack.client.api.APIConstants;
 import com.pack.pack.client.api.COMMAND;
 import com.squill.feed.web.model.JRssFeed;
 import com.pack.pack.model.web.Pagination;
+import com.squill.feed.web.model.JRssFeedType;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,47 +18,10 @@ import java.util.Map;
 /**
  * Created by Saurav on 25-03-2018.
  */
-public class SportsFeedTask extends AbstractNetworkTask<String, Integer, Pagination<JRssFeed>> {
+public class SportsFeedTask extends FeedsLoadTask {
 
-    private String pageLink;
-
-    private String errorMsg;
-
-    private static final String LOG_TAG = "SportsFeedTask";
-
-    public SportsFeedTask(Context context) {
-        super(false, false, context, false);
-    }
-
-    @Override
-    protected String getFailureMessage() {
-        return errorMsg;
-    }
-
-    @Override
-    protected Pagination<JRssFeed> executeApi(API api) throws Exception {
-        if (pageLink == null) {
-            pageLink = "FIRST_PAGE";
-        }
-        fireOnPreStart();
-        Pagination<JRssFeed> page = null;/*RssFeedCache.INSTANCE.readFromCache(pageLink);
-        if(page != null && page.getResult() != null && !page.getResult().isEmpty()) {
-            return page;
-        }*/
-        try {
-            page = (Pagination<JRssFeed>) api.execute();
-            //RssFeedCache.INSTANCE.storeInCache(pageLink, page);
-        } catch (Exception e) {
-            Log.d(LOG_TAG, e.getMessage());
-            errorMsg = "Oops! Something went wrong";
-            fireOnFailure(errorMsg);
-        }
-        return page;
-    }
-
-    @Override
-    protected String getContainerIdForObjectStore() {
-        return null;
+    public SportsFeedTask(Context context, boolean loadOfflineData) {
+        super(context, JRssFeedType.NEWS_SPORTS, loadOfflineData);
     }
 
     @Override
@@ -66,9 +30,9 @@ public class SportsFeedTask extends AbstractNetworkTask<String, Integer, Paginat
     }
 
     @Override
-    protected Map<String, Object> prepareApiParams(String inputObject) {
+    protected Map<String, Object> doPrepareApiParams(String inputObject) {
         Map<String, Object> apiParams = new HashMap<String, Object>();
-        pageLink = inputObject;
+        String pageLink = inputObject;
         String userId = AppController.getInstance().getUserId();
         apiParams.put(APIConstants.User.ID, userId);
         apiParams.put(APIConstants.PageInfo.PAGE_LINK, pageLink);

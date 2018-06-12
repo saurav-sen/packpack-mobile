@@ -44,4 +44,7 @@ public interface Constants {
 
     public static final String SHARED_IMAGE_URI_KEY = "SHARED_IMAGE_URI_KEY";
     public static final String SHARED_TEXT_OR_URL_KEY = "SHARED_TEXT_OR_URL_KEY";
+
+    public static final String FIRST_PAGE = "FIRST_PAGE";
+    public static final String END_OF_PAGE = "END_OF_PAGE";
 }

@@ -24,10 +24,11 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.pack.pack.application.AppController;
+import com.pack.pack.application.Constants;
 import com.pack.pack.application.R;
 import com.pack.pack.application.adapters.HomeActivityAdapter;
 import com.pack.pack.application.data.util.IAsyncTaskStatusListener;
-import com.pack.pack.application.data.util.RSSFeedTask;
+import com.pack.pack.application.data.util.RefreshmentFeedTask;
 import com.squill.feed.web.model.JRssFeed;
 import com.pack.pack.model.web.Pagination;
 
@@ -80,8 +81,8 @@ public class BroadcastActivity extends AbstractAppCompatActivity {
             public void onScrollStateChanged(AbsListView absListView, int scrollState) {
                 int count = squill_feeds.getCount();
                 if (scrollState == SCROLL_STATE_IDLE) {
-                    if (squill_feeds.getLastVisiblePosition() > count - 1 && !"END_OF_PAGE".equals(nextLink)) {
-                        loadRssFeeds(nextLink);
+                    if (squill_feeds.getLastVisiblePosition() > count - 1 && !Constants.END_OF_PAGE.equals(nextLink)) {
+                        loadRssFeeds(nextLink, false);
                     }
                 }
             }
@@ -92,7 +93,7 @@ public class BroadcastActivity extends AbstractAppCompatActivity {
             }
         });
 
-        loadRssFeeds(!"END_OF_PAGE".equals(nextLink) ? nextLink : prevLink);
+        loadRssFeeds(!Constants.END_OF_PAGE.equals(nextLink) ? nextLink : prevLink, true);
         //new RSSFeedTask(BroadcastActivity.this).execute(!"END_OF_PAGE".equals(nextLink) ? nextLink : prevLink);
 
         /*FloatingActionButton FAB = (FloatingActionButton) findViewById(R.id.broadcast_create);
@@ -266,8 +267,8 @@ public class BroadcastActivity extends AbstractAppCompatActivity {
         }
     }
 
-    private void loadRssFeeds(String pageLink) {
-        RSSFeedTask task = new RSSFeedTask(BroadcastActivity.this);
+    private void loadRssFeeds(String pageLink, boolean loadOfflineData) {
+        RefreshmentFeedTask task = new RefreshmentFeedTask(BroadcastActivity.this, loadOfflineData);
         RssFeedTaskStatusListener listener = new RssFeedTaskStatusListener(task.getTaskID());
         task.addListener(listener);
         task.execute(pageLink);

@@ -13,20 +13,23 @@ import com.pack.pack.model.web.Pagination;
 import com.squill.feed.web.model.JRssFeedType;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
- * Created by Saurav on 25-03-2018.
+ *
+ * @author Saurav
+ *
  */
-public class ArticlesFeedTask extends FeedsLoadTask {
+public class RefreshmentFeedTask extends FeedsLoadTask {
 
-    public ArticlesFeedTask(Context context, boolean loadOfflineData) {
-        super(context, JRssFeedType.ARTICLE, loadOfflineData);
+    public RefreshmentFeedTask(Context context, boolean loadOfflineData) {
+        super(context, JRssFeedType.REFRESHMENT, loadOfflineData);
     }
 
     @Override
     protected COMMAND command() {
-        return COMMAND.GET_ALL_ARTICLES_FEEDS;
+        return COMMAND.GET_ALL_REFRESHMENT_FEEDS;
     }
 
     @Override
@@ -39,5 +42,3 @@ public class ArticlesFeedTask extends FeedsLoadTask {
         return apiParams;
     }
 }
-
-

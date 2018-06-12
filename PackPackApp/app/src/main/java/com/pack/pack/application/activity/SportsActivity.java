@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.widget.AbsListView;
 import android.widget.ListView;
 
+import com.pack.pack.application.Constants;
 import com.pack.pack.application.R;
 import com.pack.pack.application.adapters.SportsActivityAdapter;
 import com.pack.pack.application.data.util.IAsyncTaskStatusListener;
@@ -51,8 +52,8 @@ public class SportsActivity extends AppCompatActivity {
                 int count = sports_feeds.getCount();
                 if (scrollState == SCROLL_STATE_IDLE) {
                     int c = count - 3;
-                    if (sports_feeds.getLastVisiblePosition() >= c && c > 0 && !"END_OF_PAGE".equals(nextLink)) {
-                        loadSportsFeeds(nextLink, false);
+                    if (sports_feeds.getLastVisiblePosition() >= c && c > 0 && !Constants.END_OF_PAGE.equals(nextLink)) {
+                        loadSportsFeeds(nextLink, false, false);
                     }
                 }
             }
@@ -63,7 +64,7 @@ public class SportsActivity extends AppCompatActivity {
             }
         });
 
-        loadSportsFeeds(!"END_OF_PAGE".equals(nextLink) ? nextLink : prevLink, true);
+        loadSportsFeeds(!Constants.END_OF_PAGE.equals(nextLink) ? nextLink : prevLink, true, true);
     }
 
     @Override
@@ -87,8 +88,8 @@ public class SportsActivity extends AppCompatActivity {
         }
     }
 
-    private void loadSportsFeeds(String pageLink, boolean showLoadingProgress) {
-        SportsFeedTask task = new SportsFeedTask(SportsActivity.this);
+    private void loadSportsFeeds(String pageLink, boolean showLoadingProgress, boolean loadOfflineData) {
+        SportsFeedTask task = new SportsFeedTask(SportsActivity.this, loadOfflineData);
         SportsFeedTaskStatusListener listener = new SportsFeedTaskStatusListener(task.getTaskID(), showLoadingProgress);
         task.addListener(listener);
         task.execute(pageLink);

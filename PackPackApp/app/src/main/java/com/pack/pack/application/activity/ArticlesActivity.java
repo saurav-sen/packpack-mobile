@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.widget.AbsListView;
 import android.widget.ListView;
 
+import com.pack.pack.application.Constants;
 import com.pack.pack.application.R;
 import com.pack.pack.application.adapters.ArticlesActivityAdapter;
 import com.pack.pack.application.data.util.ArticlesFeedTask;
@@ -51,8 +52,8 @@ public class ArticlesActivity extends AppCompatActivity {
                 int count = articles_feeds.getCount();
                 if (scrollState == SCROLL_STATE_IDLE) {
                     int c = count - 3;
-                    if (articles_feeds.getLastVisiblePosition() >= c && c > 0 && !"END_OF_PAGE".equals(nextLink)) {
-                        loadArticlesFeeds(nextLink, false);
+                    if (articles_feeds.getLastVisiblePosition() >= c && c > 0 && !Constants.END_OF_PAGE.equals(nextLink)) {
+                        loadArticlesFeeds(nextLink, false, false);
                     }
                 }
             }
@@ -63,7 +64,7 @@ public class ArticlesActivity extends AppCompatActivity {
             }
         });
 
-        loadArticlesFeeds(!"END_OF_PAGE".equals(nextLink) ? nextLink : prevLink, true);
+        loadArticlesFeeds(!Constants.END_OF_PAGE.equals(nextLink) ? nextLink : prevLink, true, true);
     }
 
     @Override
@@ -87,8 +88,8 @@ public class ArticlesActivity extends AppCompatActivity {
         }
     }
 
-    private void loadArticlesFeeds(String pageLink, boolean showLoadingProgress) {
-        ArticlesFeedTask task = new ArticlesFeedTask(ArticlesActivity.this);
+    private void loadArticlesFeeds(String pageLink, boolean showLoadingProgress, boolean loadOfflineData) {
+        ArticlesFeedTask task = new ArticlesFeedTask(ArticlesActivity.this, loadOfflineData);
         ArticlesFeedTaskStatusListener listener = new ArticlesFeedTaskStatusListener(task.getTaskID(), showLoadingProgress);
         task.addListener(listener);
         task.execute(pageLink);
