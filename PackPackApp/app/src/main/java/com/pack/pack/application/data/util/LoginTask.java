@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.pack.pack.application.AppController;
+import com.pack.pack.application.Mode;
 import com.pack.pack.application.data.LoggedInUserInfo;
 import com.pack.pack.application.db.DBUtil;
 import com.pack.pack.application.db.DbObject;
@@ -42,12 +43,12 @@ public class LoginTask extends AbstractNetworkTask<UserInfo, Integer, AccessToke
 
     private boolean refreshToken = false;
 
-    public LoginTask(Context context) {
+    /*public LoginTask(Context context) {
         super(false, true, context, false);
-    }
+    }*/
 
     public LoginTask(Context context, IAsyncTaskStatusListener listener, boolean refreshToken) {
-        super(false, true, context, false);
+        super(AppController.getInstance().getExecutionMode() == Mode.OFFLINE, true, context, false);
         addListener(listener);
         this.refreshToken = refreshToken;
     }
@@ -165,21 +166,23 @@ public class LoginTask extends AbstractNetworkTask<UserInfo, Integer, AccessToke
     @Override
     protected AccessToken doRetrieveFromDB(SQLiteDatabase readable, UserInfo inputObject) {
         final UserInfo userInfo = DBUtil.loadLastLoggedInUserInfo(readable);
-        if(userInfo != null && userInfo.getAccessToken() != null && userInfo.getAccessTokenSecret() != null) {
-            AppController.getInstance().setoAuthToken(userInfo.getAccessToken());
+        if(userInfo != null) {
             user = DBUtil.convertUserInfo(userInfo);
             AppController.getInstance().setUser(user);
-            return  new AccessToken() {
-                @Override
-                public String getToken() {
-                    return userInfo.getAccessToken();
-                }
+            if(AppController.getInstance().getExecutionMode() == Mode.ONLINE && userInfo.getAccessToken() != null && userInfo.getAccessTokenSecret() != null) {
+                AppController.getInstance().setoAuthToken(userInfo.getAccessToken());
+                return  new AccessToken() {
+                    @Override
+                    public String getToken() {
+                        return userInfo.getAccessToken();
+                    }
 
-                @Override
-                public String getTokenSecret() {
-                    return userInfo.getAccessTokenSecret();
-                }
-            };
+                    @Override
+                    public String getTokenSecret() {
+                        return userInfo.getAccessTokenSecret();
+                    }
+                };
+            }
         }
         return null;
     }

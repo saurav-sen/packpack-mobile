@@ -15,6 +15,7 @@ import android.os.Handler;
 
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.Constants;
+import com.pack.pack.application.Mode;
 import com.pack.pack.application.R;
 import com.pack.pack.application.data.LoggedInUserInfo;
 import com.pack.pack.application.data.util.ImageUtil;
@@ -55,8 +56,10 @@ public class SplashActivity extends AbstractActivity implements IAsyncTaskStatus
         setContentView(R.layout.activity_splash);
 
         if(!NetworkUtil.checkConnectivity(this)) {
-            startNoConnectionEmptyActivity();
-            return;
+            //startNoConnectionEmptyActivity();
+            //return;
+            AppController.getInstance().setExecutionMode(Mode.OFFLINE);
+            routeToTargetActivity();
         }
 
         JUser user = AppController.getInstance().getUser();
@@ -145,6 +148,7 @@ public class SplashActivity extends AbstractActivity implements IAsyncTaskStatus
         if(user.getProfilePictureUrl() != null && !user.getProfilePictureUrl().trim().isEmpty()) {
             new DownloadProfilePictureTask().execute(user.getProfilePictureUrl());
         }
+        AppController.getInstance().setExecutionMode(Mode.ONLINE);
         getIntent().putExtra("loginStatus", true);
         finish();
         routeToTargetActivity();

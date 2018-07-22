@@ -24,6 +24,7 @@ public class DBUtil {
 
     public static UserInfo loadLastLoggedInUserInfo(SQLiteDatabase readable) {
         Cursor cursor = null;
+        UserInfo userInfo = null;
         try {
             String[] projection = new String[] {UserInfo._ID, UserInfo.ENTITY_ID,
                     UserInfo.USER_NAME, UserInfo.ACCESS_TOKEN,
@@ -40,8 +41,8 @@ public class DBUtil {
                         String accessToken = cursor.getString(cursor.getColumnIndexOrThrow(UserInfo.ACCESS_TOKEN));
                         String accessTokenSecret = cursor.getString(cursor.getColumnIndexOrThrow(UserInfo.ACCESS_TOKEN_SECRET));
                         //String followedCategories = cursor.getString(cursor.getColumnIndexOrThrow(UserInfo.FOLLWED_CATEGORIES));
-                        UserInfo userInfo = new UserInfo(userName, userId, accessToken, accessTokenSecret);//, followedCategories);
-                        return userInfo;
+                        userInfo = new UserInfo(userName, userId, accessToken, accessTokenSecret, null);//, followedCategories);
+                        break;
                     } while(cursor.moveToNext());
                 }
             } finally {
@@ -52,7 +53,7 @@ public class DBUtil {
         } catch (Exception e) {
             Log.d(LOG_TAG, e.getMessage());
         }
-        return null;
+        return userInfo;
     }
 
     public static DbObject convert(Object object, String containerId) {

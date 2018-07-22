@@ -1,8 +1,17 @@
 package com.pack.pack.application.data.util;
 
+import android.content.Context;
 import android.util.Patterns;
 
+import com.pack.pack.application.AppController;
+import com.pack.pack.application.Mode;
+import com.pack.pack.application.data.LoggedInUserInfo;
+import com.pack.pack.application.db.DBUtil;
+import com.pack.pack.application.db.SquillDbHelper;
+import com.pack.pack.application.db.UserInfo;
+import com.pack.pack.application.image.loader.DownloadProfilePictureTask;
 import com.pack.pack.model.web.JUser;
+import com.pack.pack.oauth1.client.AccessToken;
 
 import java.util.regex.Pattern;
 
@@ -39,5 +48,70 @@ public class UserUtil {
             return null;
         }
         return "Password needs 6 to 20 length,at least one digit, upper case,one lower case,one of @,$";
+    }
+
+    public static void verifyLogin(Context context, IAsyncTaskStatusListener listener) {
+
+    }
+
+    private static void tryLogin(Context context, IAsyncTaskStatusListener listener) {
+        String oAuthToken = AppController.getInstance().getoAuthToken();
+        if(AppController.getInstance().getExecutionMode() == Mode.OFFLINE) {
+            UserInfo userInfo = DBUtil.loadLastLoggedInUserInfo(new SquillDbHelper(context).getReadableDatabase());
+            if(userInfo != null) {
+                oAuthToken = userInfo.getAccessToken();
+                if(oAuthToken != null) {
+                    /*AppController.getInstance().setoAuthToken(oAuthToken);
+                    JUser user = DBUtil.convertUserInfo(userInfo);
+                    AppController.getInstance().setUser(user);
+                    finish();
+                    startMainActivity();*/
+                    doLogin(userInfo, true, listener, context);
+                } else {
+                    doLogin(userInfo, false, listener, context);
+                }
+            }
+        }
+    }
+
+    private static void doLogin(UserInfo userInfo, boolean refreshToken, IAsyncTaskStatusListener listener, Context context) {
+        new LoginTask(context, new LoginTaskStatusListenerProxy(listener), refreshToken).execute(userInfo);
+    }
+
+    private static class LoginTaskStatusListenerProxy implements IAsyncTaskStatusListener {
+
+        private IAsyncTaskStatusListener listener;
+
+        LoginTaskStatusListenerProxy(IAsyncTaskStatusListener listener) {
+            this.listener = listener;
+        }
+
+        @Override
+        public void onPreStart(String taskID) {
+            listener.onPreStart(taskID);
+        }
+
+        @Override
+        public void onSuccess(String taskID, Object data) {
+            LoggedInUserInfo userInfo = (LoggedInUserInfo) data;
+            AccessToken token = userInfo.getAccessToken();
+            JUser user = userInfo.getUser();
+            if(user.getProfilePictureUrl() != null && !user.getProfilePictureUrl().trim().isEmpty()) {
+                new DownloadProfilePictureTask().execute(user.getProfilePictureUrl());
+            }
+            AppController.getInstance().setExecutionMode(Mode.ONLINE);
+            listener.onSuccess(taskID, data);
+        }
+
+        @Override
+        public void onFailure(String taskID, String errorMsg) {
+            AppController.getInstance().setExecutionMode(Mode.OFFLINE);
+            listener.onFailure(taskID, errorMsg);
+        }
+
+        @Override
+        public void onPostComplete(String taskID) {
+            listener.onPostComplete(taskID);
+        }
     }
 }

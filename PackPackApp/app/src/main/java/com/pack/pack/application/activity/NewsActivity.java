@@ -30,6 +30,8 @@ public class NewsActivity extends AppCompatActivity {
 
     private String prevLink;
 
+    private long lastReceivedTimestamp;
+
     private ProgressDialog progressDialog;
 
     @Override

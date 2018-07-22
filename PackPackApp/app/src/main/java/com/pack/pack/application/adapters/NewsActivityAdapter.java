@@ -94,7 +94,11 @@ public class NewsActivityAdapter extends ArrayAdapter<JRssFeed> {
         final JRssFeed feed = getItem(position);
         if(feed != null) {
             news_rss_feed__name.setText(feed.getOgTitle());
-            news_rss_feed_description.setText(feed.getOgDescription());
+            String textSummary = feed.getArticleSummaryText();
+            if(textSummary == null) {
+                textSummary = feed.getOgDescription();
+            }
+            news_rss_feed_description.setText(textSummary);
             final String imageUrl = feed.getOgImage();
             final String videoUrl = feed.getVideoUrl();
             //final String newsUrl = feed.getHrefSource();

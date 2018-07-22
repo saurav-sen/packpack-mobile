@@ -40,7 +40,13 @@ public class RssFeedCache {
 
     private JRssFeedType feedType;
 
+    private long lastReceiveTimestamp;
+
+    private static final String SETTINGS = "SETTINGS";
+
     private static final String NEXT_PAGE_LINK = "NEXT_PAGE_LINK";
+
+    private static final String FEED_RECEIVE_TIMESTAMP = "FEED_RECEIVE_TIMESTAMP";
 
     private static final String LOG_TAG = "RssFeedCache";
 
@@ -64,7 +70,13 @@ public class RssFeedCache {
                 if(c == null) {
                     return Collections.emptyList();
                 }
-                return filter(c.getFeeds());
+                List<JRssFeed> before = c.getFeeds();
+                List<JRssFeed> after = filter(before);
+                if(before.size() != after.size()) {
+                    c.setFeeds(after);
+                    storeFeeds4OfflineUsage(c);
+                }
+                return after;
             } catch (FileNotFoundException e) {
                 Log.e(LOG_TAG, e.getMessage(), e);
             } catch (IOException e) {
@@ -102,30 +114,28 @@ public class RssFeedCache {
     }
 
     public String readLastPageLink() {
-        SharedPreferences settings = context.getSharedPreferences(NEXT_PAGE_LINK, 0);
+        SharedPreferences settings = context.getSharedPreferences(SETTINGS + "_" + feedType.name(), 0);
         pageLink = settings.getString(NEXT_PAGE_LINK, Constants.FIRST_PAGE);
         return pageLink;
     }
 
-    public void storeOfflineData(Pagination<JRssFeed> page) {
-        if(page == null)
-            return;
+    public long readLastReceiveTimestamp() {
+        SharedPreferences settings = context.getSharedPreferences(SETTINGS + "_" + feedType.name(), 0);
+        String value = settings.getString(FEED_RECEIVE_TIMESTAMP, Constants.FIRST_PAGE);
+        if(value == null || Constants.FIRST_PAGE.equals(value.trim()))
+            lastReceiveTimestamp = 0;
+        else {
+            lastReceiveTimestamp = Long.parseLong(value.trim());
+        }
+        return lastReceiveTimestamp;
+    }
+
+    private void storeFeeds4OfflineUsage(JRssFeeds c) throws FileNotFoundException, IOException, PackPackException {
         FileOutputStream fileOutputStream4Data = null;
         try {
             fileOutputStream4Data = context.openFileOutput(feedType.name(), Context.MODE_PRIVATE);
-            SharedPreferences settings = context.getSharedPreferences(NEXT_PAGE_LINK, 0);
-            JRssFeeds c = new JRssFeeds();
-            c.getFeeds().addAll(page.getResult());
             String json = JSONUtil.serialize(c);
             fileOutputStream4Data.write(json.getBytes());
-            SharedPreferences.Editor editor = settings.edit();
-            editor.putString(NEXT_PAGE_LINK, page.getNextLink()).commit();
-        } catch (FileNotFoundException e) {
-            Log.e(LOG_TAG, e.getMessage(), e);
-        } catch (IOException e) {
-            Log.e(LOG_TAG, e.getMessage(), e);
-        } catch (PackPackException e) {
-            Log.e(LOG_TAG, e.getMessage(), e);
         } finally {
             try {
                 if(fileOutputStream4Data != null) {
@@ -134,6 +144,26 @@ public class RssFeedCache {
             } catch (IOException e) {
                 Log.d(LOG_TAG, e.getMessage(), e);
             }
+        }
+    }
+
+    public void storeOfflineData(Pagination<JRssFeed> page) {
+        if(page == null)
+            return;
+        try {
+            SharedPreferences settings = context.getSharedPreferences(SETTINGS + "_" + feedType.name(), 0);
+            JRssFeeds c = new JRssFeeds();
+            c.getFeeds().addAll(page.getResult());
+            storeFeeds4OfflineUsage(c);
+            SharedPreferences.Editor editor = settings.edit();
+            editor.putString(NEXT_PAGE_LINK, page.getNextLink()).commit();
+            editor.putString(FEED_RECEIVE_TIMESTAMP, String.valueOf(page.getTimestamp())).commit();
+        } catch (FileNotFoundException e) {
+            Log.e(LOG_TAG, e.getMessage(), e);
+        } catch (IOException e) {
+            Log.e(LOG_TAG, e.getMessage(), e);
+        } catch (PackPackException e) {
+            Log.e(LOG_TAG, e.getMessage(), e);
         }
     }
 }

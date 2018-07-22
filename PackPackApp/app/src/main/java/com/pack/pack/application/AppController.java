@@ -14,12 +14,14 @@ import com.pack.pack.application.data.cache.HttpCacheFactory;
 import com.pack.pack.application.topic.activity.model.UploadAttachmentData;
 import com.pack.pack.client.api.APIConstants;
 import com.pack.pack.model.web.JUser;
+import com.squill.feed.web.model.JRssFeedType;
 
 import org.apache.http.entity.mime.content.ContentBody;
 
 import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -79,6 +81,16 @@ public class AppController extends Application {
     public static final String UPLOAD_ATTACHMENT_DESCRIPTION = "upload_attachment_description";
 
     public static final String TOPIC_ID_KEY = "topic_id";
+
+    private Mode executionMode;
+
+    public void setExecutionMode(Mode executionMode) {
+        this.executionMode = executionMode;
+    }
+
+    public Mode getExecutionMode() {
+        return executionMode;
+    }
 
     public String getoAuthToken() {
         return oAuthToken;
@@ -164,6 +176,8 @@ public class AppController extends Application {
 
     private boolean signInProgress;
 
+    private Map<JRssFeedType, Boolean> feedTypeLoadStatus;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -175,6 +189,16 @@ public class AppController extends Application {
         SimpleDiskCacheInitializer.prepare(this);
         HttpCacheFactory.prepare(this);
         initializeBranchIO();
+        feedTypeLoadStatus = new HashMap<>();
+    }
+
+    public void setLoadStatus(JRssFeedType feedType, Boolean status) {
+        feedTypeLoadStatus.put(feedType, status);
+    }
+
+    public boolean getLoadStatus(JRssFeedType feedType) {
+        Boolean status = feedTypeLoadStatus.get(feedType);
+        return status != null ? status.booleanValue() : false;
     }
 
     public void waitForLoginSuccess() {

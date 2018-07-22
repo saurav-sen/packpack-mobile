@@ -12,6 +12,8 @@ import android.widget.TextView;
 import static com.pack.pack.application.AppController.SIGNUP_ACTIVITY_REQUEST_CODE;
 import static com.pack.pack.application.AppController.RESET_PASSWD_ACTIVITY_REQUEST_CODE;
 
+import com.pack.pack.application.AppController;
+import com.pack.pack.application.Mode;
 import com.pack.pack.application.R;
 import com.pack.pack.application.data.LoggedInUserInfo;
 import com.pack.pack.application.db.UserInfo;
@@ -144,6 +146,8 @@ public class LoginActivity extends AbstractAppCompatActivity implements IAsyncTa
         LoggedInUserInfo userInfo = (LoggedInUserInfo)data;
         AccessToken token = userInfo.getAccessToken();
         JUser user = userInfo.getUser();
+        AppController.getInstance().setExecutionMode(Mode.ONLINE);
+        AppController.getInstance().setUser(user);
         if(user.getProfilePictureUrl() != null && !user.getProfilePictureUrl().trim().isEmpty()) {
             new DownloadProfilePictureTask().execute(user.getProfilePictureUrl());
         }
