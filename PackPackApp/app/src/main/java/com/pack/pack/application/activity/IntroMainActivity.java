@@ -112,6 +112,10 @@ public class IntroMainActivity extends AbstractActivity implements GoogleApiClie
             //prefManager.setFirstTimeLaunch(false);
             startActivity(new Intent(IntroMainActivity.this, WelcomeActivity.class));
             finish();
+        } else if(AppController.getInstance().isLandingPageActive()){
+            Intent intent = new Intent(IntroMainActivity.this, LandingPageActivity.class);
+            startActivity(intent);
+            finish();
         } else {
             startActivity(new Intent(IntroMainActivity.this, SplashActivity.class));
             finish();

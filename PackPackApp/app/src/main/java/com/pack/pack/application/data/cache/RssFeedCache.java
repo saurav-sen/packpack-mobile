@@ -25,9 +25,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by Saurav on 18-06-2017.
@@ -49,6 +51,8 @@ public class RssFeedCache {
     private static final String FEED_RECEIVE_TIMESTAMP = "FEED_RECEIVE_TIMESTAMP";
 
     private static final String LOG_TAG = "RssFeedCache";
+
+    private int MAX_NO_FEEDS_THRESHOLD = 100;
 
     public RssFeedCache(Context context, JRssFeedType feedType) {
         this.context = context;
@@ -151,13 +155,34 @@ public class RssFeedCache {
         if(page == null)
             return;
         try {
+            List<JRssFeed> list1 = readOfflineData();
+            List<JRssFeed> list2 = page.getResult();
+            Set<JRssFeed> set3 = new LinkedHashSet<>();
+            set3.addAll(list2);
+            int size3 = set3.size();
+            if(size3 < MAX_NO_FEEDS_THRESHOLD) {
+                if((size3 + list1.size()) <= MAX_NO_FEEDS_THRESHOLD) {
+                    set3.addAll(list1);
+                } else {
+                    int size = size3;
+                    Iterator<JRssFeed> itr = list1.iterator();
+                    while(itr.hasNext() && size <= MAX_NO_FEEDS_THRESHOLD) {
+                        JRssFeed r = itr.next();
+                        set3.add(r);
+                        size++;
+                    }
+                }
+            }
+
             SharedPreferences settings = context.getSharedPreferences(SETTINGS + "_" + feedType.name(), 0);
             JRssFeeds c = new JRssFeeds();
-            c.getFeeds().addAll(page.getResult());
+            c.getFeeds().addAll(new ArrayList<JRssFeed>(set3));
             storeFeeds4OfflineUsage(c);
             SharedPreferences.Editor editor = settings.edit();
             editor.putString(NEXT_PAGE_LINK, page.getNextLink()).commit();
-            editor.putString(FEED_RECEIVE_TIMESTAMP, String.valueOf(page.getTimestamp())).commit();
+            if(page.getTimestamp() > readLastReceiveTimestamp()) {
+                editor.putString(FEED_RECEIVE_TIMESTAMP, String.valueOf(page.getTimestamp())).commit();
+            }
         } catch (FileNotFoundException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
         } catch (IOException e) {

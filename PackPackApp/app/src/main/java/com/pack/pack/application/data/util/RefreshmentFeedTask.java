@@ -31,14 +31,4 @@ public class RefreshmentFeedTask extends FeedsLoadTask {
     protected COMMAND command() {
         return COMMAND.GET_ALL_REFRESHMENT_FEEDS;
     }
-
-    @Override
-    protected Map<String, Object> doPrepareApiParams(String inputObject) {
-        Map<String, Object> apiParams = new HashMap<String, Object>();
-        String pageLink = inputObject;
-        String userId = AppController.getInstance().getUserId();
-        apiParams.put(APIConstants.User.ID, userId);
-        apiParams.put(APIConstants.PageInfo.PAGE_LINK, pageLink);
-        return apiParams;
-    }
 }

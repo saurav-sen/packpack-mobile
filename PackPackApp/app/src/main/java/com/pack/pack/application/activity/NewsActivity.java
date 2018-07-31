@@ -30,9 +30,9 @@ public class NewsActivity extends AppCompatActivity {
 
     private String prevLink;
 
-    private long lastReceivedTimestamp;
-
     private ProgressDialog progressDialog;
+
+    private long timestamp = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,7 +89,7 @@ public class NewsActivity extends AppCompatActivity {
     }
 
     private void loadNewsFeeds(String pageLink, boolean showLoadingProgress, boolean loadOfflineData) {
-        NewsFeedTask task = new NewsFeedTask(NewsActivity.this, loadOfflineData);
+        NewsFeedTask task = new NewsFeedTask(NewsActivity.this, loadOfflineData, timestamp);
         NewsFeedTaskStatusListener listener = new NewsFeedTaskStatusListener(task.getTaskID(), showLoadingProgress);
         task.addListener(listener);
         task.execute(pageLink);
@@ -129,6 +129,7 @@ public class NewsActivity extends AppCompatActivity {
                 List<JRssFeed> list = page.getResult();
                 adapter.getFeeds().addAll(list);
                 adapter.notifyDataSetChanged();
+                timestamp = page.getTimestamp();
             }
         }
 

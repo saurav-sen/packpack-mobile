@@ -34,6 +34,8 @@ public class ScienceNewsActivity extends AppCompatActivity {
 
     private ProgressDialog progressDialog;
 
+    private long timestamp = -1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,7 +91,7 @@ public class ScienceNewsActivity extends AppCompatActivity {
     }
 
     private void loadScienceFeeds(String pageLink, boolean showLoadingProgress, boolean loadOfflineData) {
-        ScienceNewsFeedTask task = new ScienceNewsFeedTask(ScienceNewsActivity.this, loadOfflineData);
+        ScienceNewsFeedTask task = new ScienceNewsFeedTask(ScienceNewsActivity.this, loadOfflineData, timestamp);
         ScienceNewsFeedTaskStatusListener listener = new ScienceNewsFeedTaskStatusListener(task.getTaskID(), showLoadingProgress);
         task.addListener(listener);
         task.execute(pageLink);
@@ -129,6 +131,7 @@ public class ScienceNewsActivity extends AppCompatActivity {
                 List<JRssFeed> list = page.getResult();
                 adapter.getFeeds().addAll(list);
                 adapter.notifyDataSetChanged();
+                timestamp = page.getTimestamp();
             }
         }
 

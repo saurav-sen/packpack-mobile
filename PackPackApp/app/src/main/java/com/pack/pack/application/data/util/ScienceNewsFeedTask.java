@@ -24,19 +24,13 @@ public class ScienceNewsFeedTask extends FeedsLoadTask {
         super(context, JRssFeedType.NEWS_SCIENCE_TECHNOLOGY, loadOfflineData);
     }
 
-    @Override
-    protected COMMAND command() {
-        return COMMAND.GET_ALL_SCIENCE_AND_TECHNOLOGY_NEWS_FEEDS;
+    public ScienceNewsFeedTask(Context context, boolean loadOfflineData, long timestamp) {
+        super(context, JRssFeedType.NEWS_SCIENCE_TECHNOLOGY, loadOfflineData, timestamp);
     }
 
     @Override
-    protected Map<String, Object> doPrepareApiParams(String inputObject) {
-        Map<String, Object> apiParams = new HashMap<String, Object>();
-        String pageLink = inputObject;
-        String userId = AppController.getInstance().getUserId();
-        apiParams.put(APIConstants.User.ID, userId);
-        apiParams.put(APIConstants.PageInfo.PAGE_LINK, pageLink);
-        return apiParams;
+    protected COMMAND command() {
+        return COMMAND.GET_ALL_SCIENCE_AND_TECHNOLOGY_NEWS_FEEDS;
     }
 }
 

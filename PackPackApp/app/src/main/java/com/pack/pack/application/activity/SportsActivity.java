@@ -34,6 +34,8 @@ public class SportsActivity extends AppCompatActivity {
 
     private ProgressDialog progressDialog;
 
+    private long timestamp = -1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,7 +91,7 @@ public class SportsActivity extends AppCompatActivity {
     }
 
     private void loadSportsFeeds(String pageLink, boolean showLoadingProgress, boolean loadOfflineData) {
-        SportsFeedTask task = new SportsFeedTask(SportsActivity.this, loadOfflineData);
+        SportsFeedTask task = new SportsFeedTask(SportsActivity.this, loadOfflineData, timestamp);
         SportsFeedTaskStatusListener listener = new SportsFeedTaskStatusListener(task.getTaskID(), showLoadingProgress);
         task.addListener(listener);
         task.execute(pageLink);
@@ -129,6 +131,7 @@ public class SportsActivity extends AppCompatActivity {
                 List<JRssFeed> list = page.getResult();
                 adapter.getFeeds().addAll(list);
                 adapter.notifyDataSetChanged();
+                timestamp = page.getTimestamp();
             }
         }
 

@@ -19,7 +19,6 @@ import com.pack.pack.application.Constants;
 import com.pack.pack.application.R;
 import com.pack.pack.application.adapters.LandingPageGridAdapter;
 import com.pack.pack.application.data.cache.PreferenceManager;
-import com.pack.pack.application.data.util.ApiConstants;
 
 public class LandingPageActivity extends AppCompatActivity {
 
@@ -36,9 +35,9 @@ public class LandingPageActivity extends AppCompatActivity {
     private static int[] imageIds = new int[] {
             R.drawable.broadcast,
             R.drawable.news_entry,
-            R.drawable.smart_society,
-            R.drawable.my_family,
-            R.drawable.art_culture,
+            R.drawable.sports_icon,
+            R.drawable.science_icon,
+            R.drawable.article_icon,
             R.drawable.app_settings
     };
 
@@ -68,9 +67,9 @@ public class LandingPageActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
                     AppController.APP_EXTERNAL_STORAGE_READ_REQUEST_CODE);
-        } else {
+        } /*else {
 
-        }
+        }*/
 
         landing_page_grid = (GridView) findViewById(R.id.landing_page_grid);
         LandingPageGridAdapter adapter = new LandingPageGridAdapter(this, texts, imageIds);
@@ -99,6 +98,8 @@ public class LandingPageActivity extends AppCompatActivity {
                 }
             }
         });
+
+        AppController.getInstance().setLandingPageActive(true);
     }
 
     @Override

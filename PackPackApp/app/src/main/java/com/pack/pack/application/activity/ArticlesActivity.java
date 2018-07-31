@@ -34,6 +34,8 @@ public class ArticlesActivity extends AppCompatActivity {
 
     private ProgressDialog progressDialog;
 
+    private long timestamp = -1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,7 +91,7 @@ public class ArticlesActivity extends AppCompatActivity {
     }
 
     private void loadArticlesFeeds(String pageLink, boolean showLoadingProgress, boolean loadOfflineData) {
-        ArticlesFeedTask task = new ArticlesFeedTask(ArticlesActivity.this, loadOfflineData);
+        ArticlesFeedTask task = new ArticlesFeedTask(ArticlesActivity.this, loadOfflineData, timestamp);
         ArticlesFeedTaskStatusListener listener = new ArticlesFeedTaskStatusListener(task.getTaskID(), showLoadingProgress);
         task.addListener(listener);
         task.execute(pageLink);
@@ -129,6 +131,7 @@ public class ArticlesActivity extends AppCompatActivity {
                 List<JRssFeed> list = page.getResult();
                 adapter.getFeeds().addAll(list);
                 adapter.notifyDataSetChanged();
+                timestamp = page.getTimestamp();
             }
         }
 

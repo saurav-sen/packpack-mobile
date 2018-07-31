@@ -15,6 +15,7 @@ import com.squill.feed.web.model.JRssFeed;
 import com.squill.feed.web.model.JRssFeedType;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -35,10 +36,17 @@ public abstract class FeedsLoadTask extends AbstractNetworkTask<String, Integer,
 
     private static final String LOG_TAG = "FeedsLoadTask";
 
+    private long timestamp;
+
     public FeedsLoadTask(Context context, JRssFeedType feedType, boolean loadOfflineData) {
+        this(context, feedType, loadOfflineData, -1);
+    }
+
+    public FeedsLoadTask(Context context, JRssFeedType feedType, boolean loadOfflineData, long timestamp) {
         super(false, false, context, false);
         this.feedType = feedType;
         this.loadOfflineData = loadOfflineData;
+        this.timestamp = timestamp;
     }
 
     @Override
@@ -49,23 +57,11 @@ public abstract class FeedsLoadTask extends AbstractNetworkTask<String, Integer,
     @Override
     protected Pagination<JRssFeed> executeApi(API api) throws Exception {
         RssFeedCache cache = new RssFeedCache(getContext(), feedType);
-        /*if(pageLink == null) {
-            pageLink = cache.readLastPageLink();
-            if(pageLink == null) {
-                pageLink = Constants.FIRST_PAGE;
-            }
-            if(Constants.END_OF_PAGE.equals(pageLink) && loadOfflineData) {
-                pageLink = Constants.END_OF_PAGE;
-            }
-        }
-        boolean loadStatus = AppController.getInstance().getLoadStatus(feedType);
-        if(!loadStatus) {
-            long lastReceiveTimestamp = cache.readLastReceiveTimestamp();
-            pageLink = PageUtil.buildNextPageLink(lastReceiveTimestamp);
-            AppController.getInstance().setLoadStatus(feedType, true);
-        }*/
 
         long lastReceiveTimestamp = cache.readLastReceiveTimestamp();
+        if(timestamp > 0) {
+            lastReceiveTimestamp = timestamp;
+        }
         pageLink = PageUtil.buildNextPageLink(lastReceiveTimestamp);
         AppController.getInstance().setLoadStatus(feedType, true);
 
@@ -78,23 +74,6 @@ public abstract class FeedsLoadTask extends AbstractNetworkTask<String, Integer,
             errorMsg = "Oops! Something went wrong";
             fireOnFailure(errorMsg);
         }
-        /*Pagination<JRssFeed> page = null;
-        try {
-            page = (Pagination<JRssFeed>)api.execute();
-            if(loadOfflineData) {
-                List<JRssFeed> list = cache.readOfflineData();
-                page.getResult().addAll(list);
-                List<JRssFeed> list2 = new ArrayList<>();
-                list2.addAll(new LinkedHashSet<>(page.getResult()));
-                page.getResult().clear();
-                page.getResult().addAll(list2);
-            }
-            cache.storeOfflineData(page);
-        } catch (Exception e) {
-            Log.d(LOG_TAG, e.getMessage());
-            errorMsg = "Oops! Something went wrong";
-            fireOnFailure(errorMsg);
-        }*/
         return page;
     }
 
@@ -107,14 +86,14 @@ public abstract class FeedsLoadTask extends AbstractNetworkTask<String, Integer,
         Pagination<JRssFeed> page = new Pagination<JRssFeed>();
         if(AppController.getInstance().getExecutionMode() == Mode.ONLINE) {
             page = (Pagination<JRssFeed>)api.execute();
-            if(loadOfflineData) {
+            /*if(loadOfflineData) {
                 List<JRssFeed> list = cache.readOfflineData();
                 page.getResult().addAll(list);
                 List<JRssFeed> list2 = new ArrayList<>();
                 list2.addAll(new LinkedHashSet<>(page.getResult()));
                 page.getResult().clear();
                 page.getResult().addAll(list2);
-            }
+            }*/
             cache.storeOfflineData(page);
         } else {
             List<JRssFeed> list = cache.readOfflineData();
@@ -126,17 +105,23 @@ public abstract class FeedsLoadTask extends AbstractNetworkTask<String, Integer,
         return page;
     }
 
-    @Override
-    protected final Map<String, Object> prepareApiParams(String inputObject) {
-        return doPrepareApiParams(pageLink);
-    }
-
     /*@Override
     protected final Map<String, Object> prepareApiParams(String inputObject) {
-        Map<String, Object> apiParams = doPrepareApiParams(inputObject);
-        pageLink = (String) apiParams.get(APIConstants.PageInfo.PAGE_LINK);
-        return apiParams;
+        return doPrepareApiParams(pageLink);
     }*/
 
-    protected abstract Map<String, Object> doPrepareApiParams(String inputObject);
+    @Override
+    protected final Map<String, Object> prepareApiParams(String inputObject) {
+        RssFeedCache cache = new RssFeedCache(getContext(), feedType);
+        long lastReceiveTimestamp = cache.readLastReceiveTimestamp();
+        if(timestamp > 0) {
+            lastReceiveTimestamp = timestamp;
+        }
+        pageLink = PageUtil.buildNextPageLink(lastReceiveTimestamp);
+        Map<String, Object> apiParams = new HashMap<String, Object>();
+        String userId = AppController.getInstance().getUserId();
+        apiParams.put(APIConstants.User.ID, userId);
+        apiParams.put(APIConstants.PageInfo.PAGE_LINK, pageLink);
+        return apiParams;
+    }
 }

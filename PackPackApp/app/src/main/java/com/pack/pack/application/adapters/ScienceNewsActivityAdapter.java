@@ -82,7 +82,11 @@ public class ScienceNewsActivityAdapter extends ArrayAdapter<JRssFeed> {
         final JRssFeed feed = getItem(position);
         if (feed != null) {
             science_news_rss_feed__name.setText(feed.getOgTitle());
-            science_news_rss_feed_description.setText(feed.getOgDescription());
+            String textSummary = feed.getArticleSummaryText();
+            if(textSummary == null) {
+                textSummary = feed.getOgDescription();
+            }
+            science_news_rss_feed_description.setText(textSummary);
             final String imageUrl = feed.getOgImage();
             final String videoUrl = feed.getVideoUrl();
             if (videoUrl != null && !videoUrl.trim().isEmpty()) {

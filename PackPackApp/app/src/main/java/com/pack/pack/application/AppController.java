@@ -135,6 +135,16 @@ public class AppController extends Application {
         return user != null ? user.getId() : "";
     }
 
+    private boolean landingPageActive = false;
+
+    public void setLandingPageActive(boolean landingPageActive) {
+        this.landingPageActive = landingPageActive;
+    }
+
+    public boolean isLandingPageActive() {
+        return landingPageActive;
+    }
+
     private static AppController mInstance;
 
     public static final String ANDROID_APP_CLIENT_KEY = "53e8a1f2-7568-4ac8-ab26-45738ca02599";

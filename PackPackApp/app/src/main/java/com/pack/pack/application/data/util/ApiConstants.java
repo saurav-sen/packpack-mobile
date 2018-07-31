@@ -8,8 +8,11 @@ public interface ApiConstants {
     //public static final String BASE_URL = "http://192.168.35.12:8080/packpack/"; //DEV Local Environment
     //public static final String PUBLIC_ENDPOINT_BASE_URL = "http://192.168.35.12:8080/RSS/";//DEV Local Environment
 
-    public static final String BASE_URL = "http://api.squill.in/api/"; //DEV Environment
-    public static final String PUBLIC_ENDPOINT_BASE_URL = "http://api.squill.in/news/";//DEV Environment
+    public static final String BASE_URL = "http://13.126.170.52/api/"; //DEV Environment
+    public static final String PUBLIC_ENDPOINT_BASE_URL = "http://13.126.170.52/news/";//DEV Environment
+
+    //public static final String BASE_URL = "http://35.154.105.113/api/"; //DEV Environment
+    //public static final String PUBLIC_ENDPOINT_BASE_URL = "http://35.154.105.113/news/";//DEV Environment
 
     //public static final String BASE_URL = "http://api.squill.co.in/api/"; //PRODUCTION Environment
     //public static final String PUBLIC_ENDPOINT_BASE_URL = "http://api.squill.co.in/news/";//PRODUCTION Environment

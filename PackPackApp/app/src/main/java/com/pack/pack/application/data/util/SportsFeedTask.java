@@ -24,19 +24,13 @@ public class SportsFeedTask extends FeedsLoadTask {
         super(context, JRssFeedType.NEWS_SPORTS, loadOfflineData);
     }
 
-    @Override
-    protected COMMAND command() {
-        return COMMAND.GET_ALL_SPORTS_NEWS_FEEDS;
+    public SportsFeedTask(Context context, boolean loadOfflineData, long timestamp) {
+        super(context, JRssFeedType.NEWS_SPORTS, loadOfflineData, timestamp);
     }
 
     @Override
-    protected Map<String, Object> doPrepareApiParams(String inputObject) {
-        Map<String, Object> apiParams = new HashMap<String, Object>();
-        String pageLink = inputObject;
-        String userId = AppController.getInstance().getUserId();
-        apiParams.put(APIConstants.User.ID, userId);
-        apiParams.put(APIConstants.PageInfo.PAGE_LINK, pageLink);
-        return apiParams;
+    protected COMMAND command() {
+        return COMMAND.GET_ALL_SPORTS_NEWS_FEEDS;
     }
 }
 
