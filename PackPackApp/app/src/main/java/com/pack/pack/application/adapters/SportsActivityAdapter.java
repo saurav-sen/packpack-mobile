@@ -94,12 +94,7 @@ public class SportsActivityAdapter extends ArrayAdapter<JRssFeed> {
                 sports_rss_feed_video_play.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent intent = new Intent(getContext(), FullScreenNewsViewActivity.class);
-                        String url = feed.getHrefSource() != null ? feed.getHrefSource() : feed.getOgUrl();
-                        String shareUrl = feed.getShareableUrl() != null ? feed.getShareableUrl() : url;
-                        intent.putExtra(FullScreenNewsViewActivity.NEWS_LINK, url);
-                        intent.putExtra(FullScreenNewsViewActivity.WEB_SHARE_LINK, shareUrl);
-                        getContext().startActivity(intent);
+                        openFullScreenNewsActivity(feed);
                     }
                 });
             } else {
@@ -111,23 +106,13 @@ public class SportsActivityAdapter extends ArrayAdapter<JRssFeed> {
                 sports_rss_feed_image.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        Intent intent = new Intent(getContext(), FullScreenNewsViewActivity.class);
-                        String url = feed.getHrefSource() != null ? feed.getHrefSource() : feed.getOgUrl();
-                        String shareUrl = feed.getShareableUrl() != null ? feed.getShareableUrl() : url;
-                        intent.putExtra(FullScreenNewsViewActivity.NEWS_LINK, url);
-                        intent.putExtra(FullScreenNewsViewActivity.WEB_SHARE_LINK, shareUrl);
-                        getContext().startActivity(intent);
+                        openFullScreenNewsActivity(feed);
                     }
                 });
                 sports_rss_feed_description.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent intent = new Intent(getContext(), FullScreenNewsViewActivity.class);
-                        String url = feed.getHrefSource() != null ? feed.getHrefSource() : feed.getOgUrl();
-                        String shareUrl = feed.getShareableUrl() != null ? feed.getShareableUrl() : url;
-                        intent.putExtra(FullScreenNewsViewActivity.NEWS_LINK, url);
-                        intent.putExtra(FullScreenNewsViewActivity.WEB_SHARE_LINK, shareUrl);
-                        getContext().startActivity(intent);
+                        openFullScreenNewsActivity(feed);
                     }
                 });
             }
@@ -140,6 +125,20 @@ public class SportsActivityAdapter extends ArrayAdapter<JRssFeed> {
             });
         }
         return convertView;
+    }
+
+    private void openFullScreenNewsActivity(final JRssFeed feed) {
+        Intent intent = new Intent(getContext(), FullScreenNewsViewActivity.class);
+        String url = feed.getSquillUrl();
+        String shareUrl = feed.getShareableUrl() != null ? feed.getShareableUrl() : url;
+        String newsTitle = feed.getOgTitle();
+        String newsFullText = feed.getFullArticleText();
+        intent.putExtra(FullScreenNewsViewActivity.NEWS_LINK, url);
+        intent.putExtra(FullScreenNewsViewActivity.WEB_SHARE_LINK, shareUrl);
+        intent.putExtra(FullScreenNewsViewActivity.SOURCE_LINK, feed.getOgUrl());
+        intent.putExtra(FullScreenNewsViewActivity.NEWS_TITLE, newsTitle);
+        intent.putExtra(FullScreenNewsViewActivity.NEWS_FULL_TEXT, newsFullText);
+        getContext().startActivity(intent);
     }
 
     private void shareUrl(JRssFeed feed) {

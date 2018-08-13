@@ -20,8 +20,10 @@ import java.util.regex.Pattern;
  */
 public class UserUtil {
 
+    /*private static final String PASSWORD_PATTERN_REGEX =
+            "((?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{6,20})";*/
     private static final String PASSWORD_PATTERN_REGEX =
-            "((?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@$]).{6,20})";
+            "((?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{6,20})";
     private static final Pattern PASSWORD_PATTERN = Pattern.compile(PASSWORD_PATTERN_REGEX);
 
     private UserUtil() {
@@ -47,7 +49,8 @@ public class UserUtil {
         if(PASSWORD_PATTERN.matcher(passwd).matches()) {
             return null;
         }
-        return "Password needs 6 to 20 length,at least one digit, upper case,one lower case,one of @,$";
+        //return "6 to 20 length,at least one digit,one upper case,one lower case,anyone of !,@,#,$,%,^,&,*";
+        return "6 to 20 length,at least one digit,one upper case,one lower case";
     }
 
     public static void verifyLogin(Context context, IAsyncTaskStatusListener listener) {

@@ -107,15 +107,7 @@ public class NewsActivityAdapter extends ArrayAdapter<JRssFeed> {
                 news_rss_feed_video_play.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        //playVideo(videoUrl);
-                        Intent intent = new Intent(getContext(), FullScreenNewsViewActivity.class);
-
-                        String url = feed.getHrefSource() != null ? feed.getHrefSource() : feed.getOgUrl();
-                        String shareUrl = feed.getShareableUrl() != null ? feed.getShareableUrl() : url;
-                        intent.putExtra(FullScreenNewsViewActivity.NEWS_LINK, url);
-                        intent.putExtra(FullScreenNewsViewActivity.WEB_SHARE_LINK, shareUrl);
-                        //intent.putParcelableArrayListExtra(FullScreenRssFeedViewActivity.PARCELLABLE_FEEDS, prepareParcel(feed));
-                        getContext().startActivity(intent);
+                        openFullScreenNewsActivity(feed);
                     }
                 });
             } else {
@@ -127,33 +119,13 @@ public class NewsActivityAdapter extends ArrayAdapter<JRssFeed> {
                 news_rss_feed_image.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                       /*Intent intent = new Intent(Intent.ACTION_VIEW);
-                        intent.setData(Uri.parse(feed.getOgUrl()));
-                        getContext().startActivity(intent);*/
-
-                        /*Intent intent = new Intent(getContext(), FullScreenRssFeedViewActivity.class);
-                        intent.putParcelableArrayListExtra(FullScreenRssFeedViewActivity.PARCELLABLE_FEEDS, prepareParcel(feed));
-                        getContext().startActivity(intent);*/
-                        Intent intent = new Intent(getContext(), FullScreenNewsViewActivity.class);
-                        String url = feed.getHrefSource() != null ? feed.getHrefSource() : feed.getOgUrl();
-                        String shareUrl = feed.getShareableUrl() != null ? feed.getShareableUrl() : url;
-                        intent.putExtra(FullScreenNewsViewActivity.NEWS_LINK, url);
-                        intent.putExtra(FullScreenNewsViewActivity.WEB_SHARE_LINK, shareUrl);
-                        getContext().startActivity(intent);
+                        openFullScreenNewsActivity(feed);
                     }
                 });
                 news_rss_feed_description.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        /*Intent intent = new Intent(getContext(), FullScreenRssFeedViewActivity.class);
-                        intent.putParcelableArrayListExtra(FullScreenRssFeedViewActivity.PARCELLABLE_FEEDS, prepareParcel(feed));
-                        getContext().startActivity(intent);*/
-                        Intent intent = new Intent(getContext(), FullScreenNewsViewActivity.class);
-                        String url = feed.getHrefSource() != null ? feed.getHrefSource() : feed.getOgUrl();
-                        String shareUrl = feed.getShareableUrl() != null ? feed.getShareableUrl() : url;
-                        intent.putExtra(FullScreenNewsViewActivity.NEWS_LINK, url);
-                        intent.putExtra(FullScreenNewsViewActivity.WEB_SHARE_LINK, shareUrl);
-                        getContext().startActivity(intent);
+                        openFullScreenNewsActivity(feed);
                     }
                 });
             }
@@ -176,6 +148,20 @@ public class NewsActivityAdapter extends ArrayAdapter<JRssFeed> {
             });
         }
         return convertView;
+    }
+
+    private void openFullScreenNewsActivity(final JRssFeed feed) {
+        Intent intent = new Intent(getContext(), FullScreenNewsViewActivity.class);
+        String url = feed.getSquillUrl();
+        String shareUrl = feed.getShareableUrl() != null ? feed.getShareableUrl() : url;
+        String newsTitle = feed.getOgTitle();
+        String newsFullText = feed.getFullArticleText();
+        intent.putExtra(FullScreenNewsViewActivity.NEWS_LINK, url);
+        intent.putExtra(FullScreenNewsViewActivity.WEB_SHARE_LINK, shareUrl);
+        intent.putExtra(FullScreenNewsViewActivity.SOURCE_LINK, feed.getOgUrl());
+        intent.putExtra(FullScreenNewsViewActivity.NEWS_TITLE, newsTitle);
+        intent.putExtra(FullScreenNewsViewActivity.NEWS_FULL_TEXT, newsFullText);
+        getContext().startActivity(intent);
     }
 
     private void shareUrl(JRssFeed feed) {

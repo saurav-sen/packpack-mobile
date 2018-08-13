@@ -18,8 +18,12 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 
+import com.pack.pack.application.AppController;
+import com.pack.pack.application.Mode;
 import com.pack.pack.application.R;
 import com.pack.pack.application.view.util.ExternalLinkShareUtil;
+import com.pack.pack.application.view.util.HtmlUtil;
+import com.pack.pack.application.view.util.LogoMap;
 import com.pack.pack.application.view.util.ViewUtil;
 
 public class FullScreenNewsViewActivity extends AppCompatActivity {
@@ -30,6 +34,10 @@ public class FullScreenNewsViewActivity extends AppCompatActivity {
 
     public static final String WEB_SHARE_LINK = "WEB_SHARE_LINK";
     public static final String NEWS_LINK = "NEWS_LINK";
+    public static final String SOURCE_LINK = "SOURCE_LINK";
+
+    public static final String NEWS_TITLE = "NEWS_TITLE";
+    public static final String NEWS_FULL_TEXT = "NEWS_FULL_TEXT";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +52,9 @@ public class FullScreenNewsViewActivity extends AppCompatActivity {
 
         final String newsLink = getIntent().getStringExtra(NEWS_LINK);
         final String webShareLink = getIntent().getStringExtra(WEB_SHARE_LINK);
+        final String sourceLink = getIntent().getStringExtra(SOURCE_LINK);
+        final String newsTitle = getIntent().getStringExtra(NEWS_TITLE);
+        final String newsFullText = getIntent().getStringExtra(NEWS_FULL_TEXT);
         new_detail_fullscreen_view = (WebView) findViewById(R.id.new_detail_fullscreen_view);
         new_detail_fullscreen_view.getSettings().setJavaScriptEnabled(true);
         //new_detail_fullscreen_view.getSettings().setUserAgentString();
@@ -56,7 +67,14 @@ public class FullScreenNewsViewActivity extends AppCompatActivity {
                 shareUrl(webShareLink);
             }
         });
-        new_detail_fullscreen_view.loadUrl(newsLink);
+       /* if(AppController.getInstance().getExecutionMode() == Mode.ONLINE) {
+            new_detail_fullscreen_view.loadUrl(newsLink);
+        } else {
+            String html = HtmlUtil.generateOfflineHtml(newsTitle, newsFullText);
+            new_detail_fullscreen_view.loadData(html, "text/html", "UTF-8");
+        }*/
+        String html = HtmlUtil.generateOfflineHtml(newsTitle, newsFullText, sourceLink, LogoMap.get(sourceLink));
+        new_detail_fullscreen_view.loadDataWithBaseURL("file:///android_asset/", html, "text/html", "UTF-8", null);
     }
 
     private void shareUrl(String url) {
