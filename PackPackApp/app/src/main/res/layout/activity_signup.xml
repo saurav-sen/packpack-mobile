@@ -82,7 +82,7 @@
             android:background="@color/colorPrimary"
             android:padding="12dp"
             android:textAllCaps="false"
-            android:text="Your age is important to us"/>
+            android:text="Done"/>
 
         <TextView android:id="@+id/link_login"
             android:layout_width="fill_parent"

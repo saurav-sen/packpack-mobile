@@ -5,7 +5,7 @@ package com.pack.pack.application.data.util;
  */
 public interface ApiConstants {
 
-    public static final String BASE_URL = "http://13.232.244.197/api/"; //DEV Environment
+    public static final String BASE_URL = "http://13.232.242.137/api/"; //DEV Environment
 
     //public static final String BASE_URL = "http://api.squill.co.in/api/"; //PRODUCTION Environment
 

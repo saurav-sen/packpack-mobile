@@ -128,13 +128,15 @@ public class SignupActivity extends AbstractAppCompatActivity implements IAsyncT
                     new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
                     LOCATION_COARSE_ACCESS_REQUEST_CODE);
             return;
+        } else {
+            LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+            Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            if(location != null) {
+                longitude = location.getLongitude();
+                latitude = location.getLatitude();
+            }
         }
-        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-        if(location != null) {
-            longitude = location.getLongitude();
-            latitude = location.getLatitude();
-        }
+
         /*Intent service = new Intent(this, FetchAddressIntentService.class);
         service.putExtra(RESULT_RECEIVER, new ResultReceiver(null) {
             @Override
