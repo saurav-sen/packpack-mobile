@@ -15,12 +15,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:scaleType="fitStart"
-            android:src="@drawable/my_friend_intro" />
+            android:src="@drawable/sci_and_tech" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/intro_slide_6_title"
+            android:text="@string/intro_slide_1_title"
             android:textColor="#4d4d4d"
             android:textSize="@dimen/intro_slide_title"
             android:textStyle="bold" />
@@ -31,11 +31,12 @@
             android:layout_marginTop="20dp"
             android:paddingLeft="@dimen/intro_desc_padding"
             android:paddingRight="@dimen/intro_desc_padding"
-            android:text="@string/intro_slide_6_desc"
+            android:text="@string/intro_slide_1_desc"
             android:textAlignment="center"
             android:textColor="#666666"
             android:textSize="@dimen/intro_slide_desc" />
 
     </LinearLayout>
+
 
 </RelativeLayout>
