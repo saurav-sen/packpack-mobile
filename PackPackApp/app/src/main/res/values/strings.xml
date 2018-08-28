@@ -40,33 +40,23 @@
     <string name="start">GOT IT</string>
 
     <string name="intro_slide_1_title">Science And Technology</string>
-    <string name="intro_slide_1_desc">Follow latest happening/trends in the world of Science And Technology</string>
+    <string name="intro_slide_1_desc">No Fiction only trends in the world of Science And Technology</string>
 
     <string name="intro_slide_2_title">Sports</string>
-    <string name="intro_slide_2_desc">Stay upto date with worlds most favourite sports events</string>
+    <string name="intro_slide_2_desc">Stay upto date with worlds most favourite sports</string>
 
-    <string name="intro_slide_3_title">SQUILL Refreshment</string>
-    <string name="intro_slide_3_desc">SQUILL team does bring to you everyday amazing video to re-vitalize your mind</string>
+    <string name="intro_slide_3_title">Just Like That</string>
+    <string name="intro_slide_3_desc">Hand picked stunning feeds by SQUILL to re-vitalize your mind</string>
 
     <string name="intro_slide_4_title">News</string>
-    <string name="intro_slide_4_desc">Read latest news and happening around the globe to stay ahead</string>
+    <string name="intro_slide_4_desc">No rumors only latest news from proven sources</string>
 
     <string name="intro_slide_5_title">Read Article</string>
-    <string name="intro_slide_5_desc">Read articles and stories of different matter from best of bloggers and writers</string>
-
-    <string name="intro_slide_6_title">Friends Group</string>
-    <string name="intro_slide_6_desc">Share and store memories with your friends and special one</string>
-
-    <string name="intro_slide_7_title">Smart Society</string>
-    <string name="intro_slide_7_desc">Stay attached to neighbour.Tackle all affairs of society at one place</string>
+    <string name="intro_slide_5_desc">It is all about reading amazing articles and blog feeds</string>
 
     <string name="title_activity_my_family">SQUILL</string>
     <string name="title_activity_refreshments">SQUILL</string>
     <string name="section_format">Hello World from section: %1$d</string>
     <string name="title_activity_generic_topic_list">SQUILL</string>
     <string name="title_activity_my_society">SQUILL</string>
-
-    <string name="invite_others_to_family_deeplink_base_url">http://www.squill.co.in/invitation/myfamily_</string>
-    <string name="invite_others_to_society_deeplink_base_url">http://www.squill.co.in/invitation/mysociety_</string>
-    <string name="invite_others_to_topic_deeplink_base_url">http://www.squill.co.in/invitation/topic_</string>
 </resources>

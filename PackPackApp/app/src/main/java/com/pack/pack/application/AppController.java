@@ -34,6 +34,8 @@ public class AppController extends Application {
 
     public static final String APP_NAME = "PackPack";
 
+    public static final String PACKAGE_NAME = "com.pack.pack.application";
+
     //public static final boolean SUPPORT_OFFLINE = false;
 
     private RequestQueue mRequestQueue;

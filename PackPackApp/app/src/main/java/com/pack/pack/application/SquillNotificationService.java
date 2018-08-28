@@ -76,7 +76,8 @@ public class SquillNotificationService extends FirebaseMessagingService {
                 Log.d(LOG_TAG, "From: " + remoteMessage.getFrom());
                 Log.d(LOG_TAG, "Notification Message Body: " + msgBody);
                 //handleNotificationMessage(msgBody);
-                NotificationUtil.showNotificationMessage(msgBody, msgBody, this, false);
+                //NotificationUtil.showNotificationMessage(msgBody, msgBody, this, false);
+                NotificationUtil.showCustomNotificationMessage(msgBody, this, false);
             } else if(remoteMessage.getData() != null && !remoteMessage.getData().isEmpty()) {
                 //NotificationUtil.showNotificationMessage("Yes", "", getApplicationContext(), false);
                 try {

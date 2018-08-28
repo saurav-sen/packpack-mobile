@@ -13,7 +13,9 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
+import android.widget.RemoteViews;
 
+import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
 import com.pack.pack.application.activity.SplashActivity;
 import com.pack.pack.model.web.notification.FeedMsg;
@@ -90,6 +92,41 @@ public final class NotificationUtil {
             notificationBuilder.setStyle(inboxStyle);
             notificationManager.notify(APP_NAME, NOTIFICATION_ID, notificationBuilder.build());
         }
+    }
+
+
+    public static void showCustomNotificationMessage(String message, Context context, boolean isDataMessage) {
+        if(message == null || message.trim().isEmpty()) { // No message to display then no notification.
+            return;
+        }
+        RemoteViews contentView = new RemoteViews(AppController.PACKAGE_NAME, R.layout.custom_notification);
+        contentView.setImageViewResource(R.id.notification_image, R.drawable.squill_notification);
+        contentView.setTextViewText(R.id.notification_title, message);
+
+        Intent intent = new Intent(context, SplashActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_ONE_SHOT);
+
+        final int NOTIFICATION_ID = new Random().nextInt();//Math.abs(feedMsg.getKey())%10000;
+        final NotificationManager notificationManager =
+                (NotificationManager) context.getSystemService(
+                        Context.NOTIFICATION_SERVICE);
+        final NotificationCompat.Builder notificationBuilder =
+                new NotificationCompat.Builder(context)
+                        .setContent(contentView)
+                        .setContentIntent(pendingIntent)
+                        .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+                        .setPriority(NotificationCompat.PRIORITY_MAX);
+        notificationManager.notify(APP_NAME, NOTIFICATION_ID, notificationBuilder.build());
+
+       /* final NotificationCompat.Builder notificationBuilder =
+                new NotificationCompat.Builder(context)
+                        *//*.setSmallIcon(R.drawable.logo)*//*
+                        *//*.setStyle(new NotificationCompat.DecoratedCustomViewStyle())*//*
+                        *//*.setCustomContentView(contentView)*//*
+                        .setContent(contentView)
+                        .setContentIntent(pendingIntent)
+                        .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+                        .setPriority(NotificationCompat.PRIORITY_MAX);*/
     }
 
     public static void showNotificationMessage(String title, String message, Context context, boolean isDataMessage) {
