@@ -92,15 +92,15 @@ public class AppController extends Application {
         return executionMode;
     }
 
-    public String getoAuthToken() {
-        return oAuthToken;
+    public String getUserEmail() {
+        return userEmail;
     }
 
-    public void setoAuthToken(String oAuthToken) {
-        this.oAuthToken = oAuthToken;
+    public void setUserEmail(String userEmail) {
+        this.userEmail = userEmail;
     }
 
-    private String oAuthToken;
+    private String userEmail;
 
     private JUser user;
 
@@ -129,6 +129,9 @@ public class AppController extends Application {
 
     public void setUser(JUser user) {
         this.user = user;
+        if(user != null) {
+            setUserEmail(user.getUsername());
+        }
     }
 
     public String getUserId() {
@@ -212,7 +215,7 @@ public class AppController extends Application {
     }
 
     public void waitForLoginSuccess() {
-        while (oAuthToken == null) {
+        while (userEmail == null) {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {

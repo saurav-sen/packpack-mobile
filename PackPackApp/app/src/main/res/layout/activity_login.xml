@@ -33,7 +33,7 @@
         </android.support.design.widget.TextInputLayout>
 
         <!--  Password Label -->
-        <android.support.design.widget.TextInputLayout
+        <!--<android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
@@ -43,7 +43,7 @@
                 android:layout_height="wrap_content"
                 android:inputType="textPassword"
                 android:hint="Password"/>
-        </android.support.design.widget.TextInputLayout>
+        </android.support.design.widget.TextInputLayout>-->
 
         <android.support.v7.widget.AppCompatButton
             android:id="@+id/btn_login"
@@ -53,7 +53,7 @@
             android:layout_marginBottom="24dp"
             android:background="@color/colorPrimary"
             android:padding="12dp"
-            android:text="Login"/>
+            android:text="Existing User"/>
 
         <android.support.v7.widget.AppCompatButton
             android:id="@+id/btn_signup"
@@ -63,15 +63,15 @@
             android:layout_marginBottom="24dp"
             android:background="@color/colorPrimary"
             android:padding="12dp"
-            android:text="Signup"/>
+            android:text="New User"/>
 
-        <TextView android:id="@+id/link_forgot_passwd"
+       <!-- <TextView android:id="@+id/link_forgot_passwd"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
             android:text="Forgot Password?"
             android:gravity="center"
-            android:textSize="16dip"/>
+            android:textSize="16dip"/>-->
 
     </LinearLayout>
 </ScrollView>

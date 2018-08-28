@@ -15,42 +15,36 @@ import com.pack.pack.client.api.APIBuilder;
 import com.pack.pack.client.api.APIConstants;
 import com.pack.pack.client.api.COMMAND;
 import com.pack.pack.model.web.JUser;
-import com.pack.pack.oauth1.client.AccessToken;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.pack.pack.application.AppController.ANDROID_APP_CLIENT_KEY;
-import static com.pack.pack.application.AppController.ANDROID_APP_CLIENT_SECRET;
-
 /**
  * Created by Saurav on 11-06-2016.
  */
-public class LoginTask extends AbstractNetworkTask<UserInfo, Integer, AccessToken> {
+public class LoginTask extends AbstractNetworkTask<UserInfo, Integer, JUser> {
 
     private String errorMsg;
 
     private static final String LOG_TAG = "LoginTask";
 
-    private JUser user;
+   // private JUser user;
 
     private UserInfo userInfo;
 
     private String followedCategories;
 
-    private boolean refreshToken = false;
+    private boolean firstTime = false;
 
     /*public LoginTask(Context context) {
         super(false, true, context, false);
     }*/
 
-    public LoginTask(Context context, IAsyncTaskStatusListener listener, boolean refreshToken) {
+    public LoginTask(Context context, IAsyncTaskStatusListener listener, boolean firstTime) {
         super(AppController.getInstance().getExecutionMode() == Mode.OFFLINE, true, context, false);
         addListener(listener);
-        this.refreshToken = refreshToken;
+        this.firstTime = firstTime;
     }
 
     @Override
@@ -69,27 +63,17 @@ public class LoginTask extends AbstractNetworkTask<UserInfo, Integer, AccessToke
     }
 
     @Override
-    protected AccessToken executeApi(API api0) throws Exception {
-        AccessToken accessToken = null;
+    protected JUser executeApi(API api0) throws Exception {
+        JUser user = null;
         try {
-            accessToken = (AccessToken) api0.execute();
-            AppController.getInstance().setoAuthToken(accessToken.getToken());
-
-            // GET user details
-            API api = APIBuilder
-                    .create(ApiConstants.BASE_URL)
-                    .setAction(COMMAND.GET_USER_BY_USERNAME)
-                    .setOauthToken(AppController.getInstance().getoAuthToken())
-                    .addApiParam(APIConstants.User.USERNAME,
-                            userInfo.getUsername()).build();
-            user = (JUser) api.execute();
+            user = (JUser) api0.execute();
             AppController.getInstance().setUser(user);
 
             // GET user followed categories
-            api = APIBuilder
+            API api = APIBuilder
                     .create(ApiConstants.BASE_URL)
                     .setAction(COMMAND.GET_USER_CATEGORIES)
-                    .setOauthToken(AppController.getInstance().getoAuthToken())
+                    .setUserName(AppController.getInstance().getUserEmail())
                     .addApiParam(APIConstants.User.ID, user.getId())
                     .build();
             List<String> list = (List<String>) api.execute();
@@ -114,14 +98,14 @@ public class LoginTask extends AbstractNetworkTask<UserInfo, Integer, AccessToke
             Log.i(LOG_TAG, e.getMessage());
             errorMsg = e.getMessage();
         }
-        return accessToken;
+        return user;
     }
 
     @Override
-    protected DbObject convertObjectForStore(AccessToken successResult, String containerIdForObjectStore) {
+    protected DbObject convertObjectForStore(JUser user, String containerIdForObjectStore) {
         UserInfo userInfo = new UserInfo();
-        userInfo.setAccessToken(successResult.getToken());
-        userInfo.setAccessTokenSecret(successResult.getTokenSecret());
+        /*userInfo.setAccessToken(successResult.getToken());
+        userInfo.setAccessTokenSecret(successResult.getTokenSecret());*/
         userInfo.setUserId(user.getId());
         userInfo.setUsername(user.getUsername());
         return userInfo;
@@ -129,33 +113,33 @@ public class LoginTask extends AbstractNetworkTask<UserInfo, Integer, AccessToke
 
     @Override
     protected COMMAND command() {
-        return COMMAND.SIGN_IN;
+        return COMMAND.GET_USER_BY_USERNAME;
     }
 
     @Override
     protected Map<String, Object> prepareApiParams(UserInfo userInfo) {
         this.userInfo = userInfo;
         Map<String, Object> apiParams = new HashMap<String, Object>();
-        apiParams.put(APIConstants.Login.CLIENT_KEY, ANDROID_APP_CLIENT_KEY);
-        apiParams.put(APIConstants.Login.CLIENT_SECRET, ANDROID_APP_CLIENT_SECRET);
-        if(!refreshToken) {
-            apiParams.put(APIConstants.Login.USERNAME, userInfo.getUsername());
-            apiParams.put(APIConstants.Login.PASSWORD, userInfo.getPassword());
-        } else {
+        /*apiParams.put(APIConstants.Login.CLIENT_KEY, ANDROID_APP_CLIENT_KEY);
+        apiParams.put(APIConstants.Login.CLIENT_SECRET, ANDROID_APP_CLIENT_SECRET);*/
+        /*if(!firstTime) {*/
+            apiParams.put(APIConstants.User.USERNAME,
+                    userInfo.getUsername());
+       /* } *//*else {
             apiParams.put(APIConstants.Login.OLD_ACCESS_TOKEN, userInfo.getAccessToken());
             apiParams.put(APIConstants.Login.OLD_ACCESS_TOKEN_SECRET, userInfo.getAccessTokenSecret());
-        }
+        }*/
         return apiParams;
     }
 
     @Override
-    protected Object getSuccessResult(AccessToken accessToken) {
-        return new LoggedInUserInfo(accessToken, user);
+    protected Object getSuccessResult(JUser user) {
+        return new LoggedInUserInfo(user);
     }
 
     @Override
-    protected boolean isSuccess(AccessToken accessToken) {
-        return accessToken != null && accessToken.getToken() != null;
+    protected boolean isSuccess(JUser user) {
+        return user != null;
     }
 
     @Override
@@ -164,24 +148,14 @@ public class LoginTask extends AbstractNetworkTask<UserInfo, Integer, AccessToke
     }
 
     @Override
-    protected AccessToken doRetrieveFromDB(SQLiteDatabase readable, UserInfo inputObject) {
+    protected JUser doRetrieveFromDB(SQLiteDatabase readable, UserInfo inputObject) {
         final UserInfo userInfo = DBUtil.loadLastLoggedInUserInfo(readable);
         if(userInfo != null) {
-            user = DBUtil.convertUserInfo(userInfo);
+            JUser user = DBUtil.convertUserInfo(userInfo);
             AppController.getInstance().setUser(user);
-            if(AppController.getInstance().getExecutionMode() == Mode.ONLINE && userInfo.getAccessToken() != null && userInfo.getAccessTokenSecret() != null) {
-                AppController.getInstance().setoAuthToken(userInfo.getAccessToken());
-                return  new AccessToken() {
-                    @Override
-                    public String getToken() {
-                        return userInfo.getAccessToken();
-                    }
-
-                    @Override
-                    public String getTokenSecret() {
-                        return userInfo.getAccessTokenSecret();
-                    }
-                };
+            if(AppController.getInstance().getExecutionMode() == Mode.OFFLINE) {
+                AppController.getInstance().setUserEmail(userInfo.getUsername());
+                return user;
             }
         }
         return null;

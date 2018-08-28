@@ -1,28 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <!--item
-        android:id="@+id/enter_forum"
-        android:orderInCategory="100"
-        android:title="Forum"
-        android:icon="@drawable/forum"
-        app:showAsAction="always"/-->
-    <!--item
+    <item
         android:id="@+id/app_settings"
         android:orderInCategory="100"
         android:title="Settings"
-        android:icon="@drawable/settings"
-        app:showAsAction="ifRoom"/-->
-
-    <item
-        android:id="@+id/invite_others"
-        android:orderInCategory="100"
-        android:title="Invite Others"
-        android:icon="@drawable/invite_others"
         app:showAsAction="always|withText"/>
-
-    <item
-        android:id="@+id/invite_others_alt"
-        android:orderInCategory="100"
-        android:title="Invite Others"/>
 </menu>

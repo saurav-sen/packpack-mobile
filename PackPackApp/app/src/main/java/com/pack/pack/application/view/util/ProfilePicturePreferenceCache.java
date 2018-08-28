@@ -67,7 +67,7 @@ public class ProfilePicturePreferenceCache {
             try {
                 API api = APIBuilder.create(ApiConstants.BASE_URL)
                         .setAction(COMMAND.UPLOAD_USER_PROFILE_PICTURE)
-                        .setOauthToken(AppController.getInstance().getoAuthToken())
+                        .setUserName(AppController.getInstance().getUserEmail())
                         .addApiParam(APIConstants.User.ID, AppController.getInstance().getUserId())
                         .addApiParam(APIConstants.User.PROFILE_PICTURE, data)
                         .build();

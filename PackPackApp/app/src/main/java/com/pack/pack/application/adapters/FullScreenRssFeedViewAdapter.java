@@ -23,10 +23,7 @@ import com.pack.pack.application.R;
 import com.pack.pack.application.activity.FullScreenPlayVideoActivity;
 import com.pack.pack.application.data.util.ApiConstants;
 import com.pack.pack.application.data.util.DownloadFeedImageTask;
-import com.pack.pack.application.data.util.ImageUtil;
-import com.pack.pack.application.image.loader.DownloadImageTask;
 import com.pack.pack.application.topic.activity.model.ParcellableRssFeed;
-import com.squill.feed.web.model.JRssSubFeed;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -101,7 +98,7 @@ public class FullScreenRssFeedViewAdapter extends PagerAdapter {
             if(imageUrl != null) {
                 /*new DownloadFeedImageTask(feed_imgDisplay, 850, 850, this, null)
                         .execute(imageUrl);*/
-                //feed_imgDisplay.setImageBitmap(ImageUtil.getBitmap(imageUrl));
+                //feed_imgDisplay.setImageBitmap(MediaUtil.getBitmap(imageUrl));
                 prepareImageRender(input);
             }
             feed_descriptionText.setText(input.getOgDescription());

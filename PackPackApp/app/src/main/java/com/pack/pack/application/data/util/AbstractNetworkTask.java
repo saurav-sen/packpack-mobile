@@ -358,9 +358,9 @@ public abstract class AbstractNetworkTask<X, Y, Z> extends AsyncTask<X, Y, Z> {
 
     protected final Z doExecuteInBackground(X x) {
         try {
-            String oAuthToken = AppController.getInstance().getoAuthToken();
+            String userEmail = AppController.getInstance().getUserEmail();
             APIBuilder builder = APIBuilder.create(getBaseUrl()).setAction(command())
-                    .setOauthToken(oAuthToken);
+                    .setUserName(userEmail);
             Map<String, Object> apiParams = prepareApiParams(x);
             if(apiParams != null && !apiParams.isEmpty()) {
                 Iterator<String> itr = apiParams.keySet().iterator();

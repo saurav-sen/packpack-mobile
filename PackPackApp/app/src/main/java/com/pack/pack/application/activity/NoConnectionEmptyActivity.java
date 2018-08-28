@@ -35,8 +35,8 @@ public class NoConnectionEmptyActivity extends AbstractActivity implements IAsyn
     private void verify() {
         UserInfo userInfo = DBUtil.loadLastLoggedInUserInfo(new SquillDbHelper(this).getReadableDatabase());
         if(userInfo != null) {
-            String oAuthToken = userInfo.getAccessToken();
-            if(oAuthToken != null) {
+            String username = userInfo.getUsername();
+            if(username != null) {
                 doLogin(userInfo, true);
             } else {
                 doLogin(userInfo, false);
@@ -60,7 +60,7 @@ public class NoConnectionEmptyActivity extends AbstractActivity implements IAsyn
     @Override
     public void onSuccess(String taskID, Object data) {
         LoggedInUserInfo userInfo = (LoggedInUserInfo) data;
-        AccessToken token = userInfo.getAccessToken();
+       // AccessToken token = userInfo.getAccessToken();
         JUser user = userInfo.getUser();
         if(user.getProfilePictureUrl() != null && !user.getProfilePictureUrl().trim().isEmpty()) {
             new DownloadProfilePictureTask().execute(user.getProfilePictureUrl());

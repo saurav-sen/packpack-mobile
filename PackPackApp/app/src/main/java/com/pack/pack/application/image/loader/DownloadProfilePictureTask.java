@@ -51,7 +51,7 @@ public class DownloadProfilePictureTask extends AsyncTask<String, Void, Bitmap> 
             Map<String, Object> apiParams = new HashMap<String, Object>();
             apiParams.put(APIConstants.ExternalResource.RESOURCE_URL, url);
             apiParams.put(APIConstants.ExternalResource.INCLUDE_OAUTH_TOKEN,
-                    String.valueOf(AppController.getInstance().getoAuthToken()));
+                    String.valueOf(AppController.getInstance().getUserEmail()));
             return apiParams;
         }
         Map<String, Object> apiParams = new HashMap<String, Object>();
@@ -115,9 +115,9 @@ public class DownloadProfilePictureTask extends AsyncTask<String, Void, Bitmap> 
 
         String url = params[0];
         try {
-            String oAuthToken = AppController.getInstance().getoAuthToken();
+            String userName = AppController.getInstance().getUserEmail();
             APIBuilder builder = APIBuilder.create(ApiConstants.BASE_URL).setAction(command())
-                    .setOauthToken(oAuthToken);
+                    .setUserName(userName);
             Map<String, Object> apiParams = prepareApiParams(url);
             if(apiParams != null && !apiParams.isEmpty()) {
                 Iterator<String> itr = apiParams.keySet().iterator();

@@ -3,10 +3,14 @@ package com.pack.pack.application.activity;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
@@ -30,7 +34,7 @@ public class LandingPageActivity extends AppCompatActivity {
             "Sports",
             "Science & Technology",
             "Articles",
-            "Settings"
+            "Bookmarks"
     };
     private static int[] imageIds = new int[] {
             R.drawable.broadcast,
@@ -38,8 +42,10 @@ public class LandingPageActivity extends AppCompatActivity {
             R.drawable.sports_icon,
             R.drawable.science_icon,
             R.drawable.article_icon,
-            R.drawable.app_settings
+            R.drawable.bookmark
     };
+
+    public static final String MESSAGE_IF_ANY = "message_if_any";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,7 +98,7 @@ public class LandingPageActivity extends AppCompatActivity {
                 } else if (position == 4) { // Open Articles/Editorials (Articles)
                     Intent intent = new Intent(LandingPageActivity.this, ArticlesActivity.class);
                     startActivity(intent);
-                } else if (position == 5) { // Open App Settings
+                } else if (position == 5) { // Open Bookmarks
                     Intent intent = new Intent(LandingPageActivity.this, SettingsActivity.class);
                     startActivity(intent);
                 }
@@ -100,6 +106,11 @@ public class LandingPageActivity extends AppCompatActivity {
         });
 
         AppController.getInstance().setLandingPageActive(true);
+
+        String messageToDisplay = getIntent().getStringExtra(MESSAGE_IF_ANY);
+        if(messageToDisplay != null && !messageToDisplay.trim().isEmpty()) {
+            Snackbar.make(landing_page_grid, messageToDisplay, Snackbar.LENGTH_LONG);
+        }
     }
 
     @Override
@@ -133,5 +144,22 @@ public class LandingPageActivity extends AppCompatActivity {
                 }
                 break;
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.app_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(R.id.app_settings == item.getItemId()) {
+            Intent intent = new Intent(LandingPageActivity.this, SettingsActivity.class);
+            startActivity(intent);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

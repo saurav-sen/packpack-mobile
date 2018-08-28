@@ -47,7 +47,7 @@
         </android.support.design.widget.TextInputLayout>
 
         <!-- Password Label -->
-        <android.support.design.widget.TextInputLayout
+        <!--<android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
@@ -59,7 +59,7 @@
                 android:hint="Password"/>
         </android.support.design.widget.TextInputLayout>
 
-        <!-- Confirm Password Label -->
+        &lt;!&ndash; Confirm Password Label &ndash;&gt;
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -70,7 +70,7 @@
                 android:layout_height="wrap_content"
                 android:inputType="textPassword"
                 android:hint="Confirm Password"/>
-        </android.support.design.widget.TextInputLayout>
+        </android.support.design.widget.TextInputLayout>-->
 
         <!-- Signup Button -->
         <android.support.v7.widget.AppCompatButton
@@ -84,13 +84,13 @@
             android:textAllCaps="false"
             android:text="Done"/>
 
-        <TextView android:id="@+id/link_login"
+        <!--TextView android:id="@+id/link_login"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
             android:text="Existing User? Login"
             android:gravity="center"
-            android:textSize="16dip"/>
+            android:textSize="16dip"/-->
 
     </LinearLayout>
 </ScrollView>

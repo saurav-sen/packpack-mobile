@@ -1,60 +1,36 @@
 package com.pack.pack.application.activity;
 
 import android.Manifest;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.Address;
 import android.location.Location;
 import android.location.LocationManager;
-import android.os.AsyncTask;
-import android.os.Handler;
-import android.os.Parcelable;
-import android.os.ResultReceiver;
+import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.AppCompatButton;
 import android.util.Log;
 import android.view.View;
-import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
-import com.pack.pack.application.data.LoggedInUserInfo;
 import com.pack.pack.application.data.util.AbstractNetworkTask;
-import com.pack.pack.application.data.util.ApiConstants;
 import com.pack.pack.application.data.util.IAsyncTaskStatusListener;
-import com.pack.pack.application.data.util.LoginTask;
 import com.pack.pack.application.data.util.UserUtil;
 import com.pack.pack.application.data.util.UsernameExistenceTestTask;
-import com.pack.pack.application.db.UserInfo;
-import com.pack.pack.application.service.FetchAddressIntentService;
 import com.pack.pack.client.api.API;
-import com.pack.pack.client.api.APIBuilder;
 import com.pack.pack.client.api.APIConstants;
 import com.pack.pack.client.api.COMMAND;
 import com.pack.pack.model.web.JStatus;
-import com.pack.pack.model.web.JUser;
-import com.pack.pack.model.web.StatusType;
-import com.pack.pack.oauth1.client.AccessToken;
 
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.pack.pack.application.AppController.FAILURE_RESULT;
-import static com.pack.pack.application.AppController.LOCATION_PARCELABLE_ADDRESS_KEY;
-import static com.pack.pack.application.AppController.RESULT_RECEIVER;
 import static com.pack.pack.application.AppController.LOCATION_COARSE_ACCESS_REQUEST_CODE;
-import static com.pack.pack.application.AppController.SUCCESS_RESULT;
-import static com.pack.pack.application.AppController.PLACE_AUTO_COMPLETE_REQ_CODE;
+
+//import com.pack.pack.application.data.util.LoginTask;
 
 /**
  *
@@ -65,10 +41,10 @@ public class SignupActivity extends AbstractAppCompatActivity implements IAsyncT
 
     private EditText input_name;
     private EditText input_email;
-    private EditText input_password;
-    private EditText input_password_confirm;
+    /*private EditText input_password;
+    private EditText input_password_confirm;*/
     private AppCompatButton btn_signup;
-    private TextView link_login;
+   // private TextView link_login;
 
     //private android.location.Address address;
 
@@ -78,7 +54,7 @@ public class SignupActivity extends AbstractAppCompatActivity implements IAsyncT
     private static final long MIN_TIME_FOR_UPDATE = 1000 * 60 * 2;
 
     private String email;
-    private String passwd;
+   // private String passwd;
     private String name;
 
     private double longitude = -1;
@@ -100,10 +76,10 @@ public class SignupActivity extends AbstractAppCompatActivity implements IAsyncT
 
         input_name = (EditText) findViewById(R.id.input_name);
         input_email = (EditText) findViewById(R.id.input_email);
-        input_password = (EditText) findViewById(R.id.input_password);
-        input_password_confirm = (EditText) findViewById(R.id.input_password_confirm);
+        /*input_password = (EditText) findViewById(R.id.input_password);
+        input_password_confirm = (EditText) findViewById(R.id.input_password_confirm);*/
         btn_signup = (AppCompatButton) findViewById(R.id.btn_signup);
-        link_login = (TextView) findViewById(R.id.link_login);
+       // link_login = (TextView) findViewById(R.id.link_login);
 
         btn_signup.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -112,13 +88,13 @@ public class SignupActivity extends AbstractAppCompatActivity implements IAsyncT
             }
         });
 
-        link_login.setOnClickListener(new View.OnClickListener() {
+        /*link_login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(SignupActivity.this, LoginActivity.class);
                 startActivity(intent);
             }
-        });
+        });*/
     }
 
     private void startAddressService() {
@@ -166,19 +142,19 @@ public class SignupActivity extends AbstractAppCompatActivity implements IAsyncT
 
     private void goToNextPage() {
         email = input_email.getText() != null ? input_email.getText().toString().trim() : null;
-        passwd = input_password.getText() != null ? input_password.getText().toString().trim() : null;
-        String passwd2 = input_password_confirm.getText() != null ? input_password_confirm.getText().toString().trim() : null;
+       /* passwd = input_password.getText() != null ? input_password.getText().toString().trim() : null;
+        String passwd2 = input_password_confirm.getText() != null ? input_password_confirm.getText().toString().trim() : null;*/
         name = input_name.getText() != null ? input_name.getText().toString().trim() : null;
 
         boolean valid = true;
-        boolean isPasswd = true;
-        boolean isPasswd2 = true;
+       // boolean isPasswd = true;
+       // boolean isPasswd2 = true;
         if(email == null || email.trim().isEmpty()) {
             Snackbar.make(input_email, "Email is empty", Snackbar.LENGTH_LONG).show();
             valid = false;
             return;
         }
-        if(passwd == null || passwd.trim().isEmpty()) {
+        /*if(passwd == null || passwd.trim().isEmpty()) {
             Snackbar.make(input_password, "Password is empty", Snackbar.LENGTH_LONG).show();
             valid = false;
             isPasswd = false;
@@ -196,29 +172,29 @@ public class SignupActivity extends AbstractAppCompatActivity implements IAsyncT
             Snackbar.make(input_password_confirm, "Confirm Password is empty", Snackbar.LENGTH_LONG).show();
             valid = false;
             isPasswd2 = false;
-        }
+        }*/
         if(name == null || name.trim().isEmpty()) {
             Snackbar.make(input_name, "Name is empty", Snackbar.LENGTH_LONG).show();
             valid = false;
         }
 
-        if(isPasswd && isPasswd2 && !passwd.equals(passwd2)) {
+       /* if(isPasswd && isPasswd2 && !passwd.equals(passwd2)) {
             Snackbar.make(input_password, "Password did not match", Snackbar.LENGTH_LONG).show();
             valid = false;
-        }
+        }*/
 
         if(valid) {
             if(!UserUtil.isValidEmailAddressFormat(email)) {
                 Snackbar.make(input_email, "Email address is invalid", Snackbar.LENGTH_LONG).show();
                 valid = false;
             }
-            else {
+            /*else {
                 String validationError = UserUtil.applyPasswordPolicy(passwd);
                 if(validationError != null) {
                     Snackbar.make(input_password, validationError.trim(), Snackbar.LENGTH_LONG).show();
                     valid = false;
                 }
-            }
+            }*/
         }
 
         if(!valid)
@@ -269,7 +245,7 @@ public class SignupActivity extends AbstractAppCompatActivity implements IAsyncT
         }*/
         Intent intent = new Intent(SignupActivity.this, PreSignupActivity2.class);
         intent.putExtra(PreSignupActivity2.EMAIL, email);
-        intent.putExtra(PreSignupActivity2.PASSWD, passwd);
+        //intent.putExtra(PreSignupActivity2.PASSWD, passwd);
         intent.putExtra(PreSignupActivity2.NAME, name);
         intent.putExtra(PreSignupActivity2.LONGITUDE, longitude);
         intent.putExtra(PreSignupActivity2.LATITUDE, latitude);

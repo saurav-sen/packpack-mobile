@@ -234,7 +234,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             try {
                 API api = APIBuilder.create(ApiConstants.BASE_URL)
                         .setAction(COMMAND.UPDATE_USER_SETTINGS)
-                        .setOauthToken(AppController.getInstance().getoAuthToken())
+                        .setUserName(AppController.getInstance().getUserEmail())
                         .addApiParam(APIConstants.User.ID, AppController.getInstance().getUserId())
                         .addApiParam(APIConstants.User.Settings.KEY, preference.getKey())
                         .addApiParam(APIConstants.User.Settings.VALUE, preference.getValue())

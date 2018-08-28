@@ -11,7 +11,6 @@ import com.pack.pack.application.db.SquillDbHelper;
 import com.pack.pack.application.db.UserInfo;
 import com.pack.pack.application.image.loader.DownloadProfilePictureTask;
 import com.pack.pack.model.web.JUser;
-import com.pack.pack.oauth1.client.AccessToken;
 
 import java.util.regex.Pattern;
 
@@ -58,12 +57,12 @@ public class UserUtil {
     }
 
     private static void tryLogin(Context context, IAsyncTaskStatusListener listener) {
-        String oAuthToken = AppController.getInstance().getoAuthToken();
+        String userName = AppController.getInstance().getUserEmail();
         if(AppController.getInstance().getExecutionMode() == Mode.OFFLINE) {
             UserInfo userInfo = DBUtil.loadLastLoggedInUserInfo(new SquillDbHelper(context).getReadableDatabase());
             if(userInfo != null) {
-                oAuthToken = userInfo.getAccessToken();
-                if(oAuthToken != null) {
+                userName = userInfo.getUsername();
+                if(userName != null) {
                     /*AppController.getInstance().setoAuthToken(oAuthToken);
                     JUser user = DBUtil.convertUserInfo(userInfo);
                     AppController.getInstance().setUser(user);
@@ -97,7 +96,7 @@ public class UserUtil {
         @Override
         public void onSuccess(String taskID, Object data) {
             LoggedInUserInfo userInfo = (LoggedInUserInfo) data;
-            AccessToken token = userInfo.getAccessToken();
+           // AccessToken token = userInfo.getAccessToken();
             JUser user = userInfo.getUser();
             if(user.getProfilePictureUrl() != null && !user.getProfilePictureUrl().trim().isEmpty()) {
                 new DownloadProfilePictureTask().execute(user.getProfilePictureUrl());

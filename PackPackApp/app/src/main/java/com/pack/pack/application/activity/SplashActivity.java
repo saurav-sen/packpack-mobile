@@ -1,38 +1,27 @@
 package com.pack.pack.application.activity;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
-import android.app.job.JobInfo;
-import android.app.job.JobScheduler;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 
 import com.pack.pack.application.AppController;
-import com.pack.pack.application.Constants;
 import com.pack.pack.application.Mode;
 import com.pack.pack.application.R;
 import com.pack.pack.application.data.LoggedInUserInfo;
-import com.pack.pack.application.data.util.ImageUtil;
+import com.pack.pack.application.data.util.IAsyncTaskStatusListener;
+import com.pack.pack.application.data.util.MediaUtil;
+import com.pack.pack.application.data.util.LoginTask;
+import com.pack.pack.application.db.Bookmark;
+import com.pack.pack.application.db.DBUtil;
 import com.pack.pack.application.db.SquillDbHelper;
 import com.pack.pack.application.db.UserInfo;
-import com.pack.pack.application.db.DBUtil;
-import com.pack.pack.application.data.util.IAsyncTaskStatusListener;
-import com.pack.pack.application.data.util.LoginTask;
 import com.pack.pack.application.image.loader.DownloadProfilePictureTask;
+import com.pack.pack.application.service.AddBookmarkService;
 import com.pack.pack.application.service.CheckNetworkService;
 import com.pack.pack.application.service.NetworkUtil;
-import com.pack.pack.application.service.NotificationReaderService;
 import com.pack.pack.application.service.SquillNTPService;
 import com.pack.pack.model.web.JUser;
-import com.pack.pack.oauth1.client.AccessToken;
-
-import java.util.regex.Pattern;
 
 /**
  *
@@ -46,9 +35,6 @@ public class SplashActivity extends AbstractActivity implements IAsyncTaskStatus
     private ProgressDialog progressDialog;
 
     private int ntpJobId = 1;
-
-    private String action;
-    private String actionContentType;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +52,7 @@ public class SplashActivity extends AbstractActivity implements IAsyncTaskStatus
         if(user == null) {
             startNetworkChecker();
             startNTPService();
+            startAddBookmarkService();
 
             new Handler().postDelayed(new Runnable() {
                 @Override
@@ -74,11 +61,9 @@ public class SplashActivity extends AbstractActivity implements IAsyncTaskStatus
                 }
             }, 5000);
 
-            ImageUtil.loadFFMpeg(this);
+            MediaUtil.loadFFMpeg(this);
         }
 
-        action = getIntent().getAction();
-        actionContentType = getIntent().getType();
         verify();
     }
 
@@ -94,10 +79,21 @@ public class SplashActivity extends AbstractActivity implements IAsyncTaskStatus
         jobScheduler.schedule(jobInfo);
     }*/
 
-    private void startNoConnectionEmptyActivity() {
+    /*private void startNoConnectionEmptyActivity() {
         Intent intent = new Intent(this, NoConnectionEmptyActivity.class);
         startActivity(intent);
         finish();
+    }*/
+
+    private void startAddBookmarkService() {
+        Intent intent = new Intent(this, AddBookmarkService.class);
+        startService(intent);
+    }
+
+    private void submitNewLinkToAddBookmarkService(String entityId) {
+        Intent intent = new Intent(this, AddBookmarkService.class);
+        intent.putExtra(AddBookmarkService.BOOKMARK_ENTITY_ID, entityId);
+        startService(intent);
     }
 
     private void startNTPService() {
@@ -111,15 +107,15 @@ public class SplashActivity extends AbstractActivity implements IAsyncTaskStatus
     }
 
     private void verify() {
-        String oAuthToken = AppController.getInstance().getoAuthToken();
-        if(oAuthToken != null) {
+        String userName = AppController.getInstance().getUserEmail();
+        if(userName != null) {
             finish();
             routeToTargetActivity();
         } else {
             UserInfo userInfo = DBUtil.loadLastLoggedInUserInfo(new SquillDbHelper(this).getReadableDatabase());
             if(userInfo != null) {
-                oAuthToken = userInfo.getAccessToken();
-                if(oAuthToken != null) {
+                userName = userInfo.getUsername();
+                if(userName != null) {
                     /*AppController.getInstance().setoAuthToken(oAuthToken);
                     JUser user = DBUtil.convertUserInfo(userInfo);
                     AppController.getInstance().setUser(user);
@@ -130,7 +126,8 @@ public class SplashActivity extends AbstractActivity implements IAsyncTaskStatus
                     doLogin(userInfo, false);
                 }
             } else {
-                startLoginActivity();
+                //startLoginActivity();
+                startSignupActivity();
             }
         }
     }
@@ -143,7 +140,7 @@ public class SplashActivity extends AbstractActivity implements IAsyncTaskStatus
     @Override
     public void onSuccess(String taskID, Object data) {
         LoggedInUserInfo userInfo = (LoggedInUserInfo) data;
-        AccessToken token = userInfo.getAccessToken();
+        //AccessToken token = userInfo.getAccessToken();
         JUser user = userInfo.getUser();
         if(user.getProfilePictureUrl() != null && !user.getProfilePictureUrl().trim().isEmpty()) {
             new DownloadProfilePictureTask().execute(user.getProfilePictureUrl());
@@ -184,29 +181,48 @@ public class SplashActivity extends AbstractActivity implements IAsyncTaskStatus
     @Override
     public void onFailure(String taskID, String errorMsg) {
         hideProgressDialog();
-        startLoginActivity();
+       // startLoginActivity();
+        startSignupActivity();
     }
 
-    private void startLoginActivity() {
-        Intent intent = new Intent(SplashActivity.this, LoginActivity.class);
-        finish();
+    private void startSignupActivity() {
+        Intent intent = new Intent(this, SignupActivity.class);
         startActivity(intent);
     }
 
+    /*private void startLoginActivity() {
+        Intent intent = new Intent(SplashActivity.this, LoginActivity.class);
+        finish();
+        startActivity(intent);
+    }*/
+
     private void routeToTargetActivity() {
-        if(Intent.ACTION_SEND.equals(action) && actionContentType != null){
-            if(Pattern.compile("image/.*").matcher(actionContentType).matches()) {
-                Uri imageUri = (Uri) getIntent().getParcelableExtra(Intent.EXTRA_STREAM);
-                Intent intent = new Intent(SplashActivity.this, ImageVideoShareReceiveActivity.class);
-                intent.putExtra(Constants.SHARED_IMAGE_URI_KEY, imageUri);
-                finish();
-                startActivity(intent);
-            } else if("text/plain".equals(actionContentType)) {
+        String action = getIntent().getAction();
+        String type = getIntent().getType();
+        if(Intent.ACTION_SEND.equals(action) && type != null){
+           if("text/plain".equals(type)) {
                 String sharedText = getIntent().getStringExtra(Intent.EXTRA_TEXT);
-                Intent intent = new Intent(SplashActivity.this, ImageVideoShareReceiveActivity.class);
+               if(sharedText == null || sharedText.trim().isEmpty()) {
+                   startMainActivity("Invalid Link Found");
+               } else {
+                   Bookmark bookmark = new Bookmark();
+                   bookmark.setProcessed(false);
+                   bookmark.setSourceUrl(sharedText.trim());
+                   bookmark.setTimeOfAdd(System.currentTimeMillis());
+                   bookmark = DBUtil.storeNewBookmark(bookmark, this);
+                   if(bookmark == null || bookmark.getEntityId() == null || bookmark.getEntityId().trim().isEmpty()) {
+                       startMainActivity("Failed to process link");
+                   } else {
+                       submitNewLinkToAddBookmarkService(bookmark.getEntityId());
+                       startBookmarkActivity();
+                   }
+               }
+
+
+               /* Intent intent = new Intent(SplashActivity.this, ImageVideoShareReceiveActivity.class);
                 intent.putExtra(Constants.SHARED_TEXT_OR_URL_KEY, sharedText);
                 finish();
-                startActivity(intent);
+                startActivity(intent);*/
             } else {
                 startMainActivity();
             }
@@ -216,7 +232,20 @@ public class SplashActivity extends AbstractActivity implements IAsyncTaskStatus
     }
 
     private void startMainActivity() {
+        startMainActivity(null);
+    }
+
+    private void startMainActivity(String messageToDisplayIfAny) {
         Intent intent = new Intent(SplashActivity.this, LandingPageActivity.class);
+        if(messageToDisplayIfAny != null && !messageToDisplayIfAny.trim().isEmpty()) {
+            intent.putExtra(LandingPageActivity.MESSAGE_IF_ANY, messageToDisplayIfAny);
+        }
+        finish();
+        startActivity(intent);
+    }
+
+    private void startBookmarkActivity() {
+        Intent intent = new Intent(SplashActivity.this, BookmarkActivity.class);
         finish();
         startActivity(intent);
     }

@@ -10,12 +10,11 @@ import android.provider.MediaStore;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
 import com.pack.pack.application.activity.SettingsActivity;
-import com.pack.pack.application.data.util.ImageUtil;
+import com.pack.pack.application.data.util.MediaUtil;
 import com.pack.pack.application.view.util.ProfilePicturePreferenceCache;
 import com.pack.pack.model.web.JUser;
 
@@ -67,7 +66,7 @@ public class ProfilePicturePreference extends Preference implements SettingsActi
 
     private void capturePhoto() {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        mediaFileUri = ImageUtil.getOutputMediaFileUri(MEDIA_TYPE_IMAGE);
+        mediaFileUri = MediaUtil.getOutputMediaFileUri(MEDIA_TYPE_IMAGE);
         intent.putExtra(MediaStore.EXTRA_OUTPUT, mediaFileUri);
         ((Activity)getContext()).startActivityForResult(intent, CAMERA_CAPTURE_PHOTO_REQUEST_CODE);
     }

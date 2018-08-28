@@ -30,7 +30,7 @@ public class PreSignupActivity2 extends AbstractAppCompatActivity implements IAs
     private static final String LOG_TAG = "PreSignupActivity2";
 
     public static final String EMAIL = "EMAIL";
-    public static final String PASSWD = "PASSWD";
+   // public static final String PASSWD = "PASSWD";
     public static final String NAME = "NAME";
 
     public static final String LONGITUDE = "LONGITUDE";
@@ -41,7 +41,7 @@ public class PreSignupActivity2 extends AbstractAppCompatActivity implements IAs
     private ProgressDialog progressDialog;
 
     private String email;
-    private String passwd;
+   // private String passwd;
     private String name;
 
     private double longitude;
@@ -53,7 +53,7 @@ public class PreSignupActivity2 extends AbstractAppCompatActivity implements IAs
         setContentView(R.layout.activity_pre_signup2);
 
         email = getIntent().getStringExtra(EMAIL);
-        passwd = getIntent().getStringExtra(PASSWD);
+       /* passwd = getIntent().getStringExtra(PASSWD);*/
         name = getIntent().getStringExtra(NAME);
 
         longitude = getIntent().getDoubleExtra(LONGITUDE, -1);
@@ -99,7 +99,7 @@ public class PreSignupActivity2 extends AbstractAppCompatActivity implements IAs
     @Override
     public void onSuccess(String taskID, Object data) {
         LoggedInUserInfo userInfo = (LoggedInUserInfo)data;
-        AccessToken token = userInfo.getAccessToken();
+        //AccessToken token = userInfo.getAccessToken();
         JUser user = userInfo.getUser();
         getIntent().putExtra("loginStatus", true);
         finish();
@@ -107,7 +107,7 @@ public class PreSignupActivity2 extends AbstractAppCompatActivity implements IAs
     }
 
     protected void onSignUpSuccess() {
-        UserInfo userInfo = new UserInfo(email.toString(), passwd.toString());
+        UserInfo userInfo = new UserInfo(email.toString()/*, passwd.toString()*/);
         doLogin(userInfo);
     }
 
@@ -140,7 +140,7 @@ public class PreSignupActivity2 extends AbstractAppCompatActivity implements IAs
         if(address != null) {
             addr = new LocalAddress(null, null, address.getCountryName(), address.getLocality());
         }*/
-        UserSignUpInfo userSignUpInfo = new UserSignUpInfo(name, email, passwd, verifierCode);
+        UserSignUpInfo userSignUpInfo = new UserSignUpInfo(name, email, /*passwd, */verifierCode);
         new SignUpTask().execute(userSignUpInfo);
     }
 
@@ -148,14 +148,14 @@ public class PreSignupActivity2 extends AbstractAppCompatActivity implements IAs
 
         private String name;
         private String email;
-        private String passwd;
+        //private String passwd;
 
         private String verifierCode;
 
-        UserSignUpInfo(String name, String email, String passwd, String verifierCode) {
+        UserSignUpInfo(String name, String email, /*String passwd, */String verifierCode) {
             this.name = name;
             this.email = email;
-            this.passwd = passwd;
+           // this.passwd = passwd;
             this.verifierCode = verifierCode;
         }
 
@@ -167,9 +167,9 @@ public class PreSignupActivity2 extends AbstractAppCompatActivity implements IAs
             return email;
         }
 
-        String getPasswd() {
+        /*String getPasswd() {
             return passwd;
-        }
+        }*/
 
         String getVerifierCode() {
             return verifierCode;
@@ -194,12 +194,12 @@ public class PreSignupActivity2 extends AbstractAppCompatActivity implements IAs
             try {
                 String name = userSignUpInfo.getName();
                 String username = userSignUpInfo.getEmail();
-                String passwd = userSignUpInfo.getPasswd();
+                //String passwd = userSignUpInfo.getPasswd();
                 String verifier = userSignUpInfo.getVerifierCode();
                 API api = APIBuilder.create(ApiConstants.BASE_URL).setAction(COMMAND.SIGN_UP)
                         .addApiParam(APIConstants.User.Register.NAME, name)
                         .addApiParam(APIConstants.User.Register.EMAIL, username)
-                        .addApiParam(APIConstants.User.Register.PASSWORD, passwd)
+                       /* .addApiParam(APIConstants.User.Register.PASSWORD, passwd)*/
                         .addApiParam(APIConstants.User.Register.LONGITUDE, longitude)
                         .addApiParam(APIConstants.User.Register.LATITUDE, latitude)
                         .addApiParam(APIConstants.User.Register.VERIFIER, verifier)

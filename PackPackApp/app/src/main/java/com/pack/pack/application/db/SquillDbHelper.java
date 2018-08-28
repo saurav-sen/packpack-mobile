@@ -14,18 +14,31 @@ public class SquillDbHelper extends SQLiteOpenHelper {
 
     public interface CreateQueries {
 
+        public static final String BOOKMARK =
+                "CREATE TABLE " + Bookmark.TABLE_NAME + " (" + Bookmark._ID
+                        + " INTEGER PRIMARY KEY, " + Bookmark.ENTITY_ID + " TEXT, "
+                        + Bookmark.TITLE+ " TEXT, " + Bookmark.DESCRIPTION
+                        + " TEXT, " + Bookmark.MEDIA_URL + " TEXT, " + Bookmark.ARTICLE
+                        + " TEXT, " + Bookmark.IMAGE_DATA + " BLOB, " + Bookmark.TIME_OF_ADD
+                        + "INTEGER, " + Bookmark.IS_PROCESSED + " INTEGER DEFAULT 0, "
+                        + Bookmark.IS_VIDEO + " INTEGER DEFAULT 0, " + Bookmark.SOURCE_URL + " TEXT)";
+
         public static final String JSON_MODEL =
                 "CREATE TABLE " + JsonModel.TABLE_NAME + " (" + JsonModel._ID
                         + " INTEGER PRIMARY KEY, " + JsonModel.ENTITY_ID + " TEXT, "
                         + JsonModel.ENTITY_CONTAINER_ID + " TEXT, " + JsonModel.CONTENT
                         + " TEXT, " + JsonModel.CLASS_TYPE + " TEXT)";
 
-        public static final String USER_INFO =
+        /*public static final String USER_INFO =
                 "CREATE TABLE " + UserInfo.TABLE_NAME + " (" + UserInfo._ID
                         + " INTEGER PRIMARY KEY, " + UserInfo.ENTITY_ID + " TEXT, "
                         + UserInfo.USER_NAME + " TEXT, " + UserInfo.ACCESS_TOKEN
                         + " TEXT, " + UserInfo.ACCESS_TOKEN_SECRET + " TEXT, "
-                        + UserInfo.FOLLWED_CATEGORIES + " TEXT)";
+                        + UserInfo.FOLLWED_CATEGORIES + " TEXT)";*/
+        public static final String USER_INFO =
+                "CREATE TABLE " + UserInfo.TABLE_NAME + " (" + UserInfo._ID
+                        + " INTEGER PRIMARY KEY, " + UserInfo.ENTITY_ID + " TEXT, "
+                        + UserInfo.USER_NAME + " TEXT)";
 
        /* public static final String USER_OWNED_TOPIC_INFO =
                 "CREATE TABLE " + UserOwnedTopicInfo.TABLE_NAME + " (" + UserOwnedTopicInfo._ID
@@ -63,6 +76,9 @@ public class SquillDbHelper extends SQLiteOpenHelper {
 
     public interface DeleteQueries {
 
+        public static final String BOOKMARK =
+                "DROP TABLE IF EXISTS " + Bookmark.TABLE_NAME;
+
         public static final String JSON_MODEL =
                 "DROP TABLE IF EXISTS " + JsonModel.TABLE_NAME;
 
@@ -99,6 +115,7 @@ public class SquillDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+        db.execSQL(CreateQueries.BOOKMARK);
         db.execSQL(CreateQueries.JSON_MODEL);
         db.execSQL(CreateQueries.USER_INFO);
         //db.execSQL(CreateQueries.USER_OWNED_TOPIC_INFO);

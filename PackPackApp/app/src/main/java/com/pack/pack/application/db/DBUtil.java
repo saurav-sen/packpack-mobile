@@ -1,5 +1,6 @@
 package com.pack.pack.application.db;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
@@ -7,6 +8,7 @@ import android.util.Log;
 import com.pack.pack.common.util.JSONUtil;
 import com.pack.pack.model.web.JUser;
 import com.pack.pack.services.exception.PackPackException;
+import com.squill.feed.web.model.JRssFeed;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -27,8 +29,7 @@ public class DBUtil {
         UserInfo userInfo = null;
         try {
             String[] projection = new String[] {UserInfo._ID, UserInfo.ENTITY_ID,
-                    UserInfo.USER_NAME, UserInfo.ACCESS_TOKEN,
-                    UserInfo.ACCESS_TOKEN_SECRET, UserInfo.FOLLWED_CATEGORIES};
+                    UserInfo.USER_NAME, UserInfo.FOLLWED_CATEGORIES};
             try {
                 cursor = readable.query(UserInfo.TABLE_NAME, projection, null, null,
                         null, null, null);
@@ -38,10 +39,10 @@ public class DBUtil {
                         long id = cursor.getLong(cursor.getColumnIndexOrThrow(UserInfo._ID));
                         String userId = cursor.getString(cursor.getColumnIndexOrThrow(UserInfo.ENTITY_ID));
                         String userName = cursor.getString(cursor.getColumnIndexOrThrow(UserInfo.USER_NAME));
-                        String accessToken = cursor.getString(cursor.getColumnIndexOrThrow(UserInfo.ACCESS_TOKEN));
-                        String accessTokenSecret = cursor.getString(cursor.getColumnIndexOrThrow(UserInfo.ACCESS_TOKEN_SECRET));
+                        /*String accessToken = cursor.getString(cursor.getColumnIndexOrThrow(UserInfo.ACCESS_TOKEN));
+                        String accessTokenSecret = cursor.getString(cursor.getColumnIndexOrThrow(UserInfo.ACCESS_TOKEN_SECRET));*/
                         //String followedCategories = cursor.getString(cursor.getColumnIndexOrThrow(UserInfo.FOLLWED_CATEGORIES));
-                        userInfo = new UserInfo(userName, userId, accessToken, accessTokenSecret, null);//, followedCategories);
+                        userInfo = new UserInfo(userName, userId, null);//, followedCategories);
                         break;
                     } while(cursor.moveToNext());
                 }
@@ -57,9 +58,12 @@ public class DBUtil {
     }
 
     public static DbObject convert(Object object, String containerId) {
-       /* if(object == null)
+        if(object == null)
             return null;
-        if(object instanceof JTopic) {
+        if(object instanceof  JRssFeed) {
+            return convertToBookmark((JRssFeed)object);
+        }
+        /*if(object instanceof JTopic) {
             return convertToJsonModel((JTopic) object, containerId);
         } else if(object instanceof JPack) {
             return convertToJsonModel((JPack)object, containerId);
@@ -67,6 +71,22 @@ public class DBUtil {
             return convertJPackAttachment((JPackAttachment) object, containerId);
         }*/
         return null;
+    }
+
+    private static Bookmark convertToBookmark(JRssFeed feed) {
+        Bookmark bookmark = new Bookmark();
+        bookmark.setEntityId(feed.getId());
+        bookmark.setTitle(feed.getOgTitle());
+        bookmark.setDescription(feed.getArticleSummaryText());
+        if(feed.getVideoUrl() != null) {
+            bookmark.setMediaUrl(feed.getVideoUrl());
+        } else {
+            bookmark.setMediaUrl(feed.getOgImage());
+        }
+        bookmark.setArticle(feed.getArticleSummaryText());
+        bookmark.setTimeOfAdd(feed.getUploadTime());
+        bookmark.setSourceUrl(feed.getOgUrl());
+        return bookmark;
     }
 
    /* private static JsonModel convertToJsonModel(JTopic topic, String containerId) {
@@ -137,6 +157,181 @@ public class DBUtil {
         topic.setWallpaperUrl(userOwnedTopicInfo.getWallpaperUrl());
         return topic;
     }*/
+
+    public static Bookmark storeNewBookmark(Bookmark bookmark, Context context) {
+        Bookmark result = null;
+        SquillDbHelper squillDbHelper = new SquillDbHelper(context);
+        SQLiteDatabase wDB = squillDbHelper.getWritableDatabase();
+        Bookmark exisitngBookmark = loadBookmarkByEntityId(bookmark.getEntityId(), context);
+        if(exisitngBookmark != null) {
+            exisitngBookmark.setTitle(bookmark.getTitle());
+            exisitngBookmark.setDescription(bookmark.getDescription());
+            exisitngBookmark.setMediaUrl(bookmark.getMediaUrl());
+            exisitngBookmark.setImage(bookmark.getImage());
+            exisitngBookmark.setArticle(bookmark.getArticle());
+            exisitngBookmark.setTimeOfAdd(bookmark.getTimeOfAdd());
+            exisitngBookmark.setSourceUrl(bookmark.getSourceUrl());
+            exisitngBookmark.setProcessed(bookmark.isProcessed());
+            exisitngBookmark.setIsVideo(bookmark.isVideo());
+            wDB.update(Bookmark.TABLE_NAME, exisitngBookmark.toContentValues(), null, null);
+            result = exisitngBookmark;
+        } else {
+            wDB.insert(Bookmark.TABLE_NAME, null, bookmark.toContentValues());
+            result = bookmark;
+        }
+        return result;
+    }
+
+    public static Bookmark loadBookmarkByEntityId(String entityId, Context context) {
+        Cursor cursor =  null;
+        SQLiteDatabase readable = new SquillDbHelper(context).getReadableDatabase();
+        try {
+            String __SQL = "SELECT " + Bookmark.ENTITY_ID + ", " + Bookmark.TITLE + ", "
+                    + Bookmark.DESCRIPTION + ", " + Bookmark.MEDIA_URL + ", " + Bookmark.ARTICLE + ", "
+                    + Bookmark.IMAGE_DATA + ", " + Bookmark.TIME_OF_ADD  + ", " + Bookmark.SOURCE_URL + ", "
+                    + Bookmark.IS_PROCESSED + ", " + Bookmark.IS_VIDEO + " FROM " + Bookmark.TABLE_NAME
+                    + " WHERE " + Bookmark.ENTITY_ID
+                    + " = " + entityId;
+            cursor = readable.rawQuery(__SQL, null);
+            if(cursor.moveToFirst()) {
+                do {
+                    entityId = cursor.getString(cursor.getColumnIndexOrThrow(Bookmark.ENTITY_ID));
+                    String title = cursor.getString(cursor.getColumnIndexOrThrow(Bookmark.TITLE));
+                    String description = cursor.getString(cursor.getColumnIndexOrThrow(Bookmark.DESCRIPTION));
+                    String mediaUrl = cursor.getString(cursor.getColumnIndexOrThrow(Bookmark.MEDIA_URL));
+                    String article = cursor.getString(cursor.getColumnIndexOrThrow(Bookmark.ARTICLE));
+                    byte[] imageData = cursor.getBlob(cursor.getColumnIndexOrThrow(Bookmark.IMAGE_DATA));
+                    long timeOfAdd = cursor.getLong(cursor.getColumnIndexOrThrow(Bookmark.TIME_OF_ADD));
+                    String sourceUrl = cursor.getString(cursor.getColumnIndexOrThrow(Bookmark.SOURCE_URL));
+                    boolean processed = cursor.getInt(cursor.getColumnIndexOrThrow(Bookmark.IS_PROCESSED)) == 0 ? false : true;
+                    boolean isVideo = cursor.getInt(cursor.getColumnIndexOrThrow(Bookmark.IS_VIDEO)) == 0 ? false : true;
+
+                    Bookmark bookmark = new Bookmark();
+                    bookmark.setEntityId(entityId);
+                    bookmark.setTitle(title);
+                    bookmark.setDescription(description);
+                    bookmark.setMediaUrl(mediaUrl);
+                    bookmark.setArticle(article);
+                    bookmark.setImage(imageData);
+                    bookmark.setTimeOfAdd(timeOfAdd);
+                    bookmark.setSourceUrl(sourceUrl);
+                    bookmark.setProcessed(processed);
+                    bookmark.setIsVideo(isVideo);
+
+                   return bookmark;
+                } while(cursor.moveToNext());
+            }
+        } finally {
+            if(cursor != null && !cursor.isClosed()) {
+                cursor.close();
+            }
+        }
+        return null;
+    }
+
+    public static PagedObject<Bookmark> loadBookmarks(long currentPageRef, SQLiteDatabase readable) {
+        Cursor cursor =  null;
+        PagedObject<Bookmark> bookmarks = new PagedObject<Bookmark>();
+        List<Bookmark> result = new ArrayList<Bookmark>();
+        if(currentPageRef <= 0) {
+            currentPageRef = Integer.MAX_VALUE;
+        }
+        long nextPageRef = currentPageRef;
+        try {
+            String __SQL = "SELECT " + Bookmark.ENTITY_ID + ", " + Bookmark.TITLE + ", "
+                    + Bookmark.DESCRIPTION + ", " + Bookmark.MEDIA_URL + ", " + Bookmark.ARTICLE + ", "
+                    + Bookmark.IMAGE_DATA + ", " + Bookmark.TIME_OF_ADD + ", " + Bookmark.SOURCE_URL + ", "
+                    + Bookmark.IS_PROCESSED + ", " + Bookmark.IS_VIDEO + " FROM " + Bookmark.TABLE_NAME
+                    + " WHERE " + Bookmark.TIME_OF_ADD + " <= " + currentPageRef + " ORDER BY " + Bookmark.TIME_OF_ADD
+                    + " LIMIT 10";
+            cursor = readable.rawQuery(__SQL, null);
+            if(cursor.moveToFirst()) {
+                do {
+                    String entityId = cursor.getString(cursor.getColumnIndexOrThrow(Bookmark.ENTITY_ID));
+                    String title = cursor.getString(cursor.getColumnIndexOrThrow(Bookmark.TITLE));
+                    String description = cursor.getString(cursor.getColumnIndexOrThrow(Bookmark.DESCRIPTION));
+                    String mediaUrl = cursor.getString(cursor.getColumnIndexOrThrow(Bookmark.MEDIA_URL));
+                    String article = cursor.getString(cursor.getColumnIndexOrThrow(Bookmark.ARTICLE));
+                    byte[] imageData = cursor.getBlob(cursor.getColumnIndexOrThrow(Bookmark.IMAGE_DATA));
+                    long timeOfAdd = cursor.getLong(cursor.getColumnIndexOrThrow(Bookmark.TIME_OF_ADD));
+                    String sourceUrl = cursor.getString(cursor.getColumnIndexOrThrow(Bookmark.SOURCE_URL));
+                    boolean processed = cursor.getInt(cursor.getColumnIndexOrThrow(Bookmark.IS_PROCESSED)) == 0 ? false : true;
+                    boolean isVideo = cursor.getInt(cursor.getColumnIndexOrThrow(Bookmark.IS_VIDEO)) == 0 ? false : true;
+
+                    if(timeOfAdd < nextPageRef) {
+                        nextPageRef = timeOfAdd;
+                    }
+
+                    Bookmark bookmark = new Bookmark();
+                    bookmark.setEntityId(entityId);
+                    bookmark.setTitle(title);
+                    bookmark.setDescription(description);
+                    bookmark.setMediaUrl(mediaUrl);
+                    bookmark.setArticle(article);
+                    bookmark.setImage(imageData);
+                    bookmark.setTimeOfAdd(timeOfAdd);
+                    bookmark.setSourceUrl(sourceUrl);
+                    bookmark.setProcessed(processed);
+                    bookmark.setIsVideo(isVideo);
+
+                    result.add(bookmark);
+                } while(cursor.moveToNext());
+            }
+        } finally {
+            if(cursor != null && !cursor.isClosed()) {
+                cursor.close();
+            }
+        }
+        bookmarks.setResult(result);
+        bookmarks.setNextPageRef(nextPageRef);
+        return bookmarks;
+    }
+
+    public static List<Bookmark> loadAllUnprocessedBookmarks(SQLiteDatabase readable) {
+        Cursor cursor =  null;
+        List<Bookmark> result = new ArrayList<Bookmark>();
+        try {
+            String __SQL = "SELECT " + Bookmark.ENTITY_ID + ", " + Bookmark.TITLE + ", "
+                    + Bookmark.DESCRIPTION + ", " + Bookmark.MEDIA_URL + ", " + Bookmark.ARTICLE + ", "
+                    + Bookmark.IMAGE_DATA + ", " + Bookmark.TIME_OF_ADD + ", " + Bookmark.SOURCE_URL + ", "
+                    + Bookmark.IS_PROCESSED  + ", " + Bookmark.IS_VIDEO + " FROM " + Bookmark.TABLE_NAME
+                    + " WHERE " + Bookmark.IS_PROCESSED + " <= 0 ORDER BY " + Bookmark.TIME_OF_ADD;
+            cursor = readable.rawQuery(__SQL, null);
+            if(cursor.moveToFirst()) {
+                do {
+                    String entityId = cursor.getString(cursor.getColumnIndexOrThrow(Bookmark.ENTITY_ID));
+                    String title = cursor.getString(cursor.getColumnIndexOrThrow(Bookmark.TITLE));
+                    String description = cursor.getString(cursor.getColumnIndexOrThrow(Bookmark.DESCRIPTION));
+                    String mediaUrl = cursor.getString(cursor.getColumnIndexOrThrow(Bookmark.MEDIA_URL));
+                    String article = cursor.getString(cursor.getColumnIndexOrThrow(Bookmark.ARTICLE));
+                    byte[] imageData = cursor.getBlob(cursor.getColumnIndexOrThrow(Bookmark.IMAGE_DATA));
+                    long timeOfAdd = cursor.getLong(cursor.getColumnIndexOrThrow(Bookmark.TIME_OF_ADD));
+                    String sourceUrl = cursor.getString(cursor.getColumnIndexOrThrow(Bookmark.SOURCE_URL));
+                    boolean processed = cursor.getInt(cursor.getColumnIndexOrThrow(Bookmark.IS_PROCESSED)) == 0 ? false : true;
+                    boolean isVideo = cursor.getInt(cursor.getColumnIndexOrThrow(Bookmark.IS_VIDEO)) == 0 ? false : true;
+
+                    Bookmark bookmark = new Bookmark();
+                    bookmark.setEntityId(entityId);
+                    bookmark.setTitle(title);
+                    bookmark.setDescription(description);
+                    bookmark.setMediaUrl(mediaUrl);
+                    bookmark.setArticle(article);
+                    bookmark.setImage(imageData);
+                    bookmark.setTimeOfAdd(timeOfAdd);
+                    bookmark.setSourceUrl(sourceUrl);
+                    bookmark.setProcessed(processed);
+                    bookmark.setIsVideo(isVideo);
+
+                    result.add(bookmark);
+                } while(cursor.moveToNext());
+            }
+        } finally {
+            if(cursor != null && !cursor.isClosed()) {
+                cursor.close();
+            }
+        }
+        return result;
+    }
 
     public static <T> T loadJsonModelByEntityId(SQLiteDatabase writable, String entityId, Class<T> classType) {
         String type = classType.getName();

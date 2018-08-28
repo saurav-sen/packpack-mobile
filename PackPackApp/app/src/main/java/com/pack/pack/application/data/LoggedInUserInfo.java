@@ -8,22 +8,22 @@ import com.pack.pack.oauth1.client.AccessToken;
  */
 public class LoggedInUserInfo {
 
-    private AccessToken accessToken;
+   /* private AccessToken accessToken;*/
 
     private JUser user;
 
-    public LoggedInUserInfo(AccessToken accessToken, JUser user) {
-        setAccessToken(accessToken);
+    public LoggedInUserInfo(/*AccessToken accessToken, */JUser user) {
+        //setAccessToken(accessToken);
         setUser(user);
     }
 
-    public AccessToken getAccessToken() {
+   /* public AccessToken getAccessToken() {
         return accessToken;
     }
 
     public void setAccessToken(AccessToken accessToken) {
         this.accessToken = accessToken;
-    }
+    }*/
 
     public JUser getUser() {
         return user;

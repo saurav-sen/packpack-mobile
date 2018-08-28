@@ -2,27 +2,23 @@ package com.pack.pack.application.activity;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.AppCompatButton;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.TextView;
-
-import static com.pack.pack.application.AppController.SIGNUP_ACTIVITY_REQUEST_CODE;
-import static com.pack.pack.application.AppController.RESET_PASSWD_ACTIVITY_REQUEST_CODE;
 
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.Mode;
 import com.pack.pack.application.R;
 import com.pack.pack.application.data.LoggedInUserInfo;
-import com.pack.pack.application.db.UserInfo;
 import com.pack.pack.application.data.util.IAsyncTaskStatusListener;
 import com.pack.pack.application.data.util.LoginTask;
-import com.pack.pack.application.image.loader.DownloadImageTask;
+import com.pack.pack.application.db.UserInfo;
 import com.pack.pack.application.image.loader.DownloadProfilePictureTask;
 import com.pack.pack.model.web.JUser;
-import com.pack.pack.oauth1.client.AccessToken;
+
+import static com.pack.pack.application.AppController.RESET_PASSWD_ACTIVITY_REQUEST_CODE;
+import static com.pack.pack.application.AppController.SIGNUP_ACTIVITY_REQUEST_CODE;
 
 /**
  *
@@ -32,10 +28,10 @@ import com.pack.pack.oauth1.client.AccessToken;
 public class LoginActivity extends AbstractAppCompatActivity implements IAsyncTaskStatusListener {
 
     private EditText input_email;
-    private EditText input_password;
+   // private EditText input_password;
     private AppCompatButton btn_login;
     private AppCompatButton btn_signup;
-    private TextView link_forgot_passwd;
+   // private TextView link_forgot_passwd;
 
     private ProgressDialog progressDialog;
 
@@ -49,10 +45,10 @@ public class LoginActivity extends AbstractAppCompatActivity implements IAsyncTa
         boolean existingUser = false;
 
         input_email = (EditText) findViewById(R.id.input_email);
-        input_password = (EditText) findViewById(R.id.input_password);
+       // input_password = (EditText) findViewById(R.id.input_password);
         btn_login = (AppCompatButton) findViewById(R.id.btn_login);
         btn_signup = (AppCompatButton) findViewById(R.id.btn_signup);
-        link_forgot_passwd = (TextView) findViewById(R.id.link_forgot_passwd);
+       // link_forgot_passwd = (TextView) findViewById(R.id.link_forgot_passwd);
 
         /*if(existingUser) {
             boolean loginStatus = getIntent().getBooleanExtra("loginStatus", false);
@@ -68,10 +64,10 @@ public class LoginActivity extends AbstractAppCompatActivity implements IAsyncTa
             link_forgot_passwd.setVisibility(View.INVISIBLE);
         } else {*/
             input_email.setVisibility(View.VISIBLE);
-            input_password.setVisibility(View.VISIBLE);
+            //input_password.setVisibility(View.VISIBLE);
             btn_login.setVisibility(View.VISIBLE);
             btn_signup.setVisibility(View.VISIBLE);
-            link_forgot_passwd.setVisibility(View.VISIBLE);
+            //link_forgot_passwd.setVisibility(View.VISIBLE);
         //}
 
 
@@ -81,13 +77,13 @@ public class LoginActivity extends AbstractAppCompatActivity implements IAsyncTa
             input_email.setText(email);
         }
         if(password != null) {
-            input_password.setText(password);
+            //input_password.setText(password);
         }
 
         btn_login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                UserInfo userInfo = new UserInfo(input_email.getText().toString(), input_password.getText().toString());
+                UserInfo userInfo = new UserInfo(input_email.getText().toString()/*, input_password.getText().toString()*/);
                 doLogin(userInfo);
             }
         });
@@ -97,18 +93,18 @@ public class LoginActivity extends AbstractAppCompatActivity implements IAsyncTa
                 doSignup();
             }
         });
-        link_forgot_passwd.setOnClickListener(new View.OnClickListener() {
+       /* link_forgot_passwd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 doResetPassword();
             }
-        });
+        });*/
     }
 
-    private void doResetPassword() {
+    /*private void doResetPassword() {
         Intent intent = new Intent(this, PasswordResetActivity.class);
         startActivityForResult(intent, RESET_PASSWD_ACTIVITY_REQUEST_CODE);
-    }
+    }*/
 
     private void showProgressDialog() {
         if(progressDialog != null) {
@@ -144,7 +140,7 @@ public class LoginActivity extends AbstractAppCompatActivity implements IAsyncTa
     @Override
     public void onSuccess(String taskID, Object data) {
         LoggedInUserInfo userInfo = (LoggedInUserInfo)data;
-        AccessToken token = userInfo.getAccessToken();
+       // AccessToken token = userInfo.getAccessToken();
         JUser user = userInfo.getUser();
         AppController.getInstance().setExecutionMode(Mode.ONLINE);
         AppController.getInstance().setUser(user);
@@ -165,7 +161,7 @@ public class LoginActivity extends AbstractAppCompatActivity implements IAsyncTa
     public void onFailure(String taskID, String errorMsg) {
         hideProgressDialog();
         getIntent().putExtra("email", input_email.getText().toString());
-        getIntent().putExtra("passwd", input_password.getText().toString());
+       // getIntent().putExtra("passwd", input_password.getText().toString());
         getIntent().putExtra("loginStatus", false);
         finish();
         startActivity(getIntent());
@@ -175,10 +171,11 @@ public class LoginActivity extends AbstractAppCompatActivity implements IAsyncTa
 
     private void doSignup() {
         Intent intent = new Intent(this, SignupActivity.class);//FollowCategoryActivity.class);
-        startActivityForResult(intent, SIGNUP_ACTIVITY_REQUEST_CODE);
+        startActivity(intent);
+        //startActivityForResult(intent, SIGNUP_ACTIVITY_REQUEST_CODE);
     }
 
-    @Override
+   /* @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(resultCode == RESULT_OK) {
             if(requestCode == SIGNUP_ACTIVITY_REQUEST_CODE) {
@@ -188,7 +185,7 @@ public class LoginActivity extends AbstractAppCompatActivity implements IAsyncTa
                 btn_login.setEnabled(true);
             }
         }
-    }
+    }*/
 
     @Override
     public void onBackPressed() {

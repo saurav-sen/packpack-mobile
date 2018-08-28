@@ -1,8 +1,10 @@
 package com.pack.pack.application.data.util;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -12,14 +14,18 @@ import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.design.widget.Snackbar;
 import android.util.Log;
+import android.view.View;
 
 /*import com.github.hiteshsondhi88.libffmpeg.FFmpeg;
 import com.github.hiteshsondhi88.libffmpeg.FFmpegExecuteResponseHandler;
 import com.github.hiteshsondhi88.libffmpeg.FFmpegLoadBinaryResponseHandler;
 import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegNotSupportedException;*/
 //import com.google.android.gms.maps.model.Circle;
+import com.google.android.youtube.player.YouTubeStandalonePlayer;
 import com.pack.pack.application.AppController;
+import com.pack.pack.application.activity.FullScreenPlayVideoActivity;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -33,13 +39,13 @@ import static com.pack.pack.application.AppController.MEDIA_TYPE_VIDEO;
 /**
  * Created by Saurav on 12-06-2016.
  */
-public class ImageUtil {
+public class MediaUtil {
 
-    private static final String LOG_TAG = "ImageUtil";
+    private static final String LOG_TAG = "MediaUtil";
 
     private static boolean ffMpegSupported = false;
 
-    private ImageUtil() {
+    private MediaUtil() {
     }
 
     public static void loadFFMpeg(Context context) {
@@ -261,4 +267,28 @@ public class ImageUtil {
         Paint paint = new Paint();
         canvas.drawCircle();
     }*/
+
+    public static boolean playVideo(String videoURL, Activity activity) {
+        boolean isExternalLink = !(videoURL.startsWith(ApiConstants.BASE_URL));
+
+        if (isExternalLink) {
+            String VIDEO_ID = null;
+            if (videoURL.contains("youtube")) {
+                String[] split = videoURL.split("v=");
+                if (split.length > 1) {
+                    VIDEO_ID = split[1];
+                }
+            }
+            if ((VIDEO_ID != null && !VIDEO_ID.isEmpty())) {
+                Intent intent = YouTubeStandalonePlayer.createVideoIntent(activity, ApiConstants.YOUTUBE_API_KEY, VIDEO_ID);
+                activity.startActivity(intent);
+                return true;
+            } else {
+                //Snackbar.make(view, "Oops! Something went wrong", Snackbar.LENGTH_LONG).show();
+                return false;
+            }
+        }
+
+        return false;
+    }
 }

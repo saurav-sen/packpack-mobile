@@ -58,7 +58,7 @@ public class FullScreenPlayVideoActivity extends AbstractActivity {
             }
             final Map<String, String> __HTTP_REQUEST_HEADERS = new HashMap<String, String>();
             if(videoURL != null && videoURL.contains(ApiConstants.BASE_URL)) {
-                __HTTP_REQUEST_HEADERS.put(APIConstants.AUTHORIZATION_HEADER, AppController.getInstance().getoAuthToken());
+                __HTTP_REQUEST_HEADERS.put(APIConstants.AUTHORIZATION_HEADER, AppController.getInstance().getUserEmail());
             }
             videoDisplay.setMediaController(mediacontroller);
             videoDisplay.setVideoURI(Uri.parse(videoURL), __HTTP_REQUEST_HEADERS);
