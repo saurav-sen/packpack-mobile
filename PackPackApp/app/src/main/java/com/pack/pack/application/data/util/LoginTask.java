@@ -70,7 +70,7 @@ public class LoginTask extends AbstractNetworkTask<UserInfo, Integer, JUser> {
             AppController.getInstance().setUser(user);
 
             // GET user followed categories
-            API api = APIBuilder
+           /* API api = APIBuilder
                     .create(ApiConstants.BASE_URL)
                     .setAction(COMMAND.GET_USER_CATEGORIES)
                     .setUserName(AppController.getInstance().getUserEmail())
@@ -86,9 +86,9 @@ public class LoginTask extends AbstractNetworkTask<UserInfo, Integer, JUser> {
                     stringBuilder.append(":");
                 }
                 followedCategories = stringBuilder.toString();
-            }
+            }*/
 
-            api = APIBuilder
+            API api = APIBuilder
                     .create(ApiConstants.BASE_URL)
                     .setAction(COMMAND.ANDROID_APK_URL)
                     .build();
@@ -104,10 +104,9 @@ public class LoginTask extends AbstractNetworkTask<UserInfo, Integer, JUser> {
     @Override
     protected DbObject convertObjectForStore(JUser user, String containerIdForObjectStore) {
         UserInfo userInfo = new UserInfo();
-        /*userInfo.setAccessToken(successResult.getToken());
-        userInfo.setAccessTokenSecret(successResult.getTokenSecret());*/
         userInfo.setUserId(user.getId());
         userInfo.setUsername(user.getUsername());
+        userInfo.setDisplayName(user.getDisplayName());
         return userInfo;
     }
 

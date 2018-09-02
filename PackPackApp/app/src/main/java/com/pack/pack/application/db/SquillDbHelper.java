@@ -20,7 +20,7 @@ public class SquillDbHelper extends SQLiteOpenHelper {
                         + Bookmark.TITLE+ " TEXT, " + Bookmark.DESCRIPTION
                         + " TEXT, " + Bookmark.MEDIA_URL + " TEXT, " + Bookmark.ARTICLE
                         + " TEXT, " + Bookmark.IMAGE_DATA + " BLOB, " + Bookmark.TIME_OF_ADD
-                        + "INTEGER, " + Bookmark.IS_PROCESSED + " INTEGER DEFAULT 0, "
+                        + " INTEGER, " + Bookmark.IS_PROCESSED + " INTEGER DEFAULT 0, "
                         + Bookmark.IS_VIDEO + " INTEGER DEFAULT 0, " + Bookmark.SOURCE_URL + " TEXT)";
 
         public static final String JSON_MODEL =
@@ -38,7 +38,7 @@ public class SquillDbHelper extends SQLiteOpenHelper {
         public static final String USER_INFO =
                 "CREATE TABLE " + UserInfo.TABLE_NAME + " (" + UserInfo._ID
                         + " INTEGER PRIMARY KEY, " + UserInfo.ENTITY_ID + " TEXT, "
-                        + UserInfo.USER_NAME + " TEXT)";
+                        + UserInfo.USER_NAME + " TEXT, " + UserInfo.DISPLAY_NAME + " TEXT)";
 
        /* public static final String USER_OWNED_TOPIC_INFO =
                 "CREATE TABLE " + UserOwnedTopicInfo.TABLE_NAME + " (" + UserOwnedTopicInfo._ID
@@ -127,6 +127,7 @@ public class SquillDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+       // db.execSQL(DeleteQueries.BOOKMARK);
         db.execSQL(DeleteQueries.JSON_MODEL);
         db.execSQL(DeleteQueries.USER_INFO);
         //db.execSQL(DeleteQueries.USER_OWNED_TOPIC_INFO);

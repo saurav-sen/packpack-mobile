@@ -56,31 +56,31 @@ public class UserUtil {
 
     }
 
-    private static void tryLogin(Context context, IAsyncTaskStatusListener listener) {
+    /*private static void tryLogin(Context context, IAsyncTaskStatusListener listener) {
         String userName = AppController.getInstance().getUserEmail();
         if(AppController.getInstance().getExecutionMode() == Mode.OFFLINE) {
             UserInfo userInfo = DBUtil.loadLastLoggedInUserInfo(new SquillDbHelper(context).getReadableDatabase());
             if(userInfo != null) {
                 userName = userInfo.getUsername();
                 if(userName != null) {
-                    /*AppController.getInstance().setoAuthToken(oAuthToken);
+                    *//*AppController.getInstance().setoAuthToken(oAuthToken);
                     JUser user = DBUtil.convertUserInfo(userInfo);
                     AppController.getInstance().setUser(user);
                     finish();
-                    startMainActivity();*/
+                    startMainActivity();*//*
                     doLogin(userInfo, true, listener, context);
                 } else {
                     doLogin(userInfo, false, listener, context);
                 }
             }
         }
-    }
+    }*/
 
-    private static void doLogin(UserInfo userInfo, boolean refreshToken, IAsyncTaskStatusListener listener, Context context) {
+    /*private static void doLogin(UserInfo userInfo, boolean refreshToken, IAsyncTaskStatusListener listener, Context context) {
         new LoginTask(context, new LoginTaskStatusListenerProxy(listener), refreshToken).execute(userInfo);
-    }
+    }*/
 
-    private static class LoginTaskStatusListenerProxy implements IAsyncTaskStatusListener {
+    /*private static class LoginTaskStatusListenerProxy implements IAsyncTaskStatusListener {
 
         private IAsyncTaskStatusListener listener;
 
@@ -115,5 +115,5 @@ public class UserUtil {
         public void onPostComplete(String taskID) {
             listener.onPostComplete(taskID);
         }
-    }
+    }*/
 }

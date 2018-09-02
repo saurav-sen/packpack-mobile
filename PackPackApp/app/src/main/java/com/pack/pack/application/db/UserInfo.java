@@ -16,56 +16,34 @@ public class UserInfo implements DbObject {
 
     public static final String ENTITY_ID = "user_id";
     public static final String USER_NAME = "username";
-  /*  public static final String ACCESS_TOKEN = "access_token";
-    public static final String ACCESS_TOKEN_SECRET = "access_token_secret";*/
-    public static final String FOLLWED_CATEGORIES = "followed_categories";
+
+    public static final String DISPLAY_NAME = "name";
 
     private String userId;
 
     private String username;
 
-    /*private String accessToken;
-
-    private String accessTokenSecret;*/
+    private String displayName;
 
     public UserInfo() {
     }
 
-    public UserInfo(String username/*, String password*/) {
-        this(username, null, null);
-        /*setPassword(password);*/
+    public UserInfo(String username) {
+        this(username, null);
     }
 
-    /*public UserInfo(String username, String id, String followedCategories) {
-        this(username, id, null, followedCategories);
-    }*/
-
-   /* public UserInfo(String username, String id, String accessToken, String followedCategories) {
-        this(username, id, accessToken, null, followedCategories);
-    }*/
-
-    public UserInfo(String username, String id, /*String accessToken, String accessTokenSecret, */String followedCategories) {
+    public UserInfo(String username, String id) {
         setUsername(username);
         setUserId(id);
-        /*setAccessToken(accessToken);
-        setAccessTokenSecret(accessTokenSecret);*/
     }
 
-    /*public String getAccessToken() {
-        return accessToken;
+    public String getDisplayName() {
+        return displayName;
     }
 
-    public void setAccessToken(String accessToken) {
-        this.accessToken = accessToken;
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
-
-    public String getAccessTokenSecret() {
-        return accessTokenSecret;
-    }
-
-    public void setAccessTokenSecret(String accessTokenSecret) {
-        this.accessTokenSecret = accessTokenSecret;
-    }*/
 
     @Override
     public String getEntityId() {
@@ -88,23 +66,12 @@ public class UserInfo implements DbObject {
         this.username = username;
     }
 
-    /*private String password;
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }*/
-
     @Override
     public ContentValues toContentValues() {
         ContentValues contentValues = new ContentValues();
         contentValues.put(ENTITY_ID, userId);
         contentValues.put(USER_NAME, username);
-       /* contentValues.put(ACCESS_TOKEN, accessToken);
-        contentValues.put(ACCESS_TOKEN_SECRET, accessTokenSecret);*/
+        contentValues.put(DISPLAY_NAME, displayName);
         return contentValues;
     }
 

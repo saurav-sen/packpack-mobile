@@ -29,7 +29,7 @@ public class DBUtil {
         UserInfo userInfo = null;
         try {
             String[] projection = new String[] {UserInfo._ID, UserInfo.ENTITY_ID,
-                    UserInfo.USER_NAME, UserInfo.FOLLWED_CATEGORIES};
+                    UserInfo.USER_NAME, UserInfo.DISPLAY_NAME};
             try {
                 cursor = readable.query(UserInfo.TABLE_NAME, projection, null, null,
                         null, null, null);
@@ -39,10 +39,9 @@ public class DBUtil {
                         long id = cursor.getLong(cursor.getColumnIndexOrThrow(UserInfo._ID));
                         String userId = cursor.getString(cursor.getColumnIndexOrThrow(UserInfo.ENTITY_ID));
                         String userName = cursor.getString(cursor.getColumnIndexOrThrow(UserInfo.USER_NAME));
-                        /*String accessToken = cursor.getString(cursor.getColumnIndexOrThrow(UserInfo.ACCESS_TOKEN));
-                        String accessTokenSecret = cursor.getString(cursor.getColumnIndexOrThrow(UserInfo.ACCESS_TOKEN_SECRET));*/
-                        //String followedCategories = cursor.getString(cursor.getColumnIndexOrThrow(UserInfo.FOLLWED_CATEGORIES));
-                        userInfo = new UserInfo(userName, userId, null);//, followedCategories);
+                        String displayName = cursor.getString(cursor.getColumnIndexOrThrow(UserInfo.DISPLAY_NAME));
+                        userInfo = new UserInfo(userName, userId);
+                        userInfo.setDisplayName(displayName);
                         break;
                     } while(cursor.moveToNext());
                 }
@@ -62,15 +61,18 @@ public class DBUtil {
             return null;
         if(object instanceof  JRssFeed) {
             return convertToBookmark((JRssFeed)object);
+        } else if(object instanceof JUser) {
+            return convertToUserInfo((JUser)object);
         }
-        /*if(object instanceof JTopic) {
-            return convertToJsonModel((JTopic) object, containerId);
-        } else if(object instanceof JPack) {
-            return convertToJsonModel((JPack)object, containerId);
-        } else if(object instanceof JPackAttachment) {
-            return convertJPackAttachment((JPackAttachment) object, containerId);
-        }*/
         return null;
+    }
+
+    private static UserInfo convertToUserInfo(JUser user) {
+        UserInfo userInfo = new UserInfo();
+        userInfo.setUserId(user.getId());
+        userInfo.setUsername(user.getUsername());
+        userInfo.setDisplayName(user.getDisplayName());
+        return userInfo;
     }
 
     private static Bookmark convertToBookmark(JRssFeed feed) {
@@ -89,74 +91,12 @@ public class DBUtil {
         return bookmark;
     }
 
-   /* private static JsonModel convertToJsonModel(JTopic topic, String containerId) {
-        JsonModel jsonModel = new JsonModel();
-        try {
-            jsonModel.setEntityId(topic.getId());
-            jsonModel.setClassType(JTopic.class.getName());
-            jsonModel.setContent(JSONUtil.serialize(topic));
-            jsonModel.setEntityContainerId(containerId);
-        } catch (PackPackException e) {
-            Log.d(LOG_TAG, e.getMessage());
-        }
-        return jsonModel;
-    }*/
-
-    /*private static JsonModel convertToJsonModel(JPack pack, String containerId) {
-        JsonModel jsonModel = new JsonModel();
-        try {
-            jsonModel.setEntityId(pack.getId());
-            jsonModel.setClassType(JPack.class.getName());
-            jsonModel.setContent(JSONUtil.serialize(pack));
-            jsonModel.setEntityContainerId(containerId);
-        } catch (PackPackException e) {
-            Log.d(LOG_TAG, e.getMessage());
-        }
-        return jsonModel;
-    }*/
-
-   /* private static AttachmentInfo convertJPackAttachment(JPackAttachment attachment, String containerId) {
-        AttachmentInfo attachmentInfo = null;
-        try {
-            attachmentInfo = new AttachmentInfo();
-            attachmentInfo.setUrl(attachment.getAttachmentUrl());
-            attachmentInfo.setType(attachment.getAttachmentType());
-            attachmentInfo.setContainerId(containerId);
-            attachmentInfo.setEntityId(attachment.getId());
-            attachmentInfo.setJsonBody(JSONUtil.serialize(attachment));
-            return attachmentInfo;
-        } catch (PackPackException e) {
-            Log.d(LOG_TAG, e.getMessage());
-        }
-        return attachmentInfo;
-    }*/
-
     public static JUser convertUserInfo(UserInfo userInfo) {
         JUser user = new JUser();
         user.setId(userInfo.getEntityId());
         user.setUsername(userInfo.getUsername());
         return user;
     }
-
-   /* public static List<JTopic> convertUserOwnedTopicInfo(List<UserOwnedTopicInfo> userOwnedTopicInfos) {
-        List<JTopic> result = new ArrayList<JTopic>();
-        if(userOwnedTopicInfos != null && !userOwnedTopicInfos.isEmpty()) {
-            for(UserOwnedTopicInfo userOwnedTopicInfo : userOwnedTopicInfos) {
-                result.add(convertUserOwnedTopicInfo(userOwnedTopicInfo));
-            }
-        }
-        return result;
-    }
-
-    private static JTopic convertUserOwnedTopicInfo(UserOwnedTopicInfo userOwnedTopicInfo) {
-        JTopic topic = new JTopic();
-        topic.setId(userOwnedTopicInfo.getId());
-        topic.setName(userOwnedTopicInfo.getName());
-        topic.setDescription(userOwnedTopicInfo.getDescription());
-        topic.setCategory(userOwnedTopicInfo.getCategory());
-        topic.setWallpaperUrl(userOwnedTopicInfo.getWallpaperUrl());
-        return topic;
-    }*/
 
     public static Bookmark storeNewBookmark(Bookmark bookmark, Context context) {
         Bookmark result = null;
@@ -396,32 +336,6 @@ public class DBUtil {
         return loadPaginationInfo(readable, entityId, null);
     }
 
-    /*public static List<JPackAttachment> loadAllAttachmentInfo(SQLiteDatabase readable, String containerId) {
-        Cursor cursor = null;
-        List<JPackAttachment> attachments = new LinkedList<JPackAttachment>();
-        try {
-            String __SQL = "SELECT " + AttachmentInfo.JSON_BODY + " FROM " + AttachmentInfo.TABLE_NAME
-                    + " WHERE " + AttachmentInfo.CONTAINER_ID + "='" + containerId + "'";
-            cursor = readable.rawQuery(__SQL, null);
-            if(cursor.moveToFirst()) {
-                do {
-                    String json = cursor.getString(cursor.getColumnIndexOrThrow(AttachmentInfo.JSON_BODY));
-                    JPackAttachment attachment = JSONUtil.deserialize(json, JPackAttachment.class, true);
-                    if(attachment != null) {
-                        attachments.add(attachment);
-                    }
-                } while (cursor.moveToNext());
-            }
-        } catch (PackPackException e) {
-            Log.i(LOG_TAG, e.getMessage());
-        } finally {
-            if(cursor != null && !cursor.isClosed()) {
-                cursor.close();
-            }
-        }
-        return attachments != null && !attachments.isEmpty() ? attachments : null;
-    }*/
-
     public static PaginationInfo loadPaginationInfo(SQLiteDatabase readable, String entityId, String type) {
         Cursor cursor = null;
         PaginationInfo paginationInfo = null;
@@ -451,45 +365,4 @@ public class DBUtil {
         }
         return paginationInfo;
     }
-
-    /*public static List<JDiscussion> getDiscussionInfosBasedUponContainerId(SQLiteDatabase readable, String containerId, String containerType) {
-        Cursor cursor = null;
-        List<JDiscussion> infos = null;
-        try {
-            String __SQL = "SELECT " + DiscussionInfo._ID + ", " + DiscussionInfo.ENTITY_ID + ", "
-                    + DiscussionInfo.DATE_TIME + ", " + DiscussionInfo.CONTAINER_TYPE + ", "
-                    + DiscussionInfo.CONTAINER_ID + ", " + DiscussionInfo.CONTENT + ", "
-                    + DiscussionInfo.FROM_USERNAME + ", " + DiscussionInfo.FROM_USER_FULL_NAME
-                    + " FROM " + DiscussionInfo.TABLE_NAME + " WHERE " + DiscussionInfo.CONTAINER_ID
-                    + "='" + containerId + "' AND " + DiscussionInfo.CONTAINER_TYPE + "='"
-                    + containerType + "'";
-            cursor = readable.rawQuery(__SQL, null);
-            if(cursor.moveToFirst()) {
-                infos = new ArrayList<JDiscussion>();
-                do {
-                    String eId = cursor.getString(cursor.getColumnIndexOrThrow(DiscussionInfo.ENTITY_ID));
-                    String cId = cursor.getString(cursor.getColumnIndexOrThrow(DiscussionInfo.CONTAINER_ID));
-                    String cType = cursor.getString(cursor.getColumnIndexOrThrow(DiscussionInfo.CONTAINER_TYPE));
-                    String content = cursor.getString(cursor.getColumnIndexOrThrow(DiscussionInfo.CONTENT));
-                    String userName = cursor.getString(cursor.getColumnIndexOrThrow(DiscussionInfo.FROM_USERNAME));
-                    String userFullName = cursor.getString(cursor.getColumnIndexOrThrow(DiscussionInfo.FROM_USER_FULL_NAME));
-                    long dateTime = cursor.getLong(cursor.getColumnIndexOrThrow(DiscussionInfo.DATE_TIME));
-                    JDiscussion info = new JDiscussion();
-                    info.setId(eId);
-                    info.setContent(content);
-                    info.setDateTime(dateTime);
-                    JUser user = new JUser();
-                    user.setUsername(userName);
-                    user.setName(userFullName);
-                    info.setFromUser(user);
-                    infos.add(info);
-                } while (cursor.moveToNext());
-            }
-        } finally {
-            if(cursor != null && !cursor.isClosed()) {
-                cursor.close();
-            }
-        }
-        return infos;
-    }*/
 }

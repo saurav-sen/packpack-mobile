@@ -46,23 +46,25 @@ public class SplashActivity extends AbstractActivity implements IAsyncTaskStatus
             //return;
             AppController.getInstance().setExecutionMode(Mode.OFFLINE);
             routeToTargetActivity();
+        } else {
+            AppController.getInstance().setExecutionMode(Mode.ONLINE);
         }
 
-        JUser user = AppController.getInstance().getUser();
-        if(user == null) {
-            startNetworkChecker();
-            startNTPService();
-            startAddBookmarkService();
+       /* JUser user = AppController.getInstance().getUser();
+        if(user == null) {*/
+        startNetworkChecker();
+        startNTPService();
+        startAddBookmarkService();
 
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
 
-                }
-            }, 5000);
+            }
+        }, 5000);
 
-            MediaUtil.loadFFMpeg(this);
-        }
+        //MediaUtil.loadFFMpeg(this);
+        /*}*/
 
         verify();
     }
@@ -116,14 +118,15 @@ public class SplashActivity extends AbstractActivity implements IAsyncTaskStatus
             if(userInfo != null) {
                 userName = userInfo.getUsername();
                 if(userName != null) {
-                    /*AppController.getInstance().setoAuthToken(oAuthToken);
+                    //AppController.getInstance().setoAuthToken(oAuthToken);
                     JUser user = DBUtil.convertUserInfo(userInfo);
                     AppController.getInstance().setUser(user);
                     finish();
-                    startMainActivity();*/
-                    doLogin(userInfo, true);
+                    startMainActivity();
+                    //doLogin(userInfo, true);
                 } else {
-                    doLogin(userInfo, false);
+                    //doLogin(userInfo, false);
+                    startSignupActivity();
                 }
             } else {
                 //startLoginActivity();
@@ -187,6 +190,7 @@ public class SplashActivity extends AbstractActivity implements IAsyncTaskStatus
 
     private void startSignupActivity() {
         Intent intent = new Intent(this, SignupActivity.class);
+        finish();
         startActivity(intent);
     }
 
@@ -250,7 +254,7 @@ public class SplashActivity extends AbstractActivity implements IAsyncTaskStatus
         startActivity(intent);
     }
 
-    private void doLogin(UserInfo userInfo, boolean refreshToken) {
+    /*private void doLogin(UserInfo userInfo, boolean refreshToken) {
         new LoginTask(this, this, refreshToken).execute(userInfo);
-    }
+    }*/
 }

@@ -1,7 +1,9 @@
 package com.pack.pack.application.activity;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -12,11 +14,14 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
 import com.pack.pack.application.data.LoggedInUserInfo;
 import com.pack.pack.application.data.util.ApiConstants;
 import com.pack.pack.application.data.util.IAsyncTaskStatusListener;
 import com.pack.pack.application.data.util.LoginTask;
+import com.pack.pack.application.db.DBUtil;
+import com.pack.pack.application.db.SquillDbHelper;
 import com.pack.pack.application.db.UserInfo;
 import com.pack.pack.client.api.API;
 import com.pack.pack.client.api.APIBuilder;
@@ -99,7 +104,6 @@ public class PreSignupActivity2 extends AbstractAppCompatActivity implements IAs
     @Override
     public void onSuccess(String taskID, Object data) {
         LoggedInUserInfo userInfo = (LoggedInUserInfo)data;
-        //AccessToken token = userInfo.getAccessToken();
         JUser user = userInfo.getUser();
         getIntent().putExtra("loginStatus", true);
         finish();
@@ -107,13 +111,16 @@ public class PreSignupActivity2 extends AbstractAppCompatActivity implements IAs
     }
 
     protected void onSignUpSuccess() {
-        UserInfo userInfo = new UserInfo(email.toString()/*, passwd.toString()*/);
-        doLogin(userInfo);
+        /*UserInfo userInfo = new UserInfo(email.toString());
+        doLogin(userInfo);*/
+        getIntent().putExtra("loginStatus", true);
+        finish();
+        startMainActivity();
     }
 
-    private void doLogin(UserInfo userInfo) {
+    /*private void doLogin(UserInfo userInfo) {
         new LoginTask(this, this, false).execute(userInfo);
-    }
+    }*/
 
     protected void onSignUpFailure(String errorMsg) {
         Toast.makeText(PreSignupActivity2.this, errorMsg, Toast.LENGTH_LONG).show();
@@ -135,13 +142,8 @@ public class PreSignupActivity2 extends AbstractAppCompatActivity implements IAs
     }
 
     private void doSignUp(String verifierCode) {
-
-        /*LocalAddress addr = null;
-        if(address != null) {
-            addr = new LocalAddress(null, null, address.getCountryName(), address.getLocality());
-        }*/
         UserSignUpInfo userSignUpInfo = new UserSignUpInfo(name, email, /*passwd, */verifierCode);
-        new SignUpTask().execute(userSignUpInfo);
+        new SignUpTask(PreSignupActivity2.this).execute(userSignUpInfo);
     }
 
     private class UserSignUpInfo {
@@ -180,6 +182,12 @@ public class PreSignupActivity2 extends AbstractAppCompatActivity implements IAs
 
         private String errorMsg;
 
+        private Context context;
+
+        SignUpTask(Context context) {
+            this.context = context;
+        }
+
         @Override
         protected void onPreExecute() {
             showProgressDialog();
@@ -190,6 +198,7 @@ public class PreSignupActivity2 extends AbstractAppCompatActivity implements IAs
         protected Void doInBackground(UserSignUpInfo... userSignUpInfos) {
             if(userSignUpInfos == null || userSignUpInfos.length == 0)
                 return null;
+            SQLiteDatabase wDB = null;
             UserSignUpInfo userSignUpInfo = userSignUpInfos[0];
             try {
                 String name = userSignUpInfo.getName();
@@ -204,10 +213,25 @@ public class PreSignupActivity2 extends AbstractAppCompatActivity implements IAs
                         .addApiParam(APIConstants.User.Register.LATITUDE, latitude)
                         .addApiParam(APIConstants.User.Register.VERIFIER, verifier)
                         .build();
-                api.execute();
+                JUser user = (JUser) api.execute();
+                AppController.getInstance().setUser(user);
+                UserInfo userInfo = (UserInfo) DBUtil.convert(user, null);
+                wDB = new SquillDbHelper(context).getWritableDatabase();
+                wDB.insert(UserInfo.TABLE_NAME, null, userInfo.toContentValues());
+
+                api = APIBuilder
+                        .create(ApiConstants.BASE_URL)
+                        .setAction(COMMAND.ANDROID_APK_URL)
+                        .build();
+                String apkUrl = (String) api.execute();
+                AppController.getInstance().setApkUrl(apkUrl);
             } catch (Exception e) {
                 Log.i(LOG_TAG, e.getMessage());
                 errorMsg = "ERROR: " + e.getMessage();
+            } finally {
+                if(wDB != null && wDB.isOpen()) {
+                    wDB.close();
+                }
             }
             return null;
         }

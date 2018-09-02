@@ -200,7 +200,7 @@ public class SignupActivity extends AbstractAppCompatActivity implements IAsyncT
         if(!valid)
             return;
 
-        UsernameExistenceTestTask task = new UsernameExistenceTestTask(SignupActivity.this);
+        /*UsernameExistenceTestTask task = new UsernameExistenceTestTask(SignupActivity.this);
         task.execute(email);
 
         long timeout = 3 * 60 * 1000;
@@ -232,7 +232,7 @@ public class SignupActivity extends AbstractAppCompatActivity implements IAsyncT
         if(!valid) {
             Snackbar.make(input_email, "Sorry something went wrong", Snackbar.LENGTH_LONG).show();
             return;
-        }
+        }*/
 
         IssueVerificationCodeInfo dto = new IssueVerificationCodeInfo(email, name);
         new IssueSignupVerifier(SignupActivity.this).addListener(SignupActivity.this).execute(dto);

@@ -60,7 +60,7 @@ public class RssFeedCache {
     }
 
     public List<JRssFeed> readOfflineData() {
-        if(!Constants.FIRST_PAGE.equals(pageLink)) {
+        if(!Constants.FIRST_PAGE.equals(pageLink) && pageLink != null) {
             FileInputStream fileInputStream = null;
             try {
                 fileInputStream = context.openFileInput(feedType.name());

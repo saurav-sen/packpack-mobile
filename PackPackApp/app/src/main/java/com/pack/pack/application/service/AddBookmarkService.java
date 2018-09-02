@@ -29,9 +29,11 @@ public class AddBookmarkService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        String entityId = intent.getStringExtra(BOOKMARK_ENTITY_ID);
-        if(entityId != null) {
-            ExecutorsPool.INSTANCE.submit(new AddBookmarkTask(entityId));
+        if(intent != null) {
+            String entityId = intent.getStringExtra(BOOKMARK_ENTITY_ID);
+            if (entityId != null) {
+                ExecutorsPool.INSTANCE.submit(new AddBookmarkTask(entityId));
+            }
         }
         List<Bookmark> unprocessedBookmarks = DBUtil.loadAllUnprocessedBookmarks(new SquillDbHelper(this).getReadableDatabase());
         if(unprocessedBookmarks != null && !unprocessedBookmarks.isEmpty()) {
