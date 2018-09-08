@@ -60,6 +60,10 @@ public class RssFeedCache {
     }
 
     public List<JRssFeed> readOfflineData() {
+        List<JRssFeed> after = Collections.emptyList();
+        if(pageLink == null || Constants.FIRST_PAGE.equals(pageLink)) {
+            pageLink = readLastPageLink();
+        }
         if(!Constants.FIRST_PAGE.equals(pageLink) && pageLink != null) {
             FileInputStream fileInputStream = null;
             try {
@@ -75,12 +79,11 @@ public class RssFeedCache {
                     return Collections.emptyList();
                 }
                 List<JRssFeed> before = c.getFeeds();
-                List<JRssFeed> after = filter(before);
+                after = filter(before);
                 if(before.size() != after.size()) {
                     c.setFeeds(after);
                     storeFeeds4OfflineUsage(c);
                 }
-                return after;
             } catch (FileNotFoundException e) {
                 Log.e(LOG_TAG, e.getMessage(), e);
             } catch (IOException e) {
@@ -97,7 +100,7 @@ public class RssFeedCache {
                 }
             }
         }
-        return Collections.emptyList();
+        return after;
     }
 
     private List<JRssFeed> filter(List<JRssFeed> feeds) {
