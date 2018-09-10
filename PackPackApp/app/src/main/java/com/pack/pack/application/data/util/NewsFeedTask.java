@@ -22,12 +22,8 @@ import java.util.Map;
  */
 public class NewsFeedTask extends FeedsLoadTask {
 
-    public NewsFeedTask(Context context, boolean loadOfflineData) {
-        super(context, JRssFeedType.NEWS, loadOfflineData);
-    }
-
-    public NewsFeedTask(Context context, boolean loadOfflineData, long timestamp) {
-        super(context, JRssFeedType.NEWS, loadOfflineData, timestamp);
+    public NewsFeedTask(Context context, int pageNo) {
+        super(context, JRssFeedType.NEWS, pageNo);
     }
 
     @Override

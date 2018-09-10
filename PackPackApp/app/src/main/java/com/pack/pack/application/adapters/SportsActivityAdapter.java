@@ -18,7 +18,10 @@ import com.pack.pack.application.data.util.DownloadFeedImageTask;
 import com.pack.pack.application.view.util.ExternalLinkShareUtil;
 import com.squill.feed.web.model.JRssFeed;
 
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Saurav on 25-03-2018.
@@ -39,14 +42,46 @@ public class SportsActivityAdapter extends ArrayAdapter<JRssFeed> {
 
     private List<JRssFeed> feeds;
 
+    private static final Object OBJECT = new Object();
+
+    private Map<String, Object> map = new HashMap<String, Object>();
+
     public SportsActivityAdapter(Activity activity, List<JRssFeed> feeds) {
         super(activity, R.layout.sports_list_items, feeds.toArray(new JRssFeed[feeds.size()]));
         this.activity = activity;
         this.feeds = feeds;
     }
 
-    public List<JRssFeed> getFeeds() {
+    private List<JRssFeed> getFeeds() {
         return feeds;
+    }
+
+    public void addNewFeeds(List<JRssFeed> newFeeds) {
+        addNewFeeds(-1, newFeeds);
+    }
+
+    public void addNewFeeds(int location, List<JRssFeed> newFeeds) {
+        if(newFeeds == null || newFeeds.isEmpty())
+            return;
+        if(map.isEmpty()) {
+            for (JRssFeed feed : feeds) {
+                map.put(feed.getOgUrl(), OBJECT);
+            }
+        }
+        Iterator<JRssFeed> itr = newFeeds.iterator();
+        while (itr.hasNext()) {
+            JRssFeed newFeed = itr.next();
+            if(map.get(newFeed.getOgUrl()) != null) {
+                itr.remove();
+            } else {
+                map.put(newFeed.getOgUrl(), OBJECT);
+            }
+        }
+        if(location >= 0) {
+            feeds.addAll(location, newFeeds);
+        } else {
+            feeds.addAll(newFeeds);
+        }
     }
 
     @Override

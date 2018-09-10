@@ -77,7 +77,7 @@ public class DBUtil {
 
     private static Bookmark convertToBookmark(JRssFeed feed) {
         Bookmark bookmark = new Bookmark();
-        bookmark.setEntityId(feed.getId());
+        bookmark.setEntityId(feed.getOgUrl());
         bookmark.setTitle(feed.getOgTitle());
         bookmark.setDescription(feed.getArticleSummaryText());
         if(feed.getVideoUrl() != null) {
@@ -341,8 +341,8 @@ public class DBUtil {
         PaginationInfo paginationInfo = null;
         try {
             String __SQL = "SELECT " + PaginationInfo._ID + ", " + PaginationInfo.ENTITY_ID
-                    + ", " + PaginationInfo.NEXT_LINK + ", " + PaginationInfo.PREVIOUS_LINK
-                    + "  FROM " + PaginationInfo.TABLE_NAME  + " WHERE " + PaginationInfo.ENTITY_ID
+                    + ", " + PaginationInfo.NEXT_PAGE_NO + "  FROM " + PaginationInfo.TABLE_NAME  +
+                    " WHERE " + PaginationInfo.ENTITY_ID
                     + "='" + entityId + "'";
             if(type != null && !type.trim().isEmpty()) {
                 __SQL = __SQL + " AND " + PaginationInfo.CLASS_TYPE + "='" + type + "'";
@@ -351,12 +351,10 @@ public class DBUtil {
             if(cursor.moveToFirst()) {
                 long id = cursor.getLong(cursor.getColumnIndexOrThrow(PaginationInfo._ID));
                 String objId = cursor.getString(cursor.getColumnIndexOrThrow(PaginationInfo.ENTITY_ID));
-                String nextLink = cursor.getString(cursor.getColumnIndexOrThrow(PaginationInfo.NEXT_LINK));
-                String previousLink = cursor.getString(cursor.getColumnIndexOrThrow(PaginationInfo.PREVIOUS_LINK));
+                int nextPageNo = cursor.getInt(cursor.getColumnIndexOrThrow(PaginationInfo.NEXT_PAGE_NO));
                 paginationInfo = new PaginationInfo();
                 paginationInfo.setEntityId(entityId);
-                paginationInfo.setNextLink(nextLink);
-                paginationInfo.setPreviousLink(previousLink);
+                paginationInfo.setNextPageNo(nextPageNo);
             }
         } finally {
             if(cursor != null && !cursor.isClosed()) {

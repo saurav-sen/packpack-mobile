@@ -31,7 +31,7 @@ public interface Constants {
     public static final String PUSH_NOTIFICATION_MSG = "PUSH_NOTIFICATION_MSG";
     public static final String PUSH_DATA_MSG = "PUSH_DATA_MSG";
 
-    public static final String GLOBAL_NOTIFICATION_TOPIC = "allDevices";
+    public static final String GLOBAL_NOTIFICATION_TOPIC = "global";
 
     public static final String TOPIC_TYPE = "TOPIC_TYPE";
 

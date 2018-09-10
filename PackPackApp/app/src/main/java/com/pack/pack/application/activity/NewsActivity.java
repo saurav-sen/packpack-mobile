@@ -26,13 +26,9 @@ public class NewsActivity extends AppCompatActivity {
 
     private ListView news_feeds;
 
-    private String nextLink;
-
-    private String prevLink;
+    private int nextPageNo = 0;
 
     private ProgressDialog progressDialog;
-
-    private long timestamp = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,9 +47,9 @@ public class NewsActivity extends AppCompatActivity {
             public void onScrollStateChanged(AbsListView absListView, int scrollState) {
                 int count = news_feeds.getCount();
                 if (scrollState == SCROLL_STATE_IDLE) {
-                    int c = count - 3;
-                    if (news_feeds.getLastVisiblePosition() >= c && c > 0 && !Constants.END_OF_PAGE.equals(nextLink)) {
-                        loadNewsFeeds(nextLink, false, false);
+                    int c = (int) (count * 0.7f);
+                    if (news_feeds.getLastVisiblePosition() >= c) {
+                        loadNewsFeeds(nextPageNo, false);
                     }
                 }
             }
@@ -64,7 +60,8 @@ public class NewsActivity extends AppCompatActivity {
             }
         });
 
-        loadNewsFeeds(!Constants.END_OF_PAGE.equals(nextLink) ? nextLink : prevLink, true, true);
+        nextPageNo = 0;
+        loadNewsFeeds(nextPageNo, true);
     }
 
     @Override
@@ -88,11 +85,13 @@ public class NewsActivity extends AppCompatActivity {
         }
     }
 
-    private void loadNewsFeeds(String pageLink, boolean showLoadingProgress, boolean loadOfflineData) {
-        NewsFeedTask task = new NewsFeedTask(NewsActivity.this, loadOfflineData, timestamp);
+    private void loadNewsFeeds(int pageNo, boolean showLoadingProgress) {
+        if(pageNo < 0)
+            return;
+        NewsFeedTask task = new NewsFeedTask(NewsActivity.this, pageNo);
         NewsFeedTaskStatusListener listener = new NewsFeedTaskStatusListener(task.getTaskID(), showLoadingProgress);
         task.addListener(listener);
-        task.execute(pageLink);
+        task.execute(String.valueOf(pageNo));
     }
 
     private class NewsFeedTaskStatusListener implements IAsyncTaskStatusListener {
@@ -124,12 +123,12 @@ public class NewsActivity extends AppCompatActivity {
         public void onSuccess(String taskID, Object data) {
             if(this.taskID.equals(taskID) && data != null) {
                 Pagination<JRssFeed> page = (Pagination<JRssFeed>) data;
-                nextLink = page.getNextLink();
-                prevLink = page.getPreviousLink();
+                nextPageNo = page.getNextPageNo();
                 List<JRssFeed> list = page.getResult();
-                adapter.getFeeds().addAll(list);
+                if(list == null || list.isEmpty())
+                    return;
+                adapter.addNewFeeds(list);
                 adapter.notifyDataSetChanged();
-                timestamp = page.getTimestamp();
             }
         }
 

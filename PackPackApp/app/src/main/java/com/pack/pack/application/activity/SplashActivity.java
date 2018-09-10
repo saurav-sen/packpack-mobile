@@ -6,12 +6,9 @@ import android.os.Bundle;
 import android.os.Handler;
 
 import com.pack.pack.application.AppController;
-import com.pack.pack.application.Mode;
 import com.pack.pack.application.R;
 import com.pack.pack.application.data.LoggedInUserInfo;
 import com.pack.pack.application.data.util.IAsyncTaskStatusListener;
-import com.pack.pack.application.data.util.MediaUtil;
-import com.pack.pack.application.data.util.LoginTask;
 import com.pack.pack.application.db.Bookmark;
 import com.pack.pack.application.db.DBUtil;
 import com.pack.pack.application.db.SquillDbHelper;
@@ -42,12 +39,7 @@ public class SplashActivity extends AbstractActivity implements IAsyncTaskStatus
         setContentView(R.layout.activity_splash);
 
         if(!NetworkUtil.checkConnectivity(this)) {
-            //startNoConnectionEmptyActivity();
-            //return;
-            AppController.getInstance().setExecutionMode(Mode.OFFLINE);
             routeToTargetActivity();
-        } else {
-            AppController.getInstance().setExecutionMode(Mode.ONLINE);
         }
 
        /* JUser user = AppController.getInstance().getUser();
@@ -143,12 +135,10 @@ public class SplashActivity extends AbstractActivity implements IAsyncTaskStatus
     @Override
     public void onSuccess(String taskID, Object data) {
         LoggedInUserInfo userInfo = (LoggedInUserInfo) data;
-        //AccessToken token = userInfo.getAccessToken();
         JUser user = userInfo.getUser();
         if(user.getProfilePictureUrl() != null && !user.getProfilePictureUrl().trim().isEmpty()) {
             new DownloadProfilePictureTask().execute(user.getProfilePictureUrl());
         }
-        AppController.getInstance().setExecutionMode(Mode.ONLINE);
         getIntent().putExtra("loginStatus", true);
         finish();
         routeToTargetActivity();
@@ -194,12 +184,6 @@ public class SplashActivity extends AbstractActivity implements IAsyncTaskStatus
         startActivity(intent);
     }
 
-    /*private void startLoginActivity() {
-        Intent intent = new Intent(SplashActivity.this, LoginActivity.class);
-        finish();
-        startActivity(intent);
-    }*/
-
     private void routeToTargetActivity() {
         String action = getIntent().getAction();
         String type = getIntent().getType();
@@ -221,12 +205,6 @@ public class SplashActivity extends AbstractActivity implements IAsyncTaskStatus
                        startBookmarkActivity();
                    }
                }
-
-
-               /* Intent intent = new Intent(SplashActivity.this, ImageVideoShareReceiveActivity.class);
-                intent.putExtra(Constants.SHARED_TEXT_OR_URL_KEY, sharedText);
-                finish();
-                startActivity(intent);*/
             } else {
                 startMainActivity();
             }
@@ -253,8 +231,4 @@ public class SplashActivity extends AbstractActivity implements IAsyncTaskStatus
         finish();
         startActivity(intent);
     }
-
-    /*private void doLogin(UserInfo userInfo, boolean refreshToken) {
-        new LoginTask(this, this, refreshToken).execute(userInfo);
-    }*/
 }

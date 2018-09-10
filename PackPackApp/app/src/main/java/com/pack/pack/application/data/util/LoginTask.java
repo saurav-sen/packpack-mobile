@@ -10,6 +10,7 @@ import com.pack.pack.application.data.LoggedInUserInfo;
 import com.pack.pack.application.db.DBUtil;
 import com.pack.pack.application.db.DbObject;
 import com.pack.pack.application.db.UserInfo;
+import com.pack.pack.application.service.NetworkUtil;
 import com.pack.pack.client.api.API;
 import com.pack.pack.client.api.APIBuilder;
 import com.pack.pack.client.api.APIConstants;
@@ -42,7 +43,7 @@ public class LoginTask extends AbstractNetworkTask<UserInfo, Integer, JUser> {
     }*/
 
     public LoginTask(Context context, IAsyncTaskStatusListener listener, boolean firstTime) {
-        super(AppController.getInstance().getExecutionMode() == Mode.OFFLINE, true, context, false);
+        super(!NetworkUtil.checkConnectivity(context), true, context, false);
         addListener(listener);
         this.firstTime = firstTime;
     }
@@ -152,7 +153,7 @@ public class LoginTask extends AbstractNetworkTask<UserInfo, Integer, JUser> {
         if(userInfo != null) {
             JUser user = DBUtil.convertUserInfo(userInfo);
             AppController.getInstance().setUser(user);
-            if(AppController.getInstance().getExecutionMode() == Mode.OFFLINE) {
+            if(!NetworkUtil.checkConnectivity(getContext())) {
                 AppController.getInstance().setUserEmail(userInfo.getUsername());
                 return user;
             }

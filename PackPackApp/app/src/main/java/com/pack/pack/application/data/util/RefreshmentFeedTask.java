@@ -23,8 +23,8 @@ import java.util.Map;
  */
 public class RefreshmentFeedTask extends FeedsLoadTask {
 
-    public RefreshmentFeedTask(Context context, boolean loadOfflineData) {
-        super(context, JRssFeedType.REFRESHMENT, loadOfflineData);
+    public RefreshmentFeedTask(Context context, int pageNo) {
+        super(context, JRssFeedType.REFRESHMENT, pageNo);
     }
 
     @Override

@@ -28,13 +28,9 @@ public class ScienceNewsActivity extends AppCompatActivity {
 
     private ListView science_feeds;
 
-    private String nextLink;
-
-    private String prevLink;
+    private int nextPageNo;
 
     private ProgressDialog progressDialog;
-
-    private long timestamp = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,9 +49,9 @@ public class ScienceNewsActivity extends AppCompatActivity {
             public void onScrollStateChanged(AbsListView absListView, int scrollState) {
                 int count = science_feeds.getCount();
                 if (scrollState == SCROLL_STATE_IDLE) {
-                    int c = count - 3;
-                    if (science_feeds.getLastVisiblePosition() >= c && c > 0 && !Constants.END_OF_PAGE.equals(nextLink)) {
-                        loadScienceFeeds(nextLink, false, false);
+                    int c = (int) (count * 0.7f);
+                    if (science_feeds.getLastVisiblePosition() >= c) {
+                        loadScienceFeeds(nextPageNo, false);
                     }
                 }
             }
@@ -66,7 +62,8 @@ public class ScienceNewsActivity extends AppCompatActivity {
             }
         });
 
-        loadScienceFeeds(!Constants.END_OF_PAGE.equals(nextLink) ? nextLink : prevLink, true, true);
+        nextPageNo = 0;
+        loadScienceFeeds(nextPageNo, true);
     }
 
     @Override
@@ -90,11 +87,13 @@ public class ScienceNewsActivity extends AppCompatActivity {
         }
     }
 
-    private void loadScienceFeeds(String pageLink, boolean showLoadingProgress, boolean loadOfflineData) {
-        ScienceNewsFeedTask task = new ScienceNewsFeedTask(ScienceNewsActivity.this, loadOfflineData, timestamp);
+    private void loadScienceFeeds(int pageNo, boolean showLoadingProgress) {
+        if(pageNo < 0)
+            return;
+        ScienceNewsFeedTask task = new ScienceNewsFeedTask(ScienceNewsActivity.this, pageNo);
         ScienceNewsFeedTaskStatusListener listener = new ScienceNewsFeedTaskStatusListener(task.getTaskID(), showLoadingProgress);
         task.addListener(listener);
-        task.execute(pageLink);
+        task.execute(String.valueOf(pageNo));
     }
 
     private class ScienceNewsFeedTaskStatusListener implements IAsyncTaskStatusListener {
@@ -126,12 +125,12 @@ public class ScienceNewsActivity extends AppCompatActivity {
         public void onSuccess(String taskID, Object data) {
             if (this.taskID.equals(taskID) && data != null) {
                 Pagination<JRssFeed> page = (Pagination<JRssFeed>) data;
-                nextLink = page.getNextLink();
-                prevLink = page.getPreviousLink();
+                nextPageNo = page.getNextPageNo();
                 List<JRssFeed> list = page.getResult();
-                adapter.getFeeds().addAll(list);
+                if(list == null || list.isEmpty())
+                    return;
+                adapter.addNewFeeds(list);
                 adapter.notifyDataSetChanged();
-                timestamp = page.getTimestamp();
             }
         }
 

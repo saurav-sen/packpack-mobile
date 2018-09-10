@@ -240,8 +240,7 @@ public abstract class AbstractNetworkTask<X, Y, Z> extends AsyncTask<X, Y, Z> {
                 PaginationInfo paginationInfo = new PaginationInfo();
                 paginationInfo.setEntityId(entityId);
                 paginationInfo.setType(className);
-                paginationInfo.setNextLink(page.getNextLink());
-                paginationInfo.setPreviousLink(page.getPreviousLink());
+                paginationInfo.setNextPageNo(page.getNextPageNo());
                 if(checkExistence_0(paginationInfo)) {
                     boolean success = deleteExisting_0(paginationInfo);
                     if(!success)

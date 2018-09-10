@@ -14,16 +14,21 @@ public class PaginationInfo implements DbObject {
 
     public static final String ENTITY_ID = "entity_id";
     public static final String CLASS_TYPE = "type";
-    public static final String NEXT_LINK = "next_link";
-    public static final String PREVIOUS_LINK = "previous_link";
+    public static final String NEXT_PAGE_NO = "nextPageNo";
 
     private String entityId;
 
     private String type;
 
-    private String nextLink;
+    public int getNextPageNo() {
+        return nextPageNo;
+    }
 
-    private String previousLink;
+    public void setNextPageNo(int nextPageNo) {
+        this.nextPageNo = nextPageNo;
+    }
+
+    private int nextPageNo;
 
     @Override
     public String getEntityId() {
@@ -42,22 +47,6 @@ public class PaginationInfo implements DbObject {
         this.type = type;
     }
 
-    public String getNextLink() {
-        return nextLink;
-    }
-
-    public void setNextLink(String nextLink) {
-        this.nextLink = nextLink;
-    }
-
-    public String getPreviousLink() {
-        return previousLink;
-    }
-
-    public void setPreviousLink(String previousLink) {
-        this.previousLink = previousLink;
-    }
-
     @Override
     public String getTableName() {
         return TABLE_NAME;
@@ -68,8 +57,7 @@ public class PaginationInfo implements DbObject {
         ContentValues contentValues = new ContentValues();
         contentValues.put(ENTITY_ID, entityId);
         contentValues.put(CLASS_TYPE, type);
-        contentValues.put(NEXT_LINK, nextLink);
-        contentValues.put(PREVIOUS_LINK, previousLink);
+        contentValues.put(NEXT_PAGE_NO, nextPageNo);
         return contentValues;
     }
 

@@ -23,36 +23,31 @@ import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Created by Saurav on 18-06-2017.
  */
 public class RssFeedCache {
 
-    private String pageLink;
-
     private Context context;
 
     private JRssFeedType feedType;
 
-    private long lastReceiveTimestamp;
-
     private static final String SETTINGS = "SETTINGS";
-
-    private static final String NEXT_PAGE_LINK = "NEXT_PAGE_LINK";
-
-    private static final String FEED_RECEIVE_TIMESTAMP = "FEED_RECEIVE_TIMESTAMP";
 
     private static final String LOG_TAG = "RssFeedCache";
 
-    private int MAX_NO_FEEDS_THRESHOLD = 100;
+    private int MAX_NO_FEEDS_THRESHOLD = 300;
 
     public RssFeedCache(Context context, JRssFeedType feedType) {
         this.context = context;
@@ -61,43 +56,38 @@ public class RssFeedCache {
 
     public List<JRssFeed> readOfflineData() {
         List<JRssFeed> after = Collections.emptyList();
-        if(pageLink == null || Constants.FIRST_PAGE.equals(pageLink)) {
-            pageLink = readLastPageLink();
-        }
-        if(!Constants.FIRST_PAGE.equals(pageLink) && pageLink != null) {
-            FileInputStream fileInputStream = null;
+        FileInputStream fileInputStream = null;
+        try {
+            fileInputStream = context.openFileInput(feedType.name());
+            StringBuilder json = new StringBuilder();
+            byte[] buffer = new byte[1024];
+            int n = -1;
+            while ((n = fileInputStream.read(buffer)) != -1) {
+                json.append(new String(buffer, 0, n));
+            }
+            JRssFeeds c = JSONUtil.deserialize(json.toString(), JRssFeeds.class, true);
+            if(c == null) {
+                return Collections.emptyList();
+            }
+            List<JRssFeed> before = c.getFeeds();
+            after = filter(before);
+            if(before.size() != after.size()) {
+                c.setFeeds(after);
+                storeFeeds4OfflineUsage(c);
+            }
+        } catch (FileNotFoundException e) {
+            Log.e(LOG_TAG, e.getMessage(), e);
+        } catch (IOException e) {
+            Log.e(LOG_TAG, e.getMessage(), e);
+        } catch (PackPackException e) {
+            Log.e(LOG_TAG, e.getMessage(), e);
+        } finally {
             try {
-                fileInputStream = context.openFileInput(feedType.name());
-                StringBuilder json = new StringBuilder();
-                byte[] buffer = new byte[1024];
-                int n = -1;
-                while ((n = fileInputStream.read(buffer)) != -1) {
-                    json.append(new String(buffer, 0, n));
+                if(fileInputStream != null) {
+                    fileInputStream.close();
                 }
-                JRssFeeds c = JSONUtil.deserialize(json.toString(), JRssFeeds.class, true);
-                if(c == null) {
-                    return Collections.emptyList();
-                }
-                List<JRssFeed> before = c.getFeeds();
-                after = filter(before);
-                if(before.size() != after.size()) {
-                    c.setFeeds(after);
-                    storeFeeds4OfflineUsage(c);
-                }
-            } catch (FileNotFoundException e) {
-                Log.e(LOG_TAG, e.getMessage(), e);
             } catch (IOException e) {
-                Log.e(LOG_TAG, e.getMessage(), e);
-            } catch (PackPackException e) {
-                Log.e(LOG_TAG, e.getMessage(), e);
-            } finally {
-                try {
-                    if(fileInputStream != null) {
-                        fileInputStream.close();
-                    }
-                } catch (IOException e) {
-                    Log.d(LOG_TAG, e.getMessage(), e);
-                }
+                Log.d(LOG_TAG, e.getMessage(), e);
             }
         }
         return after;
@@ -118,23 +108,6 @@ public class RssFeedCache {
             }
         }
         return result;
-    }
-
-    public String readLastPageLink() {
-        SharedPreferences settings = context.getSharedPreferences(SETTINGS + "_" + feedType.name(), 0);
-        pageLink = settings.getString(NEXT_PAGE_LINK, Constants.FIRST_PAGE);
-        return pageLink;
-    }
-
-    public long readLastReceiveTimestamp() {
-        SharedPreferences settings = context.getSharedPreferences(SETTINGS + "_" + feedType.name(), 0);
-        String value = settings.getString(FEED_RECEIVE_TIMESTAMP, Constants.FIRST_PAGE);
-        if(value == null || Constants.FIRST_PAGE.equals(value.trim()))
-            lastReceiveTimestamp = 0;
-        else {
-            lastReceiveTimestamp = Long.parseLong(value.trim());
-        }
-        return lastReceiveTimestamp;
     }
 
     private void storeFeeds4OfflineUsage(JRssFeeds c) throws FileNotFoundException, IOException, PackPackException {
@@ -158,12 +131,15 @@ public class RssFeedCache {
         if(page == null)
             return;
         try {
-            List<JRssFeed> list1 = readOfflineData();
+            //List<JRssFeed> list1 = readOfflineData();
             List<JRssFeed> list2 = page.getResult();
-            Set<JRssFeed> set3 = new LinkedHashSet<>();
+            if (list2 == null || list2.isEmpty())
+                return;
+
+            Set<JRssFeed> set3 = new LinkedHashSet<JRssFeed>();
             set3.addAll(list2);
             int size3 = set3.size();
-            if(size3 < MAX_NO_FEEDS_THRESHOLD) {
+            /*if(size3 < MAX_NO_FEEDS_THRESHOLD) {
                 if((size3 + list1.size()) <= MAX_NO_FEEDS_THRESHOLD) {
                     set3.addAll(list1);
                 } else {
@@ -175,17 +151,12 @@ public class RssFeedCache {
                         size++;
                     }
                 }
-            }
+            }*/
 
-            SharedPreferences settings = context.getSharedPreferences(SETTINGS + "_" + feedType.name(), 0);
+            //SharedPreferences settings = context.getSharedPreferences(SETTINGS + "_" + feedType.name(), 0);
             JRssFeeds c = new JRssFeeds();
             c.getFeeds().addAll(new ArrayList<JRssFeed>(set3));
             storeFeeds4OfflineUsage(c);
-            SharedPreferences.Editor editor = settings.edit();
-            editor.putString(NEXT_PAGE_LINK, page.getNextLink()).commit();
-            if(page.getTimestamp() > readLastReceiveTimestamp()) {
-                editor.putString(FEED_RECEIVE_TIMESTAMP, String.valueOf(page.getTimestamp())).commit();
-            }
         } catch (FileNotFoundException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
         } catch (IOException e) {

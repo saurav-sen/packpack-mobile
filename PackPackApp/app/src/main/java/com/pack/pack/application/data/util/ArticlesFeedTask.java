@@ -20,12 +20,8 @@ import java.util.Map;
  */
 public class ArticlesFeedTask extends FeedsLoadTask {
 
-    public ArticlesFeedTask(Context context, boolean loadOfflineData) {
-        super(context, JRssFeedType.ARTICLE, loadOfflineData);
-    }
-
-    public ArticlesFeedTask(Context context, boolean loadOfflineData, long timestamp) {
-        super(context, JRssFeedType.ARTICLE, loadOfflineData, timestamp);
+    public ArticlesFeedTask(Context context, int pageNo) {
+        super(context, JRssFeedType.ARTICLE, pageNo);
     }
 
     @Override

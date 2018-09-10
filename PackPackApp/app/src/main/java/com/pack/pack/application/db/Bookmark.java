@@ -174,7 +174,7 @@ public class Bookmark implements DbObject {
         bookmark.setSourceUrl(feed.getOgUrl());
         bookmark.setTitle(feed.getOgTitle());
         bookmark.setArticle(feed.getFullArticleText());
-        bookmark.setEntityId(feed.getId());
+        bookmark.setEntityId(feed.getOgUrl());
         bookmark.setDescription(feed.getArticleSummaryText());
         if(feed.getVideoUrl() != null) {
             bookmark.setMediaUrl(feed.getVideoUrl());

@@ -42,57 +42,15 @@ public class AppController extends Application {
     private ImageLoader mImageLoader;
     LruBitmapCache mLruBitmapCache;
 
-    public static final String TOPIC_PARCELABLE_KEY = "topic_parcel";
-
-    public static final String PACK_PARCELABLE_KEY = "pack_parcel";
-
-    public static final String PACK_ATTACHMENT_ID_KEY = "pack_attachment_id";
-
     public static final int SIGNUP_ACTIVITY_REQUEST_CODE = 100;
 
     public static final int RESET_PASSWD_ACTIVITY_REQUEST_CODE = 200;
 
     public static final int CAMERA_CAPTURE_PHOTO_REQUEST_CODE = 300;
 
-    public static final int CAMERA_RECORD_VIDEO_REQUEST_CODE = 400;
-
     public static final int CREATE_TOPIC_REQUSET_CODE = 401;
 
-    public static final int IMAGE_PICK_REQUSET_CODE = 402;
-
     public static final int CROP_PHOTO_REQUEST_CODE = 420;
-
-    public static final int GALLERY_SELECT_PHOTO_REQUEST_CODE = 421;
-
-    public static final int GALLERY_SELECT_VIDEO_REQUEST_CODE = 422;
-
-    public static final int EDIT_TOPIC_REQUSET_CODE = 501;
-
-    public static final String UPLOAD_FILE_BITMAP = "upload_file_bitmap";
-
-    public static final String UPLOAD_FILE_PATH = "upload_file_path";
-
-    public static final String UPLOAD_FILE_IS_PHOTO = "upload_file_is_photo";
-
-    public static final String UPLOAD_ENTITY_ID_KEY = "entity_id";
-
-    public static final String UPLOAD_ENTITY_TYPE_KEY = "entity_type";
-
-    public static final String UPLOAD_ATTACHMENT_TITLE = "upload_attachment_title";
-
-    public static final String UPLOAD_ATTACHMENT_DESCRIPTION = "upload_attachment_description";
-
-    public static final String TOPIC_ID_KEY = "topic_id";
-
-    private Mode executionMode;
-
-    public void setExecutionMode(Mode executionMode) {
-        this.executionMode = executionMode;
-    }
-
-    public Mode getExecutionMode() {
-        return executionMode;
-    }
 
     public String getUserEmail() {
         return userEmail;

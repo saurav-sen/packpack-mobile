@@ -140,9 +140,7 @@ public class LoginActivity extends AbstractAppCompatActivity implements IAsyncTa
     @Override
     public void onSuccess(String taskID, Object data) {
         LoggedInUserInfo userInfo = (LoggedInUserInfo)data;
-       // AccessToken token = userInfo.getAccessToken();
         JUser user = userInfo.getUser();
-        AppController.getInstance().setExecutionMode(Mode.ONLINE);
         AppController.getInstance().setUser(user);
         if(user.getProfilePictureUrl() != null && !user.getProfilePictureUrl().trim().isEmpty()) {
             new DownloadProfilePictureTask().execute(user.getProfilePictureUrl());

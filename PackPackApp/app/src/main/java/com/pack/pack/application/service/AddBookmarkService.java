@@ -75,7 +75,7 @@ public class AddBookmarkService extends Service {
         String sourceUrl = bookmark.getSourceUrl();
         if(sourceUrl == null || sourceUrl.trim().isEmpty())
             return;
-        if(AppController.getInstance().getExecutionMode() == Mode.ONLINE) {
+        if(NetworkUtil.checkConnectivity(this)) {
             JRssFeed feed = processBookmark(sourceUrl);
             if(feed != null) {
                 bookmark = Bookmark.convert(feed);
@@ -91,7 +91,7 @@ public class AddBookmarkService extends Service {
     private void updateExistingBookmark(Bookmark bookmark) {
         if(bookmark == null || bookmark.getSourceUrl() == null || bookmark.getSourceUrl().trim().isEmpty())
             return;
-        if(AppController.getInstance().getExecutionMode() == Mode.ONLINE) {
+        if(NetworkUtil.checkConnectivity(this)) {
             JRssFeed feed = processBookmark(bookmark.getSourceUrl().trim());
             if(feed != null) {
                 bookmark = Bookmark.convert(feed);

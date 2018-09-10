@@ -28,13 +28,9 @@ public class SportsActivity extends AppCompatActivity {
 
     private ListView sports_feeds;
 
-    private String nextLink;
-
-    private String prevLink;
+    private int nextPageNo = 0;
 
     private ProgressDialog progressDialog;
-
-    private long timestamp = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,9 +49,9 @@ public class SportsActivity extends AppCompatActivity {
             public void onScrollStateChanged(AbsListView absListView, int scrollState) {
                 int count = sports_feeds.getCount();
                 if (scrollState == SCROLL_STATE_IDLE) {
-                    int c = count - 3;
-                    if (sports_feeds.getLastVisiblePosition() >= c && c > 0 && !Constants.END_OF_PAGE.equals(nextLink)) {
-                        loadSportsFeeds(nextLink, false, false);
+                    int c = (int) (count * 0.7f);
+                    if (sports_feeds.getLastVisiblePosition() >= c) {
+                        loadSportsFeeds(nextPageNo, false);
                     }
                 }
             }
@@ -66,7 +62,8 @@ public class SportsActivity extends AppCompatActivity {
             }
         });
 
-        loadSportsFeeds(!Constants.END_OF_PAGE.equals(nextLink) ? nextLink : prevLink, true, true);
+        nextPageNo = 0;
+        loadSportsFeeds(nextPageNo, true);
     }
 
     @Override
@@ -90,11 +87,13 @@ public class SportsActivity extends AppCompatActivity {
         }
     }
 
-    private void loadSportsFeeds(String pageLink, boolean showLoadingProgress, boolean loadOfflineData) {
-        SportsFeedTask task = new SportsFeedTask(SportsActivity.this, loadOfflineData, timestamp);
+    private void loadSportsFeeds(int pageNo, boolean showLoadingProgress) {
+        if(pageNo < 0)
+            return;
+        SportsFeedTask task = new SportsFeedTask(SportsActivity.this, pageNo);
         SportsFeedTaskStatusListener listener = new SportsFeedTaskStatusListener(task.getTaskID(), showLoadingProgress);
         task.addListener(listener);
-        task.execute(pageLink);
+        task.execute(String.valueOf(pageNo));
     }
 
     private class SportsFeedTaskStatusListener implements IAsyncTaskStatusListener {
@@ -126,12 +125,12 @@ public class SportsActivity extends AppCompatActivity {
         public void onSuccess(String taskID, Object data) {
             if (this.taskID.equals(taskID) && data != null) {
                 Pagination<JRssFeed> page = (Pagination<JRssFeed>) data;
-                nextLink = page.getNextLink();
-                prevLink = page.getPreviousLink();
+                nextPageNo = page.getNextPageNo();
                 List<JRssFeed> list = page.getResult();
-                adapter.getFeeds().addAll(list);
+                if(list == null || list.isEmpty())
+                    return;
+                adapter.addNewFeeds(list);
                 adapter.notifyDataSetChanged();
-                timestamp = page.getTimestamp();
             }
         }
 

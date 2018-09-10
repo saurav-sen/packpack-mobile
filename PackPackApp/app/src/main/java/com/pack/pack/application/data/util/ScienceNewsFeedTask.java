@@ -20,12 +20,8 @@ import java.util.Map;
  */
 public class ScienceNewsFeedTask extends FeedsLoadTask {
 
-    public ScienceNewsFeedTask(Context context, boolean loadOfflineData) {
-        super(context, JRssFeedType.NEWS_SCIENCE_TECHNOLOGY, loadOfflineData);
-    }
-
-    public ScienceNewsFeedTask(Context context, boolean loadOfflineData, long timestamp) {
-        super(context, JRssFeedType.NEWS_SCIENCE_TECHNOLOGY, loadOfflineData, timestamp);
+    public ScienceNewsFeedTask(Context context, int pageNo) {
+        super(context, JRssFeedType.NEWS_SCIENCE_TECHNOLOGY, pageNo);
     }
 
     @Override
