@@ -373,9 +373,9 @@ public class DownloadImageTask extends AbstractNetworkTask<String, Void, Bitmap>
                         bitmap = Bitmap.createScaledBitmap(bitmap, dimension.newWidth, dimension.newHeight, true);
                     }
                 }
-                if(bitmap == null) {
+                /*if(bitmap == null) {
                     bitmap = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.noimage);
-                }
+                }*/
                 AppController.getInstance().getLruBitmapCache().putBitmap(lookupURL(url), bitmap);
             }
         } catch (Exception e) {
@@ -480,7 +480,11 @@ public class DownloadImageTask extends AbstractNetworkTask<String, Void, Bitmap>
     }
 
     protected void setImageBitmapToImageView(Bitmap bitmap) {
-        imageView.setImageBitmap(bitmap);
-        imageView.setVisibility(View.VISIBLE);
+        if(bitmap != null) {
+            imageView.setImageBitmap(bitmap);
+            imageView.setVisibility(View.VISIBLE);
+        } else {
+            imageView.setVisibility(View.GONE);
+        }
     }
 }

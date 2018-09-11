@@ -8,7 +8,11 @@ import android.os.Handler;
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
 import com.pack.pack.application.data.LoggedInUserInfo;
+import com.pack.pack.application.data.util.ArticlesFeedTask;
 import com.pack.pack.application.data.util.IAsyncTaskStatusListener;
+import com.pack.pack.application.data.util.NewsFeedTask;
+import com.pack.pack.application.data.util.ScienceNewsFeedTask;
+import com.pack.pack.application.data.util.SportsFeedTask;
 import com.pack.pack.application.db.Bookmark;
 import com.pack.pack.application.db.DBUtil;
 import com.pack.pack.application.db.SquillDbHelper;
@@ -19,65 +23,155 @@ import com.pack.pack.application.service.CheckNetworkService;
 import com.pack.pack.application.service.NetworkUtil;
 import com.pack.pack.application.service.SquillNTPService;
 import com.pack.pack.model.web.JUser;
+import com.pack.pack.model.web.Pagination;
+import com.squill.feed.web.model.JRssFeed;
+import com.squill.feed.web.model.JRssFeedType;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  *
  * @author Saurav
  *
  */
-public class SplashActivity extends AbstractActivity implements IAsyncTaskStatusListener {
-
-    //private ImageView splash_image;
+public class SplashActivity extends AbstractActivity /*implements IAsyncTaskStatusListener*/ {
 
     private ProgressDialog progressDialog;
-
-    private int ntpJobId = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
-        if(!NetworkUtil.checkConnectivity(this)) {
-            routeToTargetActivity();
-        }
-
-       /* JUser user = AppController.getInstance().getUser();
-        if(user == null) {*/
         startNetworkChecker();
         startNTPService();
         startAddBookmarkService();
 
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-
-            }
-        }, 5000);
-
-        //MediaUtil.loadFFMpeg(this);
-        /*}*/
-
-        verify();
+        if(!NetworkUtil.checkConnectivity(this)) {
+            routeToTargetActivity();
+        } else {
+            loadUserInfo0();
+            tryFetchingFeeds();
+        }
     }
 
-    /*private void startNTPService() {
-        ComponentName serviceComponent = new ComponentName(this, SquillNTPService.class);
-        int oneMinute = 60 * 60 * 1000;
-        JobInfo jobInfo = new JobInfo.Builder(ntpJobId++, serviceComponent)
-                .setMinimumLatency(oneMinute).setOverrideDeadline(5 * oneMinute)
-                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY).setRequiresDeviceIdle(false)
-                .setRequiresCharging(false).build();
-        JobScheduler jobScheduler = (JobScheduler) getApplication()
-                .getSystemService(Context.JOB_SCHEDULER_SERVICE);
-        jobScheduler.schedule(jobInfo);
-    }*/
+    private void tryFetchingFeeds() {
+        NewsFeedTask newsFeedTask = new NewsFeedTask(SplashActivity.this, 0);
+        SportsFeedTask sportsFeedTask = new SportsFeedTask(SplashActivity.this, 0);
+        ScienceNewsFeedTask scienceNewsFeedTask = new ScienceNewsFeedTask(SplashActivity.this, 0);
+        ArticlesFeedTask artilcesFeedTask = new ArticlesFeedTask(SplashActivity.this, 0);
 
-    /*private void startNoConnectionEmptyActivity() {
-        Intent intent = new Intent(this, NoConnectionEmptyActivity.class);
-        startActivity(intent);
-        finish();
-    }*/
+        IAsyncTaskStatusListener listener = new FeedReceiveTaskStatusListener()
+                .addTaskID(newsFeedTask.getTaskID(), JRssFeedType.NEWS)
+                .addTaskID(sportsFeedTask.getTaskID(), JRssFeedType.NEWS_SPORTS)
+                .addTaskID(scienceNewsFeedTask.getTaskID(), JRssFeedType.NEWS_SCIENCE_TECHNOLOGY)
+                .addTaskID(artilcesFeedTask.getTaskID(), JRssFeedType.ARTICLE);
+
+        newsFeedTask.addListener(listener);
+        sportsFeedTask.addListener(listener);
+        scienceNewsFeedTask.addListener(listener);
+        artilcesFeedTask.addListener(listener);
+
+        newsFeedTask.execute(String.valueOf(0));
+        sportsFeedTask.execute(String.valueOf(0));
+        scienceNewsFeedTask.execute(String.valueOf(0));
+        artilcesFeedTask.execute(String.valueOf(0));
+    }
+
+    private class FeedReceiveTaskStatusListener implements IAsyncTaskStatusListener {
+
+        private Set<String> taskIDs = new HashSet<>();
+
+        private Map<String, JRssFeedType> taskIdVsFeedType = new HashMap<>();
+
+        private FeedReceiveTaskStatusListener addTaskID(String taskID, JRssFeedType feedType) {
+            this.taskIDs.add(taskID);
+            this.taskIdVsFeedType.put(taskID, feedType);
+            return this;
+        }
+
+        @Override
+        public void onPreStart(String taskID) {
+            // Do nothing
+        }
+
+        @Override
+        public void onFailure(String taskID, String errorMsg) {
+            // Do nothing
+            if(this.taskIDs.remove(taskID)) {
+                JRssFeedType feedType = this.taskIdVsFeedType.get(taskID);
+                if(feedType != null) {
+                    switch (feedType) {
+                        case NEWS:
+                            AppController.getInstance().getFeedReceiveState().setIsFirstPageNewsReceived(false);
+                            AppController.getInstance().getFeedReceiveState().setNewsNextPageNo(0);
+                            break;
+                        case NEWS_SPORTS:
+                            AppController.getInstance().getFeedReceiveState().setIsFirstPageSportsNewsReceived(false);
+                            AppController.getInstance().getFeedReceiveState().setSportsNewsNextPageNo(0);
+                            break;
+                        case NEWS_SCIENCE_TECHNOLOGY:
+                            AppController.getInstance().getFeedReceiveState().setIsFirstPageScienceNewsReceived(false);
+                            AppController.getInstance().getFeedReceiveState().setScienceNewsNextPageNo(0);
+                            break;
+                        case ARTICLE:
+                            AppController.getInstance().getFeedReceiveState().setIsFirstPageArticlesReceived(false);
+                            AppController.getInstance().getFeedReceiveState().setArticlesNextPageNo(0);
+                            break;
+                    }
+                }
+            }
+        }
+
+        @Override
+        public void onSuccess(String taskID, Object data) {
+            if(this.taskIDs.remove(taskID) && data != null) {
+                Pagination<JRssFeed> page = (Pagination<JRssFeed>) data;
+                int nextPageNo = page.getNextPageNo();
+                List<JRssFeed> list = page.getResult();
+                if(list == null || list.isEmpty())
+                    return;
+                JRssFeedType feedType = this.taskIdVsFeedType.get(taskID);
+                if(feedType != null) {
+                    switch (feedType) {
+                        case NEWS:
+                            AppController.getInstance().getFeedReceiveState().setIsFirstPageNewsReceived(true);
+                            AppController.getInstance().getFeedReceiveState().setNewsNextPageNo(nextPageNo);
+                            break;
+                        case NEWS_SPORTS:
+                            AppController.getInstance().getFeedReceiveState().setIsFirstPageSportsNewsReceived(true);
+                            AppController.getInstance().getFeedReceiveState().setSportsNewsNextPageNo(nextPageNo);
+                            break;
+                        case NEWS_SCIENCE_TECHNOLOGY:
+                            AppController.getInstance().getFeedReceiveState().setIsFirstPageScienceNewsReceived(true);
+                            AppController.getInstance().getFeedReceiveState().setScienceNewsNextPageNo(nextPageNo);
+                            break;
+                        case ARTICLE:
+                            AppController.getInstance().getFeedReceiveState().setIsFirstPageArticlesReceived(true);
+                            AppController.getInstance().getFeedReceiveState().setArticlesNextPageNo(nextPageNo);
+                            break;
+                    }
+                }
+            }
+        }
+
+        @Override
+        public void onPostComplete(String taskID) {
+            if(this.taskIDs.isEmpty()) {
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+
+                    }
+                }, 2000);
+                loadUserInfoAndRouteToTargetActivity();
+            }
+        }
+    }
 
     private void startAddBookmarkService() {
         Intent intent = new Intent(this, AddBookmarkService.class);
@@ -100,7 +194,28 @@ public class SplashActivity extends AbstractActivity implements IAsyncTaskStatus
         startService(intent);
     }
 
-    private void verify() {
+    private void loadUserInfo0() {
+        String userName = AppController.getInstance().getUserEmail();
+        if(userName == null || userName.trim().isEmpty()) {
+            UserInfo userInfo = DBUtil.loadLastLoggedInUserInfo(new SquillDbHelper(this).getReadableDatabase());
+            if(userInfo == null) {
+                openSignupActivity();
+            } else {
+                userName = userInfo.getUsername();
+                if(userName == null || userName.trim().isEmpty()) {
+                    openSignupActivity();
+                } else {
+                    JUser user = DBUtil.convertUserInfo(userInfo);
+                    AppController.getInstance().setUser(user);
+                    if(user.getProfilePictureUrl() != null && !user.getProfilePictureUrl().trim().isEmpty()) {
+                        new DownloadProfilePictureTask().execute(user.getProfilePictureUrl());
+                    }
+                }
+            }
+        }
+    }
+
+   private void loadUserInfoAndRouteToTargetActivity() {
         String userName = AppController.getInstance().getUserEmail();
         if(userName != null) {
             finish();
@@ -110,24 +225,20 @@ public class SplashActivity extends AbstractActivity implements IAsyncTaskStatus
             if(userInfo != null) {
                 userName = userInfo.getUsername();
                 if(userName != null) {
-                    //AppController.getInstance().setoAuthToken(oAuthToken);
                     JUser user = DBUtil.convertUserInfo(userInfo);
                     AppController.getInstance().setUser(user);
                     finish();
-                    startMainActivity();
-                    //doLogin(userInfo, true);
+                    openLandingPageActivity();
                 } else {
-                    //doLogin(userInfo, false);
-                    startSignupActivity();
+                    openSignupActivity();
                 }
             } else {
-                //startLoginActivity();
-                startSignupActivity();
+                openSignupActivity();
             }
         }
     }
 
-    @Override
+    /*@Override
     public void onPreStart(String taskID) {
         showProgressDialog();
     }
@@ -147,7 +258,7 @@ public class SplashActivity extends AbstractActivity implements IAsyncTaskStatus
     @Override
     public void onPostComplete(String taskID) {
 
-    }
+    }*/
 
     private void showProgressDialog() {
         if(progressDialog != null) {
@@ -171,14 +282,13 @@ public class SplashActivity extends AbstractActivity implements IAsyncTaskStatus
         super.onDestroy();
     }
 
-    @Override
+    /*@Override
     public void onFailure(String taskID, String errorMsg) {
         hideProgressDialog();
-       // startLoginActivity();
-        startSignupActivity();
-    }
+        openSignupActivity();
+    }*/
 
-    private void startSignupActivity() {
+    private void openSignupActivity() {
         Intent intent = new Intent(this, SignupActivity.class);
         finish();
         startActivity(intent);
@@ -191,7 +301,7 @@ public class SplashActivity extends AbstractActivity implements IAsyncTaskStatus
            if("text/plain".equals(type)) {
                 String sharedText = getIntent().getStringExtra(Intent.EXTRA_TEXT);
                if(sharedText == null || sharedText.trim().isEmpty()) {
-                   startMainActivity("Invalid Link Found");
+                   openLandingPageActivity("Invalid Link Found");
                } else {
                    Bookmark bookmark = new Bookmark();
                    bookmark.setProcessed(false);
@@ -199,25 +309,25 @@ public class SplashActivity extends AbstractActivity implements IAsyncTaskStatus
                    bookmark.setTimeOfAdd(System.currentTimeMillis());
                    bookmark = DBUtil.storeNewBookmark(bookmark, this);
                    if(bookmark == null || bookmark.getEntityId() == null || bookmark.getEntityId().trim().isEmpty()) {
-                       startMainActivity("Failed to process link");
+                       openLandingPageActivity("Failed to process link");
                    } else {
                        submitNewLinkToAddBookmarkService(bookmark.getEntityId());
                        startBookmarkActivity();
                    }
                }
             } else {
-                startMainActivity();
+               openLandingPageActivity();
             }
         } else {
-            startMainActivity();
+            openLandingPageActivity();
         }
     }
 
-    private void startMainActivity() {
-        startMainActivity(null);
+    private void openLandingPageActivity() {
+        openLandingPageActivity(null);
     }
 
-    private void startMainActivity(String messageToDisplayIfAny) {
+    private void openLandingPageActivity(String messageToDisplayIfAny) {
         Intent intent = new Intent(SplashActivity.this, LandingPageActivity.class);
         if(messageToDisplayIfAny != null && !messageToDisplayIfAny.trim().isEmpty()) {
             intent.putExtra(LandingPageActivity.MESSAGE_IF_ANY, messageToDisplayIfAny);

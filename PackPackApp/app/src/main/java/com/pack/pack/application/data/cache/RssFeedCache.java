@@ -43,11 +43,11 @@ public class RssFeedCache {
 
     private JRssFeedType feedType;
 
-    private static final String SETTINGS = "SETTINGS";
+    //private static final String SETTINGS = "SETTINGS";
 
     private static final String LOG_TAG = "RssFeedCache";
 
-    private int MAX_NO_FEEDS_THRESHOLD = 300;
+   // private int MAX_NO_FEEDS_THRESHOLD = 300;
 
     public RssFeedCache(Context context, JRssFeedType feedType) {
         this.context = context;
@@ -127,33 +127,16 @@ public class RssFeedCache {
         }
     }
 
-    public void storeOfflineData(Pagination<JRssFeed> page) {
-        if(page == null)
-            return;
+    public void storeOfflineData(List<JRssFeed> newFeeds, int requestedPageNo) {
         try {
-            //List<JRssFeed> list1 = readOfflineData();
-            List<JRssFeed> list2 = page.getResult();
-            if (list2 == null || list2.isEmpty())
+            if (newFeeds == null || newFeeds.isEmpty())
                 return;
-
             Set<JRssFeed> set3 = new LinkedHashSet<JRssFeed>();
-            set3.addAll(list2);
-            int size3 = set3.size();
-            /*if(size3 < MAX_NO_FEEDS_THRESHOLD) {
-                if((size3 + list1.size()) <= MAX_NO_FEEDS_THRESHOLD) {
-                    set3.addAll(list1);
-                } else {
-                    int size = size3;
-                    Iterator<JRssFeed> itr = list1.iterator();
-                    while(itr.hasNext() && size <= MAX_NO_FEEDS_THRESHOLD) {
-                        JRssFeed r = itr.next();
-                        set3.add(r);
-                        size++;
-                    }
-                }
-            }*/
-
-            //SharedPreferences settings = context.getSharedPreferences(SETTINGS + "_" + feedType.name(), 0);
+            if(requestedPageNo > 0) {
+                List<JRssFeed> existingFeeds = readOfflineData();
+                set3.addAll(existingFeeds);
+            }
+            set3.addAll(newFeeds);
             JRssFeeds c = new JRssFeeds();
             c.getFeeds().addAll(new ArrayList<JRssFeed>(set3));
             storeFeeds4OfflineUsage(c);

@@ -277,4 +277,13 @@ public class AppController extends Application {
     public void setUploadAttachmentData(UploadAttachmentData uploadAttachmentData) {
         this.uploadAttachmentData = uploadAttachmentData;
     }
+
+    private FeedReceiveState feedReceiveState;
+
+    public FeedReceiveState getFeedReceiveState() {
+        if(feedReceiveState == null) {
+            feedReceiveState = new FeedReceiveState();
+        }
+        return feedReceiveState;
+    }
 }

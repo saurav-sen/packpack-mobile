@@ -70,10 +70,17 @@ public abstract class FeedsLoadTask extends AbstractNetworkTask<String, Integer,
         boolean readOfflineData = true;
         if(NetworkUtil.checkConnectivity(getContext())) {
             readOfflineData = false;
-            page = eliminateDuplicatesIfAny((Pagination<JRssFeed>)api.execute());
-            cache.storeOfflineData(page);
-            if(pageNo == 0 && (page == null || page.getResult().isEmpty()))
+            if(pageNo == 0 && AppController.getInstance().getFeedReceiveState().isFirstPageReceived(feedType)) {
                 readOfflineData = true;
+                pageNo = AppController.getInstance().getFeedReceiveState().getNextPageNo(feedType);
+            } else {
+                page = eliminateDuplicatesIfAny((Pagination<JRssFeed>)api.execute());
+                if(page != null && !page.getResult().isEmpty()) {
+                    cache.storeOfflineData(page.getResult(), pageNo);
+                }
+                if(pageNo == 0 && (page == null || page.getResult().isEmpty()))
+                    readOfflineData = true;
+            }
         }
         if(readOfflineData) {
             List<JRssFeed> list = cache.readOfflineData();
@@ -97,7 +104,11 @@ public abstract class FeedsLoadTask extends AbstractNetworkTask<String, Integer,
         Map<String, Object> apiParams = new HashMap<String, Object>();
         String userId = AppController.getInstance().getUserId();
         apiParams.put(APIConstants.User.ID, userId);
-        apiParams.put(APIConstants.PageInfo.PAGE_NO, pageNo);
+        int pNo = pageNo;
+        if(pNo == 0 && AppController.getInstance().getFeedReceiveState().isFirstPageReceived(feedType)) {
+            pNo = AppController.getInstance().getFeedReceiveState().getNextPageNo(feedType);
+        }
+        apiParams.put(APIConstants.PageInfo.PAGE_NO, pNo);
         return apiParams;
     }
 }
