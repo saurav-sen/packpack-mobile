@@ -15,6 +15,7 @@ import android.widget.TextView;
 import com.pack.pack.application.R;
 import com.pack.pack.application.activity.FullScreenNewsViewActivity;
 import com.pack.pack.application.data.util.DownloadFeedImageTask;
+import com.pack.pack.application.view.util.BookmarkUtil;
 import com.pack.pack.application.view.util.ExternalLinkShareUtil;
 import com.squill.feed.web.model.JRssFeed;
 
@@ -38,7 +39,7 @@ public class ScienceNewsActivityAdapter extends ArrayAdapter<JRssFeed> {
 
     private ProgressBar loading_progress;
 
-    private Button science_news_rss_share;
+    private Button science_news_bookmark;
 
     private List<JRssFeed> feeds;
 
@@ -112,7 +113,7 @@ public class ScienceNewsActivityAdapter extends ArrayAdapter<JRssFeed> {
         science_news_rss_feed_description = (TextView) convertView.findViewById(R.id.science_news_rss_feed_description);
         loading_progress = (ProgressBar) convertView.findViewById(R.id.loading_progress);
         loading_progress.setVisibility(View.VISIBLE);
-        science_news_rss_share = (Button) convertView.findViewById(R.id.science_news_rss_share);
+        science_news_bookmark = (Button) convertView.findViewById(R.id.science_news_bookmark);
 
         final JRssFeed feed = getItem(position);
         if (feed != null) {
@@ -152,10 +153,11 @@ public class ScienceNewsActivityAdapter extends ArrayAdapter<JRssFeed> {
                 });
             }
 
-            science_news_rss_share.setOnClickListener(new View.OnClickListener() {
+            science_news_bookmark.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    shareUrl(feed);
+                    BookmarkUtil.addBookmark(feed, activity, science_news_bookmark);
+                    //shareUrl(feed);
                 }
             });
         }

@@ -54,7 +54,7 @@ public class AddBookmarkService extends Service {
         JRssFeed result = null;
         try {
             String userEmail = AppController.getInstance().getUserEmail();
-            API api = APIBuilder.create(ApiConstants.BASE_URL)
+            API api = APIBuilder.create(ApiConstants.ML_BASE_URL)
                     .setAction(COMMAND.PROCESS_BOOKMARK).setUserName(userEmail)
                     .addApiParam(APIConstants.Bookmark.WEB_LINK, link)
                     .addApiParam(APIConstants.User.USERNAME, userEmail).build();
@@ -92,10 +92,17 @@ public class AddBookmarkService extends Service {
         if(bookmark == null || bookmark.getSourceUrl() == null || bookmark.getSourceUrl().trim().isEmpty())
             return;
         if(NetworkUtil.checkConnectivity(this)) {
+            String entityId = bookmark.getEntityId();
+            if(entityId == null)
+                return;
             JRssFeed feed = processBookmark(bookmark.getSourceUrl().trim());
             if(feed != null) {
                 bookmark = Bookmark.convert(feed);
-                if(bookmark != null && !bookmark.isVideo() && bookmark.getMediaUrl() != null && !bookmark.getMediaUrl().trim().isEmpty()) {
+                if(bookmark != null && !bookmark.isVideo() && bookmark.getMediaUrl() != null
+                        && !bookmark.getMediaUrl().trim().isEmpty()) {
+                    bookmark.setEntityId(entityId);
+                    bookmark.setTimeOfAdd(System.currentTimeMillis());
+                    DBUtil.storeNewBookmark(bookmark, AddBookmarkService.this);
                     new DownloadFeedImageTask(null, 850, 600, this, null)
                             .execute(bookmark.getMediaUrl());
                 }

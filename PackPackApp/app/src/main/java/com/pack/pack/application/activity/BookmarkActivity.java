@@ -41,7 +41,7 @@ public class BookmarkActivity extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        bookmark_feeds = (ListView) findViewById(R.id.science_feeds);
+        bookmark_feeds = (ListView) findViewById(R.id.bookmark_feeds);
         List<Bookmark> feeds = new LinkedList<Bookmark>();
         adapter = new BookmarkActivityAdapter(this, feeds);
         bookmark_feeds.setAdapter(adapter);

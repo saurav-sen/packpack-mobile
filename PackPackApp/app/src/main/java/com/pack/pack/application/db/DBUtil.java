@@ -131,7 +131,7 @@ public class DBUtil {
                     + Bookmark.IMAGE_DATA + ", " + Bookmark.TIME_OF_ADD  + ", " + Bookmark.SOURCE_URL + ", "
                     + Bookmark.IS_PROCESSED + ", " + Bookmark.IS_VIDEO + " FROM " + Bookmark.TABLE_NAME
                     + " WHERE " + Bookmark.ENTITY_ID
-                    + " = " + entityId;
+                    + " = '" + entityId + "'";
             cursor = readable.rawQuery(__SQL, null);
             if(cursor.moveToFirst()) {
                 do {
@@ -182,8 +182,9 @@ public class DBUtil {
                     + Bookmark.DESCRIPTION + ", " + Bookmark.MEDIA_URL + ", " + Bookmark.ARTICLE + ", "
                     + Bookmark.IMAGE_DATA + ", " + Bookmark.TIME_OF_ADD + ", " + Bookmark.SOURCE_URL + ", "
                     + Bookmark.IS_PROCESSED + ", " + Bookmark.IS_VIDEO + " FROM " + Bookmark.TABLE_NAME
-                    + " WHERE " + Bookmark.TIME_OF_ADD + " <= " + currentPageRef + " ORDER BY " + Bookmark.TIME_OF_ADD
-                    + " LIMIT 10";
+                    + " WHERE " + Bookmark.TIME_OF_ADD + " <= " + currentPageRef + " AND " + Bookmark.TITLE +
+                    " IS NOT NULL AND (" + Bookmark.DESCRIPTION + " IS NOT NULL OR " + Bookmark.ARTICLE + " IS NOT NULL)"
+                    + " ORDER BY " + Bookmark.TIME_OF_ADD + " LIMIT 10";
             cursor = readable.rawQuery(__SQL, null);
             if(cursor.moveToFirst()) {
                 do {

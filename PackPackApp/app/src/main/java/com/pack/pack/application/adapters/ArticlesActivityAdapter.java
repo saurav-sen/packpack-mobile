@@ -15,6 +15,7 @@ import android.widget.TextView;
 import com.pack.pack.application.R;
 import com.pack.pack.application.activity.FullScreenNewsViewActivity;
 import com.pack.pack.application.data.util.DownloadFeedImageTask;
+import com.pack.pack.application.view.util.BookmarkUtil;
 import com.pack.pack.application.view.util.ExternalLinkShareUtil;
 import com.squill.feed.web.model.JRssFeed;
 
@@ -40,7 +41,7 @@ public class ArticlesActivityAdapter extends ArrayAdapter<JRssFeed> {
 
     private ProgressBar loading_progress;
 
-    private Button articles_rss_share;
+    private Button articles_bookmark;
 
     private List<JRssFeed> feeds;
 
@@ -114,7 +115,7 @@ public class ArticlesActivityAdapter extends ArrayAdapter<JRssFeed> {
         articles_rss_feed_description = (TextView) convertView.findViewById(R.id.articles_rss_feed_description);
         loading_progress = (ProgressBar) convertView.findViewById(R.id.loading_progress);
         loading_progress.setVisibility(View.VISIBLE);
-        articles_rss_share = (Button) convertView.findViewById(R.id.articles_rss_share);
+        articles_bookmark = (Button) convertView.findViewById(R.id.articles_bookmark);
 
         final JRssFeed feed = getItem(position);
         if (feed != null) {
@@ -154,10 +155,11 @@ public class ArticlesActivityAdapter extends ArrayAdapter<JRssFeed> {
                 });
             }
 
-            articles_rss_share.setOnClickListener(new View.OnClickListener() {
+            articles_bookmark.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    shareUrl(feed);
+                    BookmarkUtil.addBookmark(feed, activity, articles_bookmark);
+                   // shareUrl(feed);
                 }
             });
         }

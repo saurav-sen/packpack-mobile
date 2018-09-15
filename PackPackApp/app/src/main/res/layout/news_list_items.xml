@@ -97,12 +97,12 @@
         <Button
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:text="Share"
+            android:text="Add To Bookmark"
             android:textColor="@color/timestamp"
             android:layout_marginLeft="3dp"
             android:layout_marginRight="3dp"
             android:background="@drawable/bg_parent_rounded_corner"
-            android:id="@+id/news_rss_share"/>
+            android:id="@+id/news_bookmark"/>
     </LinearLayout>
 
 </LinearLayout>

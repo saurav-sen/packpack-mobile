@@ -99,7 +99,7 @@ public class LandingPageActivity extends AppCompatActivity {
                     Intent intent = new Intent(LandingPageActivity.this, ArticlesActivity.class);
                     startActivity(intent);
                 } else if (position == 5) { // Open Bookmarks
-                    Intent intent = new Intent(LandingPageActivity.this, SettingsActivity.class);
+                    Intent intent = new Intent(LandingPageActivity.this, BookmarkActivity.class);
                     startActivity(intent);
                 }
             }

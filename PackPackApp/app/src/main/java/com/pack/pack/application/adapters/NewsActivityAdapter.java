@@ -22,7 +22,11 @@ import com.pack.pack.application.activity.FullScreenPlayVideoActivity;
 import com.pack.pack.application.activity.FullScreenRssFeedViewActivity;
 import com.pack.pack.application.data.util.ApiConstants;
 import com.pack.pack.application.data.util.DownloadFeedImageTask;
+import com.pack.pack.application.db.Bookmark;
+import com.pack.pack.application.db.DBUtil;
+import com.pack.pack.application.service.AddBookmarkService;
 import com.pack.pack.application.topic.activity.model.ParcellableRssFeed;
+import com.pack.pack.application.view.util.BookmarkUtil;
 import com.pack.pack.application.view.util.ExternalLinkShareUtil;
 import com.pack.pack.application.view.util.ViewUtil;
 import com.squill.feed.web.model.JRssFeed;
@@ -50,7 +54,7 @@ public class NewsActivityAdapter extends ArrayAdapter<JRssFeed> {
 
     private ProgressBar loading_progress;
 
-    private Button news_rss_share;
+    private Button news_bookmark;
 
     private List<JRssFeed> feeds;
 
@@ -124,7 +128,7 @@ public class NewsActivityAdapter extends ArrayAdapter<JRssFeed> {
         news_rss_feed_description = (TextView) convertView.findViewById(R.id.news_rss_feed_description);
         loading_progress = (ProgressBar) convertView.findViewById(R.id.loading_progress);
         loading_progress.setVisibility(View.VISIBLE);
-        news_rss_share = (Button) convertView.findViewById(R.id.news_rss_share);
+        news_bookmark = (Button) convertView.findViewById(R.id.news_bookmark);
 
         final JRssFeed feed = getItem(position);
         if(feed != null) {
@@ -165,7 +169,7 @@ public class NewsActivityAdapter extends ArrayAdapter<JRssFeed> {
                 });
             }
 
-            news_rss_share.setOnClickListener(new View.OnClickListener() {
+            news_bookmark.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     /*String publicUrl = imageUrl;
@@ -178,7 +182,9 @@ public class NewsActivityAdapter extends ArrayAdapter<JRssFeed> {
                         shareUrl(publicUrl);
                     }*/
 
-                    shareUrl(feed);
+
+                    BookmarkUtil.addBookmark(feed, activity, news_bookmark);
+                    //shareUrl(feed);
                 }
             });
         }
