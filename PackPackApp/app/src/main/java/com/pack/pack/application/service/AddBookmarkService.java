@@ -100,7 +100,7 @@ public class AddBookmarkService extends Service {
                 bookmark = Bookmark.convert(feed);
                 if(bookmark != null && !bookmark.isVideo() && bookmark.getMediaUrl() != null
                         && !bookmark.getMediaUrl().trim().isEmpty()) {
-                    bookmark.setEntityId(entityId);
+                    //bookmark.setEntityId(entityId);
                     bookmark.setTimeOfAdd(System.currentTimeMillis());
                     DBUtil.storeNewBookmark(bookmark, AddBookmarkService.this);
                     new DownloadFeedImageTask(null, 850, 600, this, null)

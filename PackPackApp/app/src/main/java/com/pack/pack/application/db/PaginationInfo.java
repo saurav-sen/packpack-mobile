@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * Created by Saurav on 27-06-2016.
  */
-public class PaginationInfo implements DbObject {
+public class PaginationInfo extends DbObjectImpl {
 
     public static final String TABLE_NAME = "PAGE_INFO";
 
@@ -64,5 +64,10 @@ public class PaginationInfo implements DbObject {
     @Override
     public List<? extends DbObject> getChildrenObjects() {
         return Collections.emptyList();
+    }
+
+    @Override
+    protected String getEntityIdColumnName() {
+        return ENTITY_ID;
     }
 }

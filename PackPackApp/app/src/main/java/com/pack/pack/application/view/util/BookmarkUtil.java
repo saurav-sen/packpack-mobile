@@ -18,10 +18,8 @@ import java.util.UUID;
 public class BookmarkUtil {
 
     public static void addBookmark(JRssFeed feed, Activity activity, View view) {
-        Bookmark bookmark = new Bookmark();
+        Bookmark bookmark = Bookmark.convert(feed);
         bookmark.setProcessed(false);
-        bookmark.setEntityId(UUID.randomUUID().toString());
-        bookmark.setSourceUrl(feed.getOgUrl());
         bookmark.setTimeOfAdd(System.currentTimeMillis());
         bookmark = DBUtil.storeNewBookmark(bookmark, activity);
         if(bookmark == null || bookmark.getEntityId() == null || bookmark.getEntityId().trim().isEmpty()) {

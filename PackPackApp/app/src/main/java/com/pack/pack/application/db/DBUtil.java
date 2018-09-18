@@ -113,7 +113,8 @@ public class DBUtil {
             exisitngBookmark.setSourceUrl(bookmark.getSourceUrl());
             exisitngBookmark.setProcessed(bookmark.isProcessed());
             exisitngBookmark.setIsVideo(bookmark.isVideo());
-            wDB.update(Bookmark.TABLE_NAME, exisitngBookmark.toContentValues(), null, null);
+            int noOfRows = wDB.update(Bookmark.TABLE_NAME, exisitngBookmark.toContentValues(),
+                    exisitngBookmark.updateRowWhereClause(), exisitngBookmark.updateRowWhereClauseArguments());
             result = exisitngBookmark;
         } else {
             wDB.insert(Bookmark.TABLE_NAME, null, bookmark.toContentValues());
@@ -169,6 +170,14 @@ public class DBUtil {
         return null;
     }
 
+    public static boolean deleteBookmark(Bookmark bookmark, SQLiteDatabase wDB) {
+        if(bookmark == null)
+            return false;
+        int noOfRows = wDB.delete(Bookmark.TABLE_NAME, bookmark.deleteRowWhereClause(),
+                bookmark.deleteRowWhereClauseArguments());
+        return noOfRows > 0;
+    }
+
     public static PagedObject<Bookmark> loadBookmarks(long currentPageRef, SQLiteDatabase readable) {
         Cursor cursor =  null;
         PagedObject<Bookmark> bookmarks = new PagedObject<Bookmark>();
@@ -184,7 +193,7 @@ public class DBUtil {
                     + Bookmark.IS_PROCESSED + ", " + Bookmark.IS_VIDEO + " FROM " + Bookmark.TABLE_NAME
                     + " WHERE " + Bookmark.TIME_OF_ADD + " <= " + currentPageRef + " AND " + Bookmark.TITLE +
                     " IS NOT NULL AND (" + Bookmark.DESCRIPTION + " IS NOT NULL OR " + Bookmark.ARTICLE + " IS NOT NULL)"
-                    + " ORDER BY " + Bookmark.TIME_OF_ADD + " LIMIT 10";
+                    + " ORDER BY " + Bookmark.TIME_OF_ADD + " DESC";
             cursor = readable.rawQuery(__SQL, null);
             if(cursor.moveToFirst()) {
                 do {

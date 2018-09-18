@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * Created by Saurav on 28-06-2016.
  */
-public class ResourceURL implements DbObject {
+public class ResourceURL extends DbObjectImpl {
 
     public static final String TABLE_NAME = "RESOURCE_URL";
 
@@ -56,5 +56,10 @@ public class ResourceURL implements DbObject {
     @Override
     public List<? extends DbObject> getChildrenObjects() {
         return Collections.emptyList();
+    }
+
+    @Override
+    protected String getEntityIdColumnName() {
+        return URL;
     }
 }

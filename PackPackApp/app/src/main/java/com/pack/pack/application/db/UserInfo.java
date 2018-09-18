@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * Created by Saurav on 10-04-2016.
  */
-public class UserInfo implements DbObject {
+public class UserInfo extends DbObjectImpl {
 
     public static final String TABLE_NAME = "USER_INFO";
 
@@ -83,5 +83,10 @@ public class UserInfo implements DbObject {
     @Override
     public List<? extends DbObject> getChildrenObjects() {
         return Collections.emptyList();
+    }
+
+    @Override
+    protected String getEntityIdColumnName() {
+        return ENTITY_ID;
     }
 }

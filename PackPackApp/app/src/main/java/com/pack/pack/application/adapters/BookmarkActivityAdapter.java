@@ -126,6 +126,8 @@ public class BookmarkActivityAdapter extends ArrayAdapter<Bookmark> {
     }
 
     private void openFullScreenBookmarkActivity(final Bookmark feed) {
+        if(feed.isUnderDeleteOperation())
+            return;
         Intent intent = new Intent(getContext(), FullScreenBookmarkViewActivity.class);
         String newsTitle = feed.getTitle();
         String newsFullText = feed.getArticle();

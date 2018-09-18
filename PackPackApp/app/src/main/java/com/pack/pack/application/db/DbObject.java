@@ -17,4 +17,12 @@ public interface DbObject extends BaseColumns {
     public String getEntityId();
 
     public List<? extends DbObject> getChildrenObjects();
+
+    public String updateRowWhereClause();
+
+    public String[] updateRowWhereClauseArguments();
+
+    public String deleteRowWhereClause();
+
+    public String[] deleteRowWhereClauseArguments();
 }

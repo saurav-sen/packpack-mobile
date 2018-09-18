@@ -12,7 +12,7 @@ import java.util.UUID;
 /**
  * Created by Saurav on 26-08-2018.
  */
-public class Bookmark implements DbObject {
+public class Bookmark extends DbObjectImpl {
 
     public static final String TABLE_NAME = "BOOKMARK";
 
@@ -57,7 +57,6 @@ public class Bookmark implements DbObject {
     private boolean isVideo = false;
 
     public Bookmark() {
-        this.entityId = UUID.randomUUID().toString();
     }
 
     public boolean isVideo() {
@@ -184,5 +183,33 @@ public class Bookmark implements DbObject {
             bookmark.setIsVideo(false);
         }
         return bookmark;
+    }
+
+    @Override
+    protected String getEntityIdColumnName() {
+        return ENTITY_ID;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if(o != null && (o instanceof Bookmark)) {
+            return entityId.equals(((Bookmark)o).getEntityId());
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return (this.getClass().getName() + "_" + entityId).hashCode();
+    }
+
+    private boolean underDeleteOperation = false;
+
+    public boolean isUnderDeleteOperation() {
+        return underDeleteOperation;
+    }
+
+    public void setUnderDeleteOperation(boolean underDeleteOperation) {
+        this.underDeleteOperation = underDeleteOperation;
     }
 }

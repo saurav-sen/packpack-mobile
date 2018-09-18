@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Created by Saurav on 25-06-2016.
  */
-public class JsonModel implements DbObject {
+public class JsonModel extends DbObjectImpl {
 
     public static final String TABLE_NAME = "JSON_MODEL";
 
@@ -98,5 +98,10 @@ public class JsonModel implements DbObject {
     @Override
     public List<? extends DbObject> getChildrenObjects() {
         return Collections.emptyList();
+    }
+
+    @Override
+    protected String getEntityIdColumnName() {
+        return ENTITY_ID;
     }
 }
