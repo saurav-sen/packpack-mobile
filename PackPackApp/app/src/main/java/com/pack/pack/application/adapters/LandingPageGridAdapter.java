@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.pack.pack.application.R;
+import com.pack.pack.application.image.loader.DownloadImageTask;
 
 /**
  * Created by Saurav on 01-07-2017.
@@ -56,6 +57,7 @@ public class LandingPageGridAdapter extends BaseAdapter {
             ImageView landing_grid_image = (ImageView)grid.findViewById(R.id.landing_grid_image);
             //landing_grid_text.setText(web[position]);
             landing_grid_image.setImageResource(Imageid[position]);
+          //  new DownloadImageTask(landing_grid_image, mContext).execute("http://www.googlecover.com/_asset/_thumb/Sparrow_832_thumbimg.jpeg");
 
             /*landing_grid_image.setOnTouchListener(new View.OnTouchListener() {
                 @Override

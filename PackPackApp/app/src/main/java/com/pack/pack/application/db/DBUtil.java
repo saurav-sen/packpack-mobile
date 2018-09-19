@@ -178,21 +178,26 @@ public class DBUtil {
         return noOfRows > 0;
     }
 
-    public static PagedObject<Bookmark> loadBookmarks(long currentPageRef, SQLiteDatabase readable) {
+    public static PagedObject<Bookmark> loadBookmarks(/*long currentPageRef, */SQLiteDatabase readable) {
         Cursor cursor =  null;
         PagedObject<Bookmark> bookmarks = new PagedObject<Bookmark>();
         List<Bookmark> result = new ArrayList<Bookmark>();
-        if(currentPageRef <= 0) {
+        /*if(currentPageRef <= 0) {
             currentPageRef = Integer.MAX_VALUE;
-        }
-        long nextPageRef = currentPageRef;
+        }*/
+        //long nextPageRef = currentPageRef;
         try {
-            String __SQL = "SELECT " + Bookmark.ENTITY_ID + ", " + Bookmark.TITLE + ", "
+            /*String __SQL = "SELECT " + Bookmark.ENTITY_ID + ", " + Bookmark.TITLE + ", "
                     + Bookmark.DESCRIPTION + ", " + Bookmark.MEDIA_URL + ", " + Bookmark.ARTICLE + ", "
                     + Bookmark.IMAGE_DATA + ", " + Bookmark.TIME_OF_ADD + ", " + Bookmark.SOURCE_URL + ", "
                     + Bookmark.IS_PROCESSED + ", " + Bookmark.IS_VIDEO + " FROM " + Bookmark.TABLE_NAME
                     + " WHERE " + Bookmark.TIME_OF_ADD + " <= " + currentPageRef + " AND " + Bookmark.TITLE +
                     " IS NOT NULL AND (" + Bookmark.DESCRIPTION + " IS NOT NULL OR " + Bookmark.ARTICLE + " IS NOT NULL)"
+                    + " ORDER BY " + Bookmark.TIME_OF_ADD + " DESC";*/
+            String __SQL = "SELECT " + Bookmark.ENTITY_ID + ", " + Bookmark.TITLE + ", "
+                    + Bookmark.DESCRIPTION + ", " + Bookmark.MEDIA_URL + ", " + Bookmark.ARTICLE + ", "
+                    + Bookmark.IMAGE_DATA + ", " + Bookmark.TIME_OF_ADD + ", " + Bookmark.SOURCE_URL + ", "
+                    + Bookmark.IS_PROCESSED + ", " + Bookmark.IS_VIDEO + " FROM " + Bookmark.TABLE_NAME
                     + " ORDER BY " + Bookmark.TIME_OF_ADD + " DESC";
             cursor = readable.rawQuery(__SQL, null);
             if(cursor.moveToFirst()) {
@@ -208,9 +213,9 @@ public class DBUtil {
                     boolean processed = cursor.getInt(cursor.getColumnIndexOrThrow(Bookmark.IS_PROCESSED)) == 0 ? false : true;
                     boolean isVideo = cursor.getInt(cursor.getColumnIndexOrThrow(Bookmark.IS_VIDEO)) == 0 ? false : true;
 
-                    if(timeOfAdd < nextPageRef) {
+                    /*if(timeOfAdd < nextPageRef) {
                         nextPageRef = timeOfAdd;
-                    }
+                    }*/
 
                     Bookmark bookmark = new Bookmark();
                     bookmark.setEntityId(entityId);
@@ -233,7 +238,7 @@ public class DBUtil {
             }
         }
         bookmarks.setResult(result);
-        bookmarks.setNextPageRef(nextPageRef);
+       // bookmarks.setNextPageRef(nextPageRef);
         return bookmarks;
     }
 

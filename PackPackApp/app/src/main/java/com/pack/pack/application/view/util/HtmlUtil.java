@@ -1,5 +1,10 @@
 package com.pack.pack.application.view.util;
 
+import android.util.Log;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * Created by Saurav on 05-08-2018.
  */
@@ -156,18 +161,25 @@ public final class HtmlUtil {
             "\t</body>\n" +
             "</html>";
 
+        private static final String LOG_TAG = "HtmlUtil";
+
     private HtmlUtil() {
     }
 
     public static String generateOfflineHtml(String newsTitle, String newsFullText, String sourceLink, String logoImage) {
-        if(logoImage != null) {
-                return HTML_TEMPLATE_WITH_LOGO.replaceAll("NEWSTITLE", newsTitle.replaceAll(" +", " ")
-                        .replaceAll("\\t+", " ")).replaceAll("NEWSFULLTEXT", newsFullText.replaceAll(" +", " ")
-                        .replaceAll("\\t+", " ")).replaceAll("SOURCELINK", sourceLink)
-                        .replaceAll("LOGOIMAGE", logoImage);
-        }
-        return HTML_TEMPLATE_WITHOUT_LOGO.replaceAll("NEWSTITLE", newsTitle.replaceAll(" +", " ")
-                .replaceAll("\\t+", " ")).replaceAll("NEWSFULLTEXT", newsFullText.replaceAll(" +", " ")
-                .replaceAll("\\t+", " ")).replaceAll("SOURCELINK", sourceLink);
+            try {
+                    if(logoImage != null) {
+                            return HTML_TEMPLATE_WITH_LOGO.replaceAll(Pattern.quote("NEWSTITLE"), Matcher.quoteReplacement(newsTitle.replaceAll(" +", " ")
+                                    .replaceAll("\\t+", " "))).replaceAll(Pattern.quote("NEWSFULLTEXT"), Matcher.quoteReplacement(newsFullText.replaceAll(" +", " ")
+                                    .replaceAll("\\t+", " "))).replaceAll(Pattern.quote("SOURCELINK"), Matcher.quoteReplacement(sourceLink))
+                                    .replaceAll(Pattern.quote("LOGOIMAGE"), Matcher.quoteReplacement(logoImage));
+                    }
+                    return HTML_TEMPLATE_WITHOUT_LOGO.replaceAll(Pattern.quote("NEWSTITLE"), Matcher.quoteReplacement(newsTitle.replaceAll(" +", " ")
+                            .replaceAll("\\t+", " "))).replaceAll(Pattern.quote("NEWSFULLTEXT"), Matcher.quoteReplacement(newsFullText.replaceAll(" +", " ")
+                            .replaceAll("\\t+", " "))).replaceAll(Pattern.quote("SOURCELINK"), Matcher.quoteReplacement(sourceLink));
+            } catch (Exception e) {
+                    Log.d(LOG_TAG, e.getMessage(), e);
+                    return null;
+            }
     }
 }

@@ -1,19 +1,30 @@
 package com.pack.pack.application.adapters;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.support.design.widget.Snackbar;
+import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.google.android.youtube.player.YouTubeStandalonePlayer;
 import com.pack.pack.application.R;
+import com.pack.pack.application.activity.BookmarkActivity;
 import com.pack.pack.application.activity.FullScreenBookmarkViewActivity;
+import com.pack.pack.application.data.util.ApiConstants;
+import com.pack.pack.application.data.util.BookmarkDeleteResult;
+import com.pack.pack.application.data.util.BookmarkDeleteTask;
+import com.pack.pack.application.data.util.Bookmarks;
 import com.pack.pack.application.data.util.DownloadFeedImageTask;
+import com.pack.pack.application.data.util.IAsyncTaskStatusListener;
 import com.pack.pack.application.data.util.MediaUtil;
 import com.pack.pack.application.db.Bookmark;
 
@@ -32,9 +43,13 @@ public class BookmarkActivityAdapter extends ArrayAdapter<Bookmark> {
     private ImageView bookmark_rss_feed_video_play;
     private TextView bookmark_rss_feed_description;
 
+    private Button bookmark_delete;
+
     private ProgressBar loading_progress;
 
     private List<Bookmark> feeds;
+
+    private ProgressDialog progressDialog;
 
     public BookmarkActivityAdapter(Activity activity, List<Bookmark> feeds) {
         super(activity, R.layout.bookmark_list_items, feeds.toArray(new Bookmark[feeds.size()]));
@@ -72,6 +87,8 @@ public class BookmarkActivityAdapter extends ArrayAdapter<Bookmark> {
         bookmark_rss_feed_image = (ImageView) convertView.findViewById(R.id.bookmark_rss_feed_image);
         bookmark_rss_feed_video_play = (ImageView) convertView.findViewById(R.id.bookmark_rss_feed_video_play);
         bookmark_rss_feed_description = (TextView) convertView.findViewById(R.id.bookmark_rss_feed_description);
+        bookmark_delete = (Button) convertView.findViewById(R.id.bookmark_delete);
+
         loading_progress = (ProgressBar) convertView.findViewById(R.id.loading_progress);
         loading_progress.setVisibility(View.VISIBLE);
 
@@ -121,13 +138,36 @@ public class BookmarkActivityAdapter extends ArrayAdapter<Bookmark> {
                     }
                 });
             }
+
+            bookmark_delete.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    deleteBookmark(feed, true);
+                }
+            });
         }
         return convertView;
+    }
+
+    private void deleteBookmark(Bookmark toDelete, boolean showLoadingProgress) {
+        if(toDelete == null)
+            return;
+        Bookmarks bookmarks = new Bookmarks();
+        bookmarks.getBookmarks().add(toDelete);
+        BookmarkDeleteTask task = new BookmarkDeleteTask(activity, false);
+        BookmarkDeleteTaskListener listener = new BookmarkDeleteTaskListener(task.getTaskID(), showLoadingProgress);
+        task.addListener(listener);
+        task.execute(bookmarks);
     }
 
     private void openFullScreenBookmarkActivity(final Bookmark feed) {
         if(feed.isUnderDeleteOperation())
             return;
+        String mediaUrl = feed.getMediaUrl();
+        if(mediaUrl != null && (mediaUrl.contains("youtube") || mediaUrl.contains("youtu.be")) && !(mediaUrl.startsWith(ApiConstants.BASE_URL))) {
+            if(playVideo(mediaUrl))
+                return;
+        }
         Intent intent = new Intent(getContext(), FullScreenBookmarkViewActivity.class);
         String newsTitle = feed.getTitle();
         String newsFullText = feed.getArticle();
@@ -135,5 +175,90 @@ public class BookmarkActivityAdapter extends ArrayAdapter<Bookmark> {
         intent.putExtra(FullScreenBookmarkViewActivity.NEWS_TITLE, newsTitle);
         intent.putExtra(FullScreenBookmarkViewActivity.NEWS_FULL_TEXT, newsFullText);
         getContext().startActivity(intent);
+    }
+
+    private boolean playVideo(String videoURL) {
+        String VIDEO_ID = null;
+        if (videoURL.contains("youtube") || videoURL.contains("youtu.be")) {
+            String[] split = videoURL.split("v=");
+            if (split.length > 1) {
+                VIDEO_ID = split[1];
+            }
+        }
+        if ((VIDEO_ID != null && !VIDEO_ID.isEmpty())) {
+            Intent intent = YouTubeStandalonePlayer.createVideoIntent(activity, ApiConstants.YOUTUBE_API_KEY, VIDEO_ID);
+            activity.startActivity(intent);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private void showProgressDialog() {
+        if (progressDialog == null) {
+            progressDialog = new ProgressDialog(activity);
+            progressDialog.setMessage("Removing...");
+            progressDialog.show();
+        }
+    }
+
+    private void hideProgressDialog() {
+        if (progressDialog != null) {
+            progressDialog.dismiss();
+            progressDialog = null;
+        }
+    }
+
+    private class BookmarkDeleteTaskListener implements IAsyncTaskStatusListener {
+
+        private String taskID;
+
+        private boolean showLoadingProgress;
+
+        BookmarkDeleteTaskListener(String taskID, boolean showLoadingProgress) {
+            this.taskID = taskID;
+            this.showLoadingProgress = showLoadingProgress;
+        }
+
+        @Override
+        public void onFailure(String taskID, String errorMsg) {
+            if (this.taskID.equals(taskID)) {
+                Snackbar.make(bookmark_delete, errorMsg, Snackbar.LENGTH_LONG).show();
+            }
+        }
+
+        @Override
+        public void onPreStart(String taskID) {
+            if (this.taskID.equals(taskID) && showLoadingProgress) {
+                showProgressDialog();
+            }
+        }
+
+        @Override
+        public void onPostComplete(String taskID) {
+            if (this.taskID.equals(taskID) && showLoadingProgress) {
+                hideProgressDialog();
+            }
+        }
+
+        @Override
+        public void onSuccess(String taskID, Object data) {
+            if (this.taskID.equals(taskID) && data != null) {
+                BookmarkDeleteResult result = (BookmarkDeleteResult) data;
+                List<Bookmark> success = result.getSuccess();
+                if(!success.isEmpty()) {
+                    for(Bookmark s : success) {
+                        BookmarkActivityAdapter.this.getFeeds().remove(s);
+                    }
+                    BookmarkActivityAdapter.this.notifyDataSetChanged();
+                }
+                List<Bookmark> failure = result.getFailure();
+                if(!failure.isEmpty()) {
+                    for(Bookmark f : failure) {
+                        f.setUnderDeleteOperation(false);
+                    }
+                }
+            }
+        }
     }
 }

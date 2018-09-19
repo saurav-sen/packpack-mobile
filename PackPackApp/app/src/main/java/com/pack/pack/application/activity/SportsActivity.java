@@ -5,6 +5,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.widget.AbsListView;
 import android.widget.ListView;
 
@@ -64,6 +65,16 @@ public class SportsActivity extends AppCompatActivity {
 
         nextPageNo = 0;
         loadSportsFeeds(nextPageNo, true);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

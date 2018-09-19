@@ -21,7 +21,8 @@ public class LoadBookmarkTask extends AbstractDbLoadTask<Long, Integer, PagedObj
         if(inputObject == null) {
             inputObject = Long.MAX_VALUE;
         }
-        return DBUtil.loadBookmarks(inputObject, readable);
+        //return DBUtil.loadBookmarks(inputObject, readable);
+        return DBUtil.loadBookmarks(readable);
     }
 
     @Override

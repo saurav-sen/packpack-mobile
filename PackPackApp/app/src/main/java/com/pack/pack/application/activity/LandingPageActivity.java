@@ -1,8 +1,10 @@
 package com.pack.pack.application.activity;
 
 import android.Manifest;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -14,6 +16,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.Spinner;
+import android.widget.Toast;
 
 //import com.google.firebase.messaging.FirebaseMessaging;
 //import com.google.firebase.messaging.FirebaseMessaging;
@@ -159,6 +163,14 @@ public class LandingPageActivity extends AppCompatActivity {
             Intent intent = new Intent(LandingPageActivity.this, SettingsActivity.class);
             startActivity(intent);
             return true;
+        } else if(R.id.app_feedback == item.getItemId()) {
+            Uri uri = Uri.parse("market://details?id=" + getPackageName());
+            Intent myAppLinkToMarket = new Intent(Intent.ACTION_VIEW, uri);
+            try {
+                startActivity(myAppLinkToMarket);
+            } catch (ActivityNotFoundException e) {
+                Toast.makeText(this, " unable to find market app", Toast.LENGTH_LONG).show();
+            }
         }
         return super.onOptionsItemSelected(item);
     }

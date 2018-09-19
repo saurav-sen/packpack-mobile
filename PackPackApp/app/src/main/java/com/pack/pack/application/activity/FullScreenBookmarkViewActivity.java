@@ -50,7 +50,11 @@ public class FullScreenBookmarkViewActivity extends AppCompatActivity {
         bookmark_detail_fullscreen_view.setWebViewClient(new SquillWebViewClient());
         if(newsFullText != null) {
             String html = HtmlUtil.generateOfflineHtml(newsTitle, newsFullText, sourceLink, LogoMap.get(sourceLink));
-            bookmark_detail_fullscreen_view.loadDataWithBaseURL("file:///android_asset/", html, "text/html", "UTF-8", null);
+            if(html != null) {
+                bookmark_detail_fullscreen_view.loadDataWithBaseURL("file:///android_asset/", html, "text/html", "UTF-8", null);
+            } else {
+                bookmark_detail_fullscreen_view.loadUrl(sourceLink);
+            }
         } else {
             bookmark_detail_fullscreen_view.loadUrl(sourceLink);
         }

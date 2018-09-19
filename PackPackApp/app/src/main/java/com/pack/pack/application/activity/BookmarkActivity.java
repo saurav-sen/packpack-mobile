@@ -47,14 +47,14 @@ public class BookmarkActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bookmar);
 
-        /*ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);*/
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
 
         bookmark_feeds = (ListView) findViewById(R.id.bookmark_feeds);
         List<Bookmark> feeds = new LinkedList<Bookmark>();
         adapter = new BookmarkActivityAdapter(this, feeds);
         bookmark_feeds.setAdapter(adapter);
-        bookmark_feeds.setOnScrollListener(new AbsListView.OnScrollListener() {
+        /*bookmark_feeds.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(AbsListView absListView, int scrollState) {
                 int count = bookmark_feeds.getCount();
@@ -70,8 +70,8 @@ public class BookmarkActivity extends AppCompatActivity {
             public void onScroll(AbsListView absListView, int i, int i1, int i2) {
 
             }
-        });
-        bookmark_feeds.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
+        });*/
+       /* bookmark_feeds.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
         bookmark_feeds.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
             @Override
             public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
@@ -119,9 +119,9 @@ public class BookmarkActivity extends AppCompatActivity {
             @Override
             public void onDestroyActionMode(ActionMode mode) {
             }
-        });
+        });*/
 
-        bookmark_feeds.setOnTouchListener(new SwipeDismissListViewTouchListener(bookmark_feeds, new SwipeDismissListViewTouchListener.DismissCallbacks() {
+        /*bookmark_feeds.setOnTouchListener(new SwipeDismissListViewTouchListener(bookmark_feeds, new SwipeDismissListViewTouchListener.DismissCallbacks() {
             @Override
             public boolean canDismiss(int position) {
                 return true;
@@ -141,16 +141,26 @@ public class BookmarkActivity extends AppCompatActivity {
                     deleteBookmarks(toDelete, true);
                 }
             }
-        }));
+        }));*/
 
         loadBookmarks(currentPageRef, true);
     }
 
-    private void deleteBookmarks(List<Bookmark> toDelete, boolean showLoadingProgress) {
-        deleteBookmarks(null, toDelete, showLoadingProgress);
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
-    private void deleteBookmarks(ActionMode mode, List<Bookmark> toDelete, boolean showLoadingProgress) {
+    /*private void deleteBookmarks(List<Bookmark> toDelete, boolean showLoadingProgress) {
+        deleteBookmarks(null, toDelete, showLoadingProgress);
+    }*/
+
+    /*private void deleteBookmarks(ActionMode mode, List<Bookmark> toDelete, boolean showLoadingProgress) {
         if(toDelete.isEmpty())
             return;
         Bookmarks bookmarks = new Bookmarks();
@@ -159,7 +169,7 @@ public class BookmarkActivity extends AppCompatActivity {
         BookmarkDeleteTaskListener listener = new BookmarkDeleteTaskListener(mode, task.getTaskID(), showLoadingProgress);
         task.addListener(listener);
         task.execute(bookmarks);
-    }
+    }*/
 
     private void loadBookmarks(long currentPageRef, boolean showLoadingProgress) {
         if(END_OF_PAGE == currentPageRef) {

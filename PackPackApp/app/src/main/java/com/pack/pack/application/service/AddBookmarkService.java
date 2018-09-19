@@ -25,16 +25,8 @@ import java.util.List;
  */
 public class AddBookmarkService extends Service {
 
-    public static final String BOOKMARK_ENTITY_ID = "BOOKMARK_ENTITY_ID";
-
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if(intent != null) {
-            String entityId = intent.getStringExtra(BOOKMARK_ENTITY_ID);
-            if (entityId != null) {
-                ExecutorsPool.INSTANCE.submit(new AddBookmarkTask(entityId));
-            }
-        }
         List<Bookmark> unprocessedBookmarks = DBUtil.loadAllUnprocessedBookmarks(new SquillDbHelper(this).getReadableDatabase());
         if(unprocessedBookmarks != null && !unprocessedBookmarks.isEmpty()) {
             for(Bookmark unprocessedBookmark : unprocessedBookmarks) {
@@ -66,28 +58,6 @@ public class AddBookmarkService extends Service {
         return result;
     }
 
-    private void addBookmark(String entityId) {
-        if(entityId == null || entityId.trim().isEmpty())
-            return;
-        Bookmark bookmark = DBUtil.loadBookmarkByEntityId(entityId, this);
-        if(bookmark == null)
-            return;
-        String sourceUrl = bookmark.getSourceUrl();
-        if(sourceUrl == null || sourceUrl.trim().isEmpty())
-            return;
-        if(NetworkUtil.checkConnectivity(this)) {
-            JRssFeed feed = processBookmark(sourceUrl);
-            if(feed != null) {
-                bookmark = Bookmark.convert(feed);
-                DBUtil.storeNewBookmark(bookmark, this);
-                if(bookmark != null && !bookmark.isVideo()) {
-                    new DownloadFeedImageTask(null, 850, 600, this, null)
-                            .execute(bookmark.getMediaUrl());
-                }
-            }
-        }
-    }
-
     private void updateExistingBookmark(Bookmark bookmark) {
         if(bookmark == null || bookmark.getSourceUrl() == null || bookmark.getSourceUrl().trim().isEmpty())
             return;
@@ -107,20 +77,6 @@ public class AddBookmarkService extends Service {
                             .execute(bookmark.getMediaUrl());
                 }
             }
-        }
-    }
-
-    private class AddBookmarkTask implements Runnable {
-
-        private String entityId;
-
-        private AddBookmarkTask(String entityId) {
-            this.entityId = entityId;
-        }
-
-        @Override
-        public void run() {
-            addBookmark(entityId);
         }
     }
 

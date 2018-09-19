@@ -19,16 +19,15 @@ public class BookmarkUtil {
 
     public static void addBookmark(JRssFeed feed, Activity activity, View view) {
         Bookmark bookmark = Bookmark.convert(feed);
-        bookmark.setProcessed(false);
-        bookmark.setTimeOfAdd(System.currentTimeMillis());
+       // bookmark.setProcessed(false);
+       // bookmark.setTimeOfAdd(System.currentTimeMillis());
         bookmark = DBUtil.storeNewBookmark(bookmark, activity);
         if(bookmark == null || bookmark.getEntityId() == null || bookmark.getEntityId().trim().isEmpty()) {
-            Snackbar.make(view, "Failed to process link", Snackbar.LENGTH_LONG);
+            Snackbar.make(view, "Failed to process link", Snackbar.LENGTH_LONG).show();
         } else {
-            Intent intent = new Intent(activity, AddBookmarkService.class);
-            intent.putExtra(AddBookmarkService.BOOKMARK_ENTITY_ID, bookmark.getEntityId());
-            activity.startService(intent);
-            Snackbar.make(view, "Added to bookmark list", Snackbar.LENGTH_LONG);
+            /*Intent intent = new Intent(activity, AddBookmarkService.class);
+            activity.startService(intent);*/
+            Snackbar.make(view, "Added to bookmark list", Snackbar.LENGTH_LONG).show();
         }
     }
 }

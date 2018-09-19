@@ -127,7 +127,7 @@ public class FullScreenRssFeedViewAdapter extends PagerAdapter {
 
         if (isExternalLink) {
             String VIDEO_ID = null;
-            if (videoURL.contains("youtube")) {
+            if (videoURL.contains("youtube") || videoURL.contains("youtu.be")) {
                 String[] split = videoURL.split("v=");
                 if (split.length > 1) {
                     VIDEO_ID = split[1];

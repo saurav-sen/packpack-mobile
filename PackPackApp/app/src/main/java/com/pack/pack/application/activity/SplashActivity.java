@@ -178,12 +178,6 @@ public class SplashActivity extends AbstractActivity /*implements IAsyncTaskStat
         startService(intent);
     }
 
-    private void submitNewLinkToAddBookmarkService(String entityId) {
-        Intent intent = new Intent(this, AddBookmarkService.class);
-        intent.putExtra(AddBookmarkService.BOOKMARK_ENTITY_ID, entityId);
-        startService(intent);
-    }
-
     private void startNTPService() {
         Intent intent = new Intent(this, SquillNTPService.class);
         startService(intent);
@@ -306,13 +300,15 @@ public class SplashActivity extends AbstractActivity /*implements IAsyncTaskStat
                    Bookmark bookmark = new Bookmark();
                    bookmark.setProcessed(false);
                    bookmark.setSourceUrl(sharedText.trim());
+                   bookmark.setEntityId(bookmark.getSourceUrl());
                    bookmark.setTimeOfAdd(System.currentTimeMillis());
                    bookmark = DBUtil.storeNewBookmark(bookmark, this);
                    if(bookmark == null || bookmark.getEntityId() == null || bookmark.getEntityId().trim().isEmpty()) {
                        openLandingPageActivity("Failed to process link");
                    } else {
-                       submitNewLinkToAddBookmarkService(bookmark.getEntityId());
-                       startBookmarkActivity();
+                       startAddBookmarkService();
+                      // startBookmarkActivity();
+                       openLandingPageActivity();
                    }
                }
             } else {
