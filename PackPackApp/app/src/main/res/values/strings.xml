@@ -54,6 +54,9 @@
     <string name="intro_slide_5_title">Read Article</string>
     <string name="intro_slide_5_desc">It is all about reading amazing articles and blog feeds</string>
 
+    <string name="intro_slide_6_title">Bookmark</string>
+    <string name="intro_slide_6_desc">Save your favourite Online resources from anywhere to read later</string>
+
     <string name="title_activity_my_family">SQUILL</string>
     <string name="title_activity_refreshments">SQUILL</string>
     <string name="section_format">Hello World from section: %1$d</string>

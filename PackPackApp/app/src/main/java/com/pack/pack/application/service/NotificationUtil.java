@@ -83,4 +83,27 @@ public final class NotificationUtil {
                         .setPriority(NotificationCompat.PRIORITY_MAX);
         notificationManager.notify(APP_NAME, NOTIFICATION_ID, notificationBuilder.build());
     }
+
+    public static void showNotificationMessage(Context context, String title, String message) {
+        if(message == null || message.trim().isEmpty()) { // No message to display then no notification.
+            return;
+        }
+
+        Intent intent = new Intent(context, SplashActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_ONE_SHOT);
+
+        final int NOTIFICATION_ID = new Random().nextInt();//Math.abs(feedMsg.getKey())%10000;
+        final NotificationManager notificationManager =
+                (NotificationManager) context.getSystemService(
+                        Context.NOTIFICATION_SERVICE);
+        final NotificationCompat.Builder notificationBuilder =
+                new NotificationCompat.Builder(context)
+                        .setContentTitle(title)
+                        .setContentText(message)
+                        .setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.drawable.squill_notification))
+                        .setContentIntent(pendingIntent)
+                        .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+                        .setPriority(NotificationCompat.PRIORITY_MAX);
+        notificationManager.notify(APP_NAME, NOTIFICATION_ID, notificationBuilder.build());
+    }
 }

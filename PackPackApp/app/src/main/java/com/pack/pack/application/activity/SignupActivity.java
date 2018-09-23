@@ -57,8 +57,8 @@ public class SignupActivity extends AbstractAppCompatActivity implements IAsyncT
    // private String passwd;
     private String name;
 
-    private double longitude = -1;
-    private double latitude = -1;
+    private double longitude = 28.704060;
+    private double latitude = 77.102493;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,11 +105,21 @@ public class SignupActivity extends AbstractAppCompatActivity implements IAsyncT
                     LOCATION_COARSE_ACCESS_REQUEST_CODE);
             return;
         } else {
-            LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-            Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-            if(location != null) {
-                longitude = location.getLongitude();
-                latitude = location.getLatitude();
+            LocationManager locationManager = null;
+            try {
+                locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+            } catch (Exception e) {
+                Log.e(LOG_TAG, e.getMessage(), e);
+            }
+            if(locationManager != null) {
+                Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                if(location != null) {
+                    longitude = location.getLongitude();
+                    latitude = location.getLatitude();
+                }
+            } else {
+                latitude = 28.704060;
+                longitude = 77.102493;
             }
         }
 

@@ -64,6 +64,7 @@ public class WelcomeActivity extends AppCompatActivity {
                 R.layout.intro_slide_sci,
                 R.layout.intro_slide_sports,
                 R.layout.intro_slide_article,
+                R.layout.intro_slide_bookmark,
                 R.layout.intro_slide_refresh
         };
 
