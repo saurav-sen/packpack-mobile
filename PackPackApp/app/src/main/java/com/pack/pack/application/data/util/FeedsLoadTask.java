@@ -15,6 +15,8 @@ import com.squill.feed.web.model.JRssFeedType;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -92,7 +94,21 @@ public abstract class FeedsLoadTask extends AbstractNetworkTask<String, Integer,
 
     private Pagination<JRssFeed> eliminateDuplicatesIfAny(Pagination<JRssFeed> page) {
         List<JRssFeed> list = page.getResult();
-        Set<JRssFeed> set = new HashSet<>();
+        /*if(list != null && !list.isEmpty()) {
+            Object OBJECT = new Object();
+            Map<JRssFeed, Object> map = new HashMap<>();
+            Iterator<JRssFeed> itr = list.iterator();
+            while (itr.hasNext()) {
+                JRssFeed feed = itr.next();
+                if(map.get(feed) == null) {
+                    map.put(feed, OBJECT);
+                } else {
+                    itr.remove();
+                }
+            }
+        }*/
+
+        Set<JRssFeed> set = new LinkedHashSet<>();
         set.addAll(list);
         list = new ArrayList<>(set);
         page.setResult(list);

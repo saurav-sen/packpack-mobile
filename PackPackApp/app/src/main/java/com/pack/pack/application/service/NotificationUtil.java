@@ -33,6 +33,32 @@ public final class NotificationUtil {
     private NotificationUtil() {
     }
 
+    public static boolean isApplicationRunningInForeground(Context context) {
+        ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        if(Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT_WATCH) {
+            List<ActivityManager.RunningAppProcessInfo> runningAppProcessInfos = activityManager.getRunningAppProcesses();
+            for(ActivityManager.RunningAppProcessInfo runningAppProcessInfo : runningAppProcessInfos) {
+                if(runningAppProcessInfo.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
+                    for(String pkg : runningAppProcessInfo.pkgList) {
+                        if(pkg.equals(context.getPackageName())) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        } else {
+            List<ActivityManager.RunningTaskInfo> runningTasks = activityManager.getRunningTasks(1);
+            if(runningTasks == null || runningTasks.isEmpty()) {
+                return false;
+            }
+            ComponentName componentName = runningTasks.get(0).topActivity;
+            if(componentName.getPackageName().equals(context.getPackageName())) {
+                return true;
+            }
+        }
+        return true;
+    }
+
     public static boolean isApplicationRunningInBackgroud(Context context) {
         ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         if(Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT_WATCH) {

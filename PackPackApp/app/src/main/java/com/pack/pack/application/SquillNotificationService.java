@@ -19,6 +19,8 @@ import com.google.firebase.messaging.RemoteMessage;
 import com.pack.pack.application.Constants;
 import com.pack.pack.application.R;
 import com.pack.pack.application.activity.SplashActivity;
+import com.pack.pack.application.async.FeedReceiveCallback;
+import com.pack.pack.application.async.FeedsDownloadUtil;
 import com.pack.pack.application.data.cache.PreferenceManager;
 import com.pack.pack.application.service.NotificationUtil;
 import com.pack.pack.common.util.JSONUtil;
@@ -53,8 +55,16 @@ public class SquillNotificationService extends FirebaseMessagingService {
                 String msgBody = "C:" + remoteMessage.getNotification().getBody();
                 Log.d(LOG_TAG, "From: " + remoteMessage.getFrom());
                 Log.d(LOG_TAG, "Notification Message Body: " + msgBody);
-                NotificationUtil.showCustomNotificationMessage(msgBody, this, false);
-            } else if(remoteMessage.getData() != null && !remoteMessage.getData().isEmpty()) {
+
+                FeedReceiveCallback callback = new FeedReceiveCallback() {
+                    @Override
+                    public void handleTaskComplete() {
+                        // Do nothing
+                    }
+                };
+                FeedsDownloadUtil.downloadLatestFeedsFromOrigin(SquillNotificationService.this, callback, true);
+                //NotificationUtil.showCustomNotificationMessage(msgBody, this, false);
+            } /*else if(remoteMessage.getData() != null && !remoteMessage.getData().isEmpty()) {
                 try {
                     JSONObject json = new JSONObject(remoteMessage.getData().toString());
                     Log.d(LOG_TAG, "From: " + remoteMessage.getFrom());
@@ -63,7 +73,7 @@ public class SquillNotificationService extends FirebaseMessagingService {
                 } catch (JSONException e) {
                     Log.d(LOG_TAG, e.getMessage(), e);
                 }
-            }
+            }*/
         } catch (Exception e) {
             Log.d(LOG_TAG, e.getMessage(), e);
         }

@@ -11,6 +11,9 @@ import com.android.volley.toolbox.Volley;
 import com.pack.pack.application.cz.fhucho.android.util.SimpleDiskCacheInitializer;
 import com.pack.pack.application.data.cache.HttpCache;
 import com.pack.pack.application.data.cache.HttpCacheFactory;
+import com.pack.pack.application.db.DBUtil;
+import com.pack.pack.application.db.SquillDbHelper;
+import com.pack.pack.application.db.UserInfo;
 import com.pack.pack.application.topic.activity.model.UploadAttachmentData;
 import com.pack.pack.client.api.APIConstants;
 import com.pack.pack.model.web.JUser;
@@ -151,6 +154,10 @@ public class AppController extends Application {
 
     private Map<JRssFeedType, Boolean> feedTypeLoadStatus;
 
+    private Thread.UncaughtExceptionHandler androidDefaultUEH = null;
+
+    private Thread.UncaughtExceptionHandler customUEH = null;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -163,6 +170,9 @@ public class AppController extends Application {
         HttpCacheFactory.prepare(this);
         initializeBranchIO();
         feedTypeLoadStatus = new HashMap<>();
+        androidDefaultUEH = Thread.getDefaultUncaughtExceptionHandler();
+        customUEH = new SquillUncaughtExceptionHandler(androidDefaultUEH, getApplicationContext());
+        Thread.setDefaultUncaughtExceptionHandler(customUEH);
     }
 
     public void setLoadStatus(JRssFeedType feedType, Boolean status) {
