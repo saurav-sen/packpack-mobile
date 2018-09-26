@@ -1,51 +1,45 @@
 package com.pack.pack.application.adapters;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
-import android.support.design.widget.Snackbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.pack.pack.application.R;
 import com.pack.pack.application.activity.FullScreenNewsViewActivity;
+import com.pack.pack.application.activity.fragments.BaseAdapter;
 import com.pack.pack.application.data.util.DownloadFeedImageTask;
 import com.pack.pack.application.view.util.BookmarkUtil;
 import com.pack.pack.application.view.util.ExternalLinkShareUtil;
 import com.squill.feed.web.model.JRssFeed;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Created by Saurav on 25-03-2018.
  */
-public class ArticlesActivityAdapter extends ArrayAdapter<JRssFeed> {
+public class SportsFragmentAdapter extends BaseAdapter {
 
     private Activity activity;
     private LayoutInflater inflater;
 
-    private TextView articles_rss_feed__name;
-    private ImageView articles_rss_feed_image;
-    private ImageView articles_rss_feed_video_play;
-    private TextView articles_rss_feed_description;
+    private TextView sports_rss_feed__name;
+    private ImageView sports_rss_feed_image;
+    private ImageView sports_rss_feed_video_play;
+    private TextView sports_rss_feed_description;
 
     private ProgressBar loading_progress;
 
-    private Button articles_bookmark;
+    private Button sports_news_bookmark;
 
     private List<JRssFeed> feeds;
 
@@ -53,10 +47,10 @@ public class ArticlesActivityAdapter extends ArrayAdapter<JRssFeed> {
 
     private Map<String, Object> map = new HashMap<String, Object>();
 
-    public ArticlesActivityAdapter(Activity activity, List<JRssFeed> feeds) {
-        super(activity, R.layout.articles_list_items, feeds.toArray(new JRssFeed[feeds.size()]));
+    public SportsFragmentAdapter(Activity activity, List<JRssFeed> feeds) {
+        super(activity, feeds, R.id.sports_feeds);
         this.activity = activity;
-        this.feeds = feeds;
+        this.feeds = feeds;;
     }
 
     private List<JRssFeed> getFeeds() {
@@ -111,47 +105,47 @@ public class ArticlesActivityAdapter extends ArrayAdapter<JRssFeed> {
             inflater = activity.getLayoutInflater();
         }
         if (convertView == null) {
-            convertView = inflater.inflate(R.layout.articles_list_items, null);
+            convertView = inflater.inflate(R.layout.sports_list_items, null);
         }
-        articles_rss_feed__name = (TextView) convertView.findViewById(R.id.articles_rss_feed__name);
-        articles_rss_feed_image = (ImageView) convertView.findViewById(R.id.articles_rss_feed_image);
-        articles_rss_feed_video_play = (ImageView) convertView.findViewById(R.id.articles_rss_feed_video_play);
-        articles_rss_feed_description = (TextView) convertView.findViewById(R.id.articles_rss_feed_description);
+        sports_rss_feed__name = (TextView) convertView.findViewById(R.id.sports_rss_feed__name);
+        sports_rss_feed_image = (ImageView) convertView.findViewById(R.id.sports_rss_feed_image);
+        sports_rss_feed_video_play = (ImageView) convertView.findViewById(R.id.sports_rss_feed_video_play);
+        sports_rss_feed_description = (TextView) convertView.findViewById(R.id.sports_rss_feed_description);
         loading_progress = (ProgressBar) convertView.findViewById(R.id.loading_progress);
         loading_progress.setVisibility(View.VISIBLE);
-        articles_bookmark = (Button) convertView.findViewById(R.id.articles_bookmark);
+        sports_news_bookmark = (Button) convertView.findViewById(R.id.sports_news_bookmark);
 
         final JRssFeed feed = getItem(position);
         if (feed != null) {
-            articles_rss_feed__name.setText(feed.getOgTitle());
+            sports_rss_feed__name.setText(feed.getOgTitle());
             String textSummary = feed.getArticleSummaryText();
             if(textSummary == null) {
                 textSummary = feed.getOgDescription();
             }
-            articles_rss_feed_description.setText(textSummary);
+            sports_rss_feed_description.setText(textSummary);
             final String imageUrl = feed.getOgImage();
             final String videoUrl = feed.getVideoUrl();
             if (videoUrl != null && !videoUrl.trim().isEmpty()) {
-                articles_rss_feed_video_play.setVisibility(View.VISIBLE);
-                articles_rss_feed_video_play.setOnClickListener(new View.OnClickListener() {
+                sports_rss_feed_video_play.setVisibility(View.VISIBLE);
+                sports_rss_feed_video_play.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         openFullScreenNewsActivity(feed);
                     }
                 });
             } else {
-                articles_rss_feed_video_play.setVisibility(View.GONE);
+                sports_rss_feed_video_play.setVisibility(View.GONE);
             }
             if (imageUrl != null && !imageUrl.trim().isEmpty()) {
-                new DownloadFeedImageTask(articles_rss_feed_image, 850, 600, ArticlesActivityAdapter.this.activity, loading_progress)
+                new DownloadFeedImageTask(sports_rss_feed_image, 850, 600, SportsFragmentAdapter.this.activity, loading_progress)
                         .execute(imageUrl);
-                articles_rss_feed_image.setOnClickListener(new View.OnClickListener() {
+                sports_rss_feed_image.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         openFullScreenNewsActivity(feed);
                     }
                 });
-                articles_rss_feed_description.setOnClickListener(new View.OnClickListener() {
+                sports_rss_feed_description.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         openFullScreenNewsActivity(feed);
@@ -159,11 +153,11 @@ public class ArticlesActivityAdapter extends ArrayAdapter<JRssFeed> {
                 });
             }
 
-            articles_bookmark.setOnClickListener(new View.OnClickListener() {
+            sports_news_bookmark.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    BookmarkUtil.addBookmark(feed, activity, articles_bookmark);
-                   // shareUrl(feed);
+                    BookmarkUtil.addBookmark(feed, activity, sports_news_bookmark);
+                    //shareUrl(feed);
                 }
             });
         }
@@ -188,5 +182,4 @@ public class ArticlesActivityAdapter extends ArrayAdapter<JRssFeed> {
         ExternalLinkShareUtil.shareUrl(getContext(), feed);
     }
 }
-
 

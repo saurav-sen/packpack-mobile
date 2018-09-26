@@ -1,56 +1,55 @@
-package com.pack.pack.application.activity;
+package com.pack.pack.application.activity.fragments;
 
 import android.app.ProgressDialog;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.MenuItem;
+import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.ListView;
 
-import com.pack.pack.application.Constants;
 import com.pack.pack.application.R;
-import com.pack.pack.application.adapters.HomeActivityAdapter;
-import com.pack.pack.application.adapters.NewsActivityAdapter;
+import com.pack.pack.application.data.util.FeedsLoadTask;
 import com.pack.pack.application.data.util.IAsyncTaskStatusListener;
 import com.pack.pack.application.data.util.NewsFeedTask;
-import com.squill.feed.web.model.JRssFeed;
 import com.pack.pack.model.web.Pagination;
+import com.squill.feed.web.model.JRssFeed;
 
-import java.util.LinkedList;
 import java.util.List;
 
-public class NewsActivity extends AppCompatActivity {
+/**
+ * Created by Saurav on 26-09-2018.
+ */
+public abstract class BaseFragment extends Fragment {
 
-    private NewsActivityAdapter adapter;
+    private BaseAdapter adapter;
 
-    private ListView news_feeds;
+    private ListView listView;
 
     private int nextPageNo = 0;
 
     private ProgressDialog progressDialog;
 
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_news);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(getViewLayoutId(), null);
 
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
-
-        news_feeds = (ListView) findViewById(R.id.news_feeds);
-        List<JRssFeed> feeds = new LinkedList<JRssFeed>();
-        adapter = new NewsActivityAdapter(this, feeds);
-        news_feeds.setAdapter(adapter);
-        news_feeds.setOnScrollListener(new AbsListView.OnScrollListener() {
+        listView = (ListView) view.findViewById(getListViewId());
+        boolean isLoadData = (adapter == null);
+        adapter = initFragmentAdapter();
+        listView.setAdapter(adapter);
+        listView.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(AbsListView absListView, int scrollState) {
-                int count = news_feeds.getCount();
+                int count = listView.getCount();
                 if (scrollState == SCROLL_STATE_IDLE) {
                     int c = (int) (count * 0.7f);
-                    if (news_feeds.getLastVisiblePosition() >= c) {
-                        loadNewsFeeds(nextPageNo, false);
+                    if (listView.getLastVisiblePosition() >= c) {
+                        loadNewFeeds(nextPageNo, false);
                     }
                 }
             }
@@ -62,56 +61,59 @@ public class NewsActivity extends AppCompatActivity {
         });
 
         nextPageNo = 0;
-        loadNewsFeeds(nextPageNo, true);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                onBackPressed();
-                return true;
+        if(isLoadData) {
+            loadNewFeeds(nextPageNo, true);
         }
-        return super.onOptionsItemSelected(item);
+        return view;
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        hideProgressDialog();
-    }
+    protected abstract int getListViewId();
 
-    private void showProgressDialog() {
+    protected abstract int getViewLayoutId();
+
+    protected abstract BaseAdapter initFragmentAdapter();
+
+    protected abstract FeedsLoadTask initNewTask(int pageNo);
+
+    /*@Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if(isVisibleToUser) {
+            loadNewFeeds(nextPageNo, true);
+        }
+    }*/
+
+    protected void showProgressDialog() {
         if(progressDialog == null) {
-            progressDialog = new ProgressDialog(NewsActivity.this);
+            progressDialog = new ProgressDialog(getActivity());
             progressDialog.setMessage("Loading...");
             progressDialog.show();
         }
     }
 
-    private void hideProgressDialog() {
+    protected void hideProgressDialog() {
         if(progressDialog != null) {
             progressDialog.dismiss();
             progressDialog = null;
         }
     }
 
-    private void loadNewsFeeds(int pageNo, boolean showLoadingProgress) {
+    private void loadNewFeeds(int pageNo, boolean showLoadingProgress) {
         if(pageNo < 0)
             return;
-        NewsFeedTask task = new NewsFeedTask(NewsActivity.this, pageNo);
-        NewsFeedTaskStatusListener listener = new NewsFeedTaskStatusListener(task.getTaskID(), showLoadingProgress);
+        FeedsLoadTask task = initNewTask(pageNo);
+        FeedLoadTaskStatusListener listener = new FeedLoadTaskStatusListener(task.getTaskID(), showLoadingProgress);
         task.addListener(listener);
         task.execute(String.valueOf(pageNo));
     }
 
-    private class NewsFeedTaskStatusListener implements IAsyncTaskStatusListener {
+    private class FeedLoadTaskStatusListener implements IAsyncTaskStatusListener {
 
         private String taskID;
 
         private boolean showLoadingProgress;
 
-        NewsFeedTaskStatusListener(String taskID, boolean showLoadingProgress) {
+        FeedLoadTaskStatusListener(String taskID, boolean showLoadingProgress) {
             this.taskID = taskID;
             this.showLoadingProgress = showLoadingProgress;
         }
@@ -126,7 +128,7 @@ public class NewsActivity extends AppCompatActivity {
         @Override
         public void onFailure(String taskID, String errorMsg) {
             if(this.taskID.equals(taskID)) {
-                Snackbar.make(news_feeds, errorMsg, Snackbar.LENGTH_LONG).show();
+                Snackbar.make(listView, errorMsg, Snackbar.LENGTH_LONG).show();
             }
         }
 

@@ -7,7 +7,6 @@ import android.support.design.widget.Snackbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -17,16 +16,12 @@ import com.android.volley.toolbox.ImageLoader;
 import com.google.android.youtube.player.YouTubeStandalonePlayer;
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
-import com.pack.pack.application.activity.FullScreenNewsViewActivity;
 import com.pack.pack.application.activity.FullScreenPlayVideoActivity;
 import com.pack.pack.application.activity.FullScreenRssFeedViewActivity;
+import com.pack.pack.application.activity.fragments.BaseAdapter;
 import com.pack.pack.application.data.util.ApiConstants;
 import com.pack.pack.application.data.util.DownloadFeedImageTask;
-import com.pack.pack.application.db.Bookmark;
-import com.pack.pack.application.db.DBUtil;
-import com.pack.pack.application.service.AddBookmarkService;
 import com.pack.pack.application.topic.activity.model.ParcellableRssFeed;
-import com.pack.pack.application.view.util.BookmarkUtil;
 import com.pack.pack.application.view.util.ExternalLinkShareUtil;
 import com.pack.pack.application.view.util.ViewUtil;
 import com.squill.feed.web.model.JRssFeed;
@@ -39,22 +34,24 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by Saurav on 13-08-2017.
+ *
+ * Created by Saurav on 08-04-2016.
+ *
  */
-public class NewsActivityAdapter extends ArrayAdapter<JRssFeed> {
+public class DiscoverFragmentAdapter extends BaseAdapter {
 
     private Activity activity;
     private LayoutInflater inflater;
     private ImageLoader imageLoader = AppController.getInstance().getImageLoader();
 
-    private TextView news_rss_feed__name;
-    private ImageView news_rss_feed_image;
-    private ImageView news_rss_feed_video_play;
-    private TextView news_rss_feed_description;
+    private TextView home_rss_feed__name;
+    private ImageView home_rss_feed_image;
+    private ImageView home_rss_feed_video_play;
+    private TextView home_rss_feed_description;
 
     private ProgressBar loading_progress;
 
-    private Button news_bookmark;
+    private Button home_rss_share;
 
     private List<JRssFeed> feeds;
 
@@ -62,14 +59,27 @@ public class NewsActivityAdapter extends ArrayAdapter<JRssFeed> {
 
     private Map<String, Object> map = new HashMap<String, Object>();
 
-    public NewsActivityAdapter(Activity activity, List<JRssFeed> feeds) {
-        super(activity, R.layout.news_list_items, feeds.toArray(new JRssFeed[feeds.size()]));
+    public DiscoverFragmentAdapter(Activity activity, List<JRssFeed> feeds) {
+        super(activity, feeds, R.layout.home_event_item);
         this.activity = activity;
         this.feeds = feeds;
     }
 
-    private List<JRssFeed> getFeeds() {
+    public List<JRssFeed> getFeeds() {
         return feeds;
+    }
+
+    @Override
+    public int getCount() {
+        return getFeeds().size();
+    }
+
+    @Override
+    public JRssFeed getItem(int position) {
+        if(position < getFeeds().size()) {
+            return getFeeds().get(position);
+        }
+        return null;
     }
 
     public void addNewFeeds(List<JRssFeed> newFeeds) {
@@ -101,112 +111,101 @@ public class NewsActivityAdapter extends ArrayAdapter<JRssFeed> {
     }
 
     @Override
-    public int getCount() {
-        return getFeeds().size();
-    }
-
-    @Override
-    public JRssFeed getItem(int position) {
-        if(position < getFeeds().size()) {
-            return getFeeds().get(position);
-        }
-        return null;
-    }
-
-    @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         if(inflater == null) {
             inflater = activity.getLayoutInflater();
         }
         if(convertView == null) {
-            convertView = inflater.inflate(R.layout.news_list_items, null);
+            convertView = inflater.inflate(ViewUtil.getListViewLayoutId("home"), null);
         }
-        news_rss_feed__name = (TextView) convertView.findViewById(R.id.news_rss_feed__name);
-        news_rss_feed_image = (ImageView) convertView.findViewById(R.id.news_rss_feed_image);
-        news_rss_feed_video_play = (ImageView) convertView.findViewById(R.id.news_rss_feed_video_play);
-        news_rss_feed_description = (TextView) convertView.findViewById(R.id.news_rss_feed_description);
+        home_rss_feed__name = (TextView) convertView.findViewById(R.id.home_rss_feed__name);
+        home_rss_feed_image = (ImageView) convertView.findViewById(R.id.home_rss_feed_image);
+        home_rss_feed_video_play = (ImageView) convertView.findViewById(R.id.home_rss_feed_video_play);
+        home_rss_feed_description = (TextView) convertView.findViewById(R.id.home_rss_feed_description);
         loading_progress = (ProgressBar) convertView.findViewById(R.id.loading_progress);
         loading_progress.setVisibility(View.VISIBLE);
-        news_bookmark = (Button) convertView.findViewById(R.id.news_bookmark);
+        home_rss_share = (Button) convertView.findViewById(R.id.home_rss_share);
 
         final JRssFeed feed = getItem(position);
         if(feed != null) {
-            news_rss_feed__name.setText(feed.getOgTitle());
-            String textSummary = feed.getArticleSummaryText();
-            if(textSummary == null) {
-                textSummary = feed.getOgDescription();
-            }
-            news_rss_feed_description.setText(textSummary);
+            home_rss_feed__name.setText(feed.getOgTitle());
+            home_rss_feed_description.setText(feed.getOgDescription());
             final String imageUrl = feed.getOgImage();
             final String videoUrl = feed.getVideoUrl();
-            //final String newsUrl = feed.getHrefSource();
             if(videoUrl != null && !videoUrl.trim().isEmpty()) {
-                news_rss_feed_video_play.setVisibility(View.VISIBLE);
-                news_rss_feed_video_play.setOnClickListener(new View.OnClickListener() {
+                home_rss_feed_video_play.setVisibility(View.VISIBLE);
+                home_rss_feed_video_play.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        openFullScreenNewsActivity(feed);
+                        String videoUrl = feed.getVideoUrl();
+                        if (videoUrl != null && !videoUrl.trim().isEmpty()) {
+                            playVideo(videoUrl.trim());
+                        } else {
+                            Intent intent = new Intent(getContext(), FullScreenRssFeedViewActivity.class);
+                            intent.putParcelableArrayListExtra(FullScreenRssFeedViewActivity.PARCELLABLE_FEEDS, prepareParcel(feed));
+                            getContext().startActivity(intent);
+                        }
                     }
                 });
             } else {
-                news_rss_feed_video_play.setVisibility(View.GONE);
+                home_rss_feed_video_play.setVisibility(View.GONE);
             }
             if(imageUrl != null && !imageUrl.trim().isEmpty()) {
-                new DownloadFeedImageTask(news_rss_feed_image, 850, 600, NewsActivityAdapter.this.activity, loading_progress)
+                new DownloadFeedImageTask(home_rss_feed_image, 850, 600, DiscoverFragmentAdapter.this.activity, loading_progress)
                         .execute(imageUrl);
-                news_rss_feed_image.setOnClickListener(new View.OnClickListener() {
+                home_rss_feed_image.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        openFullScreenNewsActivity(feed);
+                       /*Intent intent = new Intent(Intent.ACTION_VIEW);
+                        intent.setData(Uri.parse(feed.getOgUrl()));
+                        getContext().startActivity(intent);*/
+                        String videoUrl = feed.getVideoUrl();
+                        if (videoUrl != null && !videoUrl.trim().isEmpty()) {
+                            playVideo(videoUrl.trim());
+                        } else {
+                            Intent intent = new Intent(getContext(), FullScreenRssFeedViewActivity.class);
+                            intent.putParcelableArrayListExtra(FullScreenRssFeedViewActivity.PARCELLABLE_FEEDS, prepareParcel(feed));
+                            getContext().startActivity(intent);
+                        }
                     }
                 });
-                news_rss_feed_description.setOnClickListener(new View.OnClickListener() {
+                home_rss_feed_description.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        openFullScreenNewsActivity(feed);
+                        String videoUrl = feed.getVideoUrl();
+                        if (videoUrl != null && !videoUrl.trim().isEmpty()) {
+                            playVideo(videoUrl.trim());
+                        } else {
+                            Intent intent = new Intent(getContext(), FullScreenRssFeedViewActivity.class);
+                            intent.putParcelableArrayListExtra(FullScreenRssFeedViewActivity.PARCELLABLE_FEEDS, prepareParcel(feed));
+                            getContext().startActivity(intent);
+                        }
                     }
                 });
             }
 
-            news_bookmark.setOnClickListener(new View.OnClickListener() {
+            home_rss_share.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    /*String publicUrl = imageUrl;
+                    String publicUrl = imageUrl;
                     if(videoUrl != null) {
                         publicUrl = videoUrl;
-                    }*/
+                    }
 
-                    /*String publicUrl = newsUrl;
-                    if(publicUrl != null && !publicUrl.isEmpty()) {
-                        shareUrl(publicUrl);
-                    }*/
-
-
-                    BookmarkUtil.addBookmark(feed, activity, news_bookmark);
-                    //shareUrl(feed);
+                    if(publicUrl != null && !publicUrl.isEmpty() && publicUrl.contains("youtube.com")) {
+                        shareUrl(feed, publicUrl);
+                    } else {
+                        shareUrl(feed, null);
+                    }
                 }
             });
         }
         return convertView;
     }
 
-    private void openFullScreenNewsActivity(final JRssFeed feed) {
-        Intent intent = new Intent(getContext(), FullScreenNewsViewActivity.class);
-        String url = feed.getSquillUrl();
-        String shareUrl = feed.getShareableUrl() != null ? feed.getShareableUrl() : url;
-        String newsTitle = feed.getOgTitle();
-        String newsFullText = feed.getFullArticleText();
-        intent.putExtra(FullScreenNewsViewActivity.NEWS_LINK, url);
-        intent.putExtra(FullScreenNewsViewActivity.WEB_SHARE_LINK, shareUrl);
-        intent.putExtra(FullScreenNewsViewActivity.SOURCE_LINK, feed.getOgUrl());
-        intent.putExtra(FullScreenNewsViewActivity.NEWS_TITLE, newsTitle);
-        intent.putExtra(FullScreenNewsViewActivity.NEWS_FULL_TEXT, newsFullText);
-        getContext().startActivity(intent);
-    }
-
-    private void shareUrl(JRssFeed feed) {
-        ExternalLinkShareUtil.shareUrl(getContext(), feed);
+    private void shareUrl(JRssFeed feed, String url) {
+        ExternalLinkShareUtil.shareUrl(getContext(), feed, url);
     }
 
     private ArrayList<ParcellableRssFeed> prepareParcel(JRssFeed feed) {
@@ -244,7 +243,7 @@ public class NewsActivityAdapter extends ArrayAdapter<JRssFeed> {
                 Intent intent = YouTubeStandalonePlayer.createVideoIntent(activity, ApiConstants.YOUTUBE_API_KEY, VIDEO_ID);
                 activity.startActivity(intent);
             } else {
-                Snackbar.make(news_rss_feed_video_play, "Oops! Something went wrong", Snackbar.LENGTH_LONG).show();
+                Snackbar.make(home_rss_feed_video_play, "Oops! Something went wrong", Snackbar.LENGTH_LONG).show();
             }
         } else {
             Intent intent = new Intent(activity, FullScreenPlayVideoActivity.class);

@@ -1,9 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!--color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color-->
-    <color name="colorPrimary">#F41684</color>
-    <color name="colorPrimaryDark">#BE1066</color>
+
+    <color name="bottomtab_item_resting">#36000000</color>
+    <color name="bottomtab_item_disabled">#1e000000</color>
+    <color name="bg_light">#fafafa</color>
+    <color name="divider_light">#0c000000</color>
+
+    <color name="bottomtab_0">#6CCC3D</color>
+    <color name="bottomtab_1">#EA5C46</color>
+    <color name="bottomtab_2">#33b3cc</color>
+
+    <!--<color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>-->
+    <color name="colorPrimaryAppBarOverlay">#F41684</color>
+    <color name="colorPrimaryDarkAppBarOverlay">#BE1066</color>
+
+    <color name="logo">#F41684</color>
+    <color name="logoDark">#BE1066</color>
+
+    <color name="colorNavIcon">#6E6E6E</color>
+    <color name="colorNavText">#000000</color>
+
+    <color name="bgBottomNavigation">#fe485a</color>
+
+    <!--<color name="colorPrimary">#f4f1f1</color>
+    <color name="colorPrimaryDark">#c2bfbf</color>-->
+
+    <color name="colorPrimary">#ffffff</color>
+    <color name="colorPrimaryDark">#f4f1f1</color>
+
     <color name="colorAccent">#FF4081</color>
     <color name="white">#ffffff</color>
     <color name="feed_bg">#d3d6db</color>

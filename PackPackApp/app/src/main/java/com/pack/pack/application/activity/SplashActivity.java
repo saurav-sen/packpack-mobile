@@ -1,20 +1,13 @@
 package com.pack.pack.application.activity;
 
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
 import com.pack.pack.application.async.FeedReceiveCallback;
-import com.pack.pack.application.async.FeedReceiveTaskStatusListener;
 import com.pack.pack.application.async.FeedsDownloadUtil;
-import com.pack.pack.application.data.util.ArticlesFeedTask;
-import com.pack.pack.application.data.util.IAsyncTaskStatusListener;
-import com.pack.pack.application.data.util.NewsFeedTask;
-import com.pack.pack.application.data.util.ScienceNewsFeedTask;
-import com.pack.pack.application.data.util.SportsFeedTask;
 import com.pack.pack.application.db.Bookmark;
 import com.pack.pack.application.db.DBUtil;
 import com.pack.pack.application.db.SquillDbHelper;
@@ -25,7 +18,6 @@ import com.pack.pack.application.service.CheckNetworkService;
 import com.pack.pack.application.service.NetworkUtil;
 import com.pack.pack.application.service.SquillNTPService;
 import com.pack.pack.model.web.JUser;
-import com.squill.feed.web.model.JRssFeedType;
 
 /**
  *
@@ -219,15 +211,9 @@ public class SplashActivity extends AbstractActivity /*implements IAsyncTaskStat
 
     private void openLandingPageActivity(String messageToDisplayIfAny) {
         Intent intent = new Intent(SplashActivity.this, LandingPageActivity.class);
-        if(messageToDisplayIfAny != null && !messageToDisplayIfAny.trim().isEmpty()) {
+        /*if(messageToDisplayIfAny != null && !messageToDisplayIfAny.trim().isEmpty()) {
             intent.putExtra(LandingPageActivity.MESSAGE_IF_ANY, messageToDisplayIfAny);
-        }
-        finish();
-        startActivity(intent);
-    }
-
-    private void startBookmarkActivity() {
-        Intent intent = new Intent(SplashActivity.this, BookmarkActivity.class);
+        }*/
         finish();
         startActivity(intent);
     }

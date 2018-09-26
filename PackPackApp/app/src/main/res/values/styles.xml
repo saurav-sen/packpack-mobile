@@ -13,6 +13,26 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+
+        <item name="android:actionBarStyle">@style/AppTheme.ActionBar</item>
+        <item name="actionBarStyle">@style/AppTheme.ActionBar</item>
+    </style>
+
+    <style name="AppTheme.ActionBar" parent="Widget.AppCompat.Light.ActionBar">
+        <item name="android:titleTextStyle">@style/AppTheme.ActionBar.TitleText</item>
+        <item name="titleTextStyle">@style/AppTheme.ActionBar.TitleText</item>
+        <item name="android:height">@dimen/bar_height</item>
+        <item name="height">@dimen/bar_height</item>
+    </style>
+
+    <style name="AppTheme.ActionBar.TitleText" parent="TextAppearance.AppCompat.Widget.ActionBar.Title">
+        <item name="android:textSize">@dimen/bar_text_size</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+    <style name="AppTheme.PreferenceSettings" parent="AppTheme">
+        <!--<item name="android:windowBackground">@drawable/background_image</item>-->
+        <item name="android:background">@color/feed_bg</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -20,9 +40,16 @@
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="colorPrimary">@color/colorPrimaryAppBarOverlay</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDarkAppBarOverlay</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
 
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light">
+        <item name="colorPrimary">@color/colorPrimaryAppBarOverlay</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDarkAppBarOverlay</item>
+    </style>
 
     <style name="Divider">
         <item name="android:layout_width">match_parent</item>

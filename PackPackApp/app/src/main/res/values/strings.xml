@@ -62,4 +62,11 @@
     <string name="section_format">Hello World from section: %1$d</string>
     <string name="title_activity_generic_topic_list">SQUILL</string>
     <string name="title_activity_my_society">SQUILL</string>
+
+    <string name="title_tending">Trending</string>
+    <string name="title_sports">Sports</string>
+    <string name="title_science">Science</string>
+    <string name="title_article">Article</string>
+    <string name="title_bookmark">Bookmark</string>
+    <string name="title_fun">Fun</string>
 </resources>

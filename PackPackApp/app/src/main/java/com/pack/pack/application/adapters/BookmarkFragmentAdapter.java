@@ -5,7 +5,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.support.design.widget.Snackbar;
-import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +16,6 @@ import android.widget.TextView;
 
 import com.google.android.youtube.player.YouTubeStandalonePlayer;
 import com.pack.pack.application.R;
-import com.pack.pack.application.activity.BookmarkActivity;
 import com.pack.pack.application.activity.FullScreenBookmarkViewActivity;
 import com.pack.pack.application.data.util.ApiConstants;
 import com.pack.pack.application.data.util.BookmarkDeleteResult;
@@ -33,7 +31,7 @@ import java.util.List;
 /**
  * Created by Saurav on 26-08-2018.
  */
-public class BookmarkActivityAdapter extends ArrayAdapter<Bookmark> {
+public class BookmarkFragmentAdapter extends ArrayAdapter<Bookmark> {
 
     private Activity activity;
     private LayoutInflater inflater;
@@ -51,7 +49,7 @@ public class BookmarkActivityAdapter extends ArrayAdapter<Bookmark> {
 
     private ProgressDialog progressDialog;
 
-    public BookmarkActivityAdapter(Activity activity, List<Bookmark> feeds) {
+    public BookmarkFragmentAdapter(Activity activity, List<Bookmark> feeds) {
         super(activity, R.layout.bookmark_list_items, feeds.toArray(new Bookmark[feeds.size()]));
         this.activity = activity;
         this.feeds = feeds;
@@ -112,7 +110,7 @@ public class BookmarkActivityAdapter extends ArrayAdapter<Bookmark> {
                 bookmark_rss_feed_video_play.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if(!MediaUtil.playVideo(videoUrl, BookmarkActivityAdapter.this.activity)) {
+                        if(!MediaUtil.playVideo(videoUrl, BookmarkFragmentAdapter.this.activity)) {
                             openFullScreenBookmarkActivity(feed);
                         }
                     }
@@ -123,7 +121,7 @@ public class BookmarkActivityAdapter extends ArrayAdapter<Bookmark> {
             }
             final String imageUrl = imgUrl;
             if (imageUrl != null && !imageUrl.trim().isEmpty()) {
-                new DownloadFeedImageTask(bookmark_rss_feed_image, 850, 600, BookmarkActivityAdapter.this.activity, loading_progress)
+                new DownloadFeedImageTask(bookmark_rss_feed_image, 850, 600, BookmarkFragmentAdapter.this.activity, loading_progress)
                         .execute(imageUrl);
                 bookmark_rss_feed_image.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -248,9 +246,9 @@ public class BookmarkActivityAdapter extends ArrayAdapter<Bookmark> {
                 List<Bookmark> success = result.getSuccess();
                 if(!success.isEmpty()) {
                     for(Bookmark s : success) {
-                        BookmarkActivityAdapter.this.getFeeds().remove(s);
+                        BookmarkFragmentAdapter.this.getFeeds().remove(s);
                     }
-                    BookmarkActivityAdapter.this.notifyDataSetChanged();
+                    BookmarkFragmentAdapter.this.notifyDataSetChanged();
                 }
                 List<Bookmark> failure = result.getFailure();
                 if(!failure.isEmpty()) {

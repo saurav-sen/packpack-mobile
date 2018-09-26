@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.support.design.widget.Snackbar;
 import android.view.View;
+import android.widget.Toast;
 
 import com.pack.pack.application.db.Bookmark;
 import com.pack.pack.application.db.DBUtil;
@@ -23,11 +24,13 @@ public class BookmarkUtil {
        // bookmark.setTimeOfAdd(System.currentTimeMillis());
         bookmark = DBUtil.storeNewBookmark(bookmark, activity);
         if(bookmark == null || bookmark.getEntityId() == null || bookmark.getEntityId().trim().isEmpty()) {
-            Snackbar.make(view, "Failed to process link", Snackbar.LENGTH_LONG).show();
+            Toast.makeText(activity, "Failed to process link", Toast.LENGTH_LONG).show();
+            //Snackbar.make(view, "Failed to process link", Snackbar.LENGTH_LONG).show();
         } else {
             /*Intent intent = new Intent(activity, AddBookmarkService.class);
             activity.startService(intent);*/
-            Snackbar.make(view, "Added to bookmark list", Snackbar.LENGTH_LONG).show();
+            Toast.makeText(activity, "Added to bookmark list", Toast.LENGTH_LONG).show();
+            //Snackbar.make(view, "Added to bookmark list", Snackbar.LENGTH_LONG).show();
         }
     }
 }

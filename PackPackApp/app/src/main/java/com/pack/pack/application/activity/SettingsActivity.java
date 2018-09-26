@@ -43,11 +43,7 @@ import static com.pack.pack.application.AppController.CROP_PHOTO_REQUEST_CODE;
  */
 public class SettingsActivity extends AppCompatPreferenceActivity {
 
-    private static final String PARCELABLE_TOPIC_KEY = "topic";
-
     public static final String PROFILE_PICTURE = "profilePicPref";
-
-    public static final String PREFERENCE_KEY = "preference_key";
 
     public static final String PROFILE_PICTURE_CHANGE_KEY = "profilePictureChange";
     public static final String PROFILE_PICTURE_CROP_KEY = "profilePictureCrop";
@@ -191,34 +187,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             bindPreferenceSummaryToValue(profilePicturePreference);
 
             ((SettingsActivity) getActivity()).addSettingsChangeListener(profilePicturePreference);
-        }
-    }
-
-    private static class PreferenceSettings {
-
-        private String key;
-
-        private String value;
-
-        public PreferenceSettings(String key, String value) {
-            this.key = key;
-            this.value = value;
-        }
-
-        public String getKey() {
-            return key;
-        }
-
-        public void setKey(String key) {
-            this.key = key;
-        }
-
-        public String getValue() {
-            return value;
-        }
-
-        public void setValue(String value) {
-            this.value = value;
         }
     }
 
