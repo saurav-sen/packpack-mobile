@@ -20,8 +20,8 @@ import java.util.Map;
  */
 public class SportsFeedTask extends FeedsLoadTask {
 
-    public SportsFeedTask(Context context, int pageNo) {
-        super(context, JRssFeedType.NEWS_SPORTS, pageNo);
+    public SportsFeedTask(Context context) {
+        super(context, JRssFeedType.NEWS_SPORTS);
     }
 
     @Override

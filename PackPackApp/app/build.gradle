@@ -9,7 +9,7 @@ android {
         applicationId "com.pack.pack.application"
         minSdkVersion 19
         targetSdkVersion 26
-        versionCode 23
+        versionCode 27
         versionName "1.0.0.1"
         //multiDexEnabled = true
     }
@@ -34,9 +34,9 @@ android {
 dependencies {
     compile fileTree(include: ['*.jar', '*.aar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:26.0.0'
-    compile 'com.android.support:design:26.0.0'
-    compile 'com.android.support:support-v4:26.0.0'
+    compile 'com.android.support:appcompat-v7:26.1.0'
+    compile 'com.android.support:design:26.1.0'
+    compile 'com.android.support:support-v4:26.1.0'
     compile 'org.apache.httpcomponents:httpclient-android:4.3.5.1'
     compile 'com.fasterxml.jackson.core:jackson-core:2.2.2'
     compile 'com.fasterxml.jackson.core:jackson-annotations:2.2.0'
@@ -44,8 +44,9 @@ dependencies {
     compile 'org.apache.commons:commons-lang3:3.4'
     compile 'org.jsoup:jsoup:1.8.3'
     compile 'com.rabbitmq:amqp-client:3.5.6'
-    compile 'com.google.firebase:firebase-invites:11.0.2'
-    compile 'com.google.firebase:firebase-messaging:11.0.2'
+    compile 'com.google.firebase:firebase-messaging:15.0.2'
+    //compile 'com.google.firebase:firebase-invites:11.0.2'
+    //compile 'com.google.firebase:firebase-messaging:11.0.2'
 }
 
 

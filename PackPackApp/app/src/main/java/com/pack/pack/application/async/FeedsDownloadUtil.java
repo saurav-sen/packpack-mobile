@@ -1,13 +1,15 @@
 package com.pack.pack.application.async;
 
 import android.content.Context;
+import android.os.AsyncTask;
 
 import com.pack.pack.application.AppController;
-import com.pack.pack.application.data.util.ArticlesFeedTask;
+import com.pack.pack.application.FeedReceiveState;
 import com.pack.pack.application.data.util.IAsyncTaskStatusListener;
 import com.pack.pack.application.data.util.NewsFeedTask;
-import com.pack.pack.application.data.util.ScienceNewsFeedTask;
+import com.pack.pack.application.data.util.ArticlesFeedTask;
 import com.pack.pack.application.data.util.SportsFeedTask;
+import com.pack.pack.application.db.DBUtil;
 import com.squill.feed.web.model.JRssFeedType;
 
 /**
@@ -23,32 +25,46 @@ public final class FeedsDownloadUtil {
             return;
         }
 
-        if(resetPreviousReceiveStateInfo) {
-            AppController.getInstance().getFeedReceiveState().setIsFirstPageNewsReceived(false);
-            AppController.getInstance().getFeedReceiveState().setIsFirstPageSportsNewsReceived(false);
-            AppController.getInstance().getFeedReceiveState().setIsFirstPageScienceNewsReceived(false);
-            AppController.getInstance().getFeedReceiveState().setIsFirstPageArticlesReceived(false);
-        }
+        /*if(resetPreviousReceiveStateInfo) {
+            AppController.getInstance().getFeedReceiveState().setLastUpdateTimestamp(JRssFeedType.NEWS, FeedReceiveState.DEFAULT_MIN_TIMESTAMP);
+            AppController.getInstance().getFeedReceiveState().setLastUpdateTimestamp(JRssFeedType.NEWS_SPORTS, FeedReceiveState.DEFAULT_MIN_TIMESTAMP);
+            AppController.getInstance().getFeedReceiveState().setLastUpdateTimestamp(JRssFeedType.NEWS_SCIENCE_TECHNOLOGY, FeedReceiveState.DEFAULT_MIN_TIMESTAMP);
+            AppController.getInstance().getFeedReceiveState().setLastUpdateTimestamp(JRssFeedType.ARTICLE, FeedReceiveState.DEFAULT_MIN_TIMESTAMP);
+        }*/
 
-        NewsFeedTask newsFeedTask = new NewsFeedTask(context, 0);
-        SportsFeedTask sportsFeedTask = new SportsFeedTask(context, 0);
-        ScienceNewsFeedTask scienceNewsFeedTask = new ScienceNewsFeedTask(context, 0);
-        ArticlesFeedTask artilcesFeedTask = new ArticlesFeedTask(context, 0);
+        NewsFeedTask newsFeedTask = new NewsFeedTask(context);
+        SportsFeedTask sportsFeedTask = new SportsFeedTask(context);
+        ArticlesFeedTask scienceNewsFeedTask = new ArticlesFeedTask(context);
 
         IAsyncTaskStatusListener listener = new FeedReceiveTaskStatusListener(callback)
                 .addTaskID(newsFeedTask.getTaskID(), JRssFeedType.NEWS)
                 .addTaskID(sportsFeedTask.getTaskID(), JRssFeedType.NEWS_SPORTS)
-                .addTaskID(scienceNewsFeedTask.getTaskID(), JRssFeedType.NEWS_SCIENCE_TECHNOLOGY)
-                .addTaskID(artilcesFeedTask.getTaskID(), JRssFeedType.ARTICLE);
+                .addTaskID(scienceNewsFeedTask.getTaskID(), JRssFeedType.NEWS_SCIENCE_TECHNOLOGY);
 
         newsFeedTask.addListener(listener);
         sportsFeedTask.addListener(listener);
         scienceNewsFeedTask.addListener(listener);
-        artilcesFeedTask.addListener(listener);
 
         newsFeedTask.execute(String.valueOf(0));
         sportsFeedTask.execute(String.valueOf(0));
         scienceNewsFeedTask.execute(String.valueOf(0));
-        artilcesFeedTask.execute(String.valueOf(0));
     }
+
+   /* public void removeExpiredOfflineData(Context context) {
+        new AsyncDelete(context).execute();
+    }*/
+
+    /*private class AsyncDelete extends AsyncTask<Void, Integer, Integer> {
+
+        private Context context;
+
+        AsyncDelete(Context context) {
+            this.context = context;
+        }
+
+        @Override
+        protected Integer doInBackground(Void... params) {
+            return DBUtil.removeExpiredOfflineJsonModel(context);
+        }
+    }*/
 }

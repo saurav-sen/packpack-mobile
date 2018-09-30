@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.data.cache.RssFeedCache;
+import com.pack.pack.application.db.DBUtil;
 import com.pack.pack.application.service.NetworkUtil;
 import com.pack.pack.client.api.API;
 import com.pack.pack.client.api.APIConstants;
@@ -34,10 +35,9 @@ public abstract class FeedsLoadTask extends AbstractNetworkTask<String, Integer,
 
     private static final String LOG_TAG = "FeedsLoadTask";
 
-    public FeedsLoadTask(Context context, JRssFeedType feedType, int pageNo) {
+    public FeedsLoadTask(Context context, JRssFeedType feedType) {
         super(false, false, context, false);
         this.feedType = feedType;
-        this.pageNo = pageNo;
     }
 
     @Override
@@ -70,44 +70,39 @@ public abstract class FeedsLoadTask extends AbstractNetworkTask<String, Integer,
     private Pagination<JRssFeed> doExecute(API api, RssFeedCache cache) throws Exception {
         Pagination<JRssFeed> page = new Pagination<JRssFeed>();
         boolean readOfflineData = true;
-        if(NetworkUtil.checkConnectivity(getContext())) {
+        if(pageNo < 0) {
+            page.setNextPageNo(pageNo);
+            return page;
+        }
+        boolean isNetworkConnected = NetworkUtil.checkConnectivity(getContext());
+        if(isNetworkConnected) {
             readOfflineData = false;
-            if(pageNo == 0 && AppController.getInstance().getFeedReceiveState().isFirstPageReceived(feedType)) {
+            page = eliminateDuplicatesIfAny((Pagination<JRssFeed>)api.execute());
+            if(page != null && !page.getResult().isEmpty()) {
+                cache.storeData4OfflineUse(page.getResult(), pageNo);
+            }
+            if(pageNo == 0 && (page == null || page.getResult().isEmpty())) {
                 readOfflineData = true;
-                pageNo = AppController.getInstance().getFeedReceiveState().getNextPageNo(feedType);
-            } else {
-                page = eliminateDuplicatesIfAny((Pagination<JRssFeed>)api.execute());
-                if(page != null && !page.getResult().isEmpty()) {
-                    cache.storeOfflineData(page.getResult(), pageNo);
-                }
-                if(pageNo == 0 && (page == null || page.getResult().isEmpty()))
-                    readOfflineData = true;
             }
         }
         if(readOfflineData) {
-            List<JRssFeed> list = cache.readOfflineData();
-            page.getResult().addAll(list);
-            page.setNextPageNo(pageNo);
+            if(!isNetworkConnected) {
+                page = cache.readLastLoggedInOfflineData(pageNo);
+            } else {
+                page = cache.readOfflineData(pageNo);
+            }
+            if(pageNo == 0) {
+                boolean isFirstLoginOfTheDay = cache.updateLastLoggedInInfo();
+                if(isFirstLoginOfTheDay) {
+                    cache.removeExpiredOfflineJsonModel();
+                }
+            }
         }
         return page;
     }
 
     private Pagination<JRssFeed> eliminateDuplicatesIfAny(Pagination<JRssFeed> page) {
         List<JRssFeed> list = page.getResult();
-        /*if(list != null && !list.isEmpty()) {
-            Object OBJECT = new Object();
-            Map<JRssFeed, Object> map = new HashMap<>();
-            Iterator<JRssFeed> itr = list.iterator();
-            while (itr.hasNext()) {
-                JRssFeed feed = itr.next();
-                if(map.get(feed) == null) {
-                    map.put(feed, OBJECT);
-                } else {
-                    itr.remove();
-                }
-            }
-        }*/
-
         Set<JRssFeed> set = new LinkedHashSet<>();
         set.addAll(list);
         list = new ArrayList<>(set);
@@ -120,11 +115,8 @@ public abstract class FeedsLoadTask extends AbstractNetworkTask<String, Integer,
         Map<String, Object> apiParams = new HashMap<String, Object>();
         String userId = AppController.getInstance().getUserId();
         apiParams.put(APIConstants.User.ID, userId);
-        int pNo = pageNo;
-        if(pNo == 0 && AppController.getInstance().getFeedReceiveState().isFirstPageReceived(feedType)) {
-            pNo = AppController.getInstance().getFeedReceiveState().getNextPageNo(feedType);
-        }
-        apiParams.put(APIConstants.PageInfo.PAGE_NO, pNo);
+        this.pageNo = Integer.parseInt(inputObject.trim());
+        apiParams.put(APIConstants.PageInfo.PAGE_NO, this.pageNo);
         return apiParams;
     }
 }

@@ -5,6 +5,7 @@ import com.pack.pack.application.adapters.DiscoverFragmentAdapter;
 import com.pack.pack.application.data.util.FeedsLoadTask;
 import com.pack.pack.application.data.util.RefreshmentFeedTask;
 import com.squill.feed.web.model.JRssFeed;
+import com.squill.feed.web.model.JRssFeedType;
 
 import java.util.LinkedList;
 
@@ -34,10 +35,12 @@ public class DiscoverFragment extends BaseFragment {
     }
 
     @Override
-    protected FeedsLoadTask initNewTask(int pageNo) {
-        if(pageNo == 0) {
-            return new RefreshmentFeedTask(getActivity(), pageNo);
-        }
-        return null;
+    protected JRssFeedType getFeedType() {
+        return JRssFeedType.REFRESHMENT;
+    }
+
+    @Override
+    protected FeedsLoadTask initNewTask() {
+        return new RefreshmentFeedTask(getActivity());
     }
 }

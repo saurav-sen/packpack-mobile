@@ -22,8 +22,8 @@ import java.util.Map;
  */
 public class NewsFeedTask extends FeedsLoadTask {
 
-    public NewsFeedTask(Context context, int pageNo) {
-        super(context, JRssFeedType.NEWS, pageNo);
+    public NewsFeedTask(Context context) {
+        super(context, JRssFeedType.NEWS);
     }
 
     @Override

@@ -23,11 +23,16 @@ public class SquillDbHelper extends SQLiteOpenHelper {
                         + " INTEGER, " + Bookmark.IS_PROCESSED + " INTEGER DEFAULT 0, "
                         + Bookmark.IS_VIDEO + " INTEGER DEFAULT 0, " + Bookmark.SOURCE_URL + " TEXT)";
 
+        public static final String LOGIN_INFO =
+                "CREATE TABLE " + LoginInfo.TABLE_NAME + " (" + LoginInfo._ID
+                        + " INTEGER PRIMARY KEY, " + LoginInfo.ENTITY_ID + " TEXT, "
+                        + LoginInfo.FEED_TYPE + " TEXT, " + LoginInfo.DATE_VALUE + " TEXT)";
+
         public static final String JSON_MODEL =
                 "CREATE TABLE " + JsonModel.TABLE_NAME + " (" + JsonModel._ID
                         + " INTEGER PRIMARY KEY, " + JsonModel.ENTITY_ID + " TEXT, "
-                        + JsonModel.ENTITY_CONTAINER_ID + " TEXT, " + JsonModel.CONTENT
-                        + " TEXT, " + JsonModel.CLASS_TYPE + " TEXT)";
+                        + JsonModel.FEED_TYPE + " TEXT, " + JsonModel.CONTENT + " TEXT, "
+                        + JsonModel.PAGE_NO + " INTEGER DEFAULT 0, " + JsonModel.DATE_VALUE + " TEXT)";
 
         public static final String USER_INFO =
                 "CREATE TABLE " + UserInfo.TABLE_NAME + " (" + UserInfo._ID
@@ -50,6 +55,9 @@ public class SquillDbHelper extends SQLiteOpenHelper {
 
         public static final String BOOKMARK =
                 "DROP TABLE IF EXISTS " + Bookmark.TABLE_NAME;
+
+        public static final String LOGIN_INFO =
+                "DROP TABLE IF EXISTS " + LoginInfo.TABLE_NAME;
 
         public static final String JSON_MODEL =
                 "DROP TABLE IF EXISTS " + JsonModel.TABLE_NAME;
@@ -79,8 +87,10 @@ public class SquillDbHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CreateQueries.BOOKMARK);
+        db.execSQL(CreateQueries.LOGIN_INFO);
         db.execSQL(CreateQueries.JSON_MODEL);
         db.execSQL(CreateQueries.USER_INFO);
+
         //db.execSQL(CreateQueries.USER_OWNED_TOPIC_INFO);
         //db.execSQL(CreateQueries.ATTACHMENT_INFO);
         db.execSQL(CreateQueries.PAGINATION_INFO);
@@ -91,8 +101,10 @@ public class SquillDbHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
        // db.execSQL(DeleteQueries.BOOKMARK);
+        db.execSQL(DeleteQueries.LOGIN_INFO);
         db.execSQL(DeleteQueries.JSON_MODEL);
         db.execSQL(DeleteQueries.USER_INFO);
+
         //db.execSQL(DeleteQueries.USER_OWNED_TOPIC_INFO);
         //db.execSQL(DeleteQueries.ATTACHMENT_INFO);
         db.execSQL(DeleteQueries.PAGINATION_INFO);

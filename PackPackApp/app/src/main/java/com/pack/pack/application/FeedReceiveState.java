@@ -2,141 +2,61 @@ package com.pack.pack.application;
 
 import com.squill.feed.web.model.JRssFeedType;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * Created by Saurav on 12-09-2018.
  */
 public class FeedReceiveState {
 
-    private boolean isFirstPageNewsReceived;
+    public static final long DEFAULT_MIN_TIMESTAMP = -1;
 
-    private boolean isFirstPageScienceNewsReceived;
+    public static final long DEFAULT_UPDATE_INTERVAL = 1;
 
-    private boolean isFirstPageSportsNewsReceived;
+    public static final TimeUnit DEFAULT_UPDATE_INTERVAL_UNIT = TimeUnit.MINUTES;
 
-    private boolean isFirstPageArticlesReceived;
+    private long newsLastUpdateTimestamp = DEFAULT_MIN_TIMESTAMP;
 
-    private int newsNextPageNo;
+    private long sportsLastUpdateTimestamp = DEFAULT_MIN_TIMESTAMP;
 
-    private int sportsNewsNextPageNo;
-
-    private int scienceNewsNextPageNo;
-
-    private int articlesNextPageNo;
+    private long articlesLastUpdateTimestamp = DEFAULT_MIN_TIMESTAMP;
 
     FeedReceiveState() {
-        this.isFirstPageNewsReceived = false;
-        this.isFirstPageScienceNewsReceived = false;
-        this.isFirstPageSportsNewsReceived = false;
-        this.isFirstPageArticlesReceived = false;
-        this.newsNextPageNo = 0;
-        this.sportsNewsNextPageNo = 0;
-        this.scienceNewsNextPageNo = 0;
-        this.articlesNextPageNo = 0;
     }
 
-    public boolean isFirstPageNewsReceived() {
-        return isFirstPageNewsReceived;
+    public long getLastUpdateTimestamp(JRssFeedType feedType) {
+        long timestamp = -1;
+        if(feedType == null)
+            return timestamp;
+        switch (feedType) {
+            case NEWS:
+                timestamp = newsLastUpdateTimestamp;
+                break;
+            case NEWS_SPORTS:
+                timestamp = sportsLastUpdateTimestamp;
+                break;
+            case NEWS_SCIENCE_TECHNOLOGY:
+            case ARTICLE:
+                timestamp = articlesLastUpdateTimestamp;
+                break;
+        }
+        return timestamp;
     }
 
-    public void setIsFirstPageNewsReceived(boolean isFirstPageNewsReceived) {
-        this.isFirstPageNewsReceived = isFirstPageNewsReceived;
-    }
-
-    public boolean isFirstPageScienceNewsReceived() {
-        return isFirstPageScienceNewsReceived;
-    }
-
-    public void setIsFirstPageScienceNewsReceived(boolean isFirstPageScienceNewsReceived) {
-        this.isFirstPageScienceNewsReceived = isFirstPageScienceNewsReceived;
-    }
-
-    public boolean isFirstPageSportsNewsReceived() {
-        return isFirstPageSportsNewsReceived;
-    }
-
-    public void setIsFirstPageSportsNewsReceived(boolean isFirstPageSportsNewsReceived) {
-        this.isFirstPageSportsNewsReceived = isFirstPageSportsNewsReceived;
-    }
-
-    public boolean isFirstPageArticlesReceived() {
-        return isFirstPageArticlesReceived;
-    }
-
-    public void setIsFirstPageArticlesReceived(boolean isFirstPageArticlesReceived) {
-        this.isFirstPageArticlesReceived = isFirstPageArticlesReceived;
-    }
-
-    public int getNewsNextPageNo() {
-        return newsNextPageNo;
-    }
-
-    public void setNewsNextPageNo(int newsNextPageNo) {
-        this.newsNextPageNo = newsNextPageNo;
-    }
-
-    public int getSportsNewsNextPageNo() {
-        return sportsNewsNextPageNo;
-    }
-
-    public void setSportsNewsNextPageNo(int sportsNewsNextPageNo) {
-        this.sportsNewsNextPageNo = sportsNewsNextPageNo;
-    }
-
-    public int getScienceNewsNextPageNo() {
-        return scienceNewsNextPageNo;
-    }
-
-    public void setScienceNewsNextPageNo(int scienceNewsNextPageNo) {
-        this.scienceNewsNextPageNo = scienceNewsNextPageNo;
-    }
-
-    public int getArticlesNextPageNo() {
-        return articlesNextPageNo;
-    }
-
-    public void setArticlesNextPageNo(int articlesNextPageNo) {
-        this.articlesNextPageNo = articlesNextPageNo;
-    }
-
-    public boolean isFirstPageReceived(JRssFeedType feedType) {
-        boolean result = false;
+    public void setLastUpdateTimestamp(JRssFeedType feedType, long currentTimestamp) {
         if(feedType != null) {
             switch (feedType) {
                 case NEWS:
-                    result = isFirstPageNewsReceived();
+                    newsLastUpdateTimestamp = currentTimestamp;
                     break;
                 case NEWS_SPORTS:
-                    result = isFirstPageSportsNewsReceived();
+                    sportsLastUpdateTimestamp = currentTimestamp;
                     break;
                 case NEWS_SCIENCE_TECHNOLOGY:
-                    result = isFirstPageScienceNewsReceived();
-                    break;
                 case ARTICLE:
-                    result = isFirstPageArticlesReceived();
+                    articlesLastUpdateTimestamp = currentTimestamp;
                     break;
             }
         }
-        return result;
-    }
-
-    public int getNextPageNo(JRssFeedType feedType) {
-        int result = 0;
-        if(feedType != null) {
-            switch (feedType) {
-                case NEWS:
-                    result = getNewsNextPageNo();
-                    break;
-                case NEWS_SPORTS:
-                    result = getSportsNewsNextPageNo();
-                    break;
-                case NEWS_SCIENCE_TECHNOLOGY:
-                    result = getScienceNewsNextPageNo();
-                    break;
-                case ARTICLE:
-                    result = getArticlesNextPageNo();
-                    break;
-            }
-        }
-        return result;
     }
 }

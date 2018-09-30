@@ -5,6 +5,7 @@ import com.pack.pack.application.adapters.SportsFragmentAdapter;
 import com.pack.pack.application.data.util.FeedsLoadTask;
 import com.pack.pack.application.data.util.SportsFeedTask;
 import com.squill.feed.web.model.JRssFeed;
+import com.squill.feed.web.model.JRssFeedType;
 
 import java.util.LinkedList;
 
@@ -34,7 +35,12 @@ public class SportsFragment extends BaseFragment {
     }
 
     @Override
-    protected FeedsLoadTask initNewTask(int pageNo) {
-        return new SportsFeedTask(getActivity(), pageNo);
+    protected JRssFeedType getFeedType() {
+        return JRssFeedType.NEWS_SPORTS;
+    }
+
+    @Override
+    protected FeedsLoadTask initNewTask() {
+        return new SportsFeedTask(getActivity());
     }
 }

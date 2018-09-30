@@ -20,13 +20,13 @@ import java.util.Map;
  */
 public class ArticlesFeedTask extends FeedsLoadTask {
 
-    public ArticlesFeedTask(Context context, int pageNo) {
-        super(context, JRssFeedType.ARTICLE, pageNo);
+    public ArticlesFeedTask(Context context) {
+        super(context, JRssFeedType.NEWS_SCIENCE_TECHNOLOGY);
     }
 
     @Override
     protected COMMAND command() {
-        return COMMAND.GET_ALL_ARTICLES_FEEDS;
+        return COMMAND.GET_ALL_SCIENCE_AND_TECHNOLOGY_NEWS_FEEDS;
     }
 }
 

@@ -5,14 +5,20 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import com.pack.pack.application.data.util.DateTimeUtil;
 import com.pack.pack.common.util.JSONUtil;
 import com.pack.pack.model.web.JUser;
 import com.pack.pack.services.exception.PackPackException;
 import com.squill.feed.web.model.JRssFeed;
+import com.squill.feed.web.model.JRssFeedType;
+import com.squill.feed.web.model.JRssFeeds;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Created by Saurav on 11-06-2016.
@@ -100,25 +106,122 @@ public class DBUtil {
 
     public static Bookmark storeNewBookmark(Bookmark bookmark, Context context) {
         Bookmark result = null;
-        SquillDbHelper squillDbHelper = new SquillDbHelper(context);
-        SQLiteDatabase wDB = squillDbHelper.getWritableDatabase();
-        Bookmark exisitngBookmark = loadBookmarkByEntityId(bookmark.getEntityId(), context);
-        if(exisitngBookmark != null) {
-            exisitngBookmark.setTitle(bookmark.getTitle());
-            exisitngBookmark.setDescription(bookmark.getDescription());
-            exisitngBookmark.setMediaUrl(bookmark.getMediaUrl());
-            exisitngBookmark.setImage(bookmark.getImage());
-            exisitngBookmark.setArticle(bookmark.getArticle());
-            exisitngBookmark.setTimeOfAdd(bookmark.getTimeOfAdd());
-            exisitngBookmark.setSourceUrl(bookmark.getSourceUrl());
-            exisitngBookmark.setProcessed(bookmark.isProcessed());
-            exisitngBookmark.setIsVideo(bookmark.isVideo());
-            int noOfRows = wDB.update(Bookmark.TABLE_NAME, exisitngBookmark.toContentValues(),
-                    exisitngBookmark.updateRowWhereClause(), exisitngBookmark.updateRowWhereClauseArguments());
-            result = exisitngBookmark;
-        } else {
-            wDB.insert(Bookmark.TABLE_NAME, null, bookmark.toContentValues());
-            result = bookmark;
+        SQLiteDatabase wDB = null;
+        try {
+            SquillDbHelper squillDbHelper = new SquillDbHelper(context);
+            wDB = squillDbHelper.getWritableDatabase();
+            Bookmark exisitngBookmark = loadBookmarkByEntityId(bookmark.getEntityId(), context);
+            if(exisitngBookmark != null) {
+                exisitngBookmark.setTitle(bookmark.getTitle());
+                exisitngBookmark.setDescription(bookmark.getDescription());
+                exisitngBookmark.setMediaUrl(bookmark.getMediaUrl());
+                exisitngBookmark.setImage(bookmark.getImage());
+                exisitngBookmark.setArticle(bookmark.getArticle());
+                exisitngBookmark.setTimeOfAdd(bookmark.getTimeOfAdd());
+                exisitngBookmark.setSourceUrl(bookmark.getSourceUrl());
+                exisitngBookmark.setProcessed(bookmark.isProcessed());
+                exisitngBookmark.setIsVideo(bookmark.isVideo());
+                int noOfRows = wDB.update(Bookmark.TABLE_NAME, exisitngBookmark.toContentValues(),
+                        exisitngBookmark.updateRowWhereClause(), exisitngBookmark.updateRowWhereClauseArguments());
+                result = exisitngBookmark;
+            } else {
+                wDB.insert(Bookmark.TABLE_NAME, null, bookmark.toContentValues());
+                result = bookmark;
+            }
+        } finally {
+            if(wDB != null && wDB.isOpen()) {
+                wDB.close();
+            }
+        }
+        return result;
+    }
+
+    public static int removeExpiredOfflineJsonModel(Context context, String feedType) {
+        SQLiteDatabase readable = null;
+        SQLiteDatabase wDB = null;
+        int noOfRows = -1;
+        try {
+            SquillDbHelper squillDbHelper = new SquillDbHelper(context);
+            wDB = squillDbHelper.getWritableDatabase();
+            readable = squillDbHelper.getReadableDatabase();
+            String dateValue = getLastLoginInfoDateValue(readable, feedType);
+            if(dateValue == null) {
+                dateValue = DateTimeUtil.today();
+            }
+            String deleteRowWhereClause = JsonModel.DATE_VALUE + "!='" + dateValue
+                    + "' AND " + JsonModel.DATE_VALUE + "!='" + DateTimeUtil.today()
+                    + "' AND " + JsonModel.FEED_TYPE + "=" + feedType;
+            noOfRows = wDB.delete(JsonModel.TABLE_NAME, deleteRowWhereClause, null);
+            Log.i(LOG_TAG, "No of Rows deleted for expired JsonModel = " + noOfRows);
+        } finally {
+            if(readable != null && readable.isOpen()) {
+                readable.close();
+            }
+            if(wDB != null && wDB.isOpen()) {
+                wDB.close();
+            }
+        }
+        return noOfRows;
+    }
+
+    /*public static int removeExpiredOfflineJsonModel(Context context) {
+        SQLiteDatabase readable = null;
+        SQLiteDatabase wDB = null;
+        int noOfRows = -1;
+        try {
+            SquillDbHelper squillDbHelper = new SquillDbHelper(context);
+            wDB = squillDbHelper.getWritableDatabase();
+            readable = squillDbHelper.getReadableDatabase();
+            JRssFeedType[] feedTypes = new JRssFeedType[] {JRssFeedType.NEWS, JRssFeedType.NEWS_SPORTS, JRssFeedType.NEWS_SCIENCE_TECHNOLOGY};
+            for(JRssFeedType feedType : feedTypes) {
+                String dateValue = getLastLoginInfoDateValue(readable, feedType.name());
+                if(dateValue == null) {
+                    dateValue = DateTimeUtil.today();
+                }
+                String deleteRowWhereClause = JsonModel.DATE_VALUE + "!='" + dateValue
+                        + "' AND " + JsonModel.DATE_VALUE + "!='" + DateTimeUtil.today()
+                        + "' AND " + JsonModel.FEED_TYPE + "=" + feedType.name();
+                noOfRows = wDB.delete(JsonModel.TABLE_NAME, deleteRowWhereClause, null);
+                Log.i(LOG_TAG, "No of Rows deleted for expired JsonModel = " + noOfRows);
+            }
+        } finally {
+            if(readable != null && readable.isOpen()) {
+                readable.close();
+            }
+            if(wDB != null && wDB.isOpen()) {
+                wDB.close();
+            }
+        }
+        return noOfRows;
+    }*/
+
+    public static JsonModel storeJsonModel(JsonModel jsonM, String feedType, Context context) {
+        JsonModel result = null;
+        if(context == null)
+            return jsonM;
+        if(jsonM == null)
+            return result;
+        if(jsonM.getContent() == null || jsonM.getContent().trim().isEmpty())
+            return jsonM;
+        SQLiteDatabase wDB = null;
+        try {
+            SquillDbHelper squillDbHelper = new SquillDbHelper(context);
+            wDB = squillDbHelper.getWritableDatabase();
+            JsonModel existingJsonM = loadJsonModelByEntityId(context, feedType, jsonM.getEntityId());
+            if(existingJsonM != null) {
+                existingJsonM.setContent(jsonM.getContent());
+                int noOfRows = wDB.update(JsonModel.TABLE_NAME, existingJsonM.toContentValues(),
+                        existingJsonM.updateRowWhereClause(), existingJsonM.updateRowWhereClauseArguments());
+                Log.i(LOG_TAG, "JsonModel noOfRows updated = " + noOfRows);
+                result = existingJsonM;
+            } else {
+                wDB.insert(JsonModel.TABLE_NAME, null, jsonM.toContentValues());
+                result = jsonM;
+            }
+        } finally {
+            if(wDB != null && wDB.isOpen()) {
+                wDB.close();
+            }
         }
         return result;
     }
@@ -159,12 +262,15 @@ public class DBUtil {
                     bookmark.setProcessed(processed);
                     bookmark.setIsVideo(isVideo);
 
-                   return bookmark;
+                    return bookmark;
                 } while(cursor.moveToNext());
             }
         } finally {
             if(cursor != null && !cursor.isClosed()) {
                 cursor.close();
+            }
+            if(readable != null && readable.isOpen()) {
+                readable.close();
             }
         }
         return null;
@@ -238,7 +344,7 @@ public class DBUtil {
             }
         }
         bookmarks.setResult(result);
-       // bookmarks.setNextPageRef(nextPageRef);
+        // bookmarks.setNextPageRef(nextPageRef);
         return bookmarks;
     }
 
@@ -288,18 +394,58 @@ public class DBUtil {
         return result;
     }
 
-    public static <T> T loadJsonModelByEntityId(SQLiteDatabase writable, String entityId, Class<T> classType) {
-        String type = classType.getName();
-        T result = null;
+    private static JsonModel loadJsonModelByEntityId(Context context, String feedType, String entityId) {
+        JsonModel result = null;
+        Cursor cursor = null;
+        SQLiteDatabase readable = new SquillDbHelper(context).getReadableDatabase();
+        try {
+            String __SQL = "SELECT " + JsonModel.ENTITY_ID + ", " + JsonModel.CONTENT
+                    + ", " + JsonModel.PAGE_NO + ", " + JsonModel.DATE_VALUE + ", "
+                    + JsonModel.FEED_TYPE + " FROM " + JsonModel.TABLE_NAME + " WHERE "
+                    + JsonModel.ENTITY_ID + "='" + entityId.trim() + "' AND " + JsonModel.FEED_TYPE
+                    + "='" + feedType + "'";
+            cursor = readable.rawQuery(__SQL, null);
+            if(cursor.moveToFirst()) {
+                //entityId = cursor.getString(cursor.getColumnIndexOrThrow(JsonModel.ENTITY_ID));
+                String content = cursor.getString(cursor.getColumnIndexOrThrow(JsonModel.CONTENT));
+                int pageNo = cursor.getInt(cursor.getColumnIndexOrThrow(JsonModel.PAGE_NO));
+                String dateString = cursor.getString(cursor.getColumnIndexOrThrow(JsonModel.DATE_VALUE));
+                result = new JsonModel();
+                result.setContent(content);
+                result.setPageNo(pageNo);
+                result.setDateString(dateString);
+            }
+        } finally {
+            if(cursor != null && !cursor.isClosed()) {
+                cursor.close();
+            }
+            if(readable != null && readable.isOpen()) {
+                readable.close();
+            }
+        }
+        return result;
+    }
+
+    public static int getNextPageNumber(SQLiteDatabase readable, String feedType, int pageNo) {
+        int result = -1;
         Cursor cursor = null;
         try {
-            String __SQL = "SELECT " + JsonModel.CONTENT + " FROM " + JsonModel.TABLE_NAME
-                    + " WHERE " + JsonModel.ENTITY_ID + "='" + entityId + "' AND "
-                    + JsonModel.CLASS_TYPE + "='" + type + "'";
-            cursor = writable.rawQuery(__SQL, null);
+            Set<Integer> sortedSet = new TreeSet<>();
+            String __SQL = "SELECT " + JsonModel.PAGE_NO + " FROM " + JsonModel.TABLE_NAME
+                    + " WHERE " + JsonModel.DATE_VALUE + "='" + DateTimeUtil.today() + "' AND "
+                    + JsonModel.FEED_TYPE + "='" + feedType + "'";
+            cursor = readable.rawQuery(__SQL, null);
             if(cursor.moveToFirst()) {
-                String json = cursor.getString(cursor.getColumnIndexOrThrow(JsonModel.CONTENT));
-                result = convertFromJson(json, classType);
+                int pNo = cursor.getInt(cursor.getColumnIndexOrThrow(JsonModel.PAGE_NO));
+                sortedSet.add(pNo);
+            }
+            Iterator<Integer> itr = sortedSet.iterator();
+            while(itr.hasNext()) {
+                int pNo = itr.next();
+                if(pNo > pageNo) {
+                    result = pNo;
+                    break;
+                }
             }
         } finally {
             if(cursor != null && !cursor.isClosed()) {
@@ -309,23 +455,107 @@ public class DBUtil {
         return result;
     }
 
-    public static <T> List<T> loadAllJsonModelByContainerId(
-            SQLiteDatabase readable, String entityContainerId,
-            Class<T> classType) {
-        Cursor cursor =  null;
-        List<T> result = new ArrayList<T>();
-        String type = classType.getName();
+    public static JRssFeeds loadRssFeedsByDateAndPageNo(SQLiteDatabase readable, String feedType, String dateString, int pageNo) {
+        JRssFeeds result = null;
+        Cursor cursor = null;
         try {
             String __SQL = "SELECT " + JsonModel.CONTENT + " FROM " + JsonModel.TABLE_NAME
-                    + " WHERE " + JsonModel.ENTITY_CONTAINER_ID + "='" + entityContainerId
-                    + "' AND " + JsonModel.CLASS_TYPE + "='" + type + "'";
+                    + " WHERE " + JsonModel.DATE_VALUE + "='" + dateString.trim() + "' AND "
+                    + JsonModel.PAGE_NO + "=" + pageNo + " AND " + JsonModel.FEED_TYPE + "='"
+                    + feedType + "'";
+            cursor = readable.rawQuery(__SQL, null);
+            if(cursor.moveToFirst()) {
+                String json = cursor.getString(cursor.getColumnIndexOrThrow(JsonModel.CONTENT));
+                result = convertFromJson(json, JRssFeeds.class);
+            }
+        } finally {
+            if(cursor != null && !cursor.isClosed()) {
+                cursor.close();
+            }
+        }
+        return result;
+    }
+
+    public static String getLastLoginInfoDateValue(SQLiteDatabase readable, String feedType) {
+        Cursor cursor =  null;
+        String result = null;
+        try {
+            long t0 = 0;
+            String today = DateTimeUtil.today();
+            String __SQL = "SELECT " + LoginInfo.DATE_VALUE + " FROM " + LoginInfo.TABLE_NAME
+                    + " WHERE " + LoginInfo.FEED_TYPE + "='" + feedType.trim() + "'";
+            cursor = readable.rawQuery(__SQL, null);
+            if(cursor.moveToFirst()) {
+                do {
+                    String dateText = cursor.getString(cursor.getColumnIndexOrThrow(LoginInfo.DATE_VALUE));
+                    if(dateText != null && !today.equalsIgnoreCase(dateText)) {
+                        long t1 = DateTimeUtil.fromDateText(dateText);
+                        if(t1 > t0) {
+                            t0 = t1;
+                            result = dateText;
+                        }
+                    }
+
+                } while(cursor.moveToNext());
+            }
+        } catch (Exception e) {
+
+        } finally {
+            if(cursor != null && !cursor.isClosed()) {
+                cursor.close();
+            }
+        }
+        return result;
+    }
+
+    public static LoginInfo loadLoginInfo(SQLiteDatabase readable, String feedType, String dateValue) {
+        Cursor cursor =  null;
+        LoginInfo result = null;
+        try {
+            long t0 = 0;
+            String today = DateTimeUtil.today();
+            String __SQL = "SELECT " + LoginInfo.ENTITY_ID + ", " + LoginInfo.FEED_TYPE + ", "
+                    + LoginInfo.DATE_VALUE +  " FROM " + LoginInfo.TABLE_NAME
+                    + " WHERE " + LoginInfo.FEED_TYPE + "='" + feedType.trim() + "' AND "
+                    + LoginInfo.DATE_VALUE + "='" + dateValue + "'";
+            cursor = readable.rawQuery(__SQL, null);
+            if(cursor.moveToFirst()) {
+                do {
+                    feedType = cursor.getString(cursor.getColumnIndexOrThrow(LoginInfo.FEED_TYPE));
+                    String dateText = cursor.getString(cursor.getColumnIndexOrThrow(LoginInfo.DATE_VALUE));
+                    result = new LoginInfo();
+                    result.setDateValue(dateText);
+                    result.setFeedType(feedType);
+                } while(cursor.moveToNext());
+            }
+        } catch (Exception e) {
+
+        } finally {
+            if(cursor != null && !cursor.isClosed()) {
+                cursor.close();
+            }
+        }
+        return result;
+    }
+
+    /*public static JRssFeeds loadRssFeedsByDate(
+            SQLiteDatabase readable, String feedType, String dateString) {
+        Cursor cursor =  null;
+        JRssFeeds result = null;
+        try {
+            String __SQL = "SELECT " + JsonModel.CONTENT + ", " + JsonModel.PAGE_NO + " FROM " + JsonModel.TABLE_NAME
+                    + " WHERE " + JsonModel.DATE_VALUE + "='" + dateString + " AND " + JsonModel.FEED_TYPE + "='" + feedType
+                    + "' ORDER BY " + JsonModel.PAGE_NO + " ASC";
             cursor = readable.rawQuery(__SQL, null);
             if(cursor.moveToFirst()) {
                 do {
                     String json = cursor.getString(cursor.getColumnIndexOrThrow(JsonModel.CONTENT));
-                    T r = convertFromJson(json, classType);
-                    if(r != null) {
-                        result.add(r);
+                    JRssFeeds r = convertFromJson(json, JRssFeeds.class);
+                    if(r != null && !r.getFeeds().isEmpty()) {
+                        if(result == null) {
+                            result = new JRssFeeds();
+                        }
+                        result.getFeeds().addAll(r.getFeeds());
                     }
                 } while(cursor.moveToNext());
             }
@@ -334,8 +564,8 @@ public class DBUtil {
                 cursor.close();
             }
         }
-        return result != null && !result.isEmpty() ? result : null;
-    }
+        return result != null && !result.getFeeds().isEmpty() ? result : null;
+    }*/
 
     private static <T> T convertFromJson(String json, Class<T> classType) {
         T result = null;

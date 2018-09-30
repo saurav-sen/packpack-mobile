@@ -14,46 +14,46 @@ public class JsonModel extends DbObjectImpl {
     public static final String TABLE_NAME = "JSON_MODEL";
 
     public static final String ENTITY_ID = "entity_id";
-    public static final String ENTITY_CONTAINER_ID = "entity_container_id";
     public static final String CONTENT = "content";
-    public static final String CLASS_TYPE = "type";
-    //public static final String HAS_ATTACHMENT = "has_attachment";
-    //public static final String COMMAND = "command";
 
-    private String entityId;
+    public static final String FEED_TYPE = "feedType";
+    public static final String PAGE_NO = "pageNo";
+    public static final String DATE_VALUE = "dateValue";
 
     private String content;
 
-    private String classType;
+    private String dateString;
 
-    //private boolean hasAttachment;
+    private int pageNo;
 
-    //private String command;
+    private String feedType;
 
-    private String entityContainerId;
-
-    public String getEntityContainerId() {
-        return entityContainerId;
+    public String getFeedType() {
+        return feedType;
     }
 
-    public void setEntityContainerId(String entityContainerId) {
-        this.entityContainerId = entityContainerId;
+    public void setFeedType(String feedType) {
+        this.feedType = feedType;
     }
 
-    /*public String getCommand() {
-        return command;
+    public String getDateString() {
+        return dateString;
     }
 
-    public void setCommand(String command) {
-        this.command = command;
-    }*/
+    public void setDateString(String dateString) {
+        this.dateString = dateString;
+    }
+
+    public int getPageNo() {
+        return pageNo;
+    }
+
+    public void setPageNo(int pageNo) {
+        this.pageNo = pageNo;
+    }
 
     public String getEntityId() {
-        return entityId;
-    }
-
-    public void setEntityId(String entityId) {
-        this.entityId = entityId;
+        return feedType + "_" + dateString + "_" + pageNo;
     }
 
     public String getContent() {
@@ -64,29 +64,14 @@ public class JsonModel extends DbObjectImpl {
         this.content = content;
     }
 
-    public String getClassType() {
-        return classType;
-    }
-
-    public void setClassType(String classType) {
-        this.classType = classType;
-    }
-
-    /*public boolean isHasAttachment() {
-        return hasAttachment;
-    }
-
-    public void setHasAttachment(boolean hasAttachment) {
-        this.hasAttachment = hasAttachment;
-    }*/
-
     @Override
     public ContentValues toContentValues() {
         ContentValues contentValues = new ContentValues();
-        contentValues.put(ENTITY_ID, entityId);
-        contentValues.put(ENTITY_CONTAINER_ID, entityContainerId);
+        contentValues.put(ENTITY_ID, getEntityId());
         contentValues.put(CONTENT, content);
-        contentValues.put(CLASS_TYPE, classType);
+        contentValues.put(FEED_TYPE, feedType);
+        contentValues.put(PAGE_NO, pageNo);
+        contentValues.put(DATE_VALUE, dateString);
         return contentValues;
     }
 

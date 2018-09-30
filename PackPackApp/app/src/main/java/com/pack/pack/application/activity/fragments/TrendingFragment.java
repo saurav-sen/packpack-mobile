@@ -5,6 +5,7 @@ import com.pack.pack.application.adapters.TrendingFragmentAdapter;
 import com.pack.pack.application.data.util.FeedsLoadTask;
 import com.pack.pack.application.data.util.NewsFeedTask;
 import com.squill.feed.web.model.JRssFeed;
+import com.squill.feed.web.model.JRssFeedType;
 
 import java.util.LinkedList;
 
@@ -24,8 +25,13 @@ public class TrendingFragment extends BaseFragment {
     }
 
     @Override
-    protected FeedsLoadTask initNewTask(int pageNo) {
-        return new NewsFeedTask(getActivity(), pageNo);
+    protected FeedsLoadTask initNewTask() {
+        return new NewsFeedTask(getActivity());
+    }
+
+    @Override
+    protected JRssFeedType getFeedType() {
+        return JRssFeedType.NEWS;
     }
 
     @Override

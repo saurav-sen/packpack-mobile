@@ -11,14 +11,19 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.ListView;
 
+import com.pack.pack.application.AppController;
+import com.pack.pack.application.FeedReceiveState;
 import com.pack.pack.application.R;
+import com.pack.pack.application.data.util.DateTimeUtil;
 import com.pack.pack.application.data.util.FeedsLoadTask;
 import com.pack.pack.application.data.util.IAsyncTaskStatusListener;
 import com.pack.pack.application.data.util.NewsFeedTask;
 import com.pack.pack.model.web.Pagination;
 import com.squill.feed.web.model.JRssFeed;
+import com.squill.feed.web.model.JRssFeedType;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Saurav on 26-09-2018.
@@ -60,9 +65,17 @@ public abstract class BaseFragment extends Fragment {
             }
         });
 
-        nextPageNo = 0;
         if(isLoadData) {
+            nextPageNo = 0;
             loadNewFeeds(nextPageNo, true);
+        } else {
+            long t0 = AppController.getInstance().getFeedReceiveState().getLastUpdateTimestamp(getFeedType());
+            long t1 = System.currentTimeMillis();
+            int timeDiff = DateTimeUtil.calculateTimeDifference(t0, t1, FeedReceiveState.DEFAULT_UPDATE_INTERVAL_UNIT);
+            if(timeDiff >= FeedReceiveState.DEFAULT_UPDATE_INTERVAL) {
+                nextPageNo = 0;
+                loadNewFeeds(nextPageNo, true);
+            }
         }
         return view;
     }
@@ -73,7 +86,9 @@ public abstract class BaseFragment extends Fragment {
 
     protected abstract BaseAdapter initFragmentAdapter();
 
-    protected abstract FeedsLoadTask initNewTask(int pageNo);
+    protected abstract FeedsLoadTask initNewTask();
+
+    protected abstract JRssFeedType getFeedType();
 
     /*@Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
@@ -101,8 +116,8 @@ public abstract class BaseFragment extends Fragment {
     private void loadNewFeeds(int pageNo, boolean showLoadingProgress) {
         if(pageNo < 0)
             return;
-        FeedsLoadTask task = initNewTask(pageNo);
-        FeedLoadTaskStatusListener listener = new FeedLoadTaskStatusListener(task.getTaskID(), showLoadingProgress);
+        FeedsLoadTask task = initNewTask();
+        FeedLoadTaskStatusListener listener = new FeedLoadTaskStatusListener(task.getTaskID(), pageNo, showLoadingProgress);
         task.addListener(listener);
         task.execute(String.valueOf(pageNo));
     }
@@ -113,8 +128,11 @@ public abstract class BaseFragment extends Fragment {
 
         private boolean showLoadingProgress;
 
-        FeedLoadTaskStatusListener(String taskID, boolean showLoadingProgress) {
+        private int pNo;
+
+        FeedLoadTaskStatusListener(String taskID, int pNo, boolean showLoadingProgress) {
             this.taskID = taskID;
+            this.pNo = pNo;
             this.showLoadingProgress = showLoadingProgress;
         }
 
@@ -142,6 +160,9 @@ public abstract class BaseFragment extends Fragment {
                     return;
                 adapter.addNewFeeds(list);
                 adapter.notifyDataSetChanged();
+                if(this.pNo == 0) {
+                    AppController.getInstance().getFeedReceiveState().setLastUpdateTimestamp(getFeedType(), System.currentTimeMillis());
+                }
             }
         }
 

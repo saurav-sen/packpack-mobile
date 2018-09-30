@@ -3,8 +3,9 @@ package com.pack.pack.application.activity.fragments;
 import com.pack.pack.application.R;
 import com.pack.pack.application.adapters.ArticlesFragmentAdapter;
 import com.pack.pack.application.data.util.FeedsLoadTask;
-import com.pack.pack.application.data.util.ScienceNewsFeedTask;
+import com.pack.pack.application.data.util.ArticlesFeedTask;
 import com.squill.feed.web.model.JRssFeed;
+import com.squill.feed.web.model.JRssFeedType;
 
 import java.util.LinkedList;
 
@@ -34,7 +35,12 @@ public class ArticlesFragment extends BaseFragment {
     }
 
     @Override
-    protected FeedsLoadTask initNewTask(int pageNo) {
-        return new ScienceNewsFeedTask(getActivity(), pageNo);
+    protected JRssFeedType getFeedType() {
+        return JRssFeedType.NEWS_SCIENCE_TECHNOLOGY;
+    }
+
+    @Override
+    protected FeedsLoadTask initNewTask() {
+        return new ArticlesFeedTask(getActivity());
     }
 }
