@@ -11,7 +11,7 @@ public class FeedReceiveState {
 
     public static final long DEFAULT_MIN_TIMESTAMP = -1;
 
-    public static final long DEFAULT_UPDATE_INTERVAL = 1;
+    public static final long DEFAULT_UPDATE_INTERVAL = 15;
 
     public static final TimeUnit DEFAULT_UPDATE_INTERVAL_UNIT = TimeUnit.MINUTES;
 

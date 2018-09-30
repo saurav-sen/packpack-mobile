@@ -15,7 +15,7 @@ public class SquillDbHelper extends SQLiteOpenHelper {
     public interface CreateQueries {
 
         public static final String BOOKMARK =
-                "CREATE TABLE " + Bookmark.TABLE_NAME + " (" + Bookmark._ID
+                "CREATE TABLE IF NOT EXISTS " + Bookmark.TABLE_NAME + " (" + Bookmark._ID
                         + " INTEGER PRIMARY KEY, " + Bookmark.ENTITY_ID + " TEXT, "
                         + Bookmark.TITLE+ " TEXT, " + Bookmark.DESCRIPTION
                         + " TEXT, " + Bookmark.MEDIA_URL + " TEXT, " + Bookmark.ARTICLE
@@ -24,29 +24,29 @@ public class SquillDbHelper extends SQLiteOpenHelper {
                         + Bookmark.IS_VIDEO + " INTEGER DEFAULT 0, " + Bookmark.SOURCE_URL + " TEXT)";
 
         public static final String LOGIN_INFO =
-                "CREATE TABLE " + LoginInfo.TABLE_NAME + " (" + LoginInfo._ID
+                "CREATE TABLE IF NOT EXISTS " + LoginInfo.TABLE_NAME + " (" + LoginInfo._ID
                         + " INTEGER PRIMARY KEY, " + LoginInfo.ENTITY_ID + " TEXT, "
                         + LoginInfo.FEED_TYPE + " TEXT, " + LoginInfo.DATE_VALUE + " TEXT)";
 
         public static final String JSON_MODEL =
-                "CREATE TABLE " + JsonModel.TABLE_NAME + " (" + JsonModel._ID
+                "CREATE TABLE IF NOT EXISTS " + JsonModel.TABLE_NAME + " (" + JsonModel._ID
                         + " INTEGER PRIMARY KEY, " + JsonModel.ENTITY_ID + " TEXT, "
                         + JsonModel.FEED_TYPE + " TEXT, " + JsonModel.CONTENT + " TEXT, "
                         + JsonModel.PAGE_NO + " INTEGER DEFAULT 0, " + JsonModel.DATE_VALUE + " TEXT)";
 
         public static final String USER_INFO =
-                "CREATE TABLE " + UserInfo.TABLE_NAME + " (" + UserInfo._ID
+                "CREATE TABLE IF NOT EXISTS " + UserInfo.TABLE_NAME + " (" + UserInfo._ID
                         + " INTEGER PRIMARY KEY, " + UserInfo.ENTITY_ID + " TEXT, "
                         + UserInfo.USER_NAME + " TEXT, " + UserInfo.DISPLAY_NAME + " TEXT)";
 
         public static final String PAGINATION_INFO =
-                "CREATE TABLE " + PaginationInfo.TABLE_NAME + "(" + PaginationInfo._ID
+                "CREATE TABLE IF NOT EXISTS " + PaginationInfo.TABLE_NAME + "(" + PaginationInfo._ID
                         + " INTEGER PRIMARY KEY, " + PaginationInfo.ENTITY_ID + " TEXT, "
                         + PaginationInfo.CLASS_TYPE + " TEXT, " + PaginationInfo.NEXT_PAGE_NO
                         + " INTEGER)";
 
         public static final String RESOURCE_URL =
-                "CREATE TABLE " + ResourceURL.TABLE_NAME + "(" + ResourceURL._ID
+                "CREATE TABLE IF NOT EXISTS " + ResourceURL.TABLE_NAME + "(" + ResourceURL._ID
                         + " INTEGER PRIMARY KEY, " + ResourceURL.URL + " TEXT, "
                         + ResourceURL.BLOB_CONTENT + " BLOB)";
     }
@@ -101,9 +101,9 @@ public class SquillDbHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
        // db.execSQL(DeleteQueries.BOOKMARK);
-        db.execSQL(DeleteQueries.LOGIN_INFO);
+        //db.execSQL(DeleteQueries.LOGIN_INFO);
         db.execSQL(DeleteQueries.JSON_MODEL);
-        db.execSQL(DeleteQueries.USER_INFO);
+        //db.execSQL(DeleteQueries.USER_INFO);
 
         //db.execSQL(DeleteQueries.USER_OWNED_TOPIC_INFO);
         //db.execSQL(DeleteQueries.ATTACHMENT_INFO);

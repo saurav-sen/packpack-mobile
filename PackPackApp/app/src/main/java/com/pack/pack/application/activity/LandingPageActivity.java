@@ -12,6 +12,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.pack.pack.application.Constants;
 import com.pack.pack.application.R;
 import com.pack.pack.application.activity.fragments.BookmarkFragment;
 import com.pack.pack.application.activity.fragments.DiscoverFragment;
@@ -35,6 +37,8 @@ public class LandingPageActivity extends AppCompatActivity implements BottomNavi
 
         trendingFragment = new TrendingFragment();
         loadFragment(trendingFragment);
+
+        FirebaseMessaging.getInstance().subscribeToTopic(Constants.GLOBAL_NOTIFICATION_TOPIC);
 
         BottomNavigationView navigation = findViewById(R.id.navigation);
         BottomNavigationViewHelper.disableShiftMode(navigation);

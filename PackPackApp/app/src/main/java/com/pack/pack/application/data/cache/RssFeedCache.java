@@ -158,7 +158,7 @@ public class RssFeedCache {
                 readable = new SquillDbHelper(context).getReadableDatabase();
                 List<JRssFeed> older = readOfflineData(readable, pageNo);
                 MergeResult mergeResult = deDuplicatedMerge(feeds, older);
-                if(mergeResult.isAnyChange()) {
+                if(mergeResult.isAnyChange() || older == null || older.isEmpty()) {
                     feeds = mergeResult.getFeeds();
                     c.getFeeds().addAll(feeds);
                     JsonModel jsonM = new JsonModel();

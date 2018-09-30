@@ -436,8 +436,10 @@ public class DBUtil {
                     + JsonModel.FEED_TYPE + "='" + feedType + "'";
             cursor = readable.rawQuery(__SQL, null);
             if(cursor.moveToFirst()) {
-                int pNo = cursor.getInt(cursor.getColumnIndexOrThrow(JsonModel.PAGE_NO));
-                sortedSet.add(pNo);
+                do {
+                    int pNo = cursor.getInt(cursor.getColumnIndexOrThrow(JsonModel.PAGE_NO));
+                    sortedSet.add(pNo);
+                } while(cursor.moveToNext());
             }
             Iterator<Integer> itr = sortedSet.iterator();
             while(itr.hasNext()) {

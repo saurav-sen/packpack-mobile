@@ -69,4 +69,6 @@
     <string name="title_article">Article</string>
     <string name="title_bookmark">Bookmark</string>
     <string name="title_fun">Fun</string>
+
+    <!--<string name="default_notification_channel_id" translatable="false">fcm_default_channel</string>-->
 </resources>

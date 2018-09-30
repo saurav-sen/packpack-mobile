@@ -91,11 +91,11 @@ public abstract class FeedsLoadTask extends AbstractNetworkTask<String, Integer,
             } else {
                 page = cache.readOfflineData(pageNo);
             }
-            if(pageNo == 0) {
-                boolean isFirstLoginOfTheDay = cache.updateLastLoggedInInfo();
-                if(isFirstLoginOfTheDay) {
-                    cache.removeExpiredOfflineJsonModel();
-                }
+        }
+        if(pageNo == 0) {
+            boolean isFirstLoginOfTheDay = cache.updateLastLoggedInInfo();
+            if(isFirstLoginOfTheDay) {
+                cache.removeExpiredOfflineJsonModel();
             }
         }
         return page;
