@@ -5,7 +5,7 @@ package com.pack.pack.application.data.cache;
  */
 public class InMemory {
 
-    public static final InMemory INSTANCE = new InMemory();
+    /*public static final InMemory INSTANCE = new InMemory();
 
     public long getServerCurrentTimeInMillis() {
         return serverCurrentTimeInMillis;
@@ -18,5 +18,5 @@ public class InMemory {
     private long serverCurrentTimeInMillis;
 
     private InMemory() {
-    }
+    }*/
 }

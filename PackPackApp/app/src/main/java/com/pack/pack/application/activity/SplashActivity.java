@@ -40,7 +40,7 @@ public class SplashActivity extends AbstractActivity /*implements IAsyncTaskStat
             routeToTargetActivity();
         } else {
             startNetworkChecker();
-            startNTPService();
+            //startNTPService();
             startAddBookmarkService();
 
             if(!NetworkUtil.checkConnectivity(this)) {
@@ -63,10 +63,10 @@ public class SplashActivity extends AbstractActivity /*implements IAsyncTaskStat
         startService(intent);
     }
 
-    private void startNTPService() {
+    /*private void startNTPService() {
         Intent intent = new Intent(this, SquillNTPService.class);
         startService(intent);
-    }
+    }*/
 
     private void startNetworkChecker() {
         Intent intent = new Intent(this, CheckNetworkService.class);

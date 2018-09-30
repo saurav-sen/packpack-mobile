@@ -17,7 +17,7 @@ import com.pack.pack.client.api.COMMAND;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class SquillNTPService extends Service {
+public class SquillNTPService {/*extends Service {
 
     private static final String LOG_TAG = "SquillNTPService";
 
@@ -55,5 +55,5 @@ public class SquillNTPService extends Service {
                 Log.d(LOG_TAG, e.getMessage(), e);
             }
         }
-    }
+    }*/
 }

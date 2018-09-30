@@ -84,15 +84,15 @@
         <service
             android:name=".service.CheckNetworkService"
             android:enabled="true"
-            android:exported="true" />
-        <service
+            android:exported="false" />
+        <!--<service
             android:name=".service.SquillNTPService"
             android:enabled="true"
-            android:exported="true" />
+            android:exported="true" />-->
         <service
             android:name=".service.AddBookmarkService"
             android:enabled="true"
-            android:exported="true" />
+            android:exported="false" />
 
         <activity android:name=".activity.NoConnectionEmptyActivity" />
         <activity
