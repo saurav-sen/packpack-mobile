@@ -10,7 +10,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class SquillDbHelper extends SQLiteOpenHelper {
 
     public static final String DB_NAME = "squill";
-    public static final int DB_VERSION = 1;
+    public static final int DB_VERSION = 2;
 
     public interface CreateQueries {
 
