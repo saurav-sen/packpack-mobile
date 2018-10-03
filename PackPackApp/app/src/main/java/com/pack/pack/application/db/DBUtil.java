@@ -136,34 +136,6 @@ public class DBUtil {
         return result;
     }
 
-    public static int removeExpiredOfflineJsonModel(Context context, String feedType) {
-        SQLiteDatabase readable = null;
-        SQLiteDatabase wDB = null;
-        int noOfRows = -1;
-        try {
-            SquillDbHelper squillDbHelper = new SquillDbHelper(context);
-            wDB = squillDbHelper.getWritableDatabase();
-            readable = squillDbHelper.getReadableDatabase();
-            String dateValue = getLastLoginInfoDateValue(readable, feedType);
-            if(dateValue == null) {
-                dateValue = DateTimeUtil.today();
-            }
-            String deleteRowWhereClause = JsonModel.DATE_VALUE + "!='" + dateValue
-                    + "' AND " + JsonModel.DATE_VALUE + "!='" + DateTimeUtil.today()
-                    + "' AND " + JsonModel.FEED_TYPE + "=" + feedType;
-            noOfRows = wDB.delete(JsonModel.TABLE_NAME, deleteRowWhereClause, null);
-            Log.i(LOG_TAG, "No of Rows deleted for expired JsonModel = " + noOfRows);
-        } finally {
-            if(readable != null && readable.isOpen()) {
-                readable.close();
-            }
-            if(wDB != null && wDB.isOpen()) {
-                wDB.close();
-            }
-        }
-        return noOfRows;
-    }
-
     /*public static int removeExpiredOfflineJsonModel(Context context) {
         SQLiteDatabase readable = null;
         SQLiteDatabase wDB = null;
@@ -195,35 +167,118 @@ public class DBUtil {
         return noOfRows;
     }*/
 
-    public static JsonModel storeJsonModel(JsonModel jsonM, String feedType, Context context) {
+    public static void removeObsoletePages(SQLiteDatabase wDB, String feedType, int pageNo) {
+        if(wDB == null)
+            return;
+        int noOfRows = wDB.delete(JsonModel.TABLE_NAME, (JsonModel.FEED_TYPE + "='" + feedType + "' AND " + JsonModel.PAGE_NO + ">" + pageNo), null);
+        if(noOfRows > 0) {
+            Log.d(LOG_TAG, "Obsolete pages deleted pageNo > " + pageNo);
+        } else {
+            Log.d(LOG_TAG, "No pages found for pageNo > " + pageNo);
+        }
+    }
+
+    public static JsonModel storeJsonModel(JsonModel jsonM, SQLiteDatabase readable, SQLiteDatabase wDB) {
         JsonModel result = null;
-        if(context == null)
-            return jsonM;
         if(jsonM == null)
             return result;
         if(jsonM.getContent() == null || jsonM.getContent().trim().isEmpty())
             return jsonM;
+        JsonModel existingJsonM = loadJsonModel(readable, jsonM.getFeedType(), jsonM.getPageNo());
+        if(existingJsonM != null) {
+            existingJsonM.setContent(jsonM.getContent());
+            int noOfRows = wDB.update(JsonModel.TABLE_NAME, existingJsonM.toContentValues(),
+                    existingJsonM.updateRowWhereClause(), existingJsonM.updateRowWhereClauseArguments());
+            Log.i(LOG_TAG, "JsonModel noOfRows updated = " + noOfRows);
+            result = existingJsonM;
+        } else {
+            wDB.insert(JsonModel.TABLE_NAME, null, jsonM.toContentValues());
+            result = jsonM;
+        }
+        return result;
+    }
+
+    public static HttpImage addHttpImageInfo(String url, Context context) {
+        Cursor cursor =  null;
+        SQLiteDatabase readable = null;
+        SQLiteDatabase wDB = null;
+
+        HttpImage httpImage = new HttpImage();
+        httpImage.setUrl(url);
+        httpImage.setTimestamp(String.valueOf(System.currentTimeMillis()));
+
+        try {
+            readable = new SquillDbHelper(context).getReadableDatabase();
+            wDB = new SquillDbHelper(context).getWritableDatabase();
+            String __SQL = "SELECT " + HttpImage.URL + ", " + HttpImage.TIMESTAMP
+                    + " FROM " + HttpImage.TABLE_NAME + " WHERE " + HttpImage.URL
+                    + " = '" + url + "'";
+            cursor = readable.rawQuery(__SQL, null);
+            if(cursor.moveToFirst()) {
+                int noOfRows = wDB.update(HttpImage.TABLE_NAME, httpImage.toContentValues(),
+                        httpImage.updateRowWhereClause(), httpImage.updateRowWhereClauseArguments());
+                Log.d(LOG_TAG, "Number of rows updated = " + noOfRows);
+            } else {
+                wDB.insert(HttpImage.TABLE_NAME, null, httpImage.toContentValues());
+            }
+        } finally {
+            if(cursor != null && !cursor.isClosed()) {
+                cursor.close();
+            }
+            if(readable != null && readable.isOpen()) {
+                readable.close();
+            }
+            if(wDB != null && wDB.isOpen()) {
+                wDB.close();
+            }
+        }
+        return httpImage;
+    }
+
+    public static List<HttpImage> getAllHttpImageInfos(Context context) {
+        Cursor cursor =  null;
+        SQLiteDatabase readable = null;
+        List<HttpImage> httpImages = new ArrayList<>();
+        try {
+            readable = new SquillDbHelper(context).getReadableDatabase();
+            String __SQL = "SELECT " + HttpImage.URL + ", " + HttpImage.TIMESTAMP
+                    + " FROM " + HttpImage.TABLE_NAME;
+            cursor = readable.rawQuery(__SQL, null);
+            if(cursor.moveToFirst()) {
+                do {
+                    String url = cursor.getString(cursor.getColumnIndexOrThrow(HttpImage.URL));
+                    String timestamp = cursor.getString(cursor.getColumnIndexOrThrow(HttpImage.TIMESTAMP));
+                    HttpImage httpImage = new HttpImage();
+                    httpImage.setUrl(url);
+                    httpImage.setTimestamp(timestamp);
+                    httpImages.add(httpImage);
+                } while (cursor.moveToNext());
+            }
+        } finally {
+            if(cursor != null && !cursor.isClosed()) {
+                cursor.close();
+            }
+            if(readable != null && readable.isOpen()) {
+                readable.close();
+            }
+        }
+        return httpImages;
+    }
+
+    public static void deleteHttpImageInfos(List<HttpImage> httpImages, Context context) {
         SQLiteDatabase wDB = null;
         try {
-            SquillDbHelper squillDbHelper = new SquillDbHelper(context);
-            wDB = squillDbHelper.getWritableDatabase();
-            JsonModel existingJsonM = loadJsonModelByEntityId(context, feedType, jsonM.getEntityId());
-            if(existingJsonM != null) {
-                existingJsonM.setContent(jsonM.getContent());
-                int noOfRows = wDB.update(JsonModel.TABLE_NAME, existingJsonM.toContentValues(),
-                        existingJsonM.updateRowWhereClause(), existingJsonM.updateRowWhereClauseArguments());
-                Log.i(LOG_TAG, "JsonModel noOfRows updated = " + noOfRows);
-                result = existingJsonM;
-            } else {
-                wDB.insert(JsonModel.TABLE_NAME, null, jsonM.toContentValues());
-                result = jsonM;
+            wDB = new SquillDbHelper(context).getWritableDatabase();
+            for(HttpImage httpImage : httpImages) {
+                int noOfRows = wDB.delete(HttpImage.TABLE_NAME, httpImage.deleteRowWhereClause(),
+                        httpImage.deleteRowWhereClauseArguments());
+                Log.d(LOG_TAG, "Number of rows deleted = " + noOfRows);
             }
         } finally {
             if(wDB != null && wDB.isOpen()) {
                 wDB.close();
             }
         }
-        return result;
     }
 
     public static Bookmark loadBookmarkByEntityId(String entityId, Context context) {
@@ -394,33 +449,29 @@ public class DBUtil {
         return result;
     }
 
-    private static JsonModel loadJsonModelByEntityId(Context context, String feedType, String entityId) {
+    private static JsonModel loadJsonModel(SQLiteDatabase readable, String feedType, int pageNo) {
         JsonModel result = null;
         Cursor cursor = null;
-        SQLiteDatabase readable = new SquillDbHelper(context).getReadableDatabase();
         try {
             String __SQL = "SELECT " + JsonModel.ENTITY_ID + ", " + JsonModel.CONTENT
-                    + ", " + JsonModel.PAGE_NO + ", " + JsonModel.DATE_VALUE + ", "
+                    + ", " + JsonModel.PAGE_NO + ", "
                     + JsonModel.FEED_TYPE + " FROM " + JsonModel.TABLE_NAME + " WHERE "
-                    + JsonModel.ENTITY_ID + "='" + entityId.trim() + "' AND " + JsonModel.FEED_TYPE
+                    + JsonModel.PAGE_NO + "=" + pageNo + " AND " + JsonModel.FEED_TYPE
                     + "='" + feedType + "'";
             cursor = readable.rawQuery(__SQL, null);
             if(cursor.moveToFirst()) {
                 //entityId = cursor.getString(cursor.getColumnIndexOrThrow(JsonModel.ENTITY_ID));
                 String content = cursor.getString(cursor.getColumnIndexOrThrow(JsonModel.CONTENT));
-                int pageNo = cursor.getInt(cursor.getColumnIndexOrThrow(JsonModel.PAGE_NO));
-                String dateString = cursor.getString(cursor.getColumnIndexOrThrow(JsonModel.DATE_VALUE));
+                int pNo = cursor.getInt(cursor.getColumnIndexOrThrow(JsonModel.PAGE_NO));
+                String fType = cursor.getString(cursor.getColumnIndexOrThrow(JsonModel.FEED_TYPE));
                 result = new JsonModel();
                 result.setContent(content);
-                result.setPageNo(pageNo);
-                result.setDateString(dateString);
+                result.setPageNo(pNo);
+                result.setFeedType(fType);
             }
         } finally {
             if(cursor != null && !cursor.isClosed()) {
                 cursor.close();
-            }
-            if(readable != null && readable.isOpen()) {
-                readable.close();
             }
         }
         return result;
@@ -432,8 +483,7 @@ public class DBUtil {
         try {
             Set<Integer> sortedSet = new TreeSet<>();
             String __SQL = "SELECT " + JsonModel.PAGE_NO + " FROM " + JsonModel.TABLE_NAME
-                    + " WHERE " + JsonModel.DATE_VALUE + "='" + DateTimeUtil.today() + "' AND "
-                    + JsonModel.FEED_TYPE + "='" + feedType + "'";
+                    + " WHERE " + JsonModel.FEED_TYPE + "='" + feedType + "'";
             cursor = readable.rawQuery(__SQL, null);
             if(cursor.moveToFirst()) {
                 do {
@@ -457,81 +507,18 @@ public class DBUtil {
         return result;
     }
 
-    public static JRssFeeds loadRssFeedsByDateAndPageNo(SQLiteDatabase readable, String feedType, String dateString, int pageNo) {
+    public static JRssFeeds loadRssFeedsByDateAndPageNo(SQLiteDatabase readable, String feedType, int pageNo) {
         JRssFeeds result = null;
         Cursor cursor = null;
         try {
             String __SQL = "SELECT " + JsonModel.CONTENT + " FROM " + JsonModel.TABLE_NAME
-                    + " WHERE " + JsonModel.DATE_VALUE + "='" + dateString.trim() + "' AND "
-                    + JsonModel.PAGE_NO + "=" + pageNo + " AND " + JsonModel.FEED_TYPE + "='"
+                    + " WHERE " + JsonModel.PAGE_NO + "=" + pageNo + " AND " + JsonModel.FEED_TYPE + "='"
                     + feedType + "'";
             cursor = readable.rawQuery(__SQL, null);
             if(cursor.moveToFirst()) {
                 String json = cursor.getString(cursor.getColumnIndexOrThrow(JsonModel.CONTENT));
                 result = convertFromJson(json, JRssFeeds.class);
             }
-        } finally {
-            if(cursor != null && !cursor.isClosed()) {
-                cursor.close();
-            }
-        }
-        return result;
-    }
-
-    public static String getLastLoginInfoDateValue(SQLiteDatabase readable, String feedType) {
-        Cursor cursor =  null;
-        String result = null;
-        try {
-            long t0 = 0;
-            String today = DateTimeUtil.today();
-            String __SQL = "SELECT " + LoginInfo.DATE_VALUE + " FROM " + LoginInfo.TABLE_NAME
-                    + " WHERE " + LoginInfo.FEED_TYPE + "='" + feedType.trim() + "'";
-            cursor = readable.rawQuery(__SQL, null);
-            if(cursor.moveToFirst()) {
-                do {
-                    String dateText = cursor.getString(cursor.getColumnIndexOrThrow(LoginInfo.DATE_VALUE));
-                    if(dateText != null && !today.equalsIgnoreCase(dateText)) {
-                        long t1 = DateTimeUtil.fromDateText(dateText);
-                        if(t1 > t0) {
-                            t0 = t1;
-                            result = dateText;
-                        }
-                    }
-
-                } while(cursor.moveToNext());
-            }
-        } catch (Exception e) {
-
-        } finally {
-            if(cursor != null && !cursor.isClosed()) {
-                cursor.close();
-            }
-        }
-        return result;
-    }
-
-    public static LoginInfo loadLoginInfo(SQLiteDatabase readable, String feedType, String dateValue) {
-        Cursor cursor =  null;
-        LoginInfo result = null;
-        try {
-            long t0 = 0;
-            String today = DateTimeUtil.today();
-            String __SQL = "SELECT " + LoginInfo.ENTITY_ID + ", " + LoginInfo.FEED_TYPE + ", "
-                    + LoginInfo.DATE_VALUE +  " FROM " + LoginInfo.TABLE_NAME
-                    + " WHERE " + LoginInfo.FEED_TYPE + "='" + feedType.trim() + "' AND "
-                    + LoginInfo.DATE_VALUE + "='" + dateValue + "'";
-            cursor = readable.rawQuery(__SQL, null);
-            if(cursor.moveToFirst()) {
-                do {
-                    feedType = cursor.getString(cursor.getColumnIndexOrThrow(LoginInfo.FEED_TYPE));
-                    String dateText = cursor.getString(cursor.getColumnIndexOrThrow(LoginInfo.DATE_VALUE));
-                    result = new LoginInfo();
-                    result.setDateValue(dateText);
-                    result.setFeedType(feedType);
-                } while(cursor.moveToNext());
-            }
-        } catch (Exception e) {
-
         } finally {
             if(cursor != null && !cursor.isClosed()) {
                 cursor.close();

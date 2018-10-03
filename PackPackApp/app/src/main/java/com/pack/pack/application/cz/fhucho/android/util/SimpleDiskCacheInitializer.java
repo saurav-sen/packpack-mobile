@@ -15,7 +15,7 @@ public class SimpleDiskCacheInitializer {
 
     private static final String LOG_TAG = "DiskCacheInitializer";
 
-    private static final long MAX_SIZE = 1024 * 1024 * 30;
+    private static final long MAX_SIZE = 1024 * 1024 * 20; // 20 MB
 
     private static boolean isPrepared = false;
 

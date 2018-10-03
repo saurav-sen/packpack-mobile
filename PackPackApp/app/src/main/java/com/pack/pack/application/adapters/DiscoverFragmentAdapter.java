@@ -75,6 +75,12 @@ public class DiscoverFragmentAdapter extends BaseAdapter {
     }
 
     @Override
+    protected void doClearState() {
+        map.clear();
+        feeds.clear();
+    }
+
+    @Override
     public JRssFeed getItem(int position) {
         if(position < getFeeds().size()) {
             return getFeeds().get(position);

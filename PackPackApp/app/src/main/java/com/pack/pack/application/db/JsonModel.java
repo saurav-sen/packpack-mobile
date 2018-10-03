@@ -18,11 +18,8 @@ public class JsonModel extends DbObjectImpl {
 
     public static final String FEED_TYPE = "feedType";
     public static final String PAGE_NO = "pageNo";
-    public static final String DATE_VALUE = "dateValue";
 
     private String content;
-
-    private String dateString;
 
     private int pageNo;
 
@@ -36,14 +33,6 @@ public class JsonModel extends DbObjectImpl {
         this.feedType = feedType;
     }
 
-    public String getDateString() {
-        return dateString;
-    }
-
-    public void setDateString(String dateString) {
-        this.dateString = dateString;
-    }
-
     public int getPageNo() {
         return pageNo;
     }
@@ -53,7 +42,7 @@ public class JsonModel extends DbObjectImpl {
     }
 
     public String getEntityId() {
-        return feedType + "_" + dateString + "_" + pageNo;
+        return feedType + "_" + pageNo;
     }
 
     public String getContent() {
@@ -71,7 +60,6 @@ public class JsonModel extends DbObjectImpl {
         contentValues.put(CONTENT, content);
         contentValues.put(FEED_TYPE, feedType);
         contentValues.put(PAGE_NO, pageNo);
-        contentValues.put(DATE_VALUE, dateString);
         return contentValues;
     }
 
@@ -88,5 +76,25 @@ public class JsonModel extends DbObjectImpl {
     @Override
     protected String getEntityIdColumnName() {
         return ENTITY_ID;
+    }
+
+    @Override
+    public String updateRowWhereClause() {
+        return FEED_TYPE + "='" + feedType + "' AND " + PAGE_NO + "=" + pageNo;
+    }
+
+    @Override
+    public String[] updateRowWhereClauseArguments() {
+        return null;
+    }
+
+    @Override
+    public String deleteRowWhereClause() {
+        return updateRowWhereClause();
+    }
+
+    @Override
+    public String[] deleteRowWhereClauseArguments() {
+        return null;
     }
 }

@@ -18,6 +18,7 @@ import com.pack.pack.application.AppController;
 import com.pack.pack.application.R;
 import com.pack.pack.application.data.util.AbstractNetworkTask;
 import com.pack.pack.application.data.util.ApiConstants;
+import com.pack.pack.application.db.DBUtil;
 import com.pack.pack.application.db.DbObject;
 import com.pack.pack.application.db.ResourceURL;
 import com.pack.pack.client.api.API;
@@ -139,11 +140,10 @@ public class DownloadImageTask extends AbstractNetworkTask<String, Void, Bitmap>
 
     protected String lookupURL(String url) {
         //if(!ApiConstants.IS_AWS_S3_LINK_FOR_IMAGE) {
-            url = url != null ? url.trim() : url;
-            url = url + "?w=" + imageWidth + "&h=" + imageHeight;
+            //url = url != null ? url.trim() : url;
+            //url = url + "?w=" + imageWidth + "&h=" + imageHeight;
         //}
-        //return URLEncoder.encode(url) + "?w=" + imageWidth + "&h=" + imageHeight;
-        return url;// + "?w=" + imageWidth + "&h=" + imageHeight;
+        return url;
     }
 
     private class ImageDimension {
@@ -347,7 +347,13 @@ public class DownloadImageTask extends AbstractNetworkTask<String, Void, Bitmap>
                         bitmap = Bitmap.createScaledBitmap(bitmap, 900, 700, true);
                     }*/
                     bitmap = Bitmap.createScaledBitmap(bitmap, dimension.newWidth, dimension.newHeight, true);
-                    AppController.getInstance().getLruBitmapCache().putBitmap(lookupURL(url), bitmap);
+                    String key = lookupURL(url);
+                    try {
+                        DBUtil.addHttpImageInfo(key, getContext());
+                    } catch (Exception e) {
+                        Log.e(LOG_TAG, e.getMessage(), e);
+                    }
+                    AppController.getInstance().getLruBitmapCache().putBitmap(key, bitmap);
                 }
                 return bitmap;
             }
@@ -376,7 +382,13 @@ public class DownloadImageTask extends AbstractNetworkTask<String, Void, Bitmap>
                 /*if(bitmap == null) {
                     bitmap = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.noimage);
                 }*/
-                AppController.getInstance().getLruBitmapCache().putBitmap(lookupURL(url), bitmap);
+                String key = lookupURL(url);
+                try {
+                    DBUtil.addHttpImageInfo(key, getContext());
+                } catch (Exception e) {
+                    Log.e(LOG_TAG, e.getMessage(), e);
+                }
+                AppController.getInstance().getLruBitmapCache().putBitmap(key, bitmap);
             }
         } catch (Exception e) {
             errorMsg = e.getMessage();

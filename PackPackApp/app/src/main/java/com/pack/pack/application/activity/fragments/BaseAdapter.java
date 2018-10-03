@@ -23,6 +23,13 @@ public abstract class BaseAdapter extends ArrayAdapter<JRssFeed> {
         this.feeds = feeds;
     }
 
+    public final void clearState() {
+        clearFeeds();
+        doClearState();
+    }
+
+    protected abstract void doClearState();
+
     protected Activity getActivity() {
         return activity;
     }
@@ -36,4 +43,10 @@ public abstract class BaseAdapter extends ArrayAdapter<JRssFeed> {
     }
 
     public abstract void addNewFeeds(int location, List<JRssFeed> newFeeds);
+
+    private void clearFeeds() {
+        if(feeds != null) {
+            getFeeds().clear();
+        }
+    }
 }

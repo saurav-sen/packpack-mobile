@@ -1,7 +1,6 @@
 package com.pack.pack.application.activity;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
 import android.support.design.widget.Snackbar;
@@ -9,7 +8,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.view.View;
 
 import com.pack.pack.application.R;
-import com.pack.pack.application.service.CheckNetworkService;
+import com.pack.pack.application.service.SyncService;
 import com.pack.pack.application.service.events.NetworkStatusListener;
 
 /**
@@ -29,7 +28,7 @@ public abstract class AbstractActivity extends Activity implements NetworkBasedA
         }
         LocalBroadcastManager.getInstance(this).registerReceiver(
                 broadcastListener, new IntentFilter(
-                        CheckNetworkService.CHECK_INTERNET));
+                        SyncService.CHECK_INTERNET));
     }
 
     @Override

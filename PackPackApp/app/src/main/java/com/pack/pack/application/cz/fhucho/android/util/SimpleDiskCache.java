@@ -121,6 +121,32 @@ public class SimpleDiskCache {
         }
     }
 
+    public long getSize() {
+        if(diskLruCache != null) {
+            return diskLruCache.size();
+        }
+        return 0;
+    }
+
+    public long getMaxSize() {
+        if(diskLruCache != null) {
+            return diskLruCache.getMaxSize();
+        }
+        return 0;
+    }
+
+    public void flush() throws IOException {
+        if(diskLruCache != null) {
+            diskLruCache.flush();
+        }
+    }
+
+    public void evict(String key) throws IOException {
+        if(diskLruCache != null) {
+            diskLruCache.remove(key);
+        }
+    }
+
     public StringEntry getString(String key) throws IOException {
         DiskLruCache.Snapshot snapshot = diskLruCache.get(toInternalKey(key));
         if (snapshot == null) return null;

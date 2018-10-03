@@ -33,7 +33,7 @@ public class AddBookmarkService extends Service {
                 ExecutorsPool.INSTANCE.submit(new ProcessBookmark(unprocessedBookmark));
             }
         }
-        return START_STICKY;
+        return START_NOT_STICKY;
     }
 
     @Nullable

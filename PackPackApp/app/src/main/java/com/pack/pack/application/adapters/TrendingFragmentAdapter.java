@@ -63,6 +63,12 @@ public class TrendingFragmentAdapter extends BaseAdapter {
         this.feeds = feeds;
     }
 
+    @Override
+    protected void doClearState() {
+        map.clear();
+        feeds.clear();
+    }
+
     private List<JRssFeed> getFeeds() {
         return feeds;
     }

@@ -1,6 +1,7 @@
 package com.pack.pack.application.async;
 
 import android.os.Handler;
+import android.util.Log;
 
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.FeedReceiveState;
@@ -59,7 +60,8 @@ public class FeedReceiveTaskStatusListener implements IAsyncTaskStatusListener {
                 return;
             JRssFeedType feedType = this.taskIdVsFeedType.get(taskID);
             if(feedType != null) {
-                AppController.getInstance().getFeedReceiveState().setLastUpdateTimestamp(feedType, System.currentTimeMillis());
+                AppController.getInstance().getFeedReceiveState().set(feedType, page);
+                Log.d("FeedReceive", "Resetting last updated data to avoid duplicate calls");
             }
         }
     }

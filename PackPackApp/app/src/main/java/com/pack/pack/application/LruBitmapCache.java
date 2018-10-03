@@ -2,6 +2,7 @@ package com.pack.pack.application;
 
 import com.android.volley.toolbox.ImageLoader.ImageCache;
 import com.pack.pack.application.cz.fhucho.android.util.SimpleDiskCache;
+import com.pack.pack.application.db.DBUtil;
 
 import android.graphics.Bitmap;
 import android.support.v4.util.LruCache;
@@ -51,7 +52,6 @@ public class LruBitmapCache extends LruCache<String, Bitmap> implements
                 put(url, bitmap);
             }
         } catch (IOException e) {
-            e.printStackTrace();
             Log.d(LOG_TAG, e.getMessage(), e);
         }
         return bitmap;
@@ -65,9 +65,28 @@ public class LruBitmapCache extends LruCache<String, Bitmap> implements
         try {
             SimpleDiskCache.getInstance().put(url, bitmap);
         } catch (IOException e) {
-            e.printStackTrace();
-            Log.d(LOG_TAG, e.getMessage(), e);
+            Log.e(LOG_TAG, e.getMessage(), e);
         }
         put(url, bitmap);
+    }
+
+    public void evict(String url) {
+        if(url == null || url.trim().isEmpty())
+            return;
+        try {
+            SimpleDiskCache.getInstance().evict(url);
+        } catch (IOException e) {
+            Log.e(LOG_TAG, e.getMessage(), e);
+        }
+    }
+
+    public void flushIfSizeExceeds() {
+        try {
+            if(SimpleDiskCache.getInstance().getSize() > SimpleDiskCache.getInstance().getMaxSize()) {
+                SimpleDiskCache.getInstance().flush();
+            }
+        } catch (IOException e) {
+            Log.e(LOG_TAG, e.getMessage(), e);
+        }
     }
 }

@@ -85,7 +85,7 @@
             android:theme="@style/AppTheme.PreferenceSettings" />
 
         <service
-            android:name=".service.CheckNetworkService"
+            android:name=".service.SyncService"
             android:enabled="true"
             android:exported="false" />
         <!--<service

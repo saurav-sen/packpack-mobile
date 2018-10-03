@@ -8,7 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import com.pack.pack.application.R;
-import com.pack.pack.application.service.CheckNetworkService;
+import com.pack.pack.application.service.SyncService;
 import com.pack.pack.application.service.events.NetworkStatusListener;
 
 /**
@@ -28,7 +28,7 @@ public abstract class AbstractAppCompatActivity extends AppCompatActivity implem
         }
         LocalBroadcastManager.getInstance(this).registerReceiver(
                 broadcastListener, new IntentFilter(
-                        CheckNetworkService.CHECK_INTERNET));
+                        SyncService.CHECK_INTERNET));
     }
 
     @Override

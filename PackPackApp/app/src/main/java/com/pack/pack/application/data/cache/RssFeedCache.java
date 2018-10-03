@@ -1,15 +1,12 @@
 package com.pack.pack.application.data.cache;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import com.pack.pack.application.Constants;
 import com.pack.pack.application.data.util.DateTimeUtil;
 import com.pack.pack.application.db.DBUtil;
 import com.pack.pack.application.db.JsonModel;
-import com.pack.pack.application.db.LoginInfo;
 import com.pack.pack.application.db.SquillDbHelper;
 import com.pack.pack.common.util.JSONUtil;
 import com.pack.pack.services.exception.PackPackException;
@@ -18,29 +15,11 @@ import com.pack.pack.model.web.Pagination;
 import com.squill.feed.web.model.JRssFeedType;
 import com.squill.feed.web.model.JRssFeeds;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
-import java.util.UUID;
 
 /**
  * Created by Saurav on 18-06-2017.
@@ -60,7 +39,7 @@ public class RssFeedCache {
 
     private List<JRssFeed> readOfflineData(SQLiteDatabase readable, int pageNo) {
         List<JRssFeed> after = Collections.emptyList();
-        JRssFeeds c = DBUtil.loadRssFeedsByDateAndPageNo(readable, feedType.name(), DateTimeUtil.today(), pageNo);
+        JRssFeeds c = DBUtil.loadRssFeedsByDateAndPageNo(readable, feedType.name(), pageNo);
         if(c != null && !c.getFeeds().isEmpty()) {
             after = c.getFeeds();
         }
@@ -84,78 +63,16 @@ public class RssFeedCache {
         return page;
     }
 
-    private List<JRssFeed> readLastLoggedInOfflineData(SQLiteDatabase readable, String dateValue, int pageNo) {
-        List<JRssFeed> after = Collections.emptyList();
-        JRssFeeds c = DBUtil.loadRssFeedsByDateAndPageNo(readable, feedType.name(), dateValue, pageNo);
-        if(c != null && !c.getFeeds().isEmpty()) {
-            after = c.getFeeds();
-        }
-        return after;
-    }
-
-    public Pagination<JRssFeed> readLastLoggedInOfflineData(int pageNo) {
-        SQLiteDatabase readable = null;
-        Pagination<JRssFeed> page = new Pagination<JRssFeed>();
-        try {
-            readable = new SquillDbHelper(context).getReadableDatabase();
-            String dateValue = DBUtil.getLastLoginInfoDateValue(readable, feedType.name());
-            if(dateValue == null || dateValue.trim().isEmpty()) {
-                dateValue = DateTimeUtil.today();
-            }
-            List<JRssFeed> after = readLastLoggedInOfflineData(readable, dateValue, pageNo);
-            page.getResult().addAll(after);
-            int nextPageNo = DBUtil.getNextPageNumber(readable, feedType.name(), pageNo);
-            page.setNextPageNo(nextPageNo);
-        } finally {
-            if(readable != null && readable.isOpen()) {
-                readable.close();
-            }
-        }
-        return page;
-    }
-
-    public void removeExpiredOfflineJsonModel() {
-        DBUtil.removeExpiredOfflineJsonModel(context, feedType.name());
-    }
-
-    public boolean updateLastLoggedInInfo() {
-        if(context == null)
-            return false;
-        boolean result = false;
-        SQLiteDatabase readable = null;
-        SQLiteDatabase wDB = null;
-        try {
-            SquillDbHelper squillDbHelper = new SquillDbHelper(context);
-            readable = squillDbHelper.getReadableDatabase();
-            String dateValue = DateTimeUtil.today();
-            LoginInfo loginInfo = DBUtil.loadLoginInfo(readable, feedType.name(), dateValue);
-            if(loginInfo == null) {
-                result = true;
-                loginInfo = new LoginInfo();
-                loginInfo.setFeedType(feedType.name());
-                loginInfo.setDateValue(dateValue);
-                wDB = squillDbHelper.getWritableDatabase();
-                wDB.insert(LoginInfo.TABLE_NAME, null, loginInfo.toContentValues());
-            }
-        } finally {
-            if(readable != null && readable.isOpen()) {
-                readable.close();
-            }
-            if(wDB != null && wDB.isOpen()) {
-                wDB.close();
-            }
-        }
-        return result;
-    }
-
     public void storeData4OfflineUse(List<JRssFeed> feeds, int pageNo) {
         if(feeds == null || feeds.isEmpty())
             return;
         else {
             SQLiteDatabase readable = null;
+            SQLiteDatabase wDB = null;
             try {
                 JRssFeeds c = new JRssFeeds();
-                readable = new SquillDbHelper(context).getReadableDatabase();
+                SquillDbHelper squillDbHelper = new SquillDbHelper(context);
+                readable = squillDbHelper.getReadableDatabase();
                 List<JRssFeed> older = readOfflineData(readable, pageNo);
                 MergeResult mergeResult = deDuplicatedMerge(feeds, older);
                 if(mergeResult.isAnyChange() || older == null || older.isEmpty()) {
@@ -165,14 +82,18 @@ public class RssFeedCache {
                     jsonM.setFeedType(feedType.name());
                     jsonM.setContent(JSONUtil.serialize(c));
                     jsonM.setPageNo(pageNo);
-                    jsonM.setDateString(DateTimeUtil.today());
-                    DBUtil.storeJsonModel(jsonM, feedType.name(), context);
+                    wDB = squillDbHelper.getWritableDatabase();
+                    DBUtil.storeJsonModel(jsonM, readable, wDB);
+                    DBUtil.removeObsoletePages(wDB, feedType.name(), pageNo);
                 }
             } catch (PackPackException e) {
                 Log.e(LOG_TAG, e.getMessage(), e);
             } finally {
                 if(readable != null && readable.isOpen()) {
                     readable.close();
+                }
+                if(wDB != null && wDB.isOpen()) {
+                    wDB.close();
                 }
             }
         }

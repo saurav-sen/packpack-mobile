@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.pack.pack.application.AppController;
+import com.pack.pack.application.FeedReceiveState;
 import com.pack.pack.application.data.cache.RssFeedCache;
 import com.pack.pack.application.db.DBUtil;
 import com.pack.pack.application.service.NetworkUtil;
@@ -69,7 +70,7 @@ public abstract class FeedsLoadTask extends AbstractNetworkTask<String, Integer,
 
     private Pagination<JRssFeed> doExecute(API api, RssFeedCache cache) throws Exception {
         Pagination<JRssFeed> page = new Pagination<JRssFeed>();
-        boolean readOfflineData = true;
+        boolean readOfflineData = false;
         if(pageNo < 0) {
             page.setNextPageNo(pageNo);
             return page;
@@ -77,26 +78,25 @@ public abstract class FeedsLoadTask extends AbstractNetworkTask<String, Integer,
         boolean isNetworkConnected = NetworkUtil.checkConnectivity(getContext());
         if(isNetworkConnected) {
             readOfflineData = false;
-            page = eliminateDuplicatesIfAny((Pagination<JRssFeed>)api.execute());
+            // First Page might have already been received while Application gets to active state (Avoid making duplicate API calls if so).
+            Pagination<JRssFeed> page0 = AppController.getInstance().getFeedReceiveState().get(feedType);
+            if(pageNo == 0 && page0 != null && !page0.getResult().isEmpty()) {
+                page = eliminateDuplicatesIfAny(page0);
+                AppController.getInstance().getFeedReceiveState().clear(feedType);
+            } else {
+                page = eliminateDuplicatesIfAny((Pagination<JRssFeed>) api.execute());
+            }
             if(page != null && !page.getResult().isEmpty()) {
                 cache.storeData4OfflineUse(page.getResult(), pageNo);
             }
             if(pageNo == 0 && (page == null || page.getResult().isEmpty())) {
                 readOfflineData = true;
             }
+        } else {
+            readOfflineData = true;
         }
         if(readOfflineData) {
-            if(!isNetworkConnected) {
-                page = cache.readLastLoggedInOfflineData(pageNo);
-            } else {
-                page = cache.readOfflineData(pageNo);
-            }
-        }
-        if(pageNo == 0) {
-            boolean isFirstLoginOfTheDay = cache.updateLastLoggedInInfo();
-            if(isFirstLoginOfTheDay) {
-                cache.removeExpiredOfflineJsonModel();
-            }
+            page = cache.readOfflineData(pageNo);
         }
         return page;
     }

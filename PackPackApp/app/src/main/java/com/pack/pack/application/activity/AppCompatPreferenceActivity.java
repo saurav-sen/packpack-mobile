@@ -1,6 +1,8 @@
 package com.pack.pack.application.activity;
 
+import android.Manifest;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -8,6 +10,8 @@ import android.preference.PreferenceActivity;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatDelegate;
@@ -18,8 +22,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.pack.pack.application.R;
-import com.pack.pack.application.service.CheckNetworkService;
+import com.pack.pack.application.service.SyncService;
 import com.pack.pack.application.service.events.NetworkStatusListener;
+
+import java.security.Permission;
 
 /**
  * Created by Saurav on 03-09-2016.
@@ -137,7 +143,7 @@ public abstract class AppCompatPreferenceActivity extends PreferenceActivity imp
         }
         LocalBroadcastManager.getInstance(this).registerReceiver(
                 broadcastListener, new IntentFilter(
-                        CheckNetworkService.CHECK_INTERNET));
+                        SyncService.CHECK_INTERNET));
     }
 
     @Override

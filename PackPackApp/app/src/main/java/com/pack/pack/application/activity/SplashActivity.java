@@ -14,9 +14,8 @@ import com.pack.pack.application.db.SquillDbHelper;
 import com.pack.pack.application.db.UserInfo;
 import com.pack.pack.application.image.loader.DownloadProfilePictureTask;
 import com.pack.pack.application.service.AddBookmarkService;
-import com.pack.pack.application.service.CheckNetworkService;
+import com.pack.pack.application.service.SyncService;
 import com.pack.pack.application.service.NetworkUtil;
-import com.pack.pack.application.service.SquillNTPService;
 import com.pack.pack.model.web.JUser;
 
 /**
@@ -44,7 +43,8 @@ public class SplashActivity extends AbstractActivity /*implements IAsyncTaskStat
             startAddBookmarkService();
 
             if(!NetworkUtil.checkConnectivity(this)) {
-                routeToTargetActivity();
+                //routeToTargetActivity();
+                loadUserInfoAndRouteToTargetActivity();
             } else {
                 loadUserInfo0();
                 FeedReceiveCallback callback = new FeedReceiveCallback() {
@@ -69,7 +69,7 @@ public class SplashActivity extends AbstractActivity /*implements IAsyncTaskStat
     }*/
 
     private void startNetworkChecker() {
-        Intent intent = new Intent(this, CheckNetworkService.class);
+        Intent intent = new Intent(this, SyncService.class);
         startService(intent);
     }
 

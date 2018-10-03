@@ -86,6 +86,12 @@ public class ArticlesFragmentAdapter extends BaseAdapter {
     }
 
     @Override
+    protected void doClearState() {
+        map.clear();
+        feeds.clear();
+    }
+
+    @Override
     public int getCount() {
         return getFeeds().size();
     }

@@ -183,10 +183,12 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             }
             bindPreferenceSummaryToValue(user_addr);
 
-            ProfilePicturePreference profilePicturePreference = (ProfilePicturePreference) findPreference(PROFILE_PICTURE);
-            bindPreferenceSummaryToValue(profilePicturePreference);
+            if(AppController.getInstance().isCameraPermissionGranted()) {
+                ProfilePicturePreference profilePicturePreference = (ProfilePicturePreference) findPreference(PROFILE_PICTURE);
+                bindPreferenceSummaryToValue(profilePicturePreference);
 
-            ((SettingsActivity) getActivity()).addSettingsChangeListener(profilePicturePreference);
+                ((SettingsActivity) getActivity()).addSettingsChangeListener(profilePicturePreference);
+            }
         }
     }
 

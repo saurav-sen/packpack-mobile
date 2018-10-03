@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.pack.pack.application.activity.NetworkBasedActivity;
-import com.pack.pack.application.service.CheckNetworkService;
+import com.pack.pack.application.service.SyncService;
 
 /**
  * Created by Saurav on 15-03-2017.
@@ -20,8 +20,8 @@ public class NetworkStatusListener extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        String status = intent.getStringExtra(CheckNetworkService.CONNECTION_STATUS);
-        if(CheckNetworkService.CONNECTION_STATUS_NOT_CONNECTED.equals(status)) {
+        String status = intent.getStringExtra(SyncService.CONNECTION_STATUS);
+        if(SyncService.CONNECTION_STATUS_NOT_CONNECTED.equals(status)) {
             onNetworkDisconnect(context);
         } else {
             onNetworkConnect(context);

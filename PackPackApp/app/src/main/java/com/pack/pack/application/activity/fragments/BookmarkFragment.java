@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.pack.pack.application.R;
 import com.pack.pack.application.adapters.BookmarkFragmentAdapter;
@@ -39,13 +40,10 @@ public class BookmarkFragment extends Fragment {
         View view = inflater.inflate(R.layout.activity_bookmar, null);
 
         bookmark_feeds = (ListView) view.findViewById(R.id.bookmark_feeds);
-        boolean isLoadData = (adapter == null);
         adapter = initBookmarkAdapter();
         bookmark_feeds.setAdapter(adapter);
 
-        if(isLoadData) {
-            loadBookmarks(0, true);
-        }
+        loadBookmarks(0, true);
 
         return view;
     }
@@ -112,7 +110,7 @@ public class BookmarkFragment extends Fragment {
         @Override
         public void onFailure(String taskID, String errorMsg) {
             if (this.taskID.equals(taskID)) {
-                Snackbar.make(bookmark_feeds, errorMsg, Snackbar.LENGTH_LONG).show();
+                Toast.makeText(getContext(), errorMsg, Toast.LENGTH_LONG).show();
             }
         }
 
@@ -129,6 +127,7 @@ public class BookmarkFragment extends Fragment {
                 PagedObject<Bookmark> pagedObject = (PagedObject<Bookmark>) data;
                 List<Bookmark> bookmarks = pagedObject.getResult();
                 if(bookmarks != null && !bookmarks.isEmpty()) {
+                    adapter.getFeeds().clear();
                     adapter.getFeeds().addAll(bookmarks);
                     adapter.notifyDataSetChanged();
                     currentPageRef = pagedObject.getNextPageRef();

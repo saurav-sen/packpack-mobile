@@ -44,7 +44,6 @@ public abstract class BaseFragment extends Fragment {
         View view = inflater.inflate(getViewLayoutId(), null);
 
         listView = (ListView) view.findViewById(getListViewId());
-        boolean isLoadData = (adapter == null);
         adapter = initFragmentAdapter();
         listView.setAdapter(adapter);
         listView.setOnScrollListener(new AbsListView.OnScrollListener() {
@@ -65,18 +64,8 @@ public abstract class BaseFragment extends Fragment {
             }
         });
 
-        if(isLoadData) {
-            nextPageNo = 0;
-            loadNewFeeds(nextPageNo, true);
-        } else {
-            long t0 = AppController.getInstance().getFeedReceiveState().getLastUpdateTimestamp(getFeedType());
-            long t1 = System.currentTimeMillis();
-            int timeDiff = DateTimeUtil.calculateTimeDifference(t0, t1, FeedReceiveState.DEFAULT_UPDATE_INTERVAL_UNIT);
-            if(timeDiff >= FeedReceiveState.DEFAULT_UPDATE_INTERVAL) {
-                nextPageNo = 0;
-                loadNewFeeds(nextPageNo, true);
-            }
-        }
+        nextPageNo = 0;
+        loadNewFeeds(nextPageNo, true);
         return view;
     }
 
@@ -89,6 +78,23 @@ public abstract class BaseFragment extends Fragment {
     protected abstract FeedsLoadTask initNewTask();
 
     protected abstract JRssFeedType getFeedType();
+
+    public void onNetworkStateChange(boolean isPrevConnected, boolean isNowConnected) {
+        if(!isPrevConnected && isNowConnected) {
+            reload();
+        }
+    }
+
+    public void reload() {
+        nextPageNo = 0;
+        adapter.clearState();
+        clearState();
+        loadNewFeeds(nextPageNo, true);
+    }
+
+    protected void clearState() {
+        // DO nothing
+    }
 
     /*@Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
@@ -160,9 +166,6 @@ public abstract class BaseFragment extends Fragment {
                     return;
                 adapter.addNewFeeds(list);
                 adapter.notifyDataSetChanged();
-                if(this.pNo == 0) {
-                    AppController.getInstance().getFeedReceiveState().setLastUpdateTimestamp(getFeedType(), System.currentTimeMillis());
-                }
             }
         }
 
