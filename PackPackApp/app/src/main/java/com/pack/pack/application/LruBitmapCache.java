@@ -70,7 +70,7 @@ public class LruBitmapCache extends LruCache<String, Bitmap> implements
         put(url, bitmap);
     }
 
-    public void evict(String url) {
+    /*public void evict(String url) {
         if(url == null || url.trim().isEmpty())
             return;
         try {
@@ -88,5 +88,5 @@ public class LruBitmapCache extends LruCache<String, Bitmap> implements
         } catch (IOException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
         }
-    }
+    }*/
 }

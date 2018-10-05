@@ -8,12 +8,8 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
-import com.pack.pack.application.AppController;
-import com.pack.pack.application.db.DBUtil;
-import com.pack.pack.application.db.HttpImage;
+import com.pack.pack.application.cz.fhucho.android.util.SimpleDiskCacheInitializer;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -37,7 +33,7 @@ public class SyncService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         timer.scheduleAtFixedRate(new CheckNetworkTask(), 0, 10 * 1000);
         timer.scheduleAtFixedRate(new LruBitmapCacheCleanupTask(SyncService.this),
-                0, 1 * 60 * 60 * 1000); // Hourly Scheduled Task
+                0, 2 * 60 * 60 * 1000); // Bi-Hourly Scheduled Task
         return START_NOT_STICKY;
     }
 
@@ -64,34 +60,7 @@ public class SyncService extends Service {
         @Override
         public void run() {
             try {
-                List<HttpImage> httpImages = DBUtil.getAllHttpImageInfos(context);
-                if(httpImages == null || httpImages.isEmpty()) {
-                    AppController.getInstance().getLruBitmapCache().flushIfSizeExceeds();
-                    return;
-                }
-
-                List<HttpImage> toDelete = new ArrayList<>();
-                for(HttpImage httpImage : httpImages) {
-                    String url = httpImage.getUrl();
-                    if(url == null || url.trim().isEmpty())
-                        continue;
-                    String timestamp = httpImage.getTimestamp();
-                    if(timestamp == null || timestamp.trim().isEmpty())
-                        continue;
-                    long t0 = Long.parseLong(timestamp.trim());
-                    long t1 = System.currentTimeMillis();
-                    int diff = (int)((((t1 - t0)/1000)/60)/60);
-                    if(diff >= 12) { // 12 Hour ago cached image (Less likely to be used, force remove from cache to minimize memory usage)
-                        try {
-                            AppController.getInstance().getLruBitmapCache().evict(url);
-                        } catch (Exception e) {
-                            Log.e(LOG_TAG, e.getMessage(), e);
-                        }
-                        toDelete.add(httpImage);
-                    }
-                }
-                DBUtil.deleteHttpImageInfos(toDelete, context);
-                AppController.getInstance().getLruBitmapCache().flushIfSizeExceeds();
+                SimpleDiskCacheInitializer.enforceMaxSizeLimit(context);
             } catch (Exception e) {
                 Log.e(LOG_TAG, e.getMessage(), e);
             }

@@ -1,5 +1,6 @@
 package com.pack.pack.application.cz.fhucho.android.util;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 //import com.google.common.io.ByteStreams;
@@ -32,18 +33,91 @@ public class SimpleDiskCache {
 
     static synchronized SimpleDiskCache open(File dir, int appVersion, long maxSize)
             throws IOException {
-        synchronized (lock) {
-            if (instance == null) {
-                instance = new SimpleDiskCache(dir, appVersion, maxSize);
-                if (usedDirs.contains(dir)) {
-                    throw new IllegalStateException("Cache dir " + dir.getAbsolutePath() + " was used before.");
-                }
+        return open0(dir, appVersion, maxSize);
+    }
 
-                usedDirs.add(dir);
+    private static SimpleDiskCache open0(File dir, int appVersion, long maxSize)
+            throws IOException {
+        if (instance == null) {
+            instance = new SimpleDiskCache(dir, appVersion, maxSize);
+            if (usedDirs.contains(dir)) {
+                throw new IllegalStateException("Cache dir " + dir.getAbsolutePath() + " was used before.");
             }
+
+            usedDirs.add(dir);
         }
         return instance;
     }
+
+    static synchronized SimpleDiskCache reOpen(File dir, int appVersion, long maxSize)
+            throws IOException {
+        instance = null;
+        return open(dir, appVersion, maxSize);
+    }
+
+    /************************************************************************************************/
+    static synchronized boolean enforceMaxSizeLimit(Context context, long maxSize, long maxTolerentSize) {
+        File cacheDir = context.getCacheDir();
+        long currentSize = computeTotalCacheSize(cacheDir);
+        if(currentSize >= maxTolerentSize) {
+            cleanupCache(cacheDir, currentSize, false);
+            return true;
+        } else {
+            long bytesToDelete = currentSize - maxSize;
+            if(bytesToDelete > 0) {
+                cleanupCache(cacheDir, bytesToDelete, true);
+                currentSize = computeTotalCacheSize(cacheDir);
+                bytesToDelete = currentSize - maxSize;
+            }
+            if(bytesToDelete > 0) {
+                cleanupCache(cacheDir, bytesToDelete, false);
+            }
+            return false;
+        }
+    }
+
+    private static void cleanupCache(File dir, long bytes, boolean selectiveDelete) {
+        long bytesDeleted = 0;
+        File[] files = dir.listFiles();
+
+        for (File file : files) {
+            bytesDeleted += file.length();
+            if(!file.exists())
+                continue;
+            if(file.isDirectory())
+                continue;
+            if(file.getName().contains("journal") && selectiveDelete)
+                continue;
+            if(selectiveDelete) {
+                long t0 = file.lastModified();
+                long t1 = System.currentTimeMillis();
+                int diff = (int) ((((t1 - t0) / 1000) / 60) / 60);
+                if (diff >= 4) { // 8 Hour ago cached image (Less likely to be used, force remove from cache to minimize memory usage)
+                    file.delete();
+                }
+            } else {
+                file.delete();
+            }
+
+            if (bytesDeleted >= bytes) {
+                break;
+            }
+        }
+    }
+
+    private static long computeTotalCacheSize(File dir) {
+        long size = 0;
+        File[] files = dir.listFiles();
+
+        for (File file : files) {
+            if (file.isFile()) {
+                size += file.length();
+            }
+        }
+
+        return size;
+    }
+    /************************************************************************************************/
 
     public static SimpleDiskCache getInstance() {
         return instance;

@@ -34,11 +34,6 @@ public class SquillDbHelper extends SQLiteOpenHelper {
                         + " INTEGER PRIMARY KEY, " + UserInfo.ENTITY_ID + " TEXT, "
                         + UserInfo.USER_NAME + " TEXT, " + UserInfo.DISPLAY_NAME + " TEXT)";
 
-        public static final String HTTP_IMAGE =
-                "CREATE TABLE IF NOT EXISTS " + HttpImage.TABLE_NAME + "(" + HttpImage._ID
-                        + " INTEGER PRIMARY KEY, " + HttpImage.URL + " TEXT, "
-                        + HttpImage.TIMESTAMP + " TEXT)";
-
         public static final String PAGINATION_INFO =
                 "CREATE TABLE IF NOT EXISTS " + PaginationInfo.TABLE_NAME + "(" + PaginationInfo._ID
                         + " INTEGER PRIMARY KEY, " + PaginationInfo.ENTITY_ID + " TEXT, "
@@ -61,9 +56,6 @@ public class SquillDbHelper extends SQLiteOpenHelper {
 
         public static final String USER_INFO =
                 "DROP TABLE IF EXISTS " + UserInfo.TABLE_NAME;
-
-        public static final String HTTP_IMAGE =
-                "DROP TABLE IF EXISTS " + HttpImage.TABLE_NAME;
 
         public static final String PAGINATION_INFO =
                 "DROP TABLE IF EXISTS " + PaginationInfo.TABLE_NAME;
@@ -89,7 +81,6 @@ public class SquillDbHelper extends SQLiteOpenHelper {
         db.execSQL(CreateQueries.BOOKMARK);
         db.execSQL(CreateQueries.JSON_MODEL);
         db.execSQL(CreateQueries.USER_INFO);
-        db.execSQL(CreateQueries.HTTP_IMAGE);
 
         //db.execSQL(CreateQueries.USER_OWNED_TOPIC_INFO);
         //db.execSQL(CreateQueries.ATTACHMENT_INFO);
@@ -103,7 +94,6 @@ public class SquillDbHelper extends SQLiteOpenHelper {
        // db.execSQL(DeleteQueries.BOOKMARK);
         //db.execSQL(DeleteQueries.LOGIN_INFO);
         db.execSQL(DeleteQueries.JSON_MODEL);
-        db.execSQL(DeleteQueries.HTTP_IMAGE);
         //db.execSQL(DeleteQueries.USER_INFO);
 
         //db.execSQL(DeleteQueries.USER_OWNED_TOPIC_INFO);

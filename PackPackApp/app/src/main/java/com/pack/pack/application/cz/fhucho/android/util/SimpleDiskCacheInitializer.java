@@ -17,6 +17,8 @@ public class SimpleDiskCacheInitializer {
 
     private static final long MAX_SIZE = 1024 * 1024 * 20; // 20 MB
 
+    private static final long MAX_TOLERENT_SIZE = 1024 * 1024 * 30; // 30 MB
+
     private static boolean isPrepared = false;
 
     private static final Object lock = new Object();
@@ -29,6 +31,7 @@ public class SimpleDiskCacheInitializer {
         synchronized (lock) {
            if(!isPrepared) {
                try {
+                   enforceMaxSizeLimit(context);
                    PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
                    int appVersion = pInfo.versionCode;
                    File cacheDir = context.getCacheDir();
@@ -42,6 +45,28 @@ public class SimpleDiskCacheInitializer {
                    throw new RuntimeException(e.getMessage());
                }
            }
+        }
+    }
+
+    public static void enforceMaxSizeLimit(Context context) {
+        boolean reOpen = SimpleDiskCache.enforceMaxSizeLimit(context, MAX_SIZE, MAX_TOLERENT_SIZE);
+        if(reOpen) {
+            synchronized (lock) {
+                isPrepared = false;
+                try {
+                    PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+                    int appVersion = pInfo.versionCode;
+                    File cacheDir = context.getCacheDir();
+                    SimpleDiskCache.reOpen(cacheDir, appVersion, MAX_SIZE);
+                    isPrepared = true;
+                } catch (PackageManager.NameNotFoundException e) {
+                    Log.d(LOG_TAG, e.getMessage(), e);
+                    throw new RuntimeException(e.getMessage());
+                } catch (IOException e) {
+                    Log.d(LOG_TAG, e.getMessage(), e);
+                    throw new RuntimeException(e.getMessage());
+                }
+            }
         }
     }
 }

@@ -348,11 +348,6 @@ public class DownloadImageTask extends AbstractNetworkTask<String, Void, Bitmap>
                     }*/
                     bitmap = Bitmap.createScaledBitmap(bitmap, dimension.newWidth, dimension.newHeight, true);
                     String key = lookupURL(url);
-                    try {
-                        DBUtil.addHttpImageInfo(key, getContext());
-                    } catch (Exception e) {
-                        Log.e(LOG_TAG, e.getMessage(), e);
-                    }
                     AppController.getInstance().getLruBitmapCache().putBitmap(key, bitmap);
                 }
                 return bitmap;
@@ -383,11 +378,6 @@ public class DownloadImageTask extends AbstractNetworkTask<String, Void, Bitmap>
                     bitmap = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.noimage);
                 }*/
                 String key = lookupURL(url);
-                try {
-                    DBUtil.addHttpImageInfo(key, getContext());
-                } catch (Exception e) {
-                    Log.e(LOG_TAG, e.getMessage(), e);
-                }
                 AppController.getInstance().getLruBitmapCache().putBitmap(key, bitmap);
             }
         } catch (Exception e) {
