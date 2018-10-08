@@ -173,7 +173,11 @@ public class Bookmark extends DbObjectImpl {
         bookmark.setSourceUrl(feed.getOgUrl());
         bookmark.setTitle(feed.getOgTitle());
         bookmark.setArticle(feed.getFullArticleText());
-        bookmark.setEntityId(feed.getOgUrl());
+        String entityId = feed.getHrefSource();
+        if(entityId == null || entityId.trim().isEmpty()) {
+            entityId = feed.getOgUrl();
+        }
+        bookmark.setEntityId(entityId);
         bookmark.setDescription(feed.getArticleSummaryText());
         if(feed.getVideoUrl() != null) {
             bookmark.setMediaUrl(feed.getVideoUrl());

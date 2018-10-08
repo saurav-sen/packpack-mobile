@@ -31,7 +31,7 @@ public class SimpleDiskCacheInitializer {
         synchronized (lock) {
            if(!isPrepared) {
                try {
-                   enforceMaxSizeLimit(context);
+                   clearCacheIfRequired(context);
                    PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
                    int appVersion = pInfo.versionCode;
                    File cacheDir = context.getCacheDir();
@@ -46,6 +46,10 @@ public class SimpleDiskCacheInitializer {
                }
            }
         }
+    }
+
+    private static void clearCacheIfRequired(Context context) {
+        SimpleDiskCache.enforceMaxSizeLimit(context, MAX_SIZE, MAX_TOLERENT_SIZE);
     }
 
     public static void enforceMaxSizeLimit(Context context) {

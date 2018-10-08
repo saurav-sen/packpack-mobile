@@ -62,7 +62,7 @@ public class SimpleDiskCache {
         if(currentSize >= maxTolerentSize) {
             cleanupCache(cacheDir, currentSize, false);
             return true;
-        } else {
+        } /*else {
             long bytesToDelete = currentSize - maxSize;
             if(bytesToDelete > 0) {
                 cleanupCache(cacheDir, bytesToDelete, true);
@@ -73,7 +73,8 @@ public class SimpleDiskCache {
                 cleanupCache(cacheDir, bytesToDelete, false);
             }
             return false;
-        }
+        }*/
+        return false;
     }
 
     private static void cleanupCache(File dir, long bytes, boolean selectiveDelete) {
