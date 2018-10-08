@@ -32,8 +32,8 @@ public class SyncService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         timer.scheduleAtFixedRate(new CheckNetworkTask(), 0, 10 * 1000);
-        /*timer.scheduleAtFixedRate(new LruBitmapCacheCleanupTask(SyncService.this),
-                2 * 60 * 60 * 1000, 3 * 60 * 60 * 1000); // Quarterly Scheduled Task*/
+        timer.scheduleAtFixedRate(new LruBitmapCacheCleanupTask(SyncService.this),
+                3 * 60 * 60 * 1000, 4 * 60 * 60 * 1000); // Quarterly Scheduled Task
         return START_NOT_STICKY;
     }
 
