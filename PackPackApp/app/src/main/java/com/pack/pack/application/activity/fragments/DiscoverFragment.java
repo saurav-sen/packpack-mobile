@@ -3,7 +3,7 @@ package com.pack.pack.application.activity.fragments;
 import com.pack.pack.application.R;
 import com.pack.pack.application.adapters.DiscoverFragmentAdapter;
 import com.pack.pack.application.data.util.FeedsLoadTask;
-import com.pack.pack.application.data.util.RefreshmentFeedTask;
+import com.pack.pack.application.data.util.ArticlesFeedTask;
 import com.squill.feed.web.model.JRssFeed;
 import com.squill.feed.web.model.JRssFeedType;
 
@@ -18,12 +18,12 @@ public class DiscoverFragment extends BaseFragment {
 
     @Override
     protected int getViewLayoutId() {
-        return R.layout.activity_broadcast;
+        return R.layout.activity_science;
     }
 
     @Override
     protected int getListViewId() {
-        return R.id.squill_feeds;
+        return R.id.science_feeds;
     }
 
     @Override
@@ -36,11 +36,11 @@ public class DiscoverFragment extends BaseFragment {
 
     @Override
     protected JRssFeedType getFeedType() {
-        return JRssFeedType.REFRESHMENT;
+        return JRssFeedType.NEWS_SCIENCE_TECHNOLOGY;
     }
 
     @Override
     protected FeedsLoadTask initNewTask() {
-        return new RefreshmentFeedTask(getActivity());
+        return new ArticlesFeedTask(getActivity());
     }
 }

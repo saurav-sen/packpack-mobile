@@ -12,14 +12,12 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -28,8 +26,8 @@ import com.pack.pack.application.Constants;
 import com.pack.pack.application.R;
 import com.pack.pack.application.activity.fragments.BaseFragment;
 import com.pack.pack.application.activity.fragments.BookmarkFragment;
+import com.pack.pack.application.activity.fragments.VideosFragment;
 import com.pack.pack.application.activity.fragments.DiscoverFragment;
-import com.pack.pack.application.activity.fragments.ArticlesFragment;
 import com.pack.pack.application.activity.fragments.SportsFragment;
 import com.pack.pack.application.activity.fragments.TrendingFragment;
 import com.pack.pack.application.data.util.BottomNavigationViewHelper;
@@ -39,8 +37,8 @@ public class LandingPageActivity extends AbstractAppCompatActivity implements Bo
 
     private BaseFragment trendingFragment;
     private BaseFragment sportsFragment;
-    private BaseFragment scienceFragment;
-    private BaseFragment funFragment;
+    private BaseFragment discoverFragment;
+    private BaseFragment videosFragment;
     private Fragment specialFragment;
 
     private Fragment activeFragment;
@@ -144,17 +142,17 @@ public class LandingPageActivity extends AbstractAppCompatActivity implements Bo
                 break;
 
             case R.id.navigation_article:
-                if(scienceFragment == null) {
-                    scienceFragment = new ArticlesFragment();
+                if(discoverFragment == null) {
+                    discoverFragment = new DiscoverFragment();
                 }
-                activeFragment = scienceFragment;
+                activeFragment = discoverFragment;
                 break;
 
             case R.id.navigation_discover:
-                if(funFragment == null) {
-                    funFragment = new DiscoverFragment();
+                if(videosFragment == null) {
+                    videosFragment = new VideosFragment();
                 }
-                activeFragment = funFragment;
+                activeFragment = videosFragment;
                 break;
 
             case R.id.navigation_bookmark:

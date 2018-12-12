@@ -162,7 +162,7 @@ public class BookmarkFragmentAdapter extends ArrayAdapter<Bookmark> {
         if(feed.isUnderDeleteOperation())
             return;
         String mediaUrl = feed.getMediaUrl();
-        if(mediaUrl != null && (mediaUrl.contains("youtube") || mediaUrl.contains("youtu.be")) && !(mediaUrl.startsWith(ApiConstants.BASE_URL))) {
+        if(mediaUrl != null && (mediaUrl.contains("youtube.com") || mediaUrl.contains("youtu.be")) && !(mediaUrl.startsWith(ApiConstants.BASE_URL))) {
             if(playVideo(mediaUrl))
                 return;
         }

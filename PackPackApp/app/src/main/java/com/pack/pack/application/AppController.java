@@ -15,6 +15,7 @@ import com.pack.pack.application.db.DBUtil;
 import com.pack.pack.application.db.SquillDbHelper;
 import com.pack.pack.application.db.UserInfo;
 import com.pack.pack.application.topic.activity.model.UploadAttachmentData;
+import com.pack.pack.application.view.util.AdBlocker;
 import com.pack.pack.client.api.APIConstants;
 import com.pack.pack.model.web.JUser;
 import com.squill.feed.web.model.JRssFeedType;
@@ -168,6 +169,7 @@ public class AppController extends Application {
         mInstance = this;
         SimpleDiskCacheInitializer.prepare(this);
         HttpCacheFactory.prepare(this);
+        AdBlocker.init(this);
         initializeBranchIO();
         feedTypeLoadStatus = new HashMap<>();
         androidDefaultUEH = Thread.getDefaultUncaughtExceptionHandler();

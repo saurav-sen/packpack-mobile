@@ -1,8 +1,10 @@
 package com.pack.pack.application.activity;
 
+import android.annotation.TargetApi;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -14,6 +16,7 @@ import android.webkit.URLUtil;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
@@ -21,10 +24,15 @@ import android.widget.ProgressBar;
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.Mode;
 import com.pack.pack.application.R;
+import com.pack.pack.application.service.NetworkUtil;
+import com.pack.pack.application.view.util.AdBlocker;
 import com.pack.pack.application.view.util.ExternalLinkShareUtil;
 import com.pack.pack.application.view.util.HtmlUtil;
 import com.pack.pack.application.view.util.LogoMap;
 import com.pack.pack.application.view.util.ViewUtil;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class FullScreenNewsViewActivity extends AppCompatActivity {
 
@@ -38,6 +46,8 @@ public class FullScreenNewsViewActivity extends AppCompatActivity {
 
     public static final String NEWS_TITLE = "NEWS_TITLE";
     public static final String NEWS_FULL_TEXT = "NEWS_FULL_TEXT";
+
+    public static final String NEWS_HTML_CONTENT = "NEWS_HTML_CONTENT";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +65,7 @@ public class FullScreenNewsViewActivity extends AppCompatActivity {
         final String sourceLink = getIntent().getStringExtra(SOURCE_LINK);
         final String newsTitle = getIntent().getStringExtra(NEWS_TITLE);
         final String newsFullText = getIntent().getStringExtra(NEWS_FULL_TEXT);
+        final String newsHtmlContent = getIntent().getStringExtra(NEWS_HTML_CONTENT);
         new_detail_fullscreen_view = (WebView) findViewById(R.id.new_detail_fullscreen_view);
         new_detail_fullscreen_view.getSettings().setJavaScriptEnabled(true);
         //new_detail_fullscreen_view.getSettings().setUserAgentString();
@@ -67,14 +78,21 @@ public class FullScreenNewsViewActivity extends AppCompatActivity {
                 shareUrl(webShareLink);
             }
         });
-       /* if(AppController.getInstance().getExecutionMode() == Mode.ONLINE) {
-            new_detail_fullscreen_view.loadUrl(newsLink);
+        /*if(sourceLink != null && !sourceLink.trim().isEmpty() && NetworkUtil.checkConnectivity(this)) {
+            new_detail_fullscreen_view.loadUrl(sourceLink);
         } else {
-            String html = HtmlUtil.generateOfflineHtml(newsTitle, newsFullText);
-            new_detail_fullscreen_view.loadData(html, "text/html", "UTF-8");
+            String html = HtmlUtil.generateOfflineHtml(newsTitle, newsFullText, sourceLink, LogoMap.get(sourceLink));
+            new_detail_fullscreen_view.loadDataWithBaseURL("file:///android_asset/", html, "text/html", "UTF-8", null);
         }*/
-        String html = HtmlUtil.generateOfflineHtml(newsTitle, newsFullText, sourceLink, LogoMap.get(sourceLink));
-        new_detail_fullscreen_view.loadDataWithBaseURL("file:///android_asset/", html, "text/html", "UTF-8", null);
+        if((newsFullText == null || newsFullText.trim().isEmpty()) && (newsHtmlContent == null || newsHtmlContent.trim().isEmpty())/* && NetworkUtil.checkConnectivity(this)*/) {
+            new_detail_fullscreen_view.loadUrl(sourceLink);
+        } else if(newsHtmlContent != null && !newsHtmlContent.trim().isEmpty()) {
+            String html = HtmlUtil.generateOfflineHtmlFromHtmlSnippet(newsTitle, newsHtmlContent, sourceLink, LogoMap.get(sourceLink));
+            new_detail_fullscreen_view.loadDataWithBaseURL("file:///android_asset/", html, "text/html", "UTF-8", null);
+        } else {
+            String html = HtmlUtil.generateOfflineHtml(newsTitle, newsFullText, sourceLink, LogoMap.get(sourceLink));
+            new_detail_fullscreen_view.loadDataWithBaseURL("file:///android_asset/", html, "text/html", "UTF-8", null);
+        }
     }
 
     private void shareUrl(String url) {
@@ -95,21 +113,38 @@ public class FullScreenNewsViewActivity extends AppCompatActivity {
 
         private ProgressDialog progressDialog;
 
+        private Map<String, Boolean> loadedUrls = new HashMap<>();
+
         SquillWebViewClient() {
             progressDialog = new ProgressDialog(FullScreenNewsViewActivity.this);
             progressDialog.setMessage("Loading...");
             progressDialog.show();
         }
 
-        @Override
+        /*@Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
             if(URLUtil.isNetworkUrl(url)) {
                 //view.loadUrl(url);
                 return false;
             }
-                /*Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                startActivity(intent);*/
+                *//*Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                startActivity(intent);*//*
             return true;
+        }*/
+
+        @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+        @Override
+        public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+            boolean ad;
+            String url = request.getUrl().toString();
+            if (!loadedUrls.containsKey(url)) {
+                ad = AdBlocker.isAd(url);
+                loadedUrls.put(url, ad);
+            } else {
+                ad = loadedUrls.get(url);
+            }
+            return ad ? AdBlocker.createEmptyResource() :
+                    super.shouldInterceptRequest(view, request);
         }
 
         @Override
