@@ -83,8 +83,8 @@ public class RssFeedCache {
                     jsonM.setContent(JSONUtil.serialize(c));
                     jsonM.setPageNo(pageNo);
                     wDB = squillDbHelper.getWritableDatabase();
-                    DBUtil.storeJsonModel(jsonM, readable, wDB);
                     DBUtil.removeObsoletePages(wDB, feedType.name(), pageNo);
+                    DBUtil.storeJsonModel(jsonM, readable, wDB);
                 }
             } catch (PackPackException e) {
                 Log.e(LOG_TAG, e.getMessage(), e);

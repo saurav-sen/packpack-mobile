@@ -84,12 +84,10 @@ public class FullScreenNewsViewActivity extends AppCompatActivity {
             String html = HtmlUtil.generateOfflineHtml(newsTitle, newsFullText, sourceLink, LogoMap.get(sourceLink));
             new_detail_fullscreen_view.loadDataWithBaseURL("file:///android_asset/", html, "text/html", "UTF-8", null);
         }*/
-        if((newsFullText == null || newsFullText.trim().isEmpty()) && (newsHtmlContent == null || newsHtmlContent.trim().isEmpty())/* && NetworkUtil.checkConnectivity(this)*/) {
-            new_detail_fullscreen_view.loadUrl(sourceLink);
-        } else if(newsHtmlContent != null && !newsHtmlContent.trim().isEmpty()) {
+        if(newsHtmlContent != null && !newsHtmlContent.trim().isEmpty()) {
             String html = HtmlUtil.generateOfflineHtmlFromHtmlSnippet(newsTitle, newsHtmlContent, sourceLink, LogoMap.get(sourceLink));
             new_detail_fullscreen_view.loadDataWithBaseURL("file:///android_asset/", html, "text/html", "UTF-8", null);
-        } else {
+        } else if((newsFullText != null && !newsFullText.trim().isEmpty())) {
             String html = HtmlUtil.generateOfflineHtml(newsTitle, newsFullText, sourceLink, LogoMap.get(sourceLink));
             new_detail_fullscreen_view.loadDataWithBaseURL("file:///android_asset/", html, "text/html", "UTF-8", null);
         }

@@ -170,7 +170,7 @@ public class DBUtil {
     public static void removeObsoletePages(SQLiteDatabase wDB, String feedType, int pageNo) {
         if(wDB == null)
             return;
-        int noOfRows = wDB.delete(JsonModel.TABLE_NAME, (JsonModel.FEED_TYPE + "='" + feedType + "' AND " + JsonModel.PAGE_NO + ">" + pageNo), null);
+        int noOfRows = wDB.delete(JsonModel.TABLE_NAME, (JsonModel.FEED_TYPE + "='" + feedType + "' AND " + JsonModel.PAGE_NO + ">=" + pageNo), null);
         if(noOfRows > 0) {
             Log.d(LOG_TAG, "Obsolete pages deleted pageNo > " + pageNo);
         } else {

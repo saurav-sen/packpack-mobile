@@ -162,6 +162,8 @@ public class TrendingFragmentAdapter extends BaseAdapter {
                         openFullScreenNewsActivity(feed);
                     }
                 });
+            } else {
+                loading_progress.setVisibility(View.GONE);
             }
             news_rss_feed_description.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -198,6 +200,8 @@ public class TrendingFragmentAdapter extends BaseAdapter {
         String shareUrl = feed.getShareableUrl() != null ? feed.getShareableUrl() : url;
         String newsTitle = feed.getOgTitle();
         String newsFullText = feed.getFullArticleText();
+        String htmlSnippet = feed.getHtmlSnippet();
+        intent.putExtra(FullScreenNewsViewActivity.NEWS_HTML_CONTENT, htmlSnippet);
         intent.putExtra(FullScreenNewsViewActivity.NEWS_LINK, url);
         intent.putExtra(FullScreenNewsViewActivity.WEB_SHARE_LINK, shareUrl);
         intent.putExtra(FullScreenNewsViewActivity.SOURCE_LINK, feed.getOgUrl());

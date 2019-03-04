@@ -164,6 +164,9 @@ public abstract class BaseFragment extends Fragment {
                 List<JRssFeed> list = page.getResult();
                 if(list == null || list.isEmpty())
                     return;
+                if(showLoadingProgress) {
+                    adapter.clearState();
+                }
                 adapter.addNewFeeds(list);
                 adapter.notifyDataSetChanged();
             }

@@ -29,6 +29,8 @@ public class FullScreenBookmarkViewActivity extends AppCompatActivity {
     public static final String NEWS_TITLE = "NEWS_TITLE";
     public static final String NEWS_FULL_TEXT = "NEWS_FULL_TEXT";
 
+    public static final String NEWS_HTML_CONTENT = "NEWS_HTML_CONTENT";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,6 +45,7 @@ public class FullScreenBookmarkViewActivity extends AppCompatActivity {
         final String sourceLink = getIntent().getStringExtra(SOURCE_LINK);
         final String newsTitle = getIntent().getStringExtra(NEWS_TITLE);
         final String newsFullText = getIntent().getStringExtra(NEWS_FULL_TEXT);
+        final String newsHtmlContent = getIntent().getStringExtra(NEWS_HTML_CONTENT);
         bookmark_detail_fullscreen_view = (WebView) findViewById(R.id.bookmark_detail_fullscreen_view);
         bookmark_detail_fullscreen_view.getSettings().setJavaScriptEnabled(true);
         //new_detail_fullscreen_view.getSettings().setUserAgentString();
@@ -50,8 +53,10 @@ public class FullScreenBookmarkViewActivity extends AppCompatActivity {
         bookmark_detail_fullscreen_view.setWebViewClient(new SquillWebViewClient());
         if(sourceLink != null) {
             bookmark_detail_fullscreen_view.loadUrl(sourceLink);
-        }
-        else if(newsFullText != null) {
+        } else if(newsHtmlContent != null && !newsHtmlContent.trim().isEmpty()) {
+            String html = HtmlUtil.generateOfflineHtmlFromHtmlSnippet(newsTitle, newsHtmlContent, sourceLink, LogoMap.get(sourceLink));
+            bookmark_detail_fullscreen_view.loadDataWithBaseURL("file:///android_asset/", html, "text/html", "UTF-8", null);
+        } else if(newsFullText != null) {
             String html = HtmlUtil.generateOfflineHtml(newsTitle, newsFullText, sourceLink, LogoMap.get(sourceLink));
             if(html != null) {
                 bookmark_detail_fullscreen_view.loadDataWithBaseURL("file:///android_asset/", html, "text/html", "UTF-8", null);

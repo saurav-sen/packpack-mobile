@@ -5,6 +5,7 @@ package com.pack.pack.application.data.util;
  */
 public interface ApiConstants {
 
+    public static final String LOGO_BASE_URL = "http://api.squill.in/logo/"; //DEV Environment
     public static final String BASE_URL = "http://api.squill.in/api/"; //DEV Environment
     public static final String ML_BASE_URL = "http://api.squill.in/mlapi/"; //DEV Environment
 

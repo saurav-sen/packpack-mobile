@@ -56,7 +56,17 @@ public class Bookmark extends DbObjectImpl {
 
     private boolean isVideo = false;
 
+    private String htmlSnippet;
+
     public Bookmark() {
+    }
+
+    public String getHtmlSnippet() {
+        return htmlSnippet;
+    }
+
+    public void setHtmlSnippet(String htmlSnippet) {
+        this.htmlSnippet = htmlSnippet;
     }
 
     public boolean isVideo() {
@@ -172,7 +182,11 @@ public class Bookmark extends DbObjectImpl {
         bookmark.setTimeOfAdd(System.currentTimeMillis());
         bookmark.setSourceUrl(feed.getOgUrl());
         bookmark.setTitle(feed.getOgTitle());
-        bookmark.setArticle(feed.getFullArticleText());
+        if(feed.getHtmlSnippet() != null && !feed.getHtmlSnippet().trim().isEmpty()) {
+            bookmark.setHtmlSnippet(feed.getHtmlSnippet());
+        } else {
+            bookmark.setArticle(feed.getFullArticleText());
+        }
         String entityId = feed.getHrefSource();
         if(entityId == null || entityId.trim().isEmpty()) {
             entityId = feed.getOgUrl();

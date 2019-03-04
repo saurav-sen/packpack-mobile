@@ -94,9 +94,6 @@ public class BookmarkFragmentAdapter extends ArrayAdapter<Bookmark> {
         if (feed != null) {
             bookmark_rss_feed__name.setText(feed.getTitle());
             String textSummary = feed.getDescription();
-            if(textSummary == null) {
-                textSummary = feed.getDescription();
-            }
             bookmark_rss_feed_description.setText(textSummary);
             String mediaUrl = feed.getMediaUrl();
             String vUrl = null;
@@ -129,13 +126,22 @@ public class BookmarkFragmentAdapter extends ArrayAdapter<Bookmark> {
                         openFullScreenBookmarkActivity(feed);
                     }
                 });
-                bookmark_rss_feed_description.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        openFullScreenBookmarkActivity(feed);
-                    }
-                });
+
+            } else {
+                loading_progress.setVisibility(View.GONE);
             }
+            bookmark_rss_feed__name.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    openFullScreenBookmarkActivity(feed);
+                }
+            });
+            bookmark_rss_feed_description.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    openFullScreenBookmarkActivity(feed);
+                }
+            });
 
             bookmark_delete.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -169,9 +175,11 @@ public class BookmarkFragmentAdapter extends ArrayAdapter<Bookmark> {
         Intent intent = new Intent(getContext(), FullScreenBookmarkViewActivity.class);
         String newsTitle = feed.getTitle();
         String newsFullText = feed.getArticle();
+        String newsHtmlContent = feed.getHtmlSnippet();
         intent.putExtra(FullScreenBookmarkViewActivity.SOURCE_LINK, feed.getSourceUrl());
         intent.putExtra(FullScreenBookmarkViewActivity.NEWS_TITLE, newsTitle);
         intent.putExtra(FullScreenBookmarkViewActivity.NEWS_FULL_TEXT, newsFullText);
+        intent.putExtra(FullScreenBookmarkViewActivity.NEWS_HTML_CONTENT, newsHtmlContent);
         getContext().startActivity(intent);
     }
 

@@ -1,12 +1,17 @@
 package com.pack.pack.application.activity;
 
 import android.Manifest;
+import android.accounts.Account;
+import android.accounts.AccountManager;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -25,10 +30,14 @@ import com.pack.pack.client.api.APIConstants;
 import com.pack.pack.client.api.COMMAND;
 import com.pack.pack.model.web.JStatus;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.pack.pack.application.AppController.LOCATION_COARSE_ACCESS_REQUEST_CODE;
+import static com.pack.pack.application.AppController.USER_ACCOUNT_REQUEST_CODE;
+import static com.pack.pack.application.AppController.READ_CONTACTS_REQUEST_CODE;
 
 //import com.pack.pack.application.data.util.LoginTask;
 
@@ -95,6 +104,24 @@ public class SignupActivity extends AbstractAppCompatActivity implements IAsyncT
                 startActivity(intent);
             }
         });*/
+
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.GET_ACCOUNTS)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.GET_ACCOUNTS},
+                    USER_ACCOUNT_REQUEST_CODE);
+        } else {
+            readGmailAccounts();
+        }
+
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.READ_CONTACTS},
+                    READ_CONTACTS_REQUEST_CODE);
+        } else {
+            readUserDisplayName();
+        }
     }
 
     private void startAddressService() {
@@ -147,8 +174,84 @@ public class SignupActivity extends AbstractAppCompatActivity implements IAsyncT
                 && grantResults != null && grantResults.length > 0
                 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             startAddressService();
+        } else if(requestCode == USER_ACCOUNT_REQUEST_CODE
+                && grantResults != null && grantResults.length > 0
+                && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            readGmailAccounts();
+        } else if(requestCode == READ_CONTACTS_REQUEST_CODE
+                && grantResults != null && grantResults.length > 0
+                && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            readUserDisplayName();
         }
     }
+
+    private void readGmailAccounts() {
+        try {
+            AccountManager accountManager = AccountManager.get(SignupActivity.this);
+            if(accountManager != null) {
+                Account[] accounts = accountManager.getAccountsByType("com.google");
+                if(accounts != null && accounts.length > 0) {
+                    String email = accounts[0].name;
+                    if(email != null) {
+                        input_email.setText(email);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            Log.e(LOG_TAG, e.getMessage(), e);
+        }
+    }
+
+    private void readUserDisplayName() {
+        Cursor c = null;
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.GET_ACCOUNTS)
+                == PackageManager.PERMISSION_GRANTED) {
+            try {
+                AccountManager accountManager = AccountManager.get(SignupActivity.this);
+                if(accountManager != null) {
+                    Account[] accounts = accountManager.getAccountsByType("com.google");
+                    if (accounts != null && accounts.length > 0) {
+                        if (accounts[0].name != null) {
+                            String accountName = accounts[0].name;
+                            String where = ContactsContract.CommonDataKinds.Email.DATA + " = ?";
+
+                            List<String> what = new ArrayList<String>();
+                            what.add(accountName);
+
+                            for (int i = 1; i < accounts.length; i++) {
+                                where += " or " + ContactsContract.CommonDataKinds.Email.DATA + " = ?";
+                                what.add(accounts[i].name);
+                            }
+                            String[] whatarr = (String[])what.toArray(new String[what.size()]);
+                            ContentResolver contentResolver = getApplication().getContentResolver();
+                            if(contentResolver != null) {
+                                c = contentResolver.query(ContactsContract.CommonDataKinds.Email.CONTENT_URI, null, where, whatarr, null);
+                                if(c != null) {
+                                    if(c.moveToFirst()) {
+                                        int colIndex = c.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME);
+                                        if(colIndex > -1) {
+                                            String displayName = c.getString(colIndex);
+                                            if (displayName != null) {
+                                                input_name.setText(displayName);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                Log.e(LOG_TAG, e.getMessage(), e);
+            } finally {
+                if(c != null && !c.isClosed()) {
+                    c.close();
+                }
+            }
+        }
+    }
+
 
     private void goToNextPage() {
         email = input_email.getText() != null ? input_email.getText().toString().trim() : null;

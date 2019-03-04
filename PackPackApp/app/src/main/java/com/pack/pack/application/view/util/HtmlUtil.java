@@ -12,6 +12,7 @@ public final class HtmlUtil {
 
     private static final String HTML_TEMPLATE_FROM_HTML_SNIPPET_WITH_LOGO = "<html>\n" +
             "\t<head>\n" +
+            "\t<script async src=\"https://cdn.ampproject.org/v0.js\"></script>\n" +
             "\t\t<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge,chrome=1\">\n" +
             "\t\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\t\t\n" +
             "\t\t<link rel=\"stylesheet\" href=\"w3.css\">\n" +
@@ -88,6 +89,7 @@ public final class HtmlUtil {
 
     private static final String HTML_TEMPLATE_FROM_HTML_SNIPPET_WITHOUT_LOGO = "<html>\n" +
             "\t<head>\n" +
+            "\t<script async src=\"https://cdn.ampproject.org/v0.js\"></script>\n" +
             "\t\t<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge,chrome=1\">\n" +
             "\t\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\t\t\n" +
             "\t\t<link rel=\"stylesheet\" href=\"w3.css\">\n" +

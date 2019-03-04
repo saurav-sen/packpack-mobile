@@ -157,6 +157,8 @@ public class DiscoverFragmentAdapter extends BaseAdapter {
                         openFullScreenNewsActivity(feed);
                     }
                 });
+            } else {
+                loading_progress.setVisibility(View.GONE);
             }
 
             science_news_bookmark.setOnClickListener(new View.OnClickListener() {
@@ -176,6 +178,8 @@ public class DiscoverFragmentAdapter extends BaseAdapter {
         String shareUrl = feed.getShareableUrl() != null ? feed.getShareableUrl() : url;
         String newsTitle = feed.getOgTitle();
         String newsFullText = feed.getFullArticleText();
+        String htmlSnippet = feed.getHtmlSnippet();
+        intent.putExtra(FullScreenNewsViewActivity.NEWS_HTML_CONTENT, htmlSnippet);
         intent.putExtra(FullScreenNewsViewActivity.NEWS_LINK, url);
         intent.putExtra(FullScreenNewsViewActivity.WEB_SHARE_LINK, shareUrl);
         intent.putExtra(FullScreenNewsViewActivity.SOURCE_LINK, feed.getOgUrl());

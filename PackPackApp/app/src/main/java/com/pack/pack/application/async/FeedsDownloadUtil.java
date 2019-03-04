@@ -1,15 +1,10 @@
 package com.pack.pack.application.async;
 
 import android.content.Context;
-import android.os.AsyncTask;
 
-import com.pack.pack.application.AppController;
-import com.pack.pack.application.FeedReceiveState;
 import com.pack.pack.application.data.util.IAsyncTaskStatusListener;
 import com.pack.pack.application.data.util.NewsFeedTask;
 import com.pack.pack.application.data.util.ArticlesFeedTask;
-import com.pack.pack.application.data.util.SportsFeedTask;
-import com.pack.pack.application.db.DBUtil;
 import com.squill.feed.web.model.JRssFeedType;
 
 /**
@@ -33,20 +28,16 @@ public final class FeedsDownloadUtil {
         }*/
 
         NewsFeedTask newsFeedTask = new NewsFeedTask(context);
-        SportsFeedTask sportsFeedTask = new SportsFeedTask(context);
         ArticlesFeedTask scienceNewsFeedTask = new ArticlesFeedTask(context);
 
         IAsyncTaskStatusListener listener = new FeedReceiveTaskStatusListener(callback)
                 .addTaskID(newsFeedTask.getTaskID(), JRssFeedType.NEWS)
-                .addTaskID(sportsFeedTask.getTaskID(), JRssFeedType.NEWS_SPORTS)
                 .addTaskID(scienceNewsFeedTask.getTaskID(), JRssFeedType.NEWS_SCIENCE_TECHNOLOGY);
 
         newsFeedTask.addListener(listener);
-        sportsFeedTask.addListener(listener);
         scienceNewsFeedTask.addListener(listener);
 
         newsFeedTask.execute(String.valueOf(0));
-        sportsFeedTask.execute(String.valueOf(0));
         scienceNewsFeedTask.execute(String.valueOf(0));
     }
 

@@ -122,6 +122,7 @@ public class AppController extends Application {
     public static final int CAMERA_ACCESS_REQUEST_CODE = 116;
     public static final int LOCATION_COARSE_ACCESS_REQUEST_CODE = 117;
     public static final int READ_CONTACTS_REQUEST_CODE = 118;
+    public static final int USER_ACCOUNT_REQUEST_CODE = 119;
     public static final String RESULT_RECEIVER = "resultReceiver";
     public static final String LOCATION_PARCELABLE_ADDRESS_KEY = "address";
     public static final String LOCATION_PARCELABLE_ERR_MSG_KEY = "errMsg";

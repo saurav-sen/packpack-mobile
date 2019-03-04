@@ -6,10 +6,10 @@
         android:icon="@drawable/navigation_trending"
         android:title="Trending" />
 
-    <item
+    <!--<item
         android:id="@+id/navigation_sports"
         android:icon="@drawable/navigation_sports"
-        android:title="Sports" />
+        android:title="Sports" />-->
 
     <item
         android:id="@+id/navigation_article"
@@ -18,7 +18,7 @@
 
     <item
         android:id="@+id/navigation_discover"
-        android:icon="@drawable/navigation_discover"
+        android:icon="@drawable/navigation_videos"
         android:title="Video" />
 
     <item

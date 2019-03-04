@@ -28,7 +28,6 @@ import com.pack.pack.application.activity.fragments.BaseFragment;
 import com.pack.pack.application.activity.fragments.BookmarkFragment;
 import com.pack.pack.application.activity.fragments.VideosFragment;
 import com.pack.pack.application.activity.fragments.DiscoverFragment;
-import com.pack.pack.application.activity.fragments.SportsFragment;
 import com.pack.pack.application.activity.fragments.TrendingFragment;
 import com.pack.pack.application.data.util.BottomNavigationViewHelper;
 import com.pack.pack.application.service.NetworkUtil;
@@ -36,7 +35,6 @@ import com.pack.pack.application.service.NetworkUtil;
 public class LandingPageActivity extends AbstractAppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
 
     private BaseFragment trendingFragment;
-    private BaseFragment sportsFragment;
     private BaseFragment discoverFragment;
     private BaseFragment videosFragment;
     private Fragment specialFragment;
@@ -134,12 +132,12 @@ public class LandingPageActivity extends AbstractAppCompatActivity implements Bo
                 activeFragment = trendingFragment;
                 break;
 
-            case R.id.navigation_sports:
+            /*case R.id.navigation_sports:
                 if(sportsFragment == null) {
                     sportsFragment = new SportsFragment();
                 }
                 activeFragment = sportsFragment;
-                break;
+                break;*/
 
             case R.id.navigation_article:
                 if(discoverFragment == null) {

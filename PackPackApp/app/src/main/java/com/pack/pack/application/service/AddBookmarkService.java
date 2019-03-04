@@ -4,6 +4,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.pack.pack.application.AppController;
 import com.pack.pack.application.Mode;
@@ -24,6 +25,8 @@ import java.util.List;
  * Created by Saurav on 28-08-2018.
  */
 public class AddBookmarkService extends Service {
+
+    private static final String LOG_TAG = "BookmarkService";
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -53,7 +56,7 @@ public class AddBookmarkService extends Service {
 
             result = (JRssFeed) api.execute();
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.d(LOG_TAG, e.getMessage(), e);
         }
         return result;
     }
@@ -68,8 +71,8 @@ public class AddBookmarkService extends Service {
             JRssFeed feed = processBookmark(bookmark.getSourceUrl().trim());
             if(feed != null) {
                 bookmark = Bookmark.convert(feed);
-                if(bookmark != null && !bookmark.isVideo() && bookmark.getMediaUrl() != null
-                        && !bookmark.getMediaUrl().trim().isEmpty()) {
+                if(bookmark != null /*&& !bookmark.isVideo() && bookmark.getMediaUrl() != null
+                        && !bookmark.getMediaUrl().trim().isEmpty()*/) {
                     //bookmark.setEntityId(entityId);
                     bookmark.setTimeOfAdd(System.currentTimeMillis());
                     DBUtil.storeNewBookmark(bookmark, AddBookmarkService.this);
