@@ -1,6 +1,8 @@
 package com.pack.pack.application.activity;
 
+import android.annotation.TargetApi;
 import android.app.ProgressDialog;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.ActionBar;
@@ -12,13 +14,18 @@ import android.webkit.URLUtil;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.pack.pack.application.R;
+import com.pack.pack.application.view.util.AdBlocker;
 import com.pack.pack.application.view.util.ExternalLinkShareUtil;
 import com.pack.pack.application.view.util.HtmlUtil;
 import com.pack.pack.application.view.util.LogoMap;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class FullScreenBookmarkViewActivity extends AppCompatActivity {
 
@@ -84,21 +91,38 @@ public class FullScreenBookmarkViewActivity extends AppCompatActivity {
 
         private ProgressDialog progressDialog;
 
+        private Map<String, Boolean> loadedUrls = new HashMap<>();
+
         SquillWebViewClient() {
             progressDialog = new ProgressDialog(FullScreenBookmarkViewActivity.this);
             progressDialog.setMessage("Loading...");
             progressDialog.show();
         }
 
-        @Override
+        /*@Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
             if(URLUtil.isNetworkUrl(url)) {
                 //view.loadUrl(url);
                 return false;
             }
-                /*Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                startActivity(intent);*/
+                *//*Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                startActivity(intent);*//*
             return true;
+        }*/
+
+        @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+        @Override
+        public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+            boolean ad;
+            String url = request.getUrl().toString();
+            if (!loadedUrls.containsKey(url)) {
+                ad = AdBlocker.isAd(url);
+                loadedUrls.put(url, ad);
+            } else {
+                ad = loadedUrls.get(url);
+            }
+            return ad ? AdBlocker.createEmptyResource() :
+                    super.shouldInterceptRequest(view, request);
         }
 
         @Override
@@ -110,6 +134,14 @@ public class FullScreenBookmarkViewActivity extends AppCompatActivity {
         @Override
         public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
             super.onReceivedError(view, request, error);
+           /* view.loadUrl(
+                    "javascript:(function() { " +
+                            "var imgArr = document.getElementsByTagName('img');"
+                            + "for(i = 0;i < imgArr.length; i++) {"
+                            + "var srcUrl = imgArr[i].getAttribute(\"src\");"
+                            + "}"
+                            + "element.parentNode.removeChild(element);" +
+                            "})()");*/
             hideProgressDialog();
         }
 

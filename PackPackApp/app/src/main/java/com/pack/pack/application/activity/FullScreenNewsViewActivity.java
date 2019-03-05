@@ -154,6 +154,14 @@ public class FullScreenNewsViewActivity extends AppCompatActivity {
         @Override
         public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
             super.onReceivedError(view, request, error);
+            /*view.loadUrl(
+                    "javascript:(function() { " +
+                            "var imgArr = document.getElementsByTagName('img');"
+                            + "for(i = 0;i < imgArr.length; i++) {"
+                            + "var srcUrl = imgArr[i].getAttribute(\"src\");"
+                            + "}"
+                            + "element.parentNode.removeChild(element);" +
+                            "})()");*/
             hideProgressDialog();
         }
 
