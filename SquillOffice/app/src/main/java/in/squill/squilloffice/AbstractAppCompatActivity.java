@@ -7,9 +7,8 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
-import com.pack.pack.application.R;
-import com.pack.pack.application.service.SyncService;
-import com.pack.pack.application.service.events.NetworkStatusListener;
+import in.squill.squilloffice.events.NetworkStatusListener;
+import in.squill.squilloffice.service.SyncService;
 
 /**
  * Created by Saurav on 15-03-2017.

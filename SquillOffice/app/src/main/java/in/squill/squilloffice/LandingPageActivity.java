@@ -32,6 +32,8 @@ import com.pack.pack.application.activity.fragments.TrendingFragment;
 import com.pack.pack.application.data.util.BottomNavigationViewHelper;
 import com.pack.pack.application.service.NetworkUtil;
 
+import in.squill.squilloffice.service.NetworkUtil;
+
 public class LandingPageActivity extends AbstractAppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
 
     private BaseFragment trendingFragment;
@@ -54,8 +56,6 @@ public class LandingPageActivity extends AbstractAppCompatActivity implements Bo
 
         trendingFragment = new TrendingFragment();
         loadFragment(trendingFragment);
-
-        FirebaseMessaging.getInstance().subscribeToTopic(Constants.GLOBAL_NOTIFICATION_TOPIC);
 
         BottomNavigationView navigation = findViewById(R.id.navigation);
         BottomNavigationViewHelper.disableShiftMode(navigation);

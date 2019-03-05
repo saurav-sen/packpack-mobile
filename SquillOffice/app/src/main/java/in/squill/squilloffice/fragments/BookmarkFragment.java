@@ -20,6 +20,8 @@ import com.pack.pack.application.db.PagedObject;
 import java.util.LinkedList;
 import java.util.List;
 
+import in.squill.squilloffice.adapters.BookmarkFragmentAdapter;
+
 /**
  * Created by Saurav on 26-09-2018.
  */

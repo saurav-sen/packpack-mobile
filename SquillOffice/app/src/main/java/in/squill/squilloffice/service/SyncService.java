@@ -8,10 +8,10 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
-import com.pack.pack.application.cz.fhucho.android.util.SimpleDiskCacheInitializer;
-
 import java.util.Timer;
 import java.util.TimerTask;
+
+import in.squill.squilloffice.cz.fhucho.android.util.SimpleDiskCacheInitializer;
 
 public class SyncService extends Service {
 

@@ -9,6 +9,8 @@ import com.squill.feed.web.model.JRssFeedType;
 
 import java.util.LinkedList;
 
+import in.squill.squilloffice.adapters.TrendingFragmentAdapter;
+
 /**
  * Created by Saurav on 26-09-2018.
  */

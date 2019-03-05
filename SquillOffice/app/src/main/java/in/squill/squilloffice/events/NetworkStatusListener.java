@@ -4,10 +4,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import com.pack.pack.application.activity.NetworkBasedActivity;
-import com.pack.pack.application.service.SyncService;
-
 import in.squill.squilloffice.NetworkBasedActivity;
+import in.squill.squilloffice.service.SyncService;
 
 /**
  * Created by Saurav on 15-03-2017.
