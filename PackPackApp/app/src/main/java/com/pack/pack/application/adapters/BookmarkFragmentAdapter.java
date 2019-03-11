@@ -92,9 +92,18 @@ public class BookmarkFragmentAdapter extends ArrayAdapter<Bookmark> {
 
         final Bookmark feed = getItem(position);
         if (feed != null) {
-            bookmark_rss_feed__name.setText(feed.getTitle());
+            String title = feed.getTitle();
+            if((title == null || title.trim().isEmpty()) && feed.getSourceUrl() != null) {
+                bookmark_rss_feed__name.setText(feed.getSourceUrl());
+            } else {
+                bookmark_rss_feed__name.setText(title);
+            }
             String textSummary = feed.getDescription();
-            bookmark_rss_feed_description.setText(textSummary);
+            if(textSummary == null || textSummary.trim().isEmpty()) {
+                bookmark_rss_feed_description.setVisibility(View.GONE);
+            } else {
+                bookmark_rss_feed_description.setText(textSummary);
+            }
             String mediaUrl = feed.getMediaUrl();
             String vUrl = null;
             if(mediaUrl != null && mediaUrl.contains("youtube")) {
@@ -128,6 +137,7 @@ public class BookmarkFragmentAdapter extends ArrayAdapter<Bookmark> {
                 });
 
             } else {
+                bookmark_rss_feed_image.setVisibility(View.GONE);
                 loading_progress.setVisibility(View.GONE);
             }
             bookmark_rss_feed__name.setOnClickListener(new View.OnClickListener() {

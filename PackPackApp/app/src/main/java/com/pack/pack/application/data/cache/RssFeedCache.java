@@ -38,8 +38,13 @@ public class RssFeedCache {
     }
 
     private List<JRssFeed> readOfflineData(SQLiteDatabase readable, int pageNo) {
-        List<JRssFeed> after = Collections.emptyList();
-        JRssFeeds c = DBUtil.loadRssFeedsByDateAndPageNo(readable, feedType.name(), pageNo);
+        List<JRssFeed> after = new ArrayList<>();
+        JRssFeeds c = null;
+        try {
+            c = DBUtil.loadRssFeedsByDateAndPageNo(readable, feedType.name(), pageNo);
+        } catch (Exception e) {
+            Log.e(LOG_TAG, e.getMessage(), e);
+        }
         if(c != null && !c.getFeeds().isEmpty()) {
             after = c.getFeeds();
         }
@@ -75,7 +80,7 @@ public class RssFeedCache {
                 readable = squillDbHelper.getReadableDatabase();
                 List<JRssFeed> older = readOfflineData(readable, pageNo);
                 MergeResult mergeResult = deDuplicatedMerge(feeds, older);
-                if(mergeResult.isAnyChange() || older == null || older.isEmpty()) {
+                if(mergeResult.isAnyChange() || older.isEmpty()) {
                     feeds = mergeResult.getFeeds();
                     c.getFeeds().addAll(feeds);
                     JsonModel jsonM = new JsonModel();

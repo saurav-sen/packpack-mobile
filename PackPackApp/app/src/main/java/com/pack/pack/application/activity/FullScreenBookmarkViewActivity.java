@@ -19,6 +19,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.pack.pack.application.R;
+import com.pack.pack.application.service.NetworkUtil;
 import com.pack.pack.application.view.util.AdBlocker;
 import com.pack.pack.application.view.util.ExternalLinkShareUtil;
 import com.pack.pack.application.view.util.HtmlUtil;
@@ -58,7 +59,7 @@ public class FullScreenBookmarkViewActivity extends AppCompatActivity {
         //new_detail_fullscreen_view.getSettings().setUserAgentString();
         bookmark_detail_fullscreen_view.setWebChromeClient(new WebChromeClient());
         bookmark_detail_fullscreen_view.setWebViewClient(new SquillWebViewClient());
-        if(sourceLink != null) {
+        if(sourceLink != null && NetworkUtil.checkConnectivity(FullScreenBookmarkViewActivity.this)) {
             bookmark_detail_fullscreen_view.loadUrl(sourceLink);
         } else if(newsHtmlContent != null && !newsHtmlContent.trim().isEmpty()) {
             String html = HtmlUtil.generateOfflineHtmlFromHtmlSnippet(newsTitle, newsHtmlContent, sourceLink, LogoMap.get(sourceLink));
