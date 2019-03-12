@@ -1,15 +1,15 @@
 package in.squill.squilloffice.fragments;
 
-import com.pack.pack.application.R;
-import com.pack.pack.application.adapters.TrendingFragmentAdapter;
-import com.pack.pack.application.data.util.FeedsLoadTask;
-import com.pack.pack.application.data.util.NewsFeedTask;
 import com.squill.feed.web.model.JRssFeed;
 import com.squill.feed.web.model.JRssFeedType;
 
 import java.util.LinkedList;
 
+import in.squill.squilloffice.R;
+import in.squill.squilloffice.adapters.BaseAdapter;
 import in.squill.squilloffice.adapters.TrendingFragmentAdapter;
+import in.squill.squilloffice.data.util.FeedsLoadTask;
+import in.squill.squilloffice.data.util.NewsFeedTask;
 
 /**
  * Created by Saurav on 26-09-2018.

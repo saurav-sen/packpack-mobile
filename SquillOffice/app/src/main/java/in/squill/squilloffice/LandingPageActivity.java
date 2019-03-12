@@ -1,51 +1,31 @@
 package in.squill.squilloffice;
 
-import android.Manifest;
-import android.content.ActivityNotFoundException;
-import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.net.Uri;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.os.Bundle;
 import android.view.Gravity;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
-import com.google.firebase.messaging.FirebaseMessaging;
-import com.pack.pack.application.AppController;
-import com.pack.pack.application.Constants;
-import com.pack.pack.application.R;
-import com.pack.pack.application.activity.fragments.BaseFragment;
-import com.pack.pack.application.activity.fragments.BookmarkFragment;
-import com.pack.pack.application.activity.fragments.VideosFragment;
-import com.pack.pack.application.activity.fragments.DiscoverFragment;
-import com.pack.pack.application.activity.fragments.TrendingFragment;
-import com.pack.pack.application.data.util.BottomNavigationViewHelper;
-import com.pack.pack.application.service.NetworkUtil;
-
+import in.squill.squilloffice.data.util.BottomNavigationViewHelper;
+import in.squill.squilloffice.fragments.BaseFragment;
+import in.squill.squilloffice.fragments.BookmarkFragment;
+import in.squill.squilloffice.fragments.DiscoverFragment;
+import in.squill.squilloffice.fragments.TrendingFragment;
 import in.squill.squilloffice.service.NetworkUtil;
 
 public class LandingPageActivity extends AbstractAppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
 
     private BaseFragment trendingFragment;
     private BaseFragment discoverFragment;
-    private BaseFragment videosFragment;
     private Fragment specialFragment;
 
     private Fragment activeFragment;
 
     private boolean networkConnected = true;
-
-    private static final int REQUEST_CAMERA_PERMISSION_CODE = 55;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,54 +41,6 @@ public class LandingPageActivity extends AbstractAppCompatActivity implements Bo
         BottomNavigationViewHelper.disableShiftMode(navigation);
         navigation.setOnNavigationItemSelectedListener(this);
 
-        if(ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION_CODE);
-        } else {
-            AppController.getInstance().cameraPermissionGranted();
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        boolean enableCamera = false;
-        if(REQUEST_CAMERA_PERMISSION_CODE == requestCode) {
-            for (int i = 0, len = permissions.length; i < len; i++) {
-                String permission = permissions[i];
-                if (permission == Manifest.permission.CAMERA && grantResults[i] == PackageManager.PERMISSION_GRANTED) {
-                    enableCamera = true;
-                }
-            }
-        }
-        if(enableCamera) {
-            AppController.getInstance().cameraPermissionGranted();
-        } else {
-            AppController.getInstance().cameraPermissionGranted();
-        }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater menuInflater = getMenuInflater();
-        menuInflater.inflate(R.menu.app_menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if(R.id.app_settings == item.getItemId()) {
-            Intent intent = new Intent(LandingPageActivity.this, SettingsActivity.class);
-            startActivity(intent);
-            return true;
-        } else if(R.id.app_feedback == item.getItemId()) {
-            Uri uri = Uri.parse("market://details?id=" + getPackageName());
-            Intent myAppLinkToMarket = new Intent(Intent.ACTION_VIEW, uri);
-            try {
-                startActivity(myAppLinkToMarket);
-            } catch (ActivityNotFoundException e) {
-                Toast.makeText(this, " unable to find market app", Toast.LENGTH_LONG).show();
-            }
-        }
-        return super.onOptionsItemSelected(item);
     }
 
     private boolean loadFragment(Fragment fragment) {
@@ -132,25 +64,11 @@ public class LandingPageActivity extends AbstractAppCompatActivity implements Bo
                 activeFragment = trendingFragment;
                 break;
 
-            /*case R.id.navigation_sports:
-                if(sportsFragment == null) {
-                    sportsFragment = new SportsFragment();
-                }
-                activeFragment = sportsFragment;
-                break;*/
-
             case R.id.navigation_article:
                 if(discoverFragment == null) {
                     discoverFragment = new DiscoverFragment();
                 }
                 activeFragment = discoverFragment;
-                break;
-
-            case R.id.navigation_discover:
-                if(videosFragment == null) {
-                    videosFragment = new VideosFragment();
-                }
-                activeFragment = videosFragment;
                 break;
 
             case R.id.navigation_bookmark:
@@ -188,7 +106,7 @@ public class LandingPageActivity extends AbstractAppCompatActivity implements Bo
         if(!networkConnected)
             return;
         networkConnected = false;
-        View mainLayout = findViewById(R.id.mainLayout);
+        View mainLayout = findViewById(R.id.fragment_container);
         if(mainLayout != null && (this.err == null || !this.err.isShown())) {
             this.err = Snackbar.make(mainLayout, "Internet Connection Lost",
                     Snackbar.LENGTH_LONG);

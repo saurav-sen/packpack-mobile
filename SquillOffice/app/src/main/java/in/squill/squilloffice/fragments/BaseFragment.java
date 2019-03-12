@@ -11,19 +11,16 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.ListView;
 
-import com.pack.pack.application.AppController;
-import com.pack.pack.application.FeedReceiveState;
-import com.pack.pack.application.R;
-import com.pack.pack.application.data.util.DateTimeUtil;
-import com.pack.pack.application.data.util.FeedsLoadTask;
-import com.pack.pack.application.data.util.IAsyncTaskStatusListener;
-import com.pack.pack.application.data.util.NewsFeedTask;
 import com.pack.pack.model.web.Pagination;
 import com.squill.feed.web.model.JRssFeed;
 import com.squill.feed.web.model.JRssFeedType;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import in.squill.squilloffice.adapters.BaseAdapter;
+import in.squill.squilloffice.data.util.FeedsLoadTask;
+import in.squill.squilloffice.data.util.IAsyncTaskStatusListener;
 
 /**
  * Created by Saurav on 26-09-2018.

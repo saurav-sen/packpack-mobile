@@ -23,21 +23,21 @@ import in.squill.squilloffice.R;
 import in.squill.squilloffice.data.util.DownloadFeedImageTask;
 
 /**
- * Created by Saurav on 13-08-2017.
+ * Created by Saurav on 25-03-2018.
  */
-public class TrendingFragmentAdapter extends BaseAdapter {
+public class DiscoverFragmentAdapter extends BaseAdapter {
 
     private Activity activity;
     private LayoutInflater inflater;
 
-    private TextView news_rss_feed__name;
-    private ImageView news_rss_feed_image;
-    private ImageView news_rss_feed_video_play;
-    private TextView news_rss_feed_description;
+    private TextView science_news_rss_feed__name;
+    private ImageView science_news_rss_feed_image;
+    private ImageView science_news_rss_feed_video_play;
+    private TextView science_news_rss_feed_description;
 
     private ProgressBar loading_progress;
 
-    private Button news_bookmark;
+    private Button science_news_bookmark;
 
     private List<JRssFeed> feeds;
 
@@ -45,16 +45,10 @@ public class TrendingFragmentAdapter extends BaseAdapter {
 
     private Map<String, Object> map = new HashMap<String, Object>();
 
-    public TrendingFragmentAdapter(Activity activity, List<JRssFeed> feeds) {
-        super(activity, feeds, R.layout.news_list_items);
+    public DiscoverFragmentAdapter(Activity activity, List<JRssFeed> feeds) {
+        super(activity, feeds, R.layout.science_news_list_items);
         this.activity = activity;
         this.feeds = feeds;
-    }
-
-    @Override
-    protected void doClearState() {
-        map.clear();
-        feeds.clear();
     }
 
     private List<JRssFeed> getFeeds() {
@@ -90,13 +84,19 @@ public class TrendingFragmentAdapter extends BaseAdapter {
     }
 
     @Override
+    protected void doClearState() {
+        map.clear();
+        feeds.clear();
+    }
+
+    @Override
     public int getCount() {
         return getFeeds().size();
     }
 
     @Override
     public JRssFeed getItem(int position) {
-        if(position < getFeeds().size()) {
+        if (position < getFeeds().size()) {
             return getFeeds().get(position);
         }
         return null;
@@ -105,64 +105,65 @@ public class TrendingFragmentAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        if(inflater == null) {
+        if (inflater == null) {
             inflater = activity.getLayoutInflater();
         }
-        if(convertView == null) {
-            convertView = inflater.inflate(R.layout.news_list_items, null);
+        if (convertView == null) {
+            convertView = inflater.inflate(R.layout.science_news_list_items, null);
         }
-        news_rss_feed__name = (TextView) convertView.findViewById(R.id.news_rss_feed__name);
-        news_rss_feed_image = (ImageView) convertView.findViewById(R.id.news_rss_feed_image);
-        news_rss_feed_video_play = (ImageView) convertView.findViewById(R.id.news_rss_feed_video_play);
-        news_rss_feed_description = (TextView) convertView.findViewById(R.id.news_rss_feed_description);
+        science_news_rss_feed__name = (TextView) convertView.findViewById(R.id.science_news_rss_feed__name);
+        science_news_rss_feed_image = (ImageView) convertView.findViewById(R.id.science_news_rss_feed_image);
+        science_news_rss_feed_video_play = (ImageView) convertView.findViewById(R.id.science_news_rss_feed_video_play);
+        science_news_rss_feed_description = (TextView) convertView.findViewById(R.id.science_news_rss_feed_description);
         loading_progress = (ProgressBar) convertView.findViewById(R.id.loading_progress);
         loading_progress.setVisibility(View.VISIBLE);
-        news_bookmark = (Button) convertView.findViewById(R.id.news_bookmark);
+        science_news_bookmark = (Button) convertView.findViewById(R.id.science_news_bookmark);
 
         final JRssFeed feed = getItem(position);
-        if(feed != null) {
-            news_rss_feed__name.setText(feed.getOgTitle());
+        if (feed != null) {
+            science_news_rss_feed__name.setText(feed.getOgTitle());
             String textSummary = feed.getArticleSummaryText();
             if(textSummary == null) {
                 textSummary = feed.getOgDescription();
             }
-            news_rss_feed_description.setText(textSummary);
+            science_news_rss_feed_description.setText(textSummary);
             final String imageUrl = feed.getOgImage();
             final String videoUrl = feed.getVideoUrl();
-            //final String newsUrl = feed.getHrefSource();
-            if(videoUrl != null && !videoUrl.trim().isEmpty()) {
-                news_rss_feed_video_play.setVisibility(View.VISIBLE);
-                news_rss_feed_video_play.setOnClickListener(new View.OnClickListener() {
+            if (videoUrl != null && !videoUrl.trim().isEmpty()) {
+                science_news_rss_feed_video_play.setVisibility(View.VISIBLE);
+                science_news_rss_feed_video_play.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         openFullScreenNewsActivity(feed);
                     }
                 });
             } else {
-                news_rss_feed_video_play.setVisibility(View.GONE);
+                science_news_rss_feed_video_play.setVisibility(View.GONE);
             }
-            if(imageUrl != null && !imageUrl.trim().isEmpty()) {
-                new DownloadFeedImageTask(news_rss_feed_image, 850, 600, TrendingFragmentAdapter.this.activity, loading_progress)
+            if (imageUrl != null && !imageUrl.trim().isEmpty()) {
+                new DownloadFeedImageTask(science_news_rss_feed_image, 850, 600, DiscoverFragmentAdapter.this.activity, loading_progress)
                         .execute(imageUrl);
-                news_rss_feed_image.setOnClickListener(new View.OnClickListener() {
+                science_news_rss_feed_image.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
+                        openFullScreenNewsActivity(feed);
+                    }
+                });
+                science_news_rss_feed_description.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
                         openFullScreenNewsActivity(feed);
                     }
                 });
             } else {
                 loading_progress.setVisibility(View.GONE);
             }
-            news_rss_feed_description.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    openFullScreenNewsActivity(feed);
-                }
-            });
 
-            news_bookmark.setOnClickListener(new View.OnClickListener() {
+            science_news_bookmark.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    //BookmarkUtil.addBookmark(feed, activity, science_news_bookmark);
+                    //shareUrl(feed);
                 }
             });
         }
@@ -185,3 +186,5 @@ public class TrendingFragmentAdapter extends BaseAdapter {
         getContext().startActivity(intent);
     }
 }
+
+

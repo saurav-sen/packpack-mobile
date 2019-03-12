@@ -1,4 +1,4 @@
-package in.squill.squilloffice.fragments;
+package in.squill.squilloffice.adapters;
 
 import android.app.Activity;
 import android.widget.ArrayAdapter;

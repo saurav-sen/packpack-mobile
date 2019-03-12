@@ -14,19 +14,17 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.google.android.youtube.player.YouTubeStandalonePlayer;
-import com.pack.pack.application.R;
-import com.pack.pack.application.activity.FullScreenBookmarkViewActivity;
-import com.pack.pack.application.data.util.ApiConstants;
-import com.pack.pack.application.data.util.BookmarkDeleteResult;
-import com.pack.pack.application.data.util.BookmarkDeleteTask;
-import com.pack.pack.application.data.util.Bookmarks;
-import com.pack.pack.application.data.util.DownloadFeedImageTask;
-import com.pack.pack.application.data.util.IAsyncTaskStatusListener;
-import com.pack.pack.application.data.util.MediaUtil;
-import com.pack.pack.application.db.Bookmark;
-
 import java.util.List;
+
+import in.squill.squilloffice.FullScreenBookmarkViewActivity;
+import in.squill.squilloffice.R;
+import in.squill.squilloffice.data.util.ApiConstants;
+import in.squill.squilloffice.data.util.BookmarkDeleteResult;
+import in.squill.squilloffice.data.util.BookmarkDeleteTask;
+import in.squill.squilloffice.data.util.Bookmarks;
+import in.squill.squilloffice.data.util.DownloadFeedImageTask;
+import in.squill.squilloffice.data.util.IAsyncTaskStatusListener;
+import in.squill.squilloffice.db.Bookmark;
 
 /**
  * Created by Saurav on 26-08-2018.
@@ -107,9 +105,6 @@ public class BookmarkFragmentAdapter extends ArrayAdapter<Bookmark> {
                 bookmark_rss_feed_video_play.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if(!MediaUtil.playVideo(videoUrl, BookmarkFragmentAdapter.this.activity)) {
-                            openFullScreenBookmarkActivity(feed);
-                        }
                     }
                 });
             } else {
@@ -169,7 +164,7 @@ public class BookmarkFragmentAdapter extends ArrayAdapter<Bookmark> {
             return;
         String mediaUrl = feed.getMediaUrl();
         if(mediaUrl != null && (mediaUrl.contains("youtube.com") || mediaUrl.contains("youtu.be")) && !(mediaUrl.startsWith(ApiConstants.BASE_URL))) {
-            if(playVideo(mediaUrl))
+            //if(playVideo(mediaUrl))
                 return;
         }
         Intent intent = new Intent(getContext(), FullScreenBookmarkViewActivity.class);
@@ -183,7 +178,7 @@ public class BookmarkFragmentAdapter extends ArrayAdapter<Bookmark> {
         getContext().startActivity(intent);
     }
 
-    private boolean playVideo(String videoURL) {
+   /* private boolean playVideo(String videoURL) {
         String VIDEO_ID = null;
         if (videoURL.contains("youtube") || videoURL.contains("youtu.be")) {
             String[] split = videoURL.split("v=");
@@ -198,7 +193,7 @@ public class BookmarkFragmentAdapter extends ArrayAdapter<Bookmark> {
         } else {
             return false;
         }
-    }
+    }*/
 
     private void showProgressDialog() {
         if (progressDialog == null) {

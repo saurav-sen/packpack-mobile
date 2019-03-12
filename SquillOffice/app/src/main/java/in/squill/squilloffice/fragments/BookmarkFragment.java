@@ -10,17 +10,15 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.pack.pack.application.R;
-import com.pack.pack.application.adapters.BookmarkFragmentAdapter;
-import com.pack.pack.application.data.util.IAsyncTaskStatusListener;
-import com.pack.pack.application.data.util.LoadBookmarkTask;
-import com.pack.pack.application.db.Bookmark;
-import com.pack.pack.application.db.PagedObject;
-
 import java.util.LinkedList;
 import java.util.List;
 
+import in.squill.squilloffice.R;
 import in.squill.squilloffice.adapters.BookmarkFragmentAdapter;
+import in.squill.squilloffice.data.util.IAsyncTaskStatusListener;
+import in.squill.squilloffice.data.util.LoadBookmarkTask;
+import in.squill.squilloffice.db.Bookmark;
+import in.squill.squilloffice.db.PagedObject;
 
 /**
  * Created by Saurav on 26-09-2018.
