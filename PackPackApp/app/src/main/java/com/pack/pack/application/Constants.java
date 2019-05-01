@@ -32,6 +32,7 @@ public interface Constants {
     public static final String PUSH_DATA_MSG = "PUSH_DATA_MSG";
 
     public static final String GLOBAL_NOTIFICATION_TOPIC = "global";
+    public static final String ALL_DEVICES_NOTIFICATION_TOPIC = "allDevices";
 
     public static final String TOPIC_TYPE = "TOPIC_TYPE";
 
@@ -47,4 +48,13 @@ public interface Constants {
 
     public static final String FIRST_PAGE = "FIRST_PAGE";
     public static final String END_OF_PAGE = "END_OF_PAGE";
+
+    public static final String OG_TITLE = "ogTitle";
+    public static final String OG_IMAGE = "ogImage";
+    public static final String OG_URL = "ogUrl";
+    public static final String MSG_TYPE = "msgType";
+    public static final String SUMMARY_TEXT = "summary";
+    public static final String SHAREABLE_URL = "shareableUrl";
+
+    public static final String NOTIFICATION_DATA_MSG_TYPE = "NOTIFICATION_DATA";
 }

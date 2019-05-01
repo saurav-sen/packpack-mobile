@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.pack.pack.application.AppController;
+import com.pack.pack.application.Constants;
 import com.pack.pack.application.R;
 import com.pack.pack.application.async.FeedReceiveCallback;
 import com.pack.pack.application.async.FeedsDownloadUtil;
@@ -214,6 +215,14 @@ public class SplashActivity extends AbstractActivity /*implements IAsyncTaskStat
         /*if(messageToDisplayIfAny != null && !messageToDisplayIfAny.trim().isEmpty()) {
             intent.putExtra(LandingPageActivity.MESSAGE_IF_ANY, messageToDisplayIfAny);
         }*/
+        if(getIntent().getExtras() != null && Constants.NOTIFICATION_DATA_MSG_TYPE.equals(getIntent().getExtras().getString(Constants.MSG_TYPE))) {
+            intent.putExtra(Constants.OG_TITLE, getIntent().getExtras().getString(Constants.OG_TITLE));
+            intent.putExtra(Constants.OG_IMAGE, getIntent().getExtras().getString(Constants.OG_IMAGE));
+            intent.putExtra(Constants.OG_URL, getIntent().getExtras().getString(Constants.OG_URL));
+            intent.putExtra(Constants.SUMMARY_TEXT, getIntent().getExtras().getString(Constants.SUMMARY_TEXT));
+            intent.putExtra(Constants.SHAREABLE_URL, getIntent().getExtras().getString(Constants.SHAREABLE_URL));
+            intent.putExtra(Constants.MSG_TYPE, getIntent().getExtras().getString(Constants.MSG_TYPE));
+        }
         finish();
         startActivity(intent);
     }

@@ -16,7 +16,10 @@ import android.support.v4.app.NotificationCompat;
 import android.widget.RemoteViews;
 
 import com.pack.pack.application.AppController;
+import com.pack.pack.application.Constants;
 import com.pack.pack.application.R;
+import com.pack.pack.application.activity.IntroMainActivity;
+import com.pack.pack.application.activity.NotificationViewerActivity;
 import com.pack.pack.application.activity.SplashActivity;
 import com.pack.pack.model.web.notification.FeedMsg;
 
@@ -85,28 +88,67 @@ public final class NotificationUtil {
         return true;
     }
 
-    public static void showCustomNotificationMessage(String message, Context context, boolean isDataMessage) {
-        if(message == null || message.trim().isEmpty()) { // No message to display then no notification.
+    public static void showCustomNotificationMessage(String msgType, String ogTitle, String ogImage, Bitmap ogImageBitmap,
+                                                     String ogUrl, String shareableUrl, String summary, Context context) {
+        if(ogTitle == null || ogTitle.trim().isEmpty()) { // No message to display then no notification.
             return;
         }
         RemoteViews contentView = new RemoteViews(AppController.PACKAGE_NAME, R.layout.custom_notification);
         contentView.setImageViewResource(R.id.notification_image, R.drawable.squill_notification);
-        contentView.setTextViewText(R.id.notification_title, message);
+        contentView.setTextViewText(R.id.notification_title, ogTitle);
 
-        Intent intent = new Intent(context, SplashActivity.class);
+        //Intent intent = new Intent(context, NotificationViewerActivity.class);
+        Intent intent = new Intent(context, IntroMainActivity.class);
+        intent.putExtra(Constants.MSG_TYPE, Constants.NOTIFICATION_DATA_MSG_TYPE);
+        intent.putExtra(Constants.OG_TITLE, ogTitle);
+        intent.putExtra(Constants.OG_IMAGE, ogImage);
+        intent.putExtra(Constants.OG_URL, ogUrl);
+        intent.putExtra(Constants.SUMMARY_TEXT, summary);
+        intent.putExtra(Constants.SHAREABLE_URL, shareableUrl);
+
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_ONE_SHOT);
 
         final int NOTIFICATION_ID = new Random().nextInt();//Math.abs(feedMsg.getKey())%10000;
         final NotificationManager notificationManager =
                 (NotificationManager) context.getSystemService(
                         Context.NOTIFICATION_SERVICE);
-        final NotificationCompat.Builder notificationBuilder =
-                new NotificationCompat.Builder(context)
-                        .setContent(contentView)
-                        .setSmallIcon(R.drawable.squill_notification)
-                        .setContentIntent(pendingIntent)
-                        .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
-                        .setPriority(NotificationCompat.PRIORITY_MAX);
+        NotificationCompat.Builder notificationBuilder = null;
+        if(ogImageBitmap != null) {
+            notificationBuilder =
+                    new NotificationCompat.Builder(context, "squill_news_01")
+                            //.setContent(contentView)
+                            .setSmallIcon(R.drawable.squill_notification)
+                            /*.setLargeIcon(BitmapFactory.decodeResource(context.getResources(),
+                                    R.drawable.squill_notification))*/
+                            .setLargeIcon(ogImageBitmap)
+                            .setContentTitle("SQUILL")
+                            .setContentText(ogTitle)
+                            /*.setStyle(new NotificationCompat.BigPictureStyle()
+                                    .bigPicture(ogImageBitmap)
+                                    .setBigContentTitle(summary))*/
+                            .setStyle(new NotificationCompat.BigTextStyle().bigText(ogTitle))
+                            .setContentInfo(ogTitle)
+                            .setContentIntent(pendingIntent)
+                            .setShowWhen(true)
+                            .setAutoCancel(true)
+                            .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+                            .setPriority(NotificationCompat.PRIORITY_MAX);
+        } else {
+            notificationBuilder =
+                    new NotificationCompat.Builder(context, "squill_news_01")
+                            //.setContent(contentView)
+                            .setSmallIcon(R.drawable.squill_notification)
+                            .setLargeIcon(BitmapFactory.decodeResource(context.getResources(),
+                                    R.drawable.squill_notification))
+                            .setContentTitle("SQUILL")
+                            .setContentText(ogTitle)
+                            .setStyle(new NotificationCompat.BigTextStyle().bigText(ogTitle))
+                            .setShowWhen(true)
+                            .setAutoCancel(true)
+                            .setContentIntent(pendingIntent)
+                            .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+                            .setPriority(NotificationCompat.PRIORITY_MAX);
+        }
         notificationManager.notify(APP_NAME, NOTIFICATION_ID, notificationBuilder.build());
     }
 
@@ -127,6 +169,8 @@ public final class NotificationUtil {
                         .setContentTitle(title)
                         .setContentText(message)
                         .setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.drawable.squill_notification))
+                        .setShowWhen(true)
+                        .setAutoCancel(true)
                         .setContentIntent(pendingIntent)
                         .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                         .setPriority(NotificationCompat.PRIORITY_MAX);

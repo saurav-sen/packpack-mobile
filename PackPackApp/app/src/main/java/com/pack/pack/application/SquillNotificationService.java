@@ -22,6 +22,8 @@ import com.pack.pack.application.activity.SplashActivity;
 import com.pack.pack.application.async.FeedReceiveCallback;
 import com.pack.pack.application.async.FeedsDownloadUtil;
 import com.pack.pack.application.data.cache.PreferenceManager;
+import com.pack.pack.application.data.util.DownloadFeedImageTask;
+import com.pack.pack.application.data.util.IAsyncTaskStatusListener;
 import com.pack.pack.application.service.NotificationUtil;
 import com.pack.pack.common.util.JSONUtil;
 import com.pack.pack.model.web.notification.FeedMsg;
@@ -30,6 +32,7 @@ import com.pack.pack.model.web.notification.FeedMsgType;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Map;
 import java.util.Random;
 
 /**
@@ -51,7 +54,9 @@ public class SquillNotificationService extends FirebaseMessagingService {
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
         try {
-            if(remoteMessage.getNotification() != null) {
+            if(remoteMessage.getData() != null && !remoteMessage.getData().isEmpty()) {
+                handleDataMessage(remoteMessage.getData());
+            } else if(remoteMessage.getNotification() != null) {
                 String msgBody = "C:" + remoteMessage.getNotification().getBody();
                 Log.d(LOG_TAG, "From: " + remoteMessage.getFrom());
                 Log.d(LOG_TAG, "Notification Message Body: " + msgBody);
@@ -64,42 +69,82 @@ public class SquillNotificationService extends FirebaseMessagingService {
                 };
                 FeedsDownloadUtil.downloadLatestFeedsFromOrigin(SquillNotificationService.this, callback, true);
                 //NotificationUtil.showCustomNotificationMessage(msgBody, this, false);
-            } /*else if(remoteMessage.getData() != null && !remoteMessage.getData().isEmpty()) {
-                try {
-                    JSONObject json = new JSONObject(remoteMessage.getData().toString());
-                    Log.d(LOG_TAG, "From: " + remoteMessage.getFrom());
-                    Log.d(LOG_TAG, "Notification Message Body: " + json.toString());
-                    handleDataMessage(json);
-                } catch (JSONException e) {
-                    Log.d(LOG_TAG, e.getMessage(), e);
-                }
-            }*/
+            } /*else */
         } catch (Exception e) {
             Log.d(LOG_TAG, e.getMessage(), e);
         }
     }
 
-    private void handleDataMessage(JSONObject json) {
-        try {
-            String title = json.getString("title");
-            String msgType = json.getString("msgType");
-            String key = json.getString("key"); // id
-            String sequenceId = json.getString("sequenceId");
+    private void handleDataMessage(Map<String, String> json) {
+        String ogTitle = json.get(Constants.OG_TITLE);
+        String ogImage = json.get(Constants.OG_IMAGE);
+        String ogUrl = json.get(Constants.OG_URL); // id
+        String msgType = json.get(Constants.MSG_TYPE);
+        String shareableUrl = json.get(Constants.SHAREABLE_URL);
+        String summary = json.get(Constants.SUMMARY_TEXT);
 
-            int notificationID = new Random().nextInt();
-            if(sequenceId != null) {
+        int notificationID = new Random().nextInt();
+            /*if(sequenceId != null) {
                 notificationID = Integer.parseInt(sequenceId.trim());
-            }
+            }*/
 
-            if(!NotificationUtil.isApplicationRunningInBackgroud(getApplicationContext())) {
+            /*if(!NotificationUtil.isApplicationRunningInBackgroud(getApplicationContext())) {
                 Intent intent = new Intent(Constants.PUSH_DATA_MSG);
                 intent.putExtra("title", title);
                 intent.putExtra("msgType", msgType);
                 intent.putExtra("key", key);
                 LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
-            }
-        } catch (JSONException e) {
-            Log.d(LOG_TAG, e.getMessage(), e);
+            }*/
+
+        if(ogImage != null && !ogImage.trim().isEmpty()) {
+            new DownloadFeedImageTask(null, 850, 600, SquillNotificationService.this, null)
+                    .addListener(new OgImageLoadListener(msgType, ogTitle, ogImage, ogUrl, shareableUrl, summary))
+                    .execute(ogImage);
+        } else {
+            NotificationUtil.showCustomNotificationMessage(msgType, ogTitle, ogImage, null,
+                    ogUrl, shareableUrl, summary, SquillNotificationService.this);
         }
+    }
+
+    private class OgImageLoadListener implements IAsyncTaskStatusListener {
+
+        private String msgType;
+        private String ogTitle;
+        private String ogImage;
+        private String ogUrl;
+        private String shareableUrl;
+        private String summary;
+
+        private OgImageLoadListener(String msgType, String ogTitle, String ogImage,
+                                    String ogUrl, String shareableUrl, String summary) {
+            this.msgType = msgType;
+            this.ogTitle = ogTitle;
+            this.ogImage = ogImage;
+            this.ogUrl = ogUrl;
+            this.shareableUrl = shareableUrl;
+            this.summary = summary;
+        }
+
+        @Override
+        public void onPreStart(String taskID) {}
+
+        @Override
+        public void onSuccess(String taskID, Object data) {
+            if(data != null && (data instanceof Bitmap)) {
+                NotificationUtil.showCustomNotificationMessage(msgType, ogTitle, ogImage,
+                        (Bitmap)data, ogUrl, shareableUrl, summary,
+                        SquillNotificationService.this);
+            } else {
+                onFailure(taskID, null);
+            }
+        }
+
+        @Override
+        public void onFailure(String taskID, String errorMsg) {
+            NotificationUtil.showCustomNotificationMessage(msgType, ogTitle, ogImage, null, ogUrl, shareableUrl, summary, SquillNotificationService.this);
+        }
+
+        @Override
+        public void onPostComplete(String taskID) {}
     }
 }

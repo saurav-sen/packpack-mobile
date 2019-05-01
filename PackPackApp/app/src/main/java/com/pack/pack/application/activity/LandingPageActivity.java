@@ -43,7 +43,7 @@ public class LandingPageActivity extends AbstractAppCompatActivity implements Bo
 
     private boolean networkConnected = true;
 
-    private static final int REQUEST_CAMERA_PERMISSION_CODE = 55;
+    //private static final int REQUEST_CAMERA_PERMISSION_CODE = 55;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,19 +56,30 @@ public class LandingPageActivity extends AbstractAppCompatActivity implements Bo
         loadFragment(trendingFragment);
 
         FirebaseMessaging.getInstance().subscribeToTopic(Constants.GLOBAL_NOTIFICATION_TOPIC);
+        //FirebaseMessaging.getInstance().subscribeToTopic(Constants.ALL_DEVICES_NOTIFICATION_TOPIC);
 
         BottomNavigationView navigation = findViewById(R.id.navigation);
         BottomNavigationViewHelper.disableShiftMode(navigation);
         navigation.setOnNavigationItemSelectedListener(this);
 
-        if(ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+        if(getIntent().getExtras() != null && Constants.NOTIFICATION_DATA_MSG_TYPE.equals(getIntent().getExtras().getString(Constants.MSG_TYPE))) {
+            Intent intent = new Intent(LandingPageActivity.this, NotificationViewerActivity.class);
+            intent.putExtra(Constants.OG_TITLE, getIntent().getExtras().getString(Constants.OG_TITLE));
+            intent.putExtra(Constants.OG_IMAGE, getIntent().getExtras().getString(Constants.OG_IMAGE));
+            intent.putExtra(Constants.OG_URL, getIntent().getExtras().getString(Constants.OG_URL));
+            intent.putExtra(Constants.SUMMARY_TEXT, getIntent().getExtras().getString(Constants.SUMMARY_TEXT));
+            intent.putExtra(Constants.SHAREABLE_URL, getIntent().getExtras().getString(Constants.SHAREABLE_URL));
+            startActivity(intent);
+        }
+
+        /*if(ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION_CODE);
         } else {
             AppController.getInstance().cameraPermissionGranted();
-        }
+        }*/
     }
 
-    @Override
+    /*@Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         boolean enableCamera = false;
         if(REQUEST_CAMERA_PERMISSION_CODE == requestCode) {
@@ -84,7 +95,7 @@ public class LandingPageActivity extends AbstractAppCompatActivity implements Bo
         } else {
             AppController.getInstance().cameraPermissionGranted();
         }
-    }
+    }*/
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

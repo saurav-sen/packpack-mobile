@@ -352,4 +352,306 @@ public final class HtmlUtil {
                         return null;
                 }
         }
+
+        private static final String NOTIFICATION_VIEWER_HTML_WITH_LOGO_WITH_OGIMAGE = "<html>\n" +
+                "\t<head>\n" +
+                "\t\t<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge,chrome=1\">\n" +
+                "\t\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\t\t\n" +
+                "\t\t<link rel=\"stylesheet\" href=\"w3.css\">\n" +
+                "\t\t<style type=\"text/css\">\n" +
+                "\t\t\timg {\n" +
+                "\t\t      width: auto;\n" +
+                "\t\t      height : auto;\n" +
+                "\t\t      max-height: 100%;\n" +
+                "\t\t      max-width: 100%;\n" +
+                "\t\t    }\n" +
+                "\t\t\t.no-decoration-hyperlink {\n" +
+                "\t\t\t  text-decoration: none;\n" +
+                "\t\t\t}\n" +
+                "\t\t\t\n" +
+                "\t\t\t.img-logo {\n" +
+                "\t\t\t   display: block;\n" +
+                "\t\t\t   margin-left: auto;\n" +
+                "\t\t\t   margin-right: auto;\n" +
+                "\t\t\t   max-width: 200px;\n" +
+                "\t\t\t   max-height: 200px;\n" +
+                "\t\t\t   height: auto;\n" +
+                "\t\t\t   width: auto;\n" +
+                "\t\t\t}\n" +
+                "\t\t\t.header-border{\n" +
+                "\t\t\t\tmargin: 3% 0;\n" +
+                "\t\t\t}\n" +
+                "\t\t\t.heading{\n" +
+                "\t\t\t  font-size: 18px;\n" +
+                "\t\t\t}\n" +
+                "\t\t\t.footer-squill{\n" +
+                "\t\t\tfloat:left;\n" +
+                "\t\t\tmargin: 2% 0;\n" +
+                "\t\t\t}\n" +
+                "\t\t\t.footer-img{\n" +
+                "\t\t\tfloat:right;\n" +
+                "\t\t\tmargin: 1% 0;\n" +
+                "\t\t\t}\n" +
+                "\t\t\t\n" +
+                "\t\t</style>\n" +
+                "\t</head>\t\n" +
+                "\t<body>\n<br /><br />" +
+                "\t    <div class=\"w3-container\">\n" +
+                "\t    \n" +
+                "\t\t\t<div class=\"w3-container w3-border-top w3-border-left w3-border-bottom w3-border-right\">\n" +
+                "\t\t\t\n" +
+                "\t\t\t    <img src=\"LOGOIMAGE\" class=\"img-logo w3-border-bottom\">\t\n" +
+                "\t\t\t\t\n" +
+                "\t\t\t\t<br />\n" +
+                "\t\t\t\t\n" +
+                "\t\t\t\t<header class=\"w3-container heading\">\t\t\t  \t\n" +
+                "\t\t\t\t  <b>OGTITLE\n" +
+                "\t\t\t\t</header>\n" +
+                "\t\t\t\t\n" +
+                "\t\t\t\t<a href=\"#\" class=\"no-decoration-hyperlink\">\n" +
+                "\t\t\t\t\t\t<img src=\"OGIMAGE\">\n" +
+                "\t\t\t\t\t</a>\n" +
+                "\t\t\t\t\n" +
+                "\t\t\t\t<div class=\"w3-container\">\n" +
+                "\t\t\t\t  <p>SUMMARYTEXT</p>\n" +
+                "\t\t\t\t  <a href=\"OGURL\">Read From Source</a>\n" +
+                "\t\t\t\t</div>\n" +
+                "\t\t\t\t<br />\n" +
+                "\t\t\t  </div>\n" +
+                "\t\t\t</div>\n" +
+                "\t\t\t<br />\n" +
+                "\t\t</div>\n" +
+                "\t\n" +
+                "\t  </body>\n" +
+                "</html>";
+
+        private static final String NOTIFICATION_VIEWER_HTML_WITH_LOGO_WITHOUT_OGIMAGE = "<html>\n" +
+                "\t<head>\n" +
+                "\t\t<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge,chrome=1\">\n" +
+                "\t\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\t\t\n" +
+                "\t\t<link rel=\"stylesheet\" href=\"w3.css\">\n" +
+                "\t\t<style type=\"text/css\">\n" +
+                "\t\t\timg {\n" +
+                "\t\t      width: auto;\n" +
+                "\t\t      height : auto;\n" +
+                "\t\t      max-height: 100%;\n" +
+                "\t\t      max-width: 100%;\n" +
+                "\t\t    }\n" +
+                "\t\t\t.no-decoration-hyperlink {\n" +
+                "\t\t\t  text-decoration: none;\n" +
+                "\t\t\t}\n" +
+                "\t\t\t\n" +
+                "\t\t\t.img-logo {\n" +
+                "\t\t\t   display: block;\n" +
+                "\t\t\t   margin-left: auto;\n" +
+                "\t\t\t   margin-right: auto;\n" +
+                "\t\t\t   max-width: 200px;\n" +
+                "\t\t\t   max-height: 200px;\n" +
+                "\t\t\t   height: auto;\n" +
+                "\t\t\t   width: auto;\n" +
+                "\t\t\t}\n" +
+                "\t\t\t.header-border{\n" +
+                "\t\t\t\tmargin: 3% 0;\n" +
+                "\t\t\t}\n" +
+                "\t\t\t.heading{\n" +
+                "\t\t\t  font-size: 18px;\n" +
+                "\t\t\t}\n" +
+                "\t\t\t.footer-squill{\n" +
+                "\t\t\tfloat:left;\n" +
+                "\t\t\tmargin: 2% 0;\n" +
+                "\t\t\t}\n" +
+                "\t\t\t.footer-img{\n" +
+                "\t\t\tfloat:right;\n" +
+                "\t\t\tmargin: 1% 0;\n" +
+                "\t\t\t}\n" +
+                "\t\t\t\n" +
+                "\t\t</style>\n" +
+                "\t</head>\t\n" +
+                "\t<body>\n<br /><br />" +
+                "\t    <div class=\"w3-container\">\n" +
+                "\t    \n" +
+                "\t\t\t<div class=\"w3-container w3-border-top w3-border-left w3-border-bottom w3-border-right\">\n" +
+                "\t\t\t\n" +
+                "\t\t\t    <img src=\"LOGOIMAGE\" class=\"img-logo w3-border-bottom\">\t\n" +
+                "\t\t\t\t\n" +
+                "\t\t\t\t<br />\n" +
+                "\t\t\t\t\n" +
+                "\t\t\t\t<header class=\"w3-container heading\">\t\t\t  \t\n" +
+                "\t\t\t\t  <b>OGTITLE\n" +
+                "\t\t\t\t</header>\n" +
+                "\t\t\t\t\n" +
+                "\t\t\t\t<div class=\"w3-container\">\n" +
+                "\t\t\t\t  <p>SUMMARYTEXT</p>\n" +
+                "\t\t\t\t  <a href=\"OGURL\">Read From Source</a>\n" +
+                "\t\t\t\t</div>\n" +
+                "\t\t\t\t<br />\n" +
+                "\t\t\t  </div>\n" +
+                "\t\t\t</div>\n" +
+                "\t\t\t<br />\n" +
+                "\t\t</div>\n" +
+                "\t\n" +
+                "\t  </body>\n" +
+                "</html>";
+
+        private static final String NOTIFICATION_VIEWER_HTML_WITHOUT_LOGO_WITH_OGIMAGE = "<html>\n" +
+                "\t<head>\n" +
+                "\t\t<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge,chrome=1\">\n" +
+                "\t\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\t\t\n" +
+                "\t\t<link rel=\"stylesheet\" href=\"w3.css\">\n" +
+                "\t\t<style type=\"text/css\">\n" +
+                "\t\t\timg {\n" +
+                "\t\t      width: auto;\n" +
+                "\t\t      height : auto;\n" +
+                "\t\t      max-height: 100%;\n" +
+                "\t\t      max-width: 100%;\n" +
+                "\t\t    }\n" +
+                "\t\t\t.no-decoration-hyperlink {\n" +
+                "\t\t\t  text-decoration: none;\n" +
+                "\t\t\t}\n" +
+                "\t\t\t\n" +
+                "\t\t\t.img-logo {\n" +
+                "\t\t\t   display: block;\n" +
+                "\t\t\t   margin-left: auto;\n" +
+                "\t\t\t   margin-right: auto;\n" +
+                "\t\t\t   max-width: 200px;\n" +
+                "\t\t\t   max-height: 200px;\n" +
+                "\t\t\t   height: auto;\n" +
+                "\t\t\t   width: auto;\n" +
+                "\t\t\t}\n" +
+                "\t\t\t.header-border{\n" +
+                "\t\t\t\tmargin: 3% 0;\n" +
+                "\t\t\t}\n" +
+                "\t\t\t.heading{\n" +
+                "\t\t\t  font-size: 18px;\n" +
+                "\t\t\t}\n" +
+                "\t\t\t.footer-squill{\n" +
+                "\t\t\tfloat:left;\n" +
+                "\t\t\tmargin: 2% 0;\n" +
+                "\t\t\t}\n" +
+                "\t\t\t.footer-img{\n" +
+                "\t\t\tfloat:right;\n" +
+                "\t\t\tmargin: 1% 0;\n" +
+                "\t\t\t}\n" +
+                "\t\t\t\n" +
+                "\t\t</style>\n" +
+                "\t</head>\t\n" +
+                "\t<body>\n<br /><br />" +
+                "\t    <div class=\"w3-container\">\n" +
+                "\t    \n" +
+                "\t\t\t<div class=\"w3-container w3-border-top w3-border-left w3-border-bottom w3-border-right\">\n" +
+                "\t\t\t\t\n" +
+                "\t\t\t\t<header class=\"w3-container heading\">\t\t\t  \t\n" +
+                "\t\t\t\t  <b>OGTITLE\n" +
+                "\t\t\t\t</header>\n" +
+                "\t\t\t\t\n" +
+                "\t\t\t\t<a href=\"#\" class=\"no-decoration-hyperlink\">\n" +
+                "\t\t\t\t\t\t<img src=\"OGIMAGE\">\n" +
+                "\t\t\t\t\t</a>\n" +
+                "\t\t\t\t\n" +
+                "\t\t\t\t<div class=\"w3-container\">\n" +
+                "\t\t\t\t  <p>SUMMARYTEXT</p>\n" +
+                "\t\t\t\t  <a href=\"OGURL\">Read From Source</a>\n" +
+                "\t\t\t\t</div>\n" +
+                "\t\t\t\t<br />\n" +
+                "\t\t\t  </div>\n" +
+                "\t\t\t</div>\n" +
+                "\t\t\t<br />\n" +
+                "\t\t</div>\n" +
+                "\t\n" +
+                "\t  </body>\n" +
+                "</html>";
+
+        private static final String NOTIFICATION_VIEWER_HTML_WITHOUT_LOGO_WITHOUT_OGIMAGE = "<html>\n" +
+                "\t<head>\n" +
+                "\t\t<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge,chrome=1\">\n" +
+                "\t\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\t\t\n" +
+                "\t\t<link rel=\"stylesheet\" href=\"w3.css\">\n" +
+                "\t\t<style type=\"text/css\">\n" +
+                "\t\t\timg {\n" +
+                "\t\t      width: auto;\n" +
+                "\t\t      height : auto;\n" +
+                "\t\t      max-height: 100%;\n" +
+                "\t\t      max-width: 100%;\n" +
+                "\t\t    }\n" +
+                "\t\t\t.no-decoration-hyperlink {\n" +
+                "\t\t\t  text-decoration: none;\n" +
+                "\t\t\t}\n" +
+                "\t\t\t\n" +
+                "\t\t\t.img-logo {\n" +
+                "\t\t\t   display: block;\n" +
+                "\t\t\t   margin-left: auto;\n" +
+                "\t\t\t   margin-right: auto;\n" +
+                "\t\t\t   max-width: 200px;\n" +
+                "\t\t\t   max-height: 200px;\n" +
+                "\t\t\t   height: auto;\n" +
+                "\t\t\t   width: auto;\n" +
+                "\t\t\t}\n" +
+                "\t\t\t.header-border{\n" +
+                "\t\t\t\tmargin: 3% 0;\n" +
+                "\t\t\t}\n" +
+                "\t\t\t.heading{\n" +
+                "\t\t\t  font-size: 18px;\n" +
+                "\t\t\t}\n" +
+                "\t\t\t.footer-squill{\n" +
+                "\t\t\tfloat:left;\n" +
+                "\t\t\tmargin: 2% 0;\n" +
+                "\t\t\t}\n" +
+                "\t\t\t.footer-img{\n" +
+                "\t\t\tfloat:right;\n" +
+                "\t\t\tmargin: 1% 0;\n" +
+                "\t\t\t}\n" +
+                "\t\t\t\n" +
+                "\t\t</style>\n" +
+                "\t</head>\t\n" +
+                "\t<body>\n<br /><br />" +
+                "\t    <div class=\"w3-container\">\n" +
+                "\t    \n" +
+                "\t\t\t<div class=\"w3-container w3-border-top w3-border-left w3-border-bottom w3-border-right\">\n" +
+                "\t\t\t\t\n" +
+                "\t\t\t\t<header class=\"w3-container heading\">\t\t\t  \t\n" +
+                "\t\t\t\t  <b>OGTITLE\n" +
+                "\t\t\t\t</header>\n" +
+                "\t\t\t\t\n" +
+                "\t\t\t\t<div class=\"w3-container\">\n" +
+                "\t\t\t\t  <p>SUMMARYTEXT</p>\n" +
+                "\t\t\t\t  <a href=\"OGURL\">Read From Source</a>\n" +
+                "\t\t\t\t</div>\n" +
+                "\t\t\t\t<br />\n" +
+                "\t\t\t  </div>\n" +
+                "\t\t\t</div>\n" +
+                "\t\t\t<br />\n" +
+                "\t\t</div>\n" +
+                "\t\n" +
+                "\t  </body>\n" +
+                "</html>";
+
+        public static String generateNotificationViewerHtml(String ogTitle, String summaryText, String ogUrl, String ogImage, String logoImage) {
+                try {
+                        if(logoImage != null) {
+                                if(ogImage != null) {
+                                        return NOTIFICATION_VIEWER_HTML_WITH_LOGO_WITH_OGIMAGE.replaceAll(Pattern.quote("OGTITLE"), Matcher.quoteReplacement(ogTitle.replaceAll(" +", " ")
+                                                .replaceAll("\\t+", " "))).replaceAll(Pattern.quote("SUMMARYTEXT"), Matcher.quoteReplacement(summaryText.replaceAll(" +", " ")
+                                                .replaceAll("\\t+", " "))).replaceAll(Pattern.quote("OGIMAGE"), Matcher.quoteReplacement(ogImage))
+                                                .replaceAll(Pattern.quote("OGURL"), Matcher.quoteReplacement(ogUrl))
+                                                .replaceAll(Pattern.quote("LOGOIMAGE"), Matcher.quoteReplacement(logoImage));
+                                }
+                                return NOTIFICATION_VIEWER_HTML_WITH_LOGO_WITHOUT_OGIMAGE.replaceAll(Pattern.quote("OGTITLE"), Matcher.quoteReplacement(ogTitle.replaceAll(" +", " ")
+                                        .replaceAll("\\t+", " "))).replaceAll(Pattern.quote("SUMMARYTEXT"), Matcher.quoteReplacement(summaryText.replaceAll(" +", " ")
+                                        .replaceAll("\\t+", " "))).replaceAll(Pattern.quote("OGURL"), Matcher.quoteReplacement(ogUrl))
+                                        .replaceAll(Pattern.quote("LOGOIMAGE"), Matcher.quoteReplacement(logoImage));
+                        }
+                        if(ogImage != null) {
+                                return NOTIFICATION_VIEWER_HTML_WITHOUT_LOGO_WITH_OGIMAGE.replaceAll(Pattern.quote("OGTITLE"), Matcher.quoteReplacement(ogTitle.replaceAll(" +", " ")
+                                        .replaceAll("\\t+", " "))).replaceAll(Pattern.quote("SUMMARYTEXT"), Matcher.quoteReplacement(summaryText.replaceAll(" +", " ")
+                                        .replaceAll("\\t+", " "))).replaceAll(Pattern.quote("OGIMAGE"), Matcher.quoteReplacement(ogImage))
+                                        .replaceAll(Pattern.quote("OGURL"), Matcher.quoteReplacement(ogUrl));
+                        }
+                        return NOTIFICATION_VIEWER_HTML_WITHOUT_LOGO_WITHOUT_OGIMAGE.replaceAll(Pattern.quote("OGTITLE"), Matcher.quoteReplacement(ogTitle.replaceAll(" +", " ")
+                                .replaceAll("\\t+", " "))).replaceAll(Pattern.quote("SUMMARYTEXT"), Matcher.quoteReplacement(summaryText.replaceAll(" +", " ")
+                                .replaceAll("\\t+", " "))).replaceAll(Pattern.quote("OGURL"), Matcher.quoteReplacement(ogUrl));
+                } catch (Exception e) {
+                        Log.d(LOG_TAG, e.getMessage(), e);
+                        return null;
+                }
+        }
 }

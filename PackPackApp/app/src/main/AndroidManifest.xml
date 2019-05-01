@@ -6,7 +6,7 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <!--uses-permission android:name="android.permission.CAMERA" /-->
+    <!-- uses-permission android:name="android.permission.CAMERA" / -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -26,9 +26,11 @@
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/white" />
-        <!--<meta-data
+        <!--
+            <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
-            android:value="@string/default_notification_channel_id"/>-->
+            android:value="@string/default_notification_channel_id"/>
+        -->
 
         <activity
             android:name=".activity.SplashActivity"
@@ -89,10 +91,12 @@
             android:name=".service.SyncService"
             android:enabled="true"
             android:exported="false" />
-        <!--<service
+        <!--
+            <service
             android:name=".service.SquillNTPService"
             android:enabled="true"
-            android:exported="true" />-->
+            android:exported="true" />
+        -->
         <service
             android:name=".service.AddBookmarkService"
             android:enabled="true"
@@ -167,6 +171,10 @@
             android:label="@string/title_activity_generic_topic_list"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".activity.LandingPageActivity" />
+        <activity
+            android:name=".activity.NotificationViewerActivity"
+            android:label="@string/title_activity_generic_topic_list"
+            android:theme="@style/AppTheme.NoActionBar"/>
     </application>
 
 </manifest>
