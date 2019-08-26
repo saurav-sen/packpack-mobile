@@ -8,6 +8,7 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
+//import com.flurry.android.FlurryAgent;
 import com.pack.pack.application.cz.fhucho.android.util.SimpleDiskCacheInitializer;
 import com.pack.pack.application.data.cache.HttpCache;
 import com.pack.pack.application.data.cache.HttpCacheFactory;
@@ -176,6 +177,10 @@ public class AppController extends Application {
         androidDefaultUEH = Thread.getDefaultUncaughtExceptionHandler();
         customUEH = new SquillUncaughtExceptionHandler(androidDefaultUEH, getApplicationContext());
         Thread.setDefaultUncaughtExceptionHandler(customUEH);
+
+        /*new FlurryAgent.Builder()
+                .withLogEnabled(true)
+                .build(this, "854NFQXNZJCYZ9PBYJBJ");*/
     }
 
     public void setLoadStatus(JRssFeedType feedType, Boolean status) {

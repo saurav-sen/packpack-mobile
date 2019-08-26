@@ -57,6 +57,7 @@ public class LandingPageActivity extends AbstractAppCompatActivity implements Bo
 
         FirebaseMessaging.getInstance().subscribeToTopic(Constants.GLOBAL_NOTIFICATION_TOPIC);
         //FirebaseMessaging.getInstance().subscribeToTopic(Constants.ALL_DEVICES_NOTIFICATION_TOPIC);
+        //FirebaseMessaging.getInstance().subscribeToTopic("squillWorld");
 
         BottomNavigationView navigation = findViewById(R.id.navigation);
         BottomNavigationViewHelper.disableShiftMode(navigation);

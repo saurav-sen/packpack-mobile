@@ -97,6 +97,7 @@ public final class NotificationUtil {
         contentView.setImageViewResource(R.id.notification_image, R.drawable.squill_notification);
         contentView.setTextViewText(R.id.notification_title, ogTitle);
 
+        boolean sound = true;
         //Intent intent = new Intent(context, NotificationViewerActivity.class);
         Intent intent = new Intent(context, IntroMainActivity.class);
         intent.putExtra(Constants.MSG_TYPE, Constants.NOTIFICATION_DATA_MSG_TYPE);
@@ -104,6 +105,12 @@ public final class NotificationUtil {
         intent.putExtra(Constants.OG_IMAGE, ogImage);
         intent.putExtra(Constants.OG_URL, ogUrl);
         intent.putExtra(Constants.SUMMARY_TEXT, summary);
+        if(summary != null && !summary.trim().isEmpty()) {
+            intent.setAction(String.valueOf(System.currentTimeMillis()));
+        } else {
+            shareableUrl = ogUrl;
+            sound = false;
+        }
         intent.putExtra(Constants.SHAREABLE_URL, shareableUrl);
 
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_ONE_SHOT);
@@ -131,8 +138,10 @@ public final class NotificationUtil {
                             .setContentIntent(pendingIntent)
                             .setShowWhen(true)
                             .setAutoCancel(true)
-                            .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                             .setPriority(NotificationCompat.PRIORITY_MAX);
+            if(sound) {
+                notificationBuilder.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
+            }
         } else {
             notificationBuilder =
                     new NotificationCompat.Builder(context, "squill_news_01")
@@ -146,8 +155,10 @@ public final class NotificationUtil {
                             .setShowWhen(true)
                             .setAutoCancel(true)
                             .setContentIntent(pendingIntent)
-                            .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                             .setPriority(NotificationCompat.PRIORITY_MAX);
+            if(sound) {
+                notificationBuilder.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
+            }
         }
         notificationManager.notify(APP_NAME, NOTIFICATION_ID, notificationBuilder.build());
     }
@@ -158,6 +169,7 @@ public final class NotificationUtil {
         }
 
         Intent intent = new Intent(context, SplashActivity.class);
+        intent.setAction(String.valueOf(System.currentTimeMillis()));
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_ONE_SHOT);
 
         final int NOTIFICATION_ID = new Random().nextInt();//Math.abs(feedMsg.getKey())%10000;

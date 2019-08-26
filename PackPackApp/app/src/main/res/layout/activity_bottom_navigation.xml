@@ -22,6 +22,7 @@
         android:background="@color/white"
         app:itemIconTint="@drawable/bottom_nav_color"
         app:itemTextColor="@drawable/bottom_nav_color"
-        app:menu="@menu/navigation" />
+        app:menu="@menu/navigation"
+        app:labelVisibilityMode="labeled"/>
 
 </android.support.design.widget.CoordinatorLayout>

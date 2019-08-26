@@ -334,22 +334,17 @@ public class DownloadImageTask extends AbstractNetworkTask<String, Void, Bitmap>
             String url = getInputObject();
             bitmap = AppController.getInstance().getLruBitmapCache().getBitmap(lookupURL(url));
             if(bitmap != null) {
-                int ht = bitmap.getHeight();
+                /*int ht = bitmap.getHeight();
                 int wd = bitmap.getWidth();
                 if(ht == imageHeight && wd == imageWidth) {
                     return bitmap;
                 }
                 ImageDimension dimension = calculateResizeDimensions(bitmap);
                 if(ht != dimension.newHeight || wd != dimension.newWidth) {
-                    /*if (imageWidth > 0 && imageHeight > 0) {
-                        bitmap = Bitmap.createScaledBitmap(bitmap, imageWidth, imageHeight, true);
-                    } else {
-                        bitmap = Bitmap.createScaledBitmap(bitmap, 900, 700, true);
-                    }*/
                     bitmap = Bitmap.createScaledBitmap(bitmap, dimension.newWidth, dimension.newHeight, true);
                     String key = lookupURL(url);
                     AppController.getInstance().getLruBitmapCache().putBitmap(key, bitmap);
-                }
+                }*/
                 return bitmap;
             }
             stream = (InputStream) api.execute();

@@ -72,6 +72,8 @@ public class NotificationViewerActivity extends AppCompatActivity {
         if (ogTitle != null && !ogTitle.trim().isEmpty() && summaryText != null && !summaryText.trim().isEmpty()) {
             String html = HtmlUtil.generateNotificationViewerHtml(ogTitle, summaryText, ogUrl, ogImage, LogoMap.get(ogUrl));
             notification_fullscreen_view.loadDataWithBaseURL("file:///android_asset/", html, "text/html", "UTF-8", null);
+        } else if (ogUrl != null && !ogUrl.trim().isEmpty()) {
+            notification_fullscreen_view.loadUrl(ogUrl);
         }
     }
 
